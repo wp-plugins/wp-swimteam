@@ -1,0 +1,23 @@
+/**
+ * Need to overload the background color and image for the active tab
+ * widget since the WordPress 2.7 Dashboard has a non-white background.
+ */
+.tabs {
+	background: #f5fcfd url(../images/tabs_bg.gif) repeat-x scroll center bottom;
+}
+
+.tabs li:hover a {
+	background-color: #f5fcfd;
+}
+
+.tabs li {
+    float: left;
+    background: transparent url(../images/tab_left_f5fcfd.gif) no-repeat left top;
+    margin: 0;
+    padding: 0 0 0 6px;
+    border-bottom: 1px solid #666;
+}
+
+.tabs a {
+    background:transparent url(../images/tab_right_f5fcfd.gif) no-repeat scroll right top;
+}

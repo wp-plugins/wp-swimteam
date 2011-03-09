@@ -1,0 +1,44 @@
+To-Do List:
+
+1)  Add Swimmer Ids - need to assign unique numbers to swimmers
+    which are used during the actual meets for identification on
+    heat sheets, etc.  Not all teams use simple numbers or USA
+    Swimming type numbers.
+
+    Status:  Complete.
+
+2)  Import SDIF results - need to be able to import the results
+    of a swim meet so swimmers can look at their historical times.
+
+    Status:  Open
+
+3)  Manage volunteers - need to define and manage volunteer jobs.
+
+    Status:  Open
+
+4)  Support swimmers as end users - older kids want to register
+    with the site and access their own data.  Right now the only
+    way to support that is to assign them as a secondary contact
+    for their swimmer record.
+
+    Status:  Complete
+
+5)  Manage meet events.  Need to define a set of default meet events
+    which can be used to seed a meet with events.  Once seeded, the
+    meet events can be changed, reordered, edited, etc.
+
+    Staus:  Complete
+
+6)  Opt In/Opt Out for entire meets or selected events.  Need the
+    ability for swimmers and/or parents to indicate whether or not
+    a swimmer is participating (opt in) or not participating (opt
+    out) in swim meet or particular events.  This functionality is
+    also known as a Scratch Sheet or Scratch List.
+
+    Status:  Under development.
+
+7)  Heat Sheet management - depends on opt-in/opt-out, allows coach
+    and/or someone else to generate a heat sheet and rearrange the 
+    swimmers to the desired event/heat/lane assignments.
+
+    Status:  Open

@@ -1,0 +1,128 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE book PUBLIC "-//OASIS//DTD DocBook XML V4.5//EN"
+"http://www.oasis-open.org/docbook/xml/4.5/docbookx.dtd">
+<book>
+  <bookinfo>
+    <title>wp-SwimTeam - a Wordpress Plugin for Swim Team Managment</title>
+
+    <author>
+      <firstname>Mike</firstname>
+
+      <surname>Walsh</surname>
+
+      <affiliation>
+        <orgname>www.wp-swimteam.org</orgname>
+      </affiliation>
+    </author>
+
+    <pubdate>4/29/2010</pubdate>
+  </bookinfo>
+
+  <chapter>
+    <title>Background</title>
+
+    <section>
+      <title>MacGregor Downs MacDolphins Swim Team</title>
+
+      <para>I have three children who swim for the MacDolphins and my wife has
+      been an active volunteer for many years. At the end of the 2007 summer
+      season my wife was approached to chair the swim team for the 2008
+      season. </para>
+
+      <para>She agreed, not knowing what she was getting into!Like many summer
+      swim teams, the MacDolphins were run by an ad-hoc group of volunteers.
+      The leadership positions turned over frequently and just about
+      everything was done by hand. Registration, volunteers, rosters, heat
+      sheets - just everything the swim team did was on paper or existed on
+      someone's computer in Word or Excel. Each season the person in charge
+      litterally had to start all over.</para>
+
+      <para>My wife knew this going when she took on the position but didn't
+      know how bad it was. When she took the job she asked me if I would help
+      her computerize the MacDolphins. I said "sure, how hard can it be?".
+      Little did I know ....</para>
+    </section>
+
+    <section>
+      <title>Computerizing the MacDolphins</title>
+
+      <para>In late 2007 I began the process of computerizing the MacDolphins.
+      I was presented with some basic requirements so I had a rough idea of
+      what team wanted and needed. The early requirements consisted of
+      these:</para>
+
+      <itemizedlist>
+        <listitem>
+          <para>Computerized Registration</para>
+
+          <para>No more paper forms with hard to read handwriting. We had
+          swimmers with wrong birthdays, misspelled names, all sorts of data
+          entry errors simply because people didn't write legibly.</para>
+        </listitem>
+
+        <listitem>
+          <para>Web Presence</para>
+
+          <para>The MacDolphins wanted a web site. While the MacDolphins are
+          part of <link linkend="???">MacGregor Downs Country Club</link>, the
+          club's web site didn't feature the swim team prominently and getting
+          information posted on it was a tedious process.</para>
+        </listitem>
+
+        <listitem>
+          <para>E-Mail Distribution List</para>
+
+          <para>The swim team did not have a mechanism to communicate quickly
+          or effectively to parents.</para>
+        </listitem>
+
+        <listitem>
+          <para>Swim Times</para>
+
+          <para>Because of the ad-hoc nature the team was being run, there
+          were no records of swim times. Parents and swimmers wanted their
+          times and the coaches were seeding the meets based on gut feel and
+          not real data. Times had been kept in Excel in past years but
+          somewhere they got lost and there was no ownership of the
+          problem.</para>
+        </listitem>
+      </itemizedlist>
+
+      <para>With these basic requirements I set off in search of solutions.
+      Before I got involved, the swim team had started looking at Hy-tek Team
+      Manager since that is what was used for our local CIty Invitational
+      Meet. I did some reading on Team Manager, concluded it would do what we
+      needed from a time and seeding perspective, and began looking at the
+      other requirements.</para>
+
+      <para>Like many swim teams, we didn't have a large budget to work with
+      so I was looking for free or low cost solutions. There are a host of
+      free web offerings which all could help but I didn't find anything that
+      really solved what we wanted solved. Doodle and MySignUp.com offered
+      solutions for volunteer sign up. Yahoo Groups and Google Groups offered
+      e-mail distribution. There are a host of free web site offerings and
+      blog services. All of the sports team web site solutions I found were
+      focused on stick and ball sports and not well suited to swim team. The
+      only thing that I found which looked like a fit was Hy-tek's Active
+      Network but the cost was more than we were willing to take on.</para>
+
+      <para>We didn't want the MacDolphins scattered across half a dozen web
+      sites each requring different registration and login requirements I
+      started to think that building our own web site was the best solution. I
+      had used Wordpress for several other small projects so I was familiar
+      with it and knew that it could do a lot of what we wanted and the plugin
+      system would probably be sufficient to build what I couldn't
+      find.</para>
+
+      <para>Very quickly I had a domain registered and a web site set up to
+      show the leadership committee what could be done. The idea of everything
+      being in one central location was very appealing so with the leardership
+      committee's blessing, I started to build what has become the wp-SwimTeam
+      Wordpress plugin.</para>
+
+      <para>There wasn't a lot of time between when I started and swim team
+      registration so I focused on getting the data model correct to support
+      the registration process.</para>
+    </section>
+  </chapter>
+</book>
