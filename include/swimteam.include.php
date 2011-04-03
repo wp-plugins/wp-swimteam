@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 533 $
+ * @version $Revision: 552 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -179,6 +179,7 @@ define("WPST_DEFAULT_REGISTRATION_SYSTEM", WPST_CLOSED) ;
 define("WPST_DEFAULT_SWIMMER_LABEL_FORMAT", WPST_SIMPLE_NUMERIC) ;
 define("WPST_DEFAULT_SWIMMER_LABEL_FORMAT_CODE", "%-05s") ;
 define("WPST_DEFAULT_JOB_SIGN_UP", WPST_USER) ;
+define("WPST_DEFAULT_JOB_CREDITS", 5) ;
 define("WPST_DEFAULT_GEOGRAPHY", WPST_INTERNATIONAL) ;
 define("WPST_DEFAULT_POSTAL_CODE_LABEL", "Postal Code") ;
 define("WPST_DEFAULT_STATE_OR_PROVINCE_LABEL", "State or Province") ;
@@ -189,12 +190,14 @@ define("WPST_DEFAULT_OPT_OUT_LABEL", "Scratch") ;
 define("WPST_DEFAULT_OPT_IN_OPT_OUT_EMAIL_FORMAT", WPST_HTML) ;
 define("WPST_DEFAULT_OPT_IN_OPT_OUT_MODE", WPST_BOTH) ;
 define("WPST_DEFAULT_GOOGLE_API_KEY", "Google API Key") ;
+define("WPST_DEFAULT_GDL_ROWS_TO_DISPLAY", 20) ;
 define("WPST_DEFAULT_USER_OPTION_COUNT", 5) ;
 define("WPST_DEFAULT_USER_OPTION", WPST_DISABLED) ;
 define("WPST_DEFAULT_USER_OPTION_LABEL", "Optional Field #") ;
 define("WPST_DEFAULT_SWIMMER_OPTION_COUNT", 5) ;
 define("WPST_DEFAULT_SWIMMER_OPTION", WPST_DISABLED) ;
 define("WPST_DEFAULT_SWIMMER_OPTION_LABEL", "Optional Field #") ;
+define("WPST_DEFAULT_REG_PREFIX_LABEL", WPST_NULL_STRING) ;
 define("WPST_DEFAULT_REG_FEE_LABEL", "Registation Fee") ;
 define("WPST_DEFAULT_REG_FEE_CURRENCY_LABEL", "$") ;
 define("WPST_DEFAULT_REG_FEE_AMOUNT", "75") ;
@@ -213,18 +216,21 @@ define("WPST_OPTION_GENDER_LABEL_MALE", WPST_OPTION_PREFIX . "gender_label_male"
 define("WPST_OPTION_GENDER_LABEL_FEMALE", WPST_OPTION_PREFIX . "gender_label_female") ;
 define("WPST_OPTION_MEASUREMENT_UNITS", WPST_OPTION_PREFIX . "measurement_units") ;
 define("WPST_OPTION_JOB_SIGN_UP", WPST_OPTION_PREFIX . "job_sign_up") ;
+define("WPST_OPTION_JOB_CREDITS", WPST_OPTION_PREFIX . "job_credits") ;
 define("WPST_OPTION_AUTO_REGISTER", WPST_OPTION_PREFIX . "auto_register") ;
 define("WPST_OPTION_REGISTRATION_SYSTEM", WPST_OPTION_PREFIX . "registration_system") ;
 define("WPST_OPTION_GEOGRAPHY", WPST_OPTION_PREFIX . "geography") ;
 define("WPST_OPTION_SWIMMER_LABEL_FORMAT", WPST_OPTION_PREFIX . "swimmer_label_format") ;
 define("WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE", WPST_OPTION_PREFIX . "swimmer_label_format_code") ;
 define("WPST_OPTION_GOOGLE_API_KEY", WPST_OPTION_PREFIX . "google_api_key") ;
+define("WPST_OPTION_GDL_ROWS_TO_DISPLAY", WPST_OPTION_PREFIX . "gdl_rows_to_display") ;
 define("WPST_OPTION_OPT_IN_LABEL", WPST_OPTION_PREFIX . "opt_in_label") ;
 define("WPST_OPTION_OPT_OUT_LABEL", WPST_OPTION_PREFIX . "opt_out_label") ;
 define("WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS", WPST_OPTION_PREFIX . "opt_in_opt_out_email_address") ;
 define("WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_FORMAT", WPST_OPTION_PREFIX . "opt_in_opt_out_email_format") ;
 define("WPST_OPTION_OPT_IN_OPT_OUT_EVENTS", WPST_OPTION_PREFIX . "opt_in_opt_out_events") ;
 define("WPST_OPTION_OPT_IN_OPT_OUT_MODE", WPST_OPTION_PREFIX . "opt_in_opt_out_mode") ;
+define("WPST_OPTION_REG_PREFIX_LABEL", WPST_OPTION_PREFIX . "reg_prefix_label") ;
 define("WPST_OPTION_REG_FEE_LABEL", WPST_OPTION_PREFIX . "reg_fee_label") ;
 define("WPST_OPTION_REG_FEE_CURRENCY_LABEL", WPST_OPTION_PREFIX . "reg_fee_currency_label") ;
 define("WPST_OPTION_REG_FEE_AMOUNT", WPST_OPTION_PREFIX . "reg_fee_amount") ;

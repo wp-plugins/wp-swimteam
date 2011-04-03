@@ -2484,7 +2484,7 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
                         if ($ja->getUserId() != WPST_NULL_ID)
                         {
                             $user->loadUserProfileByUserId($ja->getUserId()) ;
-                            $row[] = $user->getUserrimaryPhone() .
+                            $row[] = $user->getUserPrimaryPhone() .
                                 " / " .  $user->getSecondaryPhone() ;
                         }
                         else

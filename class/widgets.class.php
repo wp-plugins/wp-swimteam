@@ -246,7 +246,7 @@ class SwimTeamGUIBackHomeButtons extends SPANtag
  */
 class SwimTeamGUIDataList extends DefaultGUIDataList
 {
-	// change the # of rows to display to 20 from 10
+	// change the # of rows to display to 15 from 10
 	var $_default_rows_per_page = 15 ;
 
     /**
@@ -283,6 +283,11 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
 
         //  Alternate row colors
         $this->set_alternating_row_colors(true) ;
+
+        //  Set the number of rows to display based on the configuration
+        $rows_to_display = get_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY) ;
+        $this->_default_rows_per_page = ($rows_to_display !== false) ?
+            $rows_to_display : WPST_DEFAULT_GDL_ROWS_TO_DISPLAY ;
     }
 
     /**

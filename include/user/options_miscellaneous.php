@@ -66,7 +66,7 @@ class SwimTeamMiscellaneousOptionsTabContainer extends SwimTeamTabContainer
         //  Start building the form
 
         $form = new WpSwimTeamMiscellaneousOptionsForm("Miscellaneous Options",
-            $_SERVER['HTTP_REFERER'], 600) ;
+            $_SERVER['HTTP_REFERER'], '600px') ;
 
         //  Create the form processor
 

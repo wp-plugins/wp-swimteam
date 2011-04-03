@@ -1110,6 +1110,19 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
     ) ;
 
     /**
+     * Disable all actions - need to do this when user's profile
+     * hasn't been completed to prevent swimmer additions which
+     * would end up without address and contact information.
+     *
+     */
+    function disableAllActions()
+    {
+        $this->__normal_actions = array() ;
+        $this->__empty_actions = array() ;
+    }
+
+
+    /**
      * The constructor
      *
      * @param string - the title of the data list
@@ -1473,7 +1486,7 @@ class SwimTeamSwimmerProfileInfoTable extends SwimTeamInfoTable
 
             $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-            if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+            if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
             $ometa = new SwimTeamOptionMeta() ;
             $ometa->setSwimmerId($this->getId()) ;

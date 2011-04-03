@@ -91,6 +91,11 @@ class SwimTeamOptions extends SwimTeamDBI
     var $__job_sign_up ;
 
     /**
+     * job credits property
+     */
+    var $__job_credits ;
+
+    /**
      * auto-register property
      */
     var $__auto_register ;
@@ -99,6 +104,11 @@ class SwimTeamOptions extends SwimTeamDBI
      * registration system property
      */
     var $__registration_system ;
+
+    /**
+     * GDL rows to display property
+     */
+    var $__gdl_rows_to_display ;
 
     /**
      * google maps api key property
@@ -169,6 +179,11 @@ class SwimTeamOptions extends SwimTeamDBI
      * opt in opt out events property
      */
     var $__opt_in_opt_out_events ;
+
+    /**
+     * registration prefix label property
+     */
+    var $__registration_prefix_label ;
 
     /**
      * registration fee label property
@@ -526,6 +541,26 @@ class SwimTeamOptions extends SwimTeamDBI
     }
 
     /**
+     * Get the job credits
+     *
+     * @return - integer - job credits
+     */
+    function getJobCredits()
+    {
+        return ($this->__job_credits) ;
+    }
+
+    /**
+     * Set the job sign up state
+     *
+     * @param - integer - job credits
+     */
+    function setJobCredits($credits)
+    {
+        $this->__job_credits = $credits ;
+    }
+
+    /**
      * Get the auto-register state
      *
      * @return - string - auto-register state
@@ -563,6 +598,26 @@ class SwimTeamOptions extends SwimTeamDBI
     function setRegistrationSystem($state)
     {
         $this->__registration_system = $state ;
+    }
+
+    /**
+     * Get the GDL rows to display
+     *
+     * @return - string - GDL rows to display
+     */
+    function getGDLRowsToDisplay()
+    {
+        return ($this->__gdl_rows_to_display) ;
+    }
+
+    /**
+     * Set the GDL rows to display
+     *
+     * @param - string - GDL rows to display
+     */
+    function setGDLRowsToDisplay($rows)
+    {
+        $this->__gdl_rows_to_display = $rows ;
     }
 
     /**
@@ -779,6 +834,26 @@ class SwimTeamOptions extends SwimTeamDBI
     }
 
     /**
+     * Set the registration prefix label
+     *
+     * @param - string - registration prefix label
+     */
+    function setRegistrationPrefixLabel($label)
+    {
+        $this->__registration_prefix_label = $label ;
+    }
+
+    /**
+     * Get the registration prefix out label
+     *
+     * @return - string - registration prefix label
+     */
+    function getRegistrationPrefixLabel()
+    {
+        return ($this->__registration_prefix_label) ;
+    }
+
+    /**
      * Set the registration fee label
      *
      * @param - string - registration fee label
@@ -972,7 +1047,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_GENDER) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setGender($option) ;
         }
@@ -986,7 +1061,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_MIN_AGE) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setMinAge($option) ;
         }
@@ -1001,7 +1076,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_MAX_AGE) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setMaxAge($option) ;
         }
@@ -1015,7 +1090,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_AGE_CUTOFF_DAY) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setAgeCutoffDay($option) ;
         }
@@ -1029,7 +1104,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_AGE_CUTOFF_MONTH) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setAgeCutoffMonth($option) ;
         }
@@ -1043,7 +1118,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_GENDER_LABEL_MALE) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setGenderLabelMale($option) ;
         }
@@ -1057,7 +1132,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_GENDER_LABEL_FEMALE) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setGenderLabelFemale($option) ;
         }
@@ -1071,7 +1146,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setSwimmerLabelFormat($option) ;
         }
@@ -1085,7 +1160,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setSwimmerLabelFormatCode($option) ;
         }
@@ -1099,7 +1174,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_JOB_SIGN_UP) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setJobSignUp($option) ;
         }
@@ -1109,11 +1184,25 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_JOB_SIGN_UP, WPST_DEFAULT_JOB_SIGN_UP) ;
         }
 
+        //  job credits
+        $option = get_option(WPST_OPTION_JOB_CREDITS) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setJobCredits($option) ;
+        }
+        else
+        {
+            $this->setJobCredits(WPST_DEFAULT_JOB_CREDITS) ;
+            update_option(WPST_OPTION_JOB_CREDITS, WPST_DEFAULT_JOB_CREDITS) ;
+        }
+
         //  auto-register
         $option = get_option(WPST_OPTION_AUTO_REGISTER) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setAutoRegister($option) ;
         }
@@ -1127,7 +1216,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_REGISTRATION_SYSTEM) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationSystem($option) ;
         }
@@ -1137,11 +1226,25 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_REGISTRATION_SYSTEM, WPST_DEFAULT_REGISTRATION_SYSTEM) ;
         }
 
+        //  GDL Rows to Display
+        $option = get_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setGDLRowsToDisplay($option) ;
+        }
+        else
+        {
+            $this->setGoogleAPIKey(WPST_DEFAULT_GDL_ROWS_TO_DISPLAY) ;
+            update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, WPST_DEFAULT_GDL_ROWS_TO_DISPLAY) ;
+        }
+
         //  Google API Key
         $option = get_option(WPST_OPTION_GOOGLE_API_KEY) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setGoogleAPIKey($option) ;
         }
@@ -1155,7 +1258,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_LOGIN_REDIRECT) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setLoginRedirectAction($option) ;
         }
@@ -1169,7 +1272,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_GEOGRAPHY) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setGeography($option) ;
         }
@@ -1183,7 +1286,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setPostalCodeLabel($option) ;
         }
@@ -1197,7 +1300,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setPrimaryPhoneLabel($option) ;
         }
@@ -1211,7 +1314,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setSecondaryPhoneLabel($option) ;
         }
@@ -1225,7 +1328,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setStateOrProvinceLabel($option) ;
         }
@@ -1235,11 +1338,25 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL, WPST_DEFAULT_STATE_OR_PROVINCE_LABEL) ;
         }
 
+        //  Registration Prefix Label
+        $option = get_option(WPST_OPTION_REG_PREFIX_LABEL) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setRegistrationPrefixLabel($option) ;
+        }
+        else
+        {
+            $this->setRegistrationPrefixLabel(WPST_DEFAULT_REG_PREFIX_LABEL) ;
+            update_option(WPST_OPTION_REG_PREFIX_LABEL, WPST_DEFAULT_REG_PREFIX_LABEL) ;
+        }
+
         //  Registration Fee Label
         $option = get_option(WPST_OPTION_REG_FEE_LABEL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationFeeLabel($option) ;
         }
@@ -1253,7 +1370,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_REG_FEE_CURRENCY_LABEL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationFeeCurrencyLabel($option) ;
         }
@@ -1267,7 +1384,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_REG_FEE_AMOUNT) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationFee($option) ;
         }
@@ -1281,7 +1398,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_REG_EMAIL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationEmail($option) ;
         }
@@ -1296,7 +1413,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_REG_EMAIL_FORMAT) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationEmailFormat($option) ;
         }
@@ -1310,7 +1427,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_REG_TOU_URL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationTermsOfUseURL($option) ;
         }
@@ -1324,7 +1441,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_REG_FEE_URL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setRegistrationFeePolicyURL($option) ;
         }
@@ -1338,7 +1455,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setUserOptionalFields($option) ;
         }
@@ -1376,7 +1493,7 @@ class SwimTeamOptions extends SwimTeamDBI
             $option = get_option(constant("WPST_OPTION_USER_OPTION" . $oc)) ;
 
             //  If option isn't stored in the database, use the default
-            if ($option)
+            if ($option !== false)
             {
                 $this->setSwimTeamOption(constant("WPST_OPTION_USER_OPTION" . $oc), $option) ;
             }
@@ -1392,7 +1509,7 @@ class SwimTeamOptions extends SwimTeamDBI
             $option = get_option(constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL")) ;
 
             //  If option isn't stored in the database, use the default
-            if ($option)
+            if ($option !== false)
             {
                 $this->setSwimTeamOption(constant("WPST_OPTION_USER_OPTION" .
                     $oc . "_LABEL"), $option) ;
@@ -1409,7 +1526,7 @@ class SwimTeamOptions extends SwimTeamDBI
             $option = get_option(constant("WPST_OPTION_USER_OPTION" . $oc . "_MODE")) ;
 
             //  If option isn't stored in the database, use the default
-            if ($option)
+            if ($option !== false)
             {
                 $this->setSwimTeamOption(constant("WPST_OPTION_USER_OPTION" .
                     $oc . "_MODE"), $option) ;
@@ -1437,7 +1554,7 @@ class SwimTeamOptions extends SwimTeamDBI
             $option = get_option(constant("WPST_OPTION_SWIMMER_OPTION" . $oc)) ;
 
             //  If option isn't stored in the database, use the default
-            if ($option)
+            if ($option !== false)
             {
                 $this->setSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" . $oc), $option) ;
             }
@@ -1453,7 +1570,7 @@ class SwimTeamOptions extends SwimTeamDBI
             $option = get_option(constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL")) ;
 
             //  If option isn't stored in the database, use the default
-            if ($option)
+            if ($option !== false)
             {
                 $this->setSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" .
                     $oc . "_LABEL"), $option) ;
@@ -1470,7 +1587,7 @@ class SwimTeamOptions extends SwimTeamDBI
             $option = get_option(constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE")) ;
 
             //  If option isn't stored in the database, use the default
-            if ($option)
+            if ($option !== false)
             {
                 $this->setSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" .
                     $oc . "_MODE"), $option) ;
@@ -1488,7 +1605,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_OPT_IN_LABEL) ;
 
         //  If option isn't stored in the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setOptInLabel($option) ;
         }
@@ -1502,7 +1619,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_OPT_OUT_LABEL) ;
 
         //  If option isn't stored out the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setOptOutLabel($option) ;
         }
@@ -1516,7 +1633,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS) ;
 
         //  If option isn't stored out the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setOptInOptOutEmailAddress($option) ;
         }
@@ -1531,7 +1648,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_FORMAT) ;
 
         //  If option isn't stored out the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setOptInOptOutEmailFormat($option) ;
         }
@@ -1545,7 +1662,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE) ;
 
         //  If option isn't stored out the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setOptInOptOutMode($option) ;
         }
@@ -1559,7 +1676,7 @@ class SwimTeamOptions extends SwimTeamDBI
         $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_EVENTS) ;
 
         //  If option isn't stored out the database, use the default
-        if ($option)
+        if ($option !== false)
         {
             $this->setOptInOptOutEvents($option) ;
         }
@@ -1602,16 +1719,19 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_GEOGRAPHY, $this->getGeography()) ;
         //update_option(WPST_OPTION_MEASUREMENT_UNITS, $this->getMeasurementUnits()) ;
         update_option(WPST_OPTION_JOB_SIGN_UP, $this->getJobSignUp()) ;
+        update_option(WPST_OPTION_JOB_CREDITS, $this->getJobCredits()) ;
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT, $this->getSwimmerLabelFormat()) ;
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE, $this->getSwimmerLabelFormatCode()) ;
         update_option(WPST_OPTION_AUTO_REGISTER, $this->getAutoRegister()) ;
         update_option(WPST_OPTION_REGISTRATION_SYSTEM, $this->getRegistrationSystem()) ;
         update_option(WPST_OPTION_GOOGLE_API_KEY, $this->getGoogleAPIKey()) ;
+        update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, $this->getGDLRowsToDisplay()) ;
         update_option(WPST_OPTION_LOGIN_REDIRECT, $this->getLoginRedirectAction()) ;
         update_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL, $this->getStateOrProvinceLabel()) ;
         update_option(WPST_OPTION_USER_POSTAL_CODE_LABEL, $this->getPostalCodeLabel()) ;
         update_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL, $this->getPrimaryPhoneLabel()) ;
         update_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL, $this->getSecondaryPhoneLabel()) ;
+        update_option(WPST_OPTION_REG_PREFIX_LABEL, $this->getRegistrationPrefixLabel()) ;
         update_option(WPST_OPTION_REG_FEE_LABEL, $this->getRegistrationFeeLabel()) ;
         update_option(WPST_OPTION_REG_FEE_CURRENCY_LABEL, $this->getRegistrationFeeCurrencyLabel()) ;
         update_option(WPST_OPTION_REG_FEE_AMOUNT, $this->getRegistrationFee()) ;

@@ -173,20 +173,22 @@ class SwimmersTabContainer extends SwimTeamTabContainer
 
         $user = new SwimTeamUserProfile() ;
 
-        if (!$user->userProfileExistsByUserId($userdata->ID))
+        $noprofile = (!$user->userProfileExistsByUserId($userdata->ID)) ;
+
+        if ($noprofile)
         {
             $un = html_i(html_b($userdata->user_login)) ;
 
-            $warning = html_div(null, html_b("Warning:")) ;
+            $warning = html_div(null, html_b("Error:")) ;
             $message = html_div(null, sprintf("User profile
                 information for username %s has not been entered.",
-                $un->render()), html_br(), "Please select the ",
+                $un->render()), html_br(), "You must select the ",
                 html_a(sprintf("%s/wp-admin/admin.php?page=swimteam.php&tab=2",
                 get_bloginfo('url')), "My Profile"), "tab and complete
-                your user profile information.") ;
+                your user profile information before proceding.") ;
             $warning->set_style("display:inline-block;clear:both;float:left;") ;
             $message->set_style("display:inline-block;margin-left:15px;") ;
-            $messagebox = html_div("updated fade", $warning, $message) ;
+            $messagebox = html_div("error fade", $warning, $message) ;
             $messagebox->set_style("padding: 10px;") ;
             $div->add($messagebox) ;
         }
@@ -241,11 +243,19 @@ class SwimmersTabContainer extends SwimTeamTabContainer
 
         if (empty($scriptargs) || is_null($action))
         {
+
             $gdl = $this->__buildGDL() ;
 
             $div->add($gdl, html_div_center(html_h6("Age displayed in
                 parentheses is computed relative to the Swim Team age
                 group cutoff date."))) ;
+
+            //  If the user profile is incomplete, eliminate any actions
+            if ($noprofile)
+            {
+                $gdl->disableAllActions() ;
+            }
+
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader($this->_tab_prefix . ' Swimmers Action Summary') ;
         }

@@ -38,13 +38,16 @@ class SwimTeamOptionsTabContainer extends SwimTeamTabContainer
     {
         $div = html_div() ;
         $div->add(html_p('Set the Options which determine how registration is presented
-            to end users.  Registration can be Open or Closed.  When closed, the Registration
-            option is not presented to users.  Auto-Register will automatically register new
-            swimmers for the active season when enabled.  There are settings for URLs to Terms
-            of Use and Registration Fee Policies, how e-mail is formatted and the number of optional
-            fields for Users and Swimmers.  Optional fields can be used to collect information
-            that is of interest to the team that isn&#039;t part of the default user or swimmer
-            profile.')) ;
+            to end users.'), html_ul(html_li(' Registration can be Open or Closed.  When closed, the
+            Registration option is not presented to users.  Auto-Register will automatically
+            register new swimmers for the active season when enabled.'),  html_li('There are
+            settings for URLs to Terms of Use and Registration Fee Policies, how e-mail is
+            formatted and the number of optional fields for Users and Swimmers.'),
+            html_li('Optional fields can be used to collect information that is of interest to
+            the team that isn&#039;t part of the default user or swimmer profile.'), html_li('The
+            registration prefix label can be used to "prefix" the word', html_b('registration'),
+            'in the confirmation e-mail which is sent out.  This is useful when the registration
+            system is used for a pre-registration process.'))) ;
 
         return $div ;
     }

@@ -157,7 +157,10 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
             ,ucwords(WPST_ADMIN) => WPST_ADMIN
         )) ;
         $this->add_element($jobsignup) ;
-    }
+
+        $jobcredits = new FENumberInRange('Job Credits', true, '100px', null, 0, 500) ;
+        $this->add_element($jobcredits) ;
+}
 
     /**
      * This method is called only the first time the form
@@ -196,6 +199,7 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $this->set_element_value("State or Province Label", $options->getStateOrProvinceLabel()) ;
         $this->set_element_value("Postal Code Label", $options->getPostalCodeLabel()) ;
         $this->set_element_value("Job Sign Up Mode", $options->getJobSignUp()) ;
+        $this->set_element_value("Job Credits", $options->getJobCredits()) ;
     }
 
 
@@ -255,6 +259,9 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $table->add_row($this->element_label("Job Sign Up Mode"),
             $this->element_form("Job Sign Up Mode")) ;
 
+        $table->add_row($this->element_label("Job Credits"),
+            $this->element_form("Job Credits")) ;
+
         $this->add_form_block(null, $table) ;
     }
 
@@ -312,6 +319,7 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $options->setStateOrProvinceLabel($this->get_element_value("State or Province Label")) ;
         $options->setPostalCodeLabel($this->get_element_value("Postal Code Label")) ;
         $options->setJobSignUp($this->get_element_value("Job Sign Up Mode")) ;
+        $options->setJobCredits($this->get_element_value("Job Credits")) ;
         $options->updateOptions() ;
 
         $this->set_action_message("Swim Team options updated.") ;
@@ -355,12 +363,14 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         )) ;
         $this->add_element($regsystem) ;
 
+        $regprefixlabel = new FEText("Registration Prefix Label", true, "75px");
+        $this->add_element($regprefixlabel) ;
+
         $regfeelabel = new FERegEx("Registration Fee Label", true,
             "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($regfeelabel) ;
 
         $currencylabel = new FEText("Currency Label", true, "75px");
-        
         $this->add_element($currencylabel) ;
 
         $defaultregfee = new FENumberPrice("Registration Fee", true, "100px");
@@ -403,6 +413,7 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         //  Initialize the form fields
         $this->set_element_value("Auto-Register New Swimmers", $options->getAutoRegister()) ;
         $this->set_element_value("Registration System", $options->getRegistrationSystem()) ;
+        $this->set_element_value("Registration Prefix Label", $options->getRegistrationPrefixLabel()) ;
         $this->set_element_value("Registration Fee Label", $options->getRegistrationFeeLabel()) ;
         $this->set_element_value("Currency Label", $options->getRegistrationFeeCurrencyLabel()) ;
         $this->set_element_value("Registration Fee", $options->getRegistrationFee()) ;
@@ -431,6 +442,9 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
 
         $table->add_row($this->element_label("Registration System"),
             $this->element_form("Registration System")) ;
+
+        $table->add_row($this->element_label("Registration Prefix Label"),
+            $this->element_form("Registration Prefix Label")) ;
 
         $table->add_row($this->element_label("Registration Fee Label"),
             $this->element_form("Registration Fee Label")) ;
@@ -487,6 +501,7 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
         $options->setAutoRegister($this->get_element_value("Auto-Register New Swimmers")) ;
         $options->setRegistrationSystem($this->get_element_value("Registration System")) ;
+        $options->setRegistrationPrefixLabel($this->get_element_value("Registration Prefix Label")) ;
         $options->setRegistrationFeeLabel($this->get_element_value("Registration Fee Label")) ;
         $options->setRegistrationFeeCurrencyLabel($this->get_element_value("Currency Label")) ;
         $options->setRegistrationFee($this->get_element_value("Registration Fee")) ;
@@ -640,23 +655,26 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
         if ($options_count === false)
             $options_count = WPST_DEFAULT_USER_OPTION_COUNT ;
 
-        $table->add_row(html_b("Option Label"),
-            html_b("Option Type"), html_b("Option Mode")) ;
-
-        //  Load the user options
-
-        for ($oc = 1 ; $oc <= $options_count ; $oc++)
+        if ($options_count > 0)
         {
-            $table->add_row(
-                $this->element_form("User Option #" . $oc . " Label"),
-                $this->element_form("User Option #" . $oc),
-                $this->element_form("User Option #" . $oc . " Mode")
-            ) ;
-        }
+            $table->add_row(html_b("Option Label"),
+                html_b("Option Type"), html_b("Option Mode")) ;
 
-        $td = html_td(null, null, div_font8bold("Admin Mode:  Field is only visible to Adminstrative users.")) ;
-        $td->set_tag_attributes(array("colspan" => 3, "align" => "center")) ;
-        $table->add(html_tr(null, $td)) ;
+            //  Load the user options
+
+            for ($oc = 1 ; $oc <= $options_count ; $oc++)
+            {
+                $table->add_row(
+                    $this->element_form("User Option #" . $oc . " Label"),
+                    $this->element_form("User Option #" . $oc),
+                    $this->element_form("User Option #" . $oc . " Mode")
+                ) ;
+            }
+
+            $td = html_td(null, null, div_font8bold("Admin Mode:  Field is only visible to Adminstrative users.")) ;
+            $td->set_tag_attributes(array("colspan" => 3, "align" => "center")) ;
+            $table->add(html_tr(null, $td)) ;
+        }
 
         $this->add_form_block(null, $table) ;
     }
@@ -872,23 +890,26 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         if ($options_count === false)
             $options_count = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
-        $table->add(html_tr(null, html_th("Option Label"),
-            html_th("Option Type"), html_th("Option Mode"))) ;
-
-        //  Load the swimmer options
-
-        for ($oc = 1 ; $oc <= $options_count ; $oc++)
+        if ($options_count > 0)
         {
-            $table->add_row(
-                $this->element_form("Swimmer Option #" . $oc . " Label"),
-                $this->element_form("Swimmer Option #" . $oc),
-                $this->element_form("Swimmer Option #" . $oc . " Mode")
-            ) ;
-        }
+            $table->add(html_tr(null, html_th("Option Label"),
+                html_th("Option Type"), html_th("Option Mode"))) ;
 
-        $td = html_td(null, null, div_font8bold("Admin Mode:  Field is only visible to Adminstrative users.")) ;
-        $td->set_tag_attributes(array("colspan" => 3, "align" => "center")) ;
-        $table->add(html_tr(null, $td)) ;
+            //  Load the swimmer options
+    
+            for ($oc = 1 ; $oc <= $options_count ; $oc++)
+            {
+                $table->add_row(
+                    $this->element_form("Swimmer Option #" . $oc . " Label"),
+                    $this->element_form("Swimmer Option #" . $oc),
+                    $this->element_form("Swimmer Option #" . $oc . " Mode")
+                ) ;
+            }
+
+            $td = html_td(null, null, div_font8bold("Admin Mode:  Field is only visible to Adminstrative users.")) ;
+            $td->set_tag_attributes(array("colspan" => 3, "align" => "center")) ;
+            $table->add(html_tr(null, $td)) ;
+        }
 
         $this->add_form_block(null, $table) ;
     }
@@ -1063,6 +1084,9 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
+        $gdlrows = new FENumberInRange('Rows to Display', true, '100px', null, 5, 200) ;
+        $this->add_element($gdlrows) ;
+
         $googlemapsapikey = new FETextArea("Google API Key", false, 3, 60, "300px") ;
         $this->add_element($googlemapsapikey) ;
 
@@ -1090,6 +1114,7 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
 
         //  Initialize the form fields
+        $this->set_element_value("Rows to Display", $options->getGDLRowsToDisplay()) ;
         $this->set_element_value("Google API Key", $options->getGoogleAPIKey()) ;
         $this->set_element_value("Login Redirect", WPST_NONE) ;
     }
@@ -1105,10 +1130,16 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_label("Login Redirect"),
-            $this->element_form("Login Redirect")) ;
+        $table->add_row($this->element_label("Rows to Display"),
+            $this->element_form("Rows to Display")) ;
+
+        $table->add_row(null, html_span(null,
+            'Frequently wp-SwimTeam presents information in', html_br(),
+            'a table format.  This setting determines how many', html_br(),
+            'rows should be shown on a page at one time.')) ;
 
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
+
         $table->add_row($this->element_label("Google API Key"),
             $this->element_form("Google API Key")) ;
 
@@ -1118,6 +1149,11 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
             "Don't have a Google Maps API Key?", html_br(), 
             html_a("http://code.google.com/apis/maps/signup.html",
             "Sign up"), "for a free API key with Google.")) ;
+
+        $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
+
+        $table->add_row($this->element_label("Login Redirect"),
+            $this->element_form("Login Redirect")) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -1143,8 +1179,9 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
     {
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
-        $options->setLoginRedirectAction($this->get_element_value("Login Redirect")) ;
+        $options->setGDLRowsToDisplay($this->get_element_value("Rows to Display")) ;
         $options->setGoogleAPIKey($this->get_element_value("Google API Key")) ;
+        $options->setLoginRedirectAction($this->get_element_value("Login Redirect")) ;
         $options->updateOptions() ;
 
         return true ;

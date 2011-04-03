@@ -1084,7 +1084,7 @@ class SwimTeamUserProfileInfoTable extends SwimTeamInfoTable
 
             $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
-            if (empty($options)) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
+            if ($options === false) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
 
             $ometa = new SwimTeamOptionMeta() ;
             $ometa->setUserId($this->getId()) ;

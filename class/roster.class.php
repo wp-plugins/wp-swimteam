@@ -371,6 +371,9 @@ class SwimTeamRoster extends SwimTeamDBI
         global $userdata ;
         get_currentuserinfo() ;
 
+        $regprefix = get_option(WPST_OPTION_REG_PREFIX_LABEL) ;
+        if ($regprefix === false) $regprefix = WPST_DEFAULT_REG_PREFIX_LABEL ;
+
         $swimmer = new SwimTeamSwimmer() ;
         $swimmer->loadSwimmerById($this->getSwimmerId()) ;
 
@@ -464,7 +467,7 @@ class SwimTeamRoster extends SwimTeamDBI
             $message = sprintf($html,
                 get_bloginfo('url'),
                 $c1data->user_firstname,
-                ($action == WPST_ACTION_REGISTER) ? "" : "un",
+                ($action == WPST_ACTION_REGISTER) ? $regprefix : "un",
                 $swimmer->getFirstName() . " " . $swimmer->getLastName(),
                 ($action == WPST_ACTION_REGISTER) ? "for" : "from",
                 $swimmer->getFirstName() . " " . $swimmer->getLastName(),
@@ -496,7 +499,7 @@ class SwimTeamRoster extends SwimTeamDBI
 
             $message = sprintf($plain,
                 $c1data->user_firstname,
-                ($action == WPST_ACTION_REGISTER) ? "" : "un",
+                ($action == WPST_ACTION_REGISTER) ? $regprefix : "un",
                 $swimmer->getFirstName() . " " . $swimmer->getLastName(),
                 ($action == WPST_ACTION_REGISTER) ? "for" : "from",
                 get_bloginfo('url'),
@@ -510,7 +513,7 @@ class SwimTeamRoster extends SwimTeamDBI
             $c1data->user_lastname, $c1data->user_email) ;
 
         $subject = sprintf("Swimmer %sregistration for %s",
-            ($action == WPST_ACTION_REGISTER) ? "" : "un",
+            ($action == WPST_ACTION_REGISTER) ? $regprefix : "un",
             $swimmer->getFirstName() . " " . $swimmer->getLastName()) ;
 
         $status = wp_mail($to, $subject, $message, $headers) ;
