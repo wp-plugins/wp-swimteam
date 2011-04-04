@@ -1,24 +1,73 @@
+=== Swim Team ===
+Contributors: mpwalsh8
+Donate link: http://www.wp-swimteam.org/
+Tags: swimteam, swim, team
+Requires at least: 3.0
+Tested up to: 3.1
+Stable tag: trunk
 
-Welcome to the WordPress Swim Team plugin - wp-swimteam.
+Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
+team including registration, volunteer assignments, scheduling, and much more.
 
-You can find the latest version of the plugin along with other
-information on the plugin web site at:  http://wp-swimteam.sourceforge.net
+== Description ==
 
-This plugin was originally developed with WordPress version 2.3.3 - no
-effort what so ever had been made to test it with prior versions of
-WordPress.  It is now being developed with WordPress 2.6.2 but to the best
-of my knowledge, should still work with 2.5.1 and possibly 2.3.3 but YMMV.
+The wp-SwimTeam plugin builds a swim team management system on top of WordPress.  The use model
+is targeted at Summer Swim League teams but is not limited to that use model.  wp-SwimTeam
+features include:
 
-This plugin is installed in the same manner as any other WordPress
-plugin - unzip it and upload it to the wp-content/plugin directory
-and activate the plugin.  Once activated, the options must be set
-before much can be done with the plugin.
+* Electronic Registration for Parents and Swimmers
+* Each Swimmer can have two Parents or Guardians
+* Configurable custom fields for the Swim Team parent or guardian profile
+* Configurable custom fields for the Swimmer profile
+* Seamless integration with WordPress registration and login
+* Define and Manage Seasons
+* Define and Manage Age Groups
+* Define and Manage Opponent Profiles
+* Define and Manage Meet Schedule
+* Report Generator
+* CSV Export for Reports and Roster
+* SDIF (SD3) Export for Roster
+* Short Code for Google Maps
+* Short Code for Opponent Profiles
+* Short Code for Meet Schedule
+* Short Code for Flickr Photo Gallery
+* Volunteer Signup and Management
+* Opt-In/Opt-Out System for Meet Participation
+* Volunteer registration and reporting
 
-NOTE: This plugin is completely depedent phpHtmlLib which must be
-installed as a plugin or the wp-swimteam plugin will not work.
+More information can be found on the [wp-SwimTeam](http://www.wp-swimteam.org) blog.  A fully
+functioning [wp-SwimTeam Demo](http://demo.wp-swimteam.org) is also a good source for example
+features and usage, particularly for the short codes.
 
-You can download phpHtmlLib from:  http://phphtmllib.sourceforge.net
+== Installation ==
 
-At this writing, you need the development version of the 2_X branch
-in order for the plugin to work correctly.  A new release of the 2_X
-branch should be released in the near future.
+1. Ensure the dependent [phpHtmlLib](http://wordpress.org/extend/plugins/phphtmllib/) plugin is installed and active.
+1. Unzip and Upload the wp-SwimTeam content to your /wp-content/plugins/ directory
+1. Activate the plugin through the 'Plugins' menu in WordPress
+1. Refer to the official plugin page for documentation, usage and tips
+
+
+== Frequently Asked Questions ==
+
+Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for questions and support.
+
+== Screenshots ==
+
+1. The overview tab which all users see.
+2. List of Swim Team volunteer jobs which users can sign up for.
+3. List of Swim Meets from the Management tab.
+4. Job Assignment Report Generator
+5. Swimmer Profile Options
+
+== Changelog ==
+
+The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
+future developments and much more and is the definitive source for the Change Log.
+
+= 1.2.x =
+* First release unde the WordPress plugin respository.
+
+== Upgrade Notice ==
+
+= 1.2 =
+Addresses a serious issue when user or swimmer optional field counts are set to zero.

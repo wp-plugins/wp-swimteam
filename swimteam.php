@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.0.553
- * Last Modified:  2011/04/03 12:59:27
+ * Version: 1.2.556
+ * Last Modified:  2011/04/04 13:55:40
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 546 2011-03-08 16:08:20Z mpwalsh8 $
+ * $Id: swimteam.php 556 2011-04-04 12:55:40Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,7 +20,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 546 $
+ * @version $Rev: 556 $
  * @lastmodified $Date$
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
