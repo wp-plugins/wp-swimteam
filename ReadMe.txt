@@ -64,7 +64,14 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
-= 1.2.x =
+= 1.3 =
+* Fixed bug in wpst_meet_report short code.
+* Fixed bug in Add/Update Club Profile due to invalid URL field(s).
+* Added showmaplinks option to wpst_meet_report short code.
+* Added URL sanitatization to Google Maps and Mapquest URL fields on club profile.
+* Added notes to use Google URL shortner for URLs that don't validate.
+
+= 1.2 =
 * First release unde the WordPress plugin respository.
 
 == Upgrade Notice ==

@@ -185,7 +185,7 @@ class SwimTeamProfile extends SwimTeamDBI
      */
     function setClubOrPoolName($name)
     {
-        $this->__teamClubOrPoolName = $name ;
+        $this->__teamcluborpoolname = $name ;
     }
 
     /**
@@ -195,7 +195,7 @@ class SwimTeamProfile extends SwimTeamDBI
      */
     function getClubOrPoolName()
     {
-        return ($this->__teamClubOrPoolName) ;
+        return ($this->__teamcluborpoolname) ;
     }
 
     /**

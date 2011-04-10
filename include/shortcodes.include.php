@@ -392,6 +392,7 @@ function wpst_meet_report_sc_handler($atts)
         'summary' => 'n',
         'profile' => 'n',
         'showmap' => 'n',
+        'showmaplinks' => 'n',
         'optinoptout' => 'y',
         'firstinitial' => 'n',
         'lastinitial' => 'n',
@@ -425,6 +426,9 @@ function wpst_meet_report_sc_handler($atts)
 
     //  Display the opponent map?
     $meetreport->setShowMap(strtolower(substr($showmap, 0, 1)) == 'y') ;
+
+    //  Display the opponent map links?
+    $meetreport->setShowMapLinks(strtolower(substr($showmaplinks, 0, 1)) == 'y') ;
 
     //  Display the opt-in opt-out report?
     $meetreport->setOptInOptOut(strtolower(substr($optinoptout, 0, 1)) == 'y') ;

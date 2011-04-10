@@ -71,10 +71,10 @@ class WpSwimTeamSwimClubAddForm extends WpSwimTeamTeamProfileForm
         $contactname = new FEText("Contact Name", false, "250px") ;
         $this->add_element($contactname) ;
 
-        $googlemapsurl = new FEText("Google Maps URL", false, "250px") ;
+        $googlemapsurl = new FEUrl("Google Maps URL", false, "250px") ;
         $this->add_element($googlemapsurl) ;
 
-        $mapquesturl = new FEText("MapQuest URL", false, "250px") ;
+        $mapquesturl = new FEUrl("MapQuest URL", false, "250px") ;
         $this->add_element($mapquesturl) ;
 
         $notes = new FETextArea("Notes", false, 5, 40, "400px") ;
@@ -225,8 +225,16 @@ class WpSwimTeamSwimClubAddForm extends WpSwimTeamTeamProfileForm
         $table->add_row($this->element_label("Google Maps URL"),
             $this->element_form("Google Maps URL")) ;
 
+        $table->add_row(null, html_span(null, div_font8bold(
+            "Google Maps URL not validating?", html_a("http://goo.gl",
+            "Try using a Short URL"), "from Google."))) ;
+
         $table->add_row($this->element_label("MapQuest URL"),
             $this->element_form("MapQuest URL")) ;
+
+        $table->add_row(null, html_span(null, div_font8bold(
+            "MapQuest URL not validating?", html_a("http://goo.gl",
+            "Try using a Short URL"), "from Google."))) ;
 
         $table->add_row($this->element_label("Notes"),
             $this->element_form("Notes")) ;

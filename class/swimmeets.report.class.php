@@ -71,6 +71,11 @@ class SwimMeetReport extends SwimMeet
     var $__show_map = false ;
 
     /**
+     * Show Map Links flag
+     */
+    var $__show_map_links = false ;
+
+    /**
      * Use Initials flag
      */
     var $__use_first_intial = false ;
@@ -268,6 +273,26 @@ class SwimMeetReport extends SwimMeet
     function getShowMap()
     {
         return $this->__show_map ;
+    }
+
+    /**
+     * set show map links flag inclusion
+     *
+     * @param boolean - flag to turn show map links inclusion on or off
+     */
+    function setShowMapLinks($flag = true)
+    {
+        $this->__show_map_links = $flag ;
+    }
+
+    /**
+     * get show map flag links inclusion
+     *
+     * @return boolean - flag to turn show map links inclusion on or off
+     */
+    function getShowMapLinks()
+    {
+        return $this->__show_map_links ;
     }
 
     /**
@@ -563,6 +588,8 @@ class SwimMeetReport extends SwimMeet
                 $c->add(html_br(2), $full, $fullmsg, html_br(2), $partial, $partialmsg) ;
         }
 
+        $sc = null ;
+
         //  Include Google Map in the output?
 
         if ($this->getShowMap())
@@ -614,17 +641,42 @@ class SwimMeetReport extends SwimMeet
                 else
                     $c->add(html_br(2), $map) ;
 
-                //  Show the link too?
+            }
+            else
+            {
+                if (empty($c->_content))
+                    $c->add(html_h4("No club profile information available to map.")) ;
+                else
+                    $c->add(html_br(2), html_h4("No club profile information available to map.")) ;
+            }
+        }
 
-                if (strtolower(substr($link, 0, 1)) == 'y')
+        //  Include Map URLs in the output?
+
+        if ($this->getShowMapLinks())
+        {
+            if ($this->getOpponentSwimClubId() != WPST_NONE)
+            {
+                //  Use the loaded swim club profile is maps are shown
+                if ($sc == null)
                 {
-                    $c->add(html_br(), html_a($sc->getGoogleMapsURL(),
+                    $sc = new SwimClubProfile() ;
+                    $sc->loadSwimClubBySwimClubId($this->getOpponentSwimClubId()) ;
+                }
+
+                //  Show the Google Maps link if it exists
+                $url = $sc->getGoogleMapsURL() ;
+                if (!empty($url))
+                {
+                    $c->add(html_br(), html_a($url,
                         "View this map on Google Maps."), html_br()) ;
                 }
 
-                if (strtolower(substr($mapquestmap, 0, 1)) == 'y')
+                //  Show the MapQuest link if it exists
+                $url = $sc->getMapQuestURL() ;
+                if (!empty($url))
                 {
-                    $c->add(html_br(), html_a($sc->getMapQuestURL(),
+                    $c->add(html_br(), html_a($url,
                         "View this location on MapQuest."), html_br()) ;
                 }
             }
@@ -635,6 +687,7 @@ class SwimMeetReport extends SwimMeet
                 else
                     $c->add(html_br(2), html_h4("No club profile information available to map.")) ;
             }
+
         }
 
         $c->add(html_br(2)) ;
