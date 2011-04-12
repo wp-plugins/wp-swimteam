@@ -88,11 +88,9 @@ class OptionsTabContainer extends Container
         $tab_content[] = new TabWidgetContent("SDIF Profile",
             $tab_index++, "sdifprofile.php",
             "SDIFProfileTabContainer") ;
-        /*
-        $tab_content[] = new TabWidgetContent("Google Maps",
-            $tab_index++, "googlemapsoptions.php",
-            "SwimTeamGoogleMapsOptionsTabContainer") ;
-         */
+        $tab_content[] = new TabWidgetContent("Jobs",
+            $tab_index++, "options_jobs.php",
+            "JobOptionsTabContainer") ;
         $tab_content[] = new TabWidgetContent("Miscellaneous",
             $tab_index++, "options_miscellaneous.php",
             "SwimTeamMiscellaneousOptionsTabContainer") ;

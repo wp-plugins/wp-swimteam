@@ -1674,36 +1674,46 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
             if ($ja->getUserId() != $this->get_element_value("Job #$label"))
             {
                 $ja->setUserId($this->get_element_value("Job #$label")) ;
-                $u = get_userdata($ja->getUserId()) ;
+
+                //  Need to account for the use case when a job
+                //  us is unassigned by setting the User to None.
+
+                if ($ja->getUserId() == WPST_NULL_ID)
+                {
+                    $msg = "unsassigned" ;
+                }
+                else
+                {
+                    $u = get_userdata($ja->getUserId()) ;
+                    $msg = sprintf("assigned to %s %s (%s)", $u->first_name, $u->last_name, $u->user_login) ;
+                }
+
+                //  Perform the assignment
 
                 if ($ja->reassignJob() != null)
                 {
                     if ($ja->getMeetId() == WPST_NULL_ID)
-                        $actionmsgs[] = sprintf("Job \"%s\" assigned to %s
-                            %s (%s) for swim season <i>(%s - %s - %s)</i>.",
-                            $job->getJobPosition(), $u->first_name, $u->last_name,
-                            $u->user_login, $seasondetails["label"],
+                        $actionmsgs[] = sprintf("Job \"%s\" %s
+                            for swim season <i>(%s - %s - %s)</i>.",
+                            $job->getJobPosition(), $msg, $seasondetails["label"],
                             $seasondetails["start"], $seasondetails["end"]) ;
                     else
-                        $actionmsgs[] = sprintf("Job \"%s\" assigned to %s
-                            %s (%s) for swim meet <i>(%s - %s - %s)</i>.",
-                            $job->getJobPosition(), $u->first_name, $u->last_name,
-                            $u->user_login, $meetdetails["opponent"],
+                        $actionmsgs[] = sprintf("Job \"%s\" %s
+                            for swim meet <i>(%s - %s - %s)</i>.",
+                            $job->getJobPosition(), $msg, $meetdetails["opponent"],
                             $meetdetails["date"], $meetdetails["location"]) ;
                 }
                 else
                 {
                     if ($ja->getMeetId() == WPST_NULL_ID)
-                        $actionmsgs[] = sprintf("Job \"%s\" WAS NOT assigned to %s
-                            %s (%s) for swim season <i>(%s - %s - %s)</i>.",
-                            $job->getJobPosition(), $u->first_name, $u->last_name,
-                            $u->user_login, $seasondetails["label"],
+                        $actionmsgs[] = sprintf("Job \"%s\" WAS NOT %s
+                            for swim season <i>(%s - %s - %s)</i>.",
+                            $job->getJobPosition(), $msg, $seasondetails["label"],
                             $seasondetails["statrt"], $seasondetails["end"]) ;
                     else
-                        $actionmsgs[] = sprintf("Job \"%s\" WAS NOT assigned to %s
-                            %s (%s) for swim meet <i>(%s - %s - %s)</i>.",
-                            $job->getJobPosition(), $u->first_name, $u->last_name,
-                            $u->user_login, $meetdetails["opponent"],
+                        $actionmsgs[] = sprintf("Job \"%s\" WAS NOT %s
+                            for swim meet <i>(%s - %s - %s)</i>.",
+                            $job->getJobPosition(), $msg, $meetdetails["opponent"],
                             $meetdetails["date"], $meetdetails["location"]) ;
                 }
             }

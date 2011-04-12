@@ -64,6 +64,13 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.4 =
+* Fixed bug in Opt-In/Opt-Out e-mail confirmation which duplicated recipients.
+* Fixed bug in handling Country when set to US Only.
+* Added Club Profile initialization based on State or Province in Team Profile.
+* Added E-mail confirmation for Job Assignments.
+* Added Job Options tab on Options page to configuring Jobs module.
+
 = 1.3 =
 * Fixed bug in wpst_meet_report short code.
 * Fixed bug in Add/Update Club Profile due to invalid URL field(s).

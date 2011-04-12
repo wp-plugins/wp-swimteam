@@ -121,6 +121,18 @@ class WpSwimTeamSwimClubAddForm extends WpSwimTeamTeamProfileForm
             $this->set_element_value("Pool Lanes", $option) ;
         else
             $this->set_element_value("Pool Lanes", WPST_DEFAULT_POOL_LANES) ;
+
+        $geography = get_option(WPST_OPTION_GEOGRAPHY) ;
+
+        if ($geography == WPST_US_ONLY)
+        {
+            $this->set_element_value("Country", ucwords(WPST_US_ONLY)) ;
+            var_dump(get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL));
+            var_dump(get_option(WPST_OPTION_TEAM_STATE_OR_PROVINCE)) ;
+            $this->set_element_value(get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL),
+                 get_option(WPST_OPTION_TEAM_STATE_OR_PROVINCE)) ;
+        }
+
     }
 
     /**
@@ -293,7 +305,11 @@ class WpSwimTeamSwimClubAddForm extends WpSwimTeamTeamProfileForm
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
         $sc->setPostalCode($this->get_element_value($label)) ;
 
-        $sc->setCountry($this->get_element_value("Country")) ;
+        if (get_option(WPST_OPTION_GEOGRAPHY) == WPST_US_ONLY)
+            $sc->setCountry(ucwords(WPST_US_ONLY)) ;
+        else
+            $sc->setCountry($this->get_element_value("Country")) ;
+
         $sc->setPrimaryPhone($this->get_element_value("Primary Phone")) ;
         $sc->setSecondaryPhone($this->get_element_value("Secondary Phone")) ;
         $sc->setContactName($this->get_element_value("Contact Name")) ;
@@ -333,6 +349,7 @@ class WpSwimTeamSwimClubAddForm extends WpSwimTeamTeamProfileForm
         return $container ;
     }
 }
+
 /**
  * Construct the Update Swim Club Profile form
  *
@@ -417,7 +434,11 @@ class WpSwimTeamSwimClubUpdateForm extends WpSwimTeamSwimClubAddForm
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
         $sc->setPostalCode($this->get_element_value($label)) ;
 
-        $sc->setCountry($this->get_element_value("Country")) ;
+        if (get_option(WPST_OPTION_GEOGRAPHY) == WPST_US_ONLY)
+            $sc->setCountry(ucwords(WPST_US_ONLY)) ;
+        else
+            $sc->setCountry($this->get_element_value("Country")) ;
+
         $sc->setPrimaryPhone($this->get_element_value("Primary Phone")) ;
         $sc->setSecondaryPhone($this->get_element_value("Secondary Phone")) ;
         $sc->setContactName($this->get_element_value("Contact Name")) ;

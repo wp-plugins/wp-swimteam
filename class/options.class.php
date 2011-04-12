@@ -96,6 +96,21 @@ class SwimTeamOptions extends SwimTeamDBI
     var $__job_credits ;
 
     /**
+     * job email address property
+     */
+    var $__job_email_address ;
+
+    /**
+     * job email format property
+     */
+    var $__job_email_format ;
+
+    /**
+     * job expectations url property
+     */
+    var $__job_expectations_url ;
+
+    /**
      * auto-register property
      */
     var $__auto_register ;
@@ -551,13 +566,73 @@ class SwimTeamOptions extends SwimTeamDBI
     }
 
     /**
-     * Set the job sign up state
+     * Set the job credits
      *
      * @param - integer - job credits
      */
     function setJobCredits($credits)
     {
         $this->__job_credits = $credits ;
+    }
+
+    /**
+     * Set the job email address
+     *
+     * @param - string - job email address
+     */
+    function setJobEmailAddress($email_address)
+    {
+        $this->__job_email_address = $email_address ;
+    }
+
+    /**
+     * Get the job email address
+     *
+     * @return - string - job email address
+     */
+    function getJobEmailAddress()
+    {
+        return ($this->__job_email_address) ;
+    }
+
+    /**
+     * Set the job email format
+     *
+     * @param - string - job email format
+     */
+    function setJobEmailFormat($email_format)
+    {
+        $this->__job_email_format = $email_format ;
+    }
+
+    /**
+     * Get the job email format
+     *
+     * @return - string - job email format
+     */
+    function getJobEmailFormat()
+    {
+        return ($this->__job_email_format) ;
+    }
+
+    /**
+     * Set the job expecations url
+     *
+     * @param - string - job expecations url
+     */
+    function setJobExpectationsURL($url)
+    {
+        $this->__job_expectations_url = $url ;
+    }
+
+    /**
+     * Get the job expecations url
+     *
+     * @return - string - job expecations url
+     */
+    function getJobExpectationsURL()
+    {
+        return ($this->__job_expectations_url) ;
     }
 
     /**
@@ -1198,6 +1273,49 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_JOB_CREDITS, WPST_DEFAULT_JOB_CREDITS) ;
         }
 
+        //  job email address
+        $option = get_option(WPST_OPTION_JOB_EMAIL_ADDRESS) ;
+
+        //  If option isn't stored out the database, use the default
+        if ($option !== false)
+        {
+            $this->setJobEmailAddress($option) ;
+        }
+        else
+        {
+            $email = get_bloginfo('admin_email') ;
+            $this->setJobEmailAddress($email) ;
+            update_option(WPST_OPTION_JOB_EMAIL_ADDRESS, $email) ;
+        }
+ 
+        //  job email format
+        $option = get_option(WPST_OPTION_JOB_EMAIL_FORMAT) ;
+
+        //  If option isn't stored out the database, use the default
+        if ($option !== false)
+        {
+            $this->setJobEmailFormat($option) ;
+        }
+        else
+        {
+            $this->setJobEmailFormat(WPST_DEFAULT_JOB_EMAIL_FORMAT) ;
+            update_option(WPST_OPTION_JOB_EMAIL_FORMAT, WPST_DEFAULT_JOB_EMAIL_FORMAT) ;
+        }
+ 
+        //  job expectations url
+        $option = get_option(WPST_OPTION_JOB_EXPECTATIONS_URL) ;
+
+        //  If option isn't stored out the database, use the default
+        if ($option !== false)
+        {
+            $this->setJobExpectationsURL($option) ;
+        }
+        else
+        {
+            $this->setJobExpectationsURL(WPST_NULL_STRING) ;
+            update_option(WPST_OPTION_JOB_EXPECTATIONS_URL, WPST_NULL_STRING) ;
+        }
+ 
         //  auto-register
         $option = get_option(WPST_OPTION_AUTO_REGISTER) ;
 
@@ -1293,7 +1411,7 @@ class SwimTeamOptions extends SwimTeamDBI
         else
         {
             $this->setPostalCodeLabel(WPST_DEFAULT_POSTAL_CODE_LABEL) ;
-            update_option(WPST_OPTION_USER_POSTAL_CODE_LABEL, WPST_DEFAULT_POSTAL_CODE_LABEL) ;
+            update_option(WPST_OPTION_POSTAL_CODE_LABEL, WPST_DEFAULT_POSTAL_CODE_LABEL) ;
         }
 
         //  primary phone label
@@ -1335,7 +1453,7 @@ class SwimTeamOptions extends SwimTeamDBI
         else
         {
             $this->setStateOrProvinceLabel(WPST_DEFAULT_STATE_OR_PROVINCE_LABEL) ;
-            update_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL, WPST_DEFAULT_STATE_OR_PROVINCE_LABEL) ;
+            update_option(WPST_OPTION_STATE_OR_PROVINCE_LABEL, WPST_DEFAULT_STATE_OR_PROVINCE_LABEL) ;
         }
 
         //  Registration Prefix Label
@@ -1720,6 +1838,9 @@ class SwimTeamOptions extends SwimTeamDBI
         //update_option(WPST_OPTION_MEASUREMENT_UNITS, $this->getMeasurementUnits()) ;
         update_option(WPST_OPTION_JOB_SIGN_UP, $this->getJobSignUp()) ;
         update_option(WPST_OPTION_JOB_CREDITS, $this->getJobCredits()) ;
+        update_option(WPST_OPTION_JOB_EMAIL_ADDRESS, $this->getJobEmailAddress()) ;
+        update_option(WPST_OPTION_JOB_EMAIL_FORMAT, $this->getJobEmailFormat()) ;
+        update_option(WPST_OPTION_JOB_EXPECTATIONS_URL, $this->getJobExpectationsURL()) ;
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT, $this->getSwimmerLabelFormat()) ;
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE, $this->getSwimmerLabelFormatCode()) ;
         update_option(WPST_OPTION_AUTO_REGISTER, $this->getAutoRegister()) ;

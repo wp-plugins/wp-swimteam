@@ -150,16 +150,6 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         )) ;
         $this->add_element($measurementunits) ;
         */
-
-        $jobsignup = new FEListBox("Job Sign Up Mode", true, "100px");
-        $jobsignup->set_list_data(array(
-             ucwords(WPST_USER) => WPST_USER
-            ,ucwords(WPST_ADMIN) => WPST_ADMIN
-        )) ;
-        $this->add_element($jobsignup) ;
-
-        $jobcredits = new FENumberInRange('Job Credits', true, '100px', null, 0, 500) ;
-        $this->add_element($jobcredits) ;
 }
 
     /**
@@ -198,8 +188,6 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $this->set_element_value("Geography", $options->getGeography()) ;
         $this->set_element_value("State or Province Label", $options->getStateOrProvinceLabel()) ;
         $this->set_element_value("Postal Code Label", $options->getPostalCodeLabel()) ;
-        $this->set_element_value("Job Sign Up Mode", $options->getJobSignUp()) ;
-        $this->set_element_value("Job Credits", $options->getJobCredits()) ;
     }
 
 
@@ -255,12 +243,6 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
 
         $table->add_row($this->element_label("Postal Code Label"),
             $this->element_form("Postal Code Label")) ;
-
-        $table->add_row($this->element_label("Job Sign Up Mode"),
-            $this->element_form("Job Sign Up Mode")) ;
-
-        $table->add_row($this->element_label("Job Credits"),
-            $this->element_form("Job Credits")) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -318,8 +300,6 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $options->setGeography($this->get_element_value("Geography")) ;
         $options->setStateOrProvinceLabel($this->get_element_value("State or Province Label")) ;
         $options->setPostalCodeLabel($this->get_element_value("Postal Code Label")) ;
-        $options->setJobSignUp($this->get_element_value("Job Sign Up Mode")) ;
-        $options->setJobCredits($this->get_element_value("Job Credits")) ;
         $options->updateOptions() ;
 
         $this->set_action_message("Swim Team options updated.") ;
@@ -1067,6 +1047,137 @@ class WpSwimTeamGoogleMapsOptionsForm extends WpSwimTeamForm
     }
 }
 
+/**
+ * Construct the Job Options Settings form
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see WpSwimTeamForm
+ */
+class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
+{
+    /**
+     * This method gets called EVERY time the object is
+     * created.  It is used to build all of the 
+     * FormElement objects used in this Form.
+     *
+     */
+    function form_init_elements()
+    {
+        $jobsignup = new FEListBox("Job Sign Up Mode", true, "100px");
+        $jobsignup->set_list_data(array(
+             ucwords(WPST_USER) => WPST_USER
+            ,ucwords(WPST_ADMIN) => WPST_ADMIN
+        )) ;
+        $this->add_element($jobsignup) ;
+
+        $jobcredits = new FENumberInRange('Job Credits', true, '100px', null, 0, 500) ;
+        $this->add_element($jobcredits) ;
+
+        $regemail = new FEEmailMany("Job E-mail Address", true, "300px");
+        $this->add_element($regemail) ;
+
+        $regemailformat = new FEListBox("Job E-mail Format", true, "100px");
+        $regemailformat->set_list_data(array(
+             ucwords(WPST_HTML) => WPST_HTML
+            ,ucwords(WPST_TEXT) => WPST_TEXT
+        )) ;
+        $this->add_element($regemailformat) ;
+
+        $regtouurl = new FEUrl("Job Expectations URL", false, "300px");
+        $this->add_element($regtouurl) ;
+    }
+
+    /**
+     * This method is called only the first time the form
+     * page is hit.  This enables u to query a DB and 
+     * pre populate the FormElement objects with data.
+     *
+     */
+    function form_init_data()
+    {
+        $options = new SwimTeamOptions() ;
+        $options->loadOptions() ;
+
+        //  Initialize the form fields
+        $this->set_element_value("Job Sign Up Mode", $options->getJobSignUp()) ;
+        $this->set_element_value("Job Credits", $options->getJobCredits()) ;
+        $this->set_element_value("Job E-mail Address", $options->getJobEmailAddress()) ;
+        $this->set_element_value("Job E-mail Format", $options->getJobEmailFormat()) ;
+        $this->set_element_value("Job Expectations URL", $options->getJobExpectationsURL()) ;
+    }
+
+
+    /**
+     * This is the method that builds the layout of where the
+     * FormElements will live.  You can lay it out any way
+     * you like.
+     *
+     */
+    function form_content()
+    {
+        $table = html_table($this->_width, 0, 4) ;
+        //$table->set_style("border: 1px solid") ;
+
+        $table->add_row($this->element_label("Job Sign Up Mode"),
+            $this->element_form("Job Sign Up Mode")) ;
+
+        $table->add_row($this->element_label("Job Credits"),
+            $this->element_form("Job Credits")) ;
+
+        $table->add_row($this->element_label("Job E-mail Address"),
+            $this->element_form("Job E-mail Address")) ;
+
+        $table->add_row($this->element_label("Job E-mail Format"),
+            $this->element_form("Job E-mail Format")) ;
+
+        $table->add_row($this->element_label("Job Expectations URL"),
+            $this->element_form("Job Expectations URL")) ;
+
+        $this->add_form_block(null, $table) ;
+    }
+
+    /**
+     * This method gets called after the FormElement data has
+     * passed the validation.  This enables you to validate the
+     * data against some backend mechanism, say a DB.
+     *
+     */
+    function form_backend_validation()
+    {
+        $valid = true ;
+
+	    return $valid ;
+    }
+
+    /**
+     * This method is called ONLY after ALL validation has
+     * passed.  This is the method that allows you to 
+     * do something with the data, say insert/update records
+     * in the DB.
+     */
+    function form_action()
+    {
+        $options = new SwimTeamOptions() ;
+        $options->loadOptions() ;
+        $options->setJobSignUp($this->get_element_value("Job Sign Up Mode")) ;
+        $options->setJobCredits($this->get_element_value("Job Credits")) ;
+        $options->setJobEmailAddress($this->get_element_value("Job E-mail Address")) ;
+        $options->setJobEmailFormat($this->get_element_value("Job E-mail Format")) ;
+        $options->setJobExpectationsURL($this->get_element_value("Job Expectations URL")) ;
+        $options->updateOptions() ;
+
+        return true ;
+    }
+
+    function form_success()
+    {
+        $container = container() ;
+        $container->add(html_div("updated fade", html_h3("Swim Team options updated."))) ;
+
+        return $container ;
+    }
+}
 /**
  * Construct the Googple Maps Options Settings form
  *

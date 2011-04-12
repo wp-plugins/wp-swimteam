@@ -341,6 +341,8 @@ class WpSwimTeamTeamProfileForm extends WpSwimTeamForm
 
         $p->updateTeamProfile() ;
 
+        $this->set_action_message("Swim Team profile updated.") ;
+
         return true ;
     }
 
@@ -352,7 +354,7 @@ class WpSwimTeamTeamProfileForm extends WpSwimTeamForm
     function form_success()
     {
         $container = container() ;
-        $container->add("Swim Team profile updated.") ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }

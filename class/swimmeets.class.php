@@ -2013,7 +2013,7 @@ class SwimMeetMeta extends SwimTeamDBI
 
         if ($swimmer->getContact2Id() != WPST_NULL_ID)
         {
-            $c2data = get_userdata($swimmer->getContact1Id()) ;
+            $c2data = get_userdata($swimmer->getContact2Id()) ;
             $c2email = $c1data->user_email ;
         }
         else
