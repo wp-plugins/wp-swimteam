@@ -2218,16 +2218,11 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
         $action = ($signup) ? __('sign up') : __('withdrawl') ;
 
-        //$this->loadJobByJobId($this->getJobId()) ;
-        //var_dump($this->getJobDuration()) ;
         $meetdetails = SwimTeamTextMap::__mapMeetIdToText($this->getMeetId()) ;
         $jobdetails = SwimTeamTextMap::__mapJobIdToText($this->getJobId()) ;
-        var_dump($jobdetails) ;
         $seasondetails = SwimTeamTextMap::__mapSeasonIdToText($this->getSeasonId(), true) ;
-        //var_dump($seasondetails['label']) ;
 
         $u = get_userdata($userid) ;
-        //$msg = sprintf("assigned to %s %s (%s)", $u->first_name, $u->last_name, $u->user_login) ;
     
         if ($this->getMeetId() == WPST_NULL_ID)
         {
@@ -2243,9 +2238,6 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $actionmsgs[] = sprintf('Swim Meet:  %s - %s - %s',
                 $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
         }
-
-        //$actionmsgs = array(sprintf("%s %s %s", $jobdetails, $meetdetails, $seasondetails['label'])) ;
-        //var_dump($actionmsgs) ;
 
         $c1data = get_userdata($userid) ;
         $c1email = $c1data->user_email ;
@@ -2295,6 +2287,9 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $htmlftr = '
                 </ul>
                 <p>
+                View all <a href="%s">Job Descriptions and Expectations</a>.
+                </p>
+                <p>
                 Thank you,<br/><br/>
                 %s
                 </p>
@@ -2319,7 +2314,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $message .= $htmlbody ;
 
             $message .= sprintf($htmlftr,
-
+                get_option(WPST_OPTION_JOB_EXPECTATIONS_URL),
                 get_bloginfo('name'),
                 get_bloginfo('url'),
                 get_bloginfo('url')) ;
@@ -2334,6 +2329,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             foreach ($actionmsgs as $actionmsg)
                 $plain .= strip_tags($actionmsg) . "\r\n" ;
 
+            $plain .= "\r\n\r\nView job descriptions and expectations:  %s\r\n\r\n" ;
             $plain .= "\r\n\r\nThank you,\r\n\r\n" ;
             $plain .= "%s\r\n\r\n" ;
             $plain .= "Visit %s for all your swim team news." ;
@@ -2343,6 +2339,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
                 $action,
                 $c1data->user_firstname . " " . $c1data->user_lastname,
                 //$action,
+                get_option(WPST_OPTION_JOB_EXPECTATIONS_URL),
                 get_bloginfo('name'),
                 get_bloginfo('url'),
                 get_bloginfo('url')) ;
@@ -2354,8 +2351,8 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         $subject = sprintf("Job %s for %s",
             $action, $c1data->user_firstname . " " . $c1data->user_lastname) ;
 
-        //$status = wp_mail($to, $subject, $message, $headers) ;
-        $status = wp_mail($to, $subject, $message, $hdrs) ;
+        $status = wp_mail($to, $subject, $message, $headers) ;
+        //$status = wp_mail($to, $subject, $message, $hdrs) ;
 
         return $status ;
     }

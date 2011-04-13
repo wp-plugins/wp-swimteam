@@ -24,8 +24,8 @@
  */
 define("WPST_MAJOR_VERSION", '1') ;
 define("WPST_MINOR_VERSION", '4') ;
-define("WPST_BUILD_NUMBER", '572') ;
+define("WPST_BUILD_NUMBER", '573') ;
 define("WPST_VERSION", WPST_MAJOR_VERSION .
     "." . WPST_MINOR_VERSION . "." . WPST_BUILD_NUMBER) ;
-define("WPST_BUILD_TIME", '2011/04/13 00:55:35') ;
+define("WPST_BUILD_TIME", '2011/04/13 06:11:42') ;
 ?>
