@@ -2246,8 +2246,8 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
         if ($mode == WPST_HTML)
         {
-            $headers  = 'MIME-Version: 1.0' . "\r\n";
-            $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n";
+            $headers  = 'MIME-Version: 1.0' . "\r\n" ;
+            $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n" ;
         }
         else
         {
@@ -2255,17 +2255,14 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         }
 
         // Additional headers
-        $headers .= sprintf("To: %s %s <%s>", $c1data->user_firstname,
-            $c1data->user_lastname, $c1data->user_email) . "\r\n" ;
+        //$headers .= sprintf('To: "%s %s" <%s>', $c1data->user_firstname,
+        //    $c1data->user_lastname, $c1data->user_email) . "\r\n" ;
 
-        $headers .= sprintf("From: %s <%s>", get_bloginfo('name'), $from) . "\r\n" ;
-
-        $headers .= sprintf("Cc: %s", $from) . "\r\n" ;
-        $headers .= sprintf("Bcc: %s", get_bloginfo('admin_email')) . "\r\n" ;
-        $headers .= sprintf("Reply-To: %s", $from) . "\r\n" ;
-        $headers .= sprintf("X-Mailer: PHP/%s", phpversion()) ;
-
-        $hdrs = array('cc' => '', 'bcc' => '', $headers) ;
+        $headers .= sprintf('From: %s <%s>', get_bloginfo('name'), $from) . "\r\n" ;
+        $headers .= sprintf('Cc: %s', $from) . "\r\n" ;
+        $headers .= sprintf('Bcc: %s', get_bloginfo('admin_email')) . "\r\n" ;
+        $headers .= sprintf('Reply-To: %s', $from) . "\r\n" ;
+        $headers .= sprintf('X-Mailer: PHP/%s', phpversion()) ;
 
         if ($mode == WPST_HTML)
         {
@@ -2338,7 +2335,6 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
                 $c1data->user_firstname,
                 $action,
                 $c1data->user_firstname . " " . $c1data->user_lastname,
-                //$action,
                 get_option(WPST_OPTION_JOB_EXPECTATIONS_URL),
                 get_bloginfo('name'),
                 get_bloginfo('url'),
@@ -2352,7 +2348,6 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $action, $c1data->user_firstname . " " . $c1data->user_lastname) ;
 
         $status = wp_mail($to, $subject, $message, $headers) ;
-        //$status = wp_mail($to, $subject, $message, $hdrs) ;
 
         return $status ;
     }

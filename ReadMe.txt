@@ -64,6 +64,10 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.5 =
+* Fixed bug with duplicate e-mails for Registration, Opt-In/Opt-Out, and Job Sign Up.
+* Fixed confirmation messages after saving Options to utlize WordPress message standard.
+
 = 1.4 =
 * Fixed bug in Opt-In/Opt-Out e-mail confirmation which duplicated recipients.
 * Fixed bug in handling Country when set to US Only.

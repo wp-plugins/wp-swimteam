@@ -493,13 +493,15 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         $options->setSwimmerOptionalFields($this->get_element_value("Swimmer Optional Fields")) ;
         $options->updateOptions() ;
 
+        $this->set_action_message('Swim Team options updated.') ; 
+
         return true ;
     }
 
     function form_success()
     {
         $container = container() ;
-        $container->add(html_div("updated fade", html_h3("Swim Team options updated."))) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }
@@ -706,13 +708,15 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
 
         $options->updateOptions() ;
 
+        $this->set_action_message('User Profile options updated.') ;
+
         return true ;
     }
 
     function form_success()
     {
         $container = container() ;
-        $container->add(html_div("updated fade", html_h3("User Profile options updated."))) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }
@@ -941,13 +945,15 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         }
         $options->updateOptions() ;
 
+        $this->set_action_message('Swimmer Profile options updated.') ;
+
         return true ;
     }
 
     function form_success()
     {
         $container = container() ;
-        $container->add(html_div("updated fade", html_h3("Swimmer Profile options updated."))) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }
@@ -1035,13 +1041,15 @@ class WpSwimTeamGoogleMapsOptionsForm extends WpSwimTeamForm
         $options->setGoogleAPIKey($this->get_element_value("Google API Key")) ;
         $options->updateOptions() ;
 
+        $this->set_action_message('Swim Team Google Maps options updated.') ;
+
         return true ;
     }
 
     function form_success()
     {
         $container = container() ;
-        $container->add(html_div("updated fade", html_h3("Swim Team Google Maps options updated."))) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }
@@ -1167,13 +1175,15 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
         $options->setJobExpectationsURL($this->get_element_value("Job Expectations URL")) ;
         $options->updateOptions() ;
 
+        $this->set_action_message('Swim Team options updated.') ;
+
         return true ;
     }
 
     function form_success()
     {
         $container = container() ;
-        $container->add(html_div("updated fade", html_h3("Swim Team options updated."))) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }
@@ -1295,13 +1305,15 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $options->setLoginRedirectAction($this->get_element_value("Login Redirect")) ;
         $options->updateOptions() ;
 
+        $this->set_action_message('Swim Team Miscellaneous options updated.') ;
+
         return true ;
     }
 
     function form_success()
     {
         $container = container() ;
-        $container->add(html_div("updated fade", html_h3("Swim Team Miscellaneous options updated."))) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }

@@ -347,6 +347,7 @@ class SwimTeamRoster extends SwimTeamDBI
             //$swimmer->loadSwimmerById($this->getSwimmerId()) ;
             //$swimmer->setStatus(WPST_ACTIVE) ;
             //$update = $swimmer->updateSwimmer() ;
+            $update = true ;
         }
         else
         {
@@ -378,17 +379,17 @@ class SwimTeamRoster extends SwimTeamDBI
         $swimmer->loadSwimmerById($this->getSwimmerId()) ;
 
         $c1data = get_userdata($swimmer->getContact1Id()) ;
-        $c1email = $c1data->user_email ;
+        //$c1email = $c1data->user_email ;
 
         if ($swimmer->getContact2Id() != WPST_NULL_ID)
         {
-            $c2data = get_userdata($swimmer->getContact1Id()) ;
-            $c2email = $c1data->user_email ;
+            $c2data = get_userdata($swimmer->getContact2Id()) ;
+            //$c2email = $c2data->user_email ;
         }
         else
         {
             $c2data = null ;
-            $c2email = WPST_NULL_STRING ;
+            //$c2email = WPST_NULL_STRING ;
         }
 
         // To send HTML mail, the Content-type header must be set
@@ -404,13 +405,13 @@ class SwimTeamRoster extends SwimTeamDBI
         }
 
         // Additional headers
-        if (is_null($c2data))
-            $headers .= sprintf("To: %s %s <%s>", $c1data->user_firstname,
-                $c1data->user_lastname, $c1data->user_email) . "\r\n" ;
-        else
-            $headers .= sprintf("To: %s %s <%s>, %s %s<%s>",
-                $c1data->user_firstname, $c1data->user_lastname, $c1data->user_email,
-                $c2data->user_firstname, $c2data->user_lastname, $c2data->user_email) . "\r\n" ;
+        //if (is_null($c2data))
+        //    $headers .= sprintf("To: %s %s <%s>", $c1data->user_firstname,
+        //        $c1data->user_lastname, $c1data->user_email) . "\r\n" ;
+        //else
+        //    $headers .= sprintf("To: %s %s <%s>, %s %s<%s>",
+        //        $c1data->user_firstname, $c1data->user_lastname, $c1data->user_email,
+        //        $c2data->user_firstname, $c2data->user_lastname, $c2data->user_email) . "\r\n" ;
 
         $headers .= sprintf("From: %s <%s>",
             get_bloginfo('name'), get_bloginfo('admin_email')) . "\r\n" ;
@@ -509,8 +510,15 @@ class SwimTeamRoster extends SwimTeamDBI
                 get_bloginfo('url')) ;
         }
 
-        $to = sprintf("%s %s <%s>", $c1data->user_firstname,
-            $c1data->user_lastname, $c1data->user_email) ;
+        //$to = sprintf("%s %s <%s>", $c1data->user_firstname,
+        //    $c1data->user_lastname, $c1data->user_email) ;
+        if (is_null($c2data))
+            $to = sprintf("%s %s <%s>", $c1data->user_firstname,
+                $c1data->user_lastname, $c1data->user_email) . "\r\n" ;
+        else
+            $to = sprintf("%s %s <%s>, %s %s<%s>",
+                $c1data->user_firstname, $c1data->user_lastname, $c1data->user_email,
+                $c2data->user_firstname, $c2data->user_lastname, $c2data->user_email) . "\r\n" ;
 
         $subject = sprintf("Swimmer %sregistration for %s",
             ($action == WPST_ACTION_REGISTER) ? $regprefix : "un",

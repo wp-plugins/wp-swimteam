@@ -505,7 +505,7 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
     function form_success()
     {
         $container = container() ;
-        $container->add(html_h4("Swimmer unregistered.")) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }
@@ -702,7 +702,7 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
     function form_success()
     {
         $container = container() ;
-        $container->add(html_h4("Swimmer Label assigned.")) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }
