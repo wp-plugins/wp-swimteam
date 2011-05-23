@@ -36,6 +36,11 @@ require_once("print.class.php") ;
 class SwimMeetReport extends SwimMeet
 {
     /**
+     * User Id 
+     */
+    var $__userid = null ;
+
+    /**
      * Meet Summary flag
      */
     var $__meetsummary = false ;
@@ -114,6 +119,26 @@ class SwimMeetReport extends SwimMeet
        ,WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE =>
             WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_LABEL
     ) ;
+
+    /**
+     * set user id
+     *
+     * @param int - id for the user
+     */
+    function setUserId($id)
+    {
+        $this->__userid = $id ;
+    }
+
+    /**
+     * get user id
+     *
+     * @return int - id for the user
+     */
+    function getUserId()
+    {
+        return $this->__userid ;
+    }
 
     /**
      * set active season id
@@ -390,7 +415,10 @@ class SwimMeetReport extends SwimMeet
             $jobassignments->setShowPhone(true) ;
             $jobassignments->setShowNotes(true) ;
 
-            $jobassignments->constructSwimMeetJobAssignmentInfoTable() ;
+            if (user_can(get_current_user_id(), 'publish_posts'))
+                $jobassignments->constructSwimMeetJobAssignmentInfoTable() ;
+            else
+                $jobassignments->constructSwimMeetJobAssignmentInfoTable(null, $this->getUserId()) ;
 
             if (empty($c->_content))
                 $c->add($jobassignments) ;
@@ -491,6 +519,11 @@ class SwimMeetReport extends SwimMeet
                 foreach ($swimmerIds as $swimmerId)
                 {
                     $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+
+                    if (user_can(get_current_user_id(), 'publish_posts') ||
+                        (get_current_user_id() == $swimmer->getContact1Id()) ||
+                        (get_current_user_id() == $swimmer->getContact2Id()))
+                    {
                     $roster->setSwimmerId($swimmerId['swimmerid']) ;
                     $roster->loadRosterBySeasonIdAndSwimmerId() ;
 
@@ -561,6 +594,7 @@ class SwimMeetReport extends SwimMeet
                         }
 
                         $partialrows++ ;
+                    }
                     }
                 }
 
@@ -838,6 +872,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
         //  which originated from the GUIDataList.
  
         $this->add_hidden_element("_action") ;
+        $this->add_hidden_element("_userid") ;
 
         //  Swim  Meet drop down list
 
@@ -885,7 +920,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
             ,ucfirst(WPST_GENERATE_PRINTABLE_WEB_PAGE) => WPST_GENERATE_PRINTABLE_WEB_PAGE
         )) ;
         $this->add_element($output) ;
-}
+    }
 
     /**
      * This method is called only the first time the form
@@ -900,6 +935,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
         $this->set_element_value(get_option(WPST_OPTION_OPT_IN_LABEL) .
             " / " . get_option(WPST_OPTION_OPT_OUT_LABEL) . " List", true) ;
         $this->set_element_value("Sort By", WPST_SORT_BY_NAME) ;
+        $this->set_hidden_element_value('_userid', get_current_user_id()) ;
     }
 
 
@@ -972,10 +1008,11 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
             ? new PrintableSwimMeetReport() : new SwimMeetReport() ;
 
         $rpt = &$this->__report ;
+        $rpt->setUserId($this->get_hidden_element_value('_userid')) ;
 
         //  Get the meet ids to report on
 
-        $meets = $this->get_element_value("Swim Meet") ;
+        $meets = $this->get_element_value('Swim Meet') ;
 
         //  Loop through the meets 
 

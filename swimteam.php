@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.5.579
- * Last Modified:  2011/04/17 07:30:42
+ * Version: 1.5.605
+ * Last Modified:  2011/05/23 23:44:52
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 579 2011-04-17 06:30:42Z mpwalsh8 $
+ * $Id: swimteam.php 582 2011-05-13 14:31:30Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,7 +20,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 579 $
+ * @version $Rev: 582 $
  * @lastmodified $Date$
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
@@ -866,5 +866,60 @@ function wpst_login_redirect($redirect_to, $request_redirect_to, $user)
  
 // add filter with default priority (10), filter takes (3) parameters
 add_filter('login_redirect','wpst_login_redirect', 10, 3);
+
+/**
+ *  Build the WordPress Dashboard widget to dispkay an overview of the swim team.
+ *
+ */
+function wpst_dashboard_widget()
+{
+    require_once('agegroups.class.php') ;
+
+    $br = html_br() ;
+    $div = html_div() ;
+
+    $season = new SwimTeamSeason() ;
+
+    if ($season->loadActiveSeason())
+        $div->add(html_h4(sprintf('Active Season is:  %s',
+            $season->getSeasonLabel())), $br) ;
+    else
+        $div->add(html_h4('No Season Active.'), $br) ;
+
+    //  Age group summary
+
+    $agegroups = new SwimTeamAgeGroupInfoTable('Active Swimmers', '100%') ;
+    $agegroups->constructAgeGroupInfoTable() ;
+    $agdiv = html_div() ;
+    $agdiv->add($agegroups) ;
+
+    //  Meet summary
+
+    $meetsummary = new SwimMeetScheduleInfoTable('Meet Schedule','100%') ;
+    $meetsummary->constructSwimMeetScheduleInfoTable() ;
+    $msdiv = html_div() ;
+    $msdiv->add($meetsummary) ;
+
+    $br->set_tag_attribute('clear', 'both') ;
+    $div->add($msdiv, $br, $br, $agdiv, $br) ;
+
+    $div->add(html_h6('wp-SwimTeam plugin v' .
+        WPST_VERSION, $br, 'wp-SwimTeam database v' .
+        WPST_DB_VERSION)) ;
+
+    echo $div->render() ;
+}
+
+/**
+ * Set up the WordPress dashboard widget(s)
+ *
+ */
+function wpst_dashboard_widget_setup()
+{
+    wp_add_dashboard_widget('dashboard_custom_feed', 'Swim Team Overview', 'wpst_dashboard_widget') ;
+}
+
+//  Hook into the Dashboard setup action to add Dashboard widgets
+add_action('wp_dashboard_setup', 'wpst_dashboard_widget_setup') ;
 
 ?>

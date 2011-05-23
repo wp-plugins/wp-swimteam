@@ -96,6 +96,11 @@ class SwimTeamOptions extends SwimTeamDBI
     var $__job_credits ;
 
     /**
+     * job credits required property
+     */
+    var $__job_credits_required  ;
+
+    /**
      * job email address property
      */
     var $__job_email_address ;
@@ -573,6 +578,26 @@ class SwimTeamOptions extends SwimTeamDBI
     function setJobCredits($credits)
     {
         $this->__job_credits = $credits ;
+    }
+
+    /**
+     * Get the job credits required
+     *
+     * @return - integer - job credits required
+     */
+    function getJobCreditsRequired()
+    {
+        return ($this->__job_credits_required) ;
+    }
+
+    /**
+     * Set the job credits required
+     *
+     * @param - integer - job credits required
+     */
+    function setJobCreditsRequired($required)
+    {
+        $this->__job_credits_required = $required ;
     }
 
     /**
@@ -1269,8 +1294,22 @@ class SwimTeamOptions extends SwimTeamDBI
         }
         else
         {
-            $this->setJobCredits(WPST_DEFAULT_JOB_CREDITS) ;
+            $this->setJobCreditsRequired(WPST_DEFAULT_JOB_CREDITS) ;
             update_option(WPST_OPTION_JOB_CREDITS, WPST_DEFAULT_JOB_CREDITS) ;
+        }
+
+        //  job credits required
+        $option = get_option(WPST_OPTION_JOB_CREDITS_REQUIRED) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setJobCreditsRequired($option) ;
+        }
+        else
+        {
+            $this->setJobCredits(WPST_DEFAULT_JOB_CREDITS_REQUIRED) ;
+            update_option(WPST_OPTION_JOB_CREDITS_REQUIRED, WPST_DEFAULT_JOB_CREDITS_REQUIRED) ;
         }
 
         //  job email address
@@ -1838,6 +1877,7 @@ class SwimTeamOptions extends SwimTeamDBI
         //update_option(WPST_OPTION_MEASUREMENT_UNITS, $this->getMeasurementUnits()) ;
         update_option(WPST_OPTION_JOB_SIGN_UP, $this->getJobSignUp()) ;
         update_option(WPST_OPTION_JOB_CREDITS, $this->getJobCredits()) ;
+        update_option(WPST_OPTION_JOB_CREDITS_REQUIRED, $this->getJobCreditsRequired()) ;
         update_option(WPST_OPTION_JOB_EMAIL_ADDRESS, $this->getJobEmailAddress()) ;
         update_option(WPST_OPTION_JOB_EMAIL_FORMAT, $this->getJobEmailFormat()) ;
         update_option(WPST_OPTION_JOB_EXPECTATIONS_URL, $this->getJobExpectationsURL()) ;

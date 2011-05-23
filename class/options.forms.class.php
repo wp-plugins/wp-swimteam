@@ -1082,6 +1082,9 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
         $jobcredits = new FENumberInRange('Job Credits', true, '100px', null, 0, 500) ;
         $this->add_element($jobcredits) ;
 
+        $jobcreditsrequired = new FENumberInRange('Job Credits Required', true, '100px', null, 0, 500) ;
+        $this->add_element($jobcreditsrequired) ;
+
         $regemail = new FEEmailMany("Job E-mail Address", true, "300px");
         $this->add_element($regemail) ;
 
@@ -1110,6 +1113,7 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
         //  Initialize the form fields
         $this->set_element_value("Job Sign Up Mode", $options->getJobSignUp()) ;
         $this->set_element_value("Job Credits", $options->getJobCredits()) ;
+        $this->set_element_value("Job Credits Required", $options->getJobCreditsRequired()) ;
         $this->set_element_value("Job E-mail Address", $options->getJobEmailAddress()) ;
         $this->set_element_value("Job E-mail Format", $options->getJobEmailFormat()) ;
         $this->set_element_value("Job Expectations URL", $options->getJobExpectationsURL()) ;
@@ -1132,6 +1136,9 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
 
         $table->add_row($this->element_label("Job Credits"),
             $this->element_form("Job Credits")) ;
+
+        $table->add_row($this->element_label("Job Credits Required"),
+            $this->element_form("Job Credits Required")) ;
 
         $table->add_row($this->element_label("Job E-mail Address"),
             $this->element_form("Job E-mail Address")) ;
@@ -1170,6 +1177,7 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
         $options->setJobSignUp($this->get_element_value("Job Sign Up Mode")) ;
         $options->setJobCredits($this->get_element_value("Job Credits")) ;
+        $options->setJobCreditsRequired($this->get_element_value("Job Credits Required")) ;
         $options->setJobEmailAddress($this->get_element_value("Job E-mail Address")) ;
         $options->setJobEmailFormat($this->get_element_value("Job E-mail Format")) ;
         $options->setJobExpectationsURL($this->get_element_value("Job Expectations URL")) ;

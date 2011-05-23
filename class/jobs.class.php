@@ -2092,7 +2092,44 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
     }
 
     /**
-     * Get Job Assignment Ids by Meet Id
+     * Get Job Assignment Ids by User Id
+     *
+     * @param int - $id - user id
+     * @return mixed - array of job assignment ids
+     */
+    function getJobAssignmentIdsByUserId($id = null, $fullseasonjobs = false)
+    {
+        if (is_null($id)) $id = $this->getUserId() ;
+
+        //  Select the records for the meet
+
+        if ($fullseasonjobs)
+            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid=\"%s\" AND %s.jobid = %s.jobid
+                ORDER BY %s.jobposition, %s.jobassignmentid",
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE) ;
+        else
+            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid=\"%s\" AND %s.jobid = %s.jobid AND
+                %s.jobduration != \"%s\" ORDER BY %s.jobposition,
+                %s.jobassignmentid",
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_DURATION_FULL_SEASON, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResults() ;
+    }
+
+     /**
+     * Get Job Assignment Ids by Job Id and Season Id
      *
      * @param int - $id - swim meet id
      * @return mixed - array of job assignment ids
@@ -2113,9 +2150,9 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
     }
 
     /**
-     * Get Job Assignment Ids by Meet Id
+     * Get Job Assignment Ids by Season Id
      *
-     * @param int - $id - swim meet id
+     * @param int - $id - season id
      * @return mixed - array of job assignment ids
      */
     function getJobAssignmentIdsBySeasonId($id = null, $fullseason = true)
@@ -2142,6 +2179,45 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResults() ;
+    }
+
+    /**
+     * Get Job Assignment Ids by Season Id and User Id
+     *
+     * @param int - $seasonid - season id
+     * @param int - $userid - user id
+     * @return mixed - array of job assignment ids
+     */
+    function getJobAssignmentIdsBySeasonIdAndUserId($seasonid = null, $userid = null, $fullseason = true)
+    {
+        if (is_null($userid)) $userid = $this->getUserId() ;
+        if (is_null($seasonid)) $seasonid = $this->getSeasonId() ;
+
+        //  Select the records for the meet
+
+        if ($fullseason)
+            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.seasonid=\"%s\" AND %s.jobid=%s.jobid AND
+                %s.meetid=\"%s\" AND %s.userid=\"%s\" ORDER BY %s.jobposition,
+                %s.jobassignmentid",
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $seasonid,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_NULL_ID, WPST_JOB_ASSIGNMENTS_TABLE,
+                $userid, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE) ;
+        else
+            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.seasonid=\"%s\" AND %s.jobid = %s.jobid AND %s.userid=\"%s\"
+                ORDER BY %s.jobposition, %s.jobassignmentid",
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $seasonid,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE,
+                $userid, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -2216,7 +2292,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         global $userdata ;
         get_currentuserinfo() ;
 
-        $action = ($signup) ? __('sign up') : __('withdrawl') ;
+        $action = ($signup) ? __('sign up') : __('withdrawal') ;
 
         $meetdetails = SwimTeamTextMap::__mapMeetIdToText($this->getMeetId()) ;
         $jobdetails = SwimTeamTextMap::__mapJobIdToText($this->getJobId()) ;
@@ -2276,7 +2352,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
                 %s -
                 </p>
                 <p>
-                A job %s request has been received for %s.
+                A job %s request has been received for %s:
                 </p>
                 <ul>
                 ' ;
@@ -2319,7 +2395,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         else
         {
             $plain = "%s -\r\n\r\n" ;
-            $plain .= "A job %s request has been received for %s.\r\n\r\n" ;
+            $plain .= "A job %s request has been received for %s:\r\n\r\n" ;
 
             //  Add each action message to the e-mail body
   
@@ -2542,7 +2618,7 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
      * Build the InfoTable
      *
      */
-    function constructSwimMeetJobAssignmentInfoTable($meetid = null)
+    function constructSwimMeetJobAssignmentInfoTable($meetid = null, $userid = null)
     {
         //  Need swim meet classes to build the table
 
@@ -2608,57 +2684,65 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
                     $ja->loadJobAssignmentByJobAssignmentId($key) ;
                     $job->loadJobByJobId($ja->getJobId()) ;
 
-                    //  Job Position
-                    $row[] = html_b($job->getJobPosition()) ;
-
-                    //  Name fields, handle initials if necessary
-
-                    $u = get_userdata($ja->getUserId()) ;
-
-                    if ($ja->getUserId() != WPST_NULL_ID)
+                    if (($userid == null) || ($ja->getUserId() == $userid))
                     {
-                        $name = ($this->getShowFirstInitial() ?
-                            substr($u->first_name, 0, 1) . "." : $u->first_name) ;
-
-                        $name .= " " . ($this->getShowLastInitial() ?
-                            substr($u->last_name, 0, 1) . "." : $u->last_name) ;
-
-                        if ($this->getShowUsername())
-                            $name .= " (" . $u->user_login . ")" ;
-
-                        $row[] = $name ;
-                    }
-                    else
-                    {
-                       $row[] = __("None") ;
-                    }
-
-                    if ($this->getShowEmail())
-                    {
-                        if ($ja->getUserId() != WPST_NULL_ID)
-                            $row[] = html_a(sprintf("mailto:%s",
-                                $u->user_email), $u->user_email) ;
-                        else
-                            $row[] = _HTML_SPACE ;
-                    }
-
-                    if ($this->getShowPhone())
-                    {
+                        //  Job Position
+                        $row[] = html_b($job->getJobPosition()) ;
+    
+                        //  Name fields, handle initials if necessary
+    
+                        $u = get_userdata($ja->getUserId()) ;
+    
+                        //  Only report the data when the userid is null or
+                        //  when the user id matches.  Id will be null for admin
+                        //  users, set to a specific id for regular users.
+     
                         if ($ja->getUserId() != WPST_NULL_ID)
                         {
-                            $user->loadUserProfileByUserId($ja->getUserId()) ;
-                            $row[] = $user->getUserPrimaryPhone() .
-                                " / " .  $user->getSecondaryPhone() ;
+                            $name = ($this->getShowFirstInitial() ?
+                                substr($u->first_name, 0, 1) . "." : $u->first_name) ;
+    
+                            $name .= " " . ($this->getShowLastInitial() ?
+                                substr($u->last_name, 0, 1) . "." : $u->last_name) ;
+    
+                            if ($this->getShowUsername())
+                                $name .= " (" . $u->user_login . ")" ;
+    
+                            $row[] = $name ;
                         }
                         else
-                            $row[] = _HTML_SPACE ;
-                    }
-
-                    //  Job Notes
-                    if ($this->getShowNotes())
-                        $row[] = $job->getJobNotes() ;
+                        {
+                           $row[] = __("None") ;
+                        }
     
-                    call_user_func_array(array(&$this, 'add_row'), $row) ;
+                        if ($this->getShowEmail())
+                        {
+                            if ($ja->getUserId() != WPST_NULL_ID)
+                                $row[] = html_a(sprintf("mailto:%s",
+                                    $u->user_email), $u->user_email) ;
+                            else
+                                $row[] = _HTML_SPACE ;
+                        }
+    
+                        if ($this->getShowPhone())
+                        {
+                            if ($ja->getUserId() != WPST_NULL_ID)
+                            {
+                                $user->loadUserProfileByUserId($ja->getUserId()) ;
+                                $row[] = $user->getPrimaryPhone() .
+                                    " / " .  $user->getSecondaryPhone() ;
+                            }
+                            else
+                                $row[] = _HTML_SPACE ;
+                        }
+    
+                        //  Job Notes
+
+                        if ($this->getShowNotes())
+                            $row[] = $job->getJobNotes() ;
+        
+                        call_user_func_array(array(&$this, 'add_row'), $row) ;
+                    }
                 }
             }
         }
@@ -2776,4 +2860,146 @@ class SwimTeamJobDescriptionsInfoTable extends SwimTeamInfoTable
     }
 }
 
+/**
+ * Extended InfoTable Class for presenting SwimTeam
+ * information as a table extracted from the database.
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see SwimTeamInfoTable
+ */
+class SwimTeamUserJobsInfoTable extends SwimTeamInfoTable
+{
+    /**
+     * Credits property
+     */
+    var $__credits ;
+
+    /**
+     * User Id property
+     */
+    var $__userid ;
+
+    /**
+     * Season Id property
+     */
+    var $__seasonid ;
+
+    /**
+     * Set the credits
+     *
+     * @param - int - credits
+     */
+    function setCredits($credits)
+    {
+        $this->__credits = $credits ;
+    }
+
+    /**
+     * Get the credits
+     *
+     * @return - int - credits
+     */
+    function getCredits()
+    {
+        return ($this->__credits) ;
+    }
+
+    /**
+     * Set the user id
+     *
+     * @param - int - id of the user
+     */
+    function setUserId($id)
+    {
+        $this->__userid = $id ;
+    }
+
+    /**
+     * Get the user id
+     *
+     * @return - int - id of the user
+     */
+    function getUserId()
+    {
+        return ($this->__userid) ;
+    }
+
+    /**
+     * Set the season id
+     *
+     * @param - int - id of the season
+     */
+    function setSeasonId($id)
+    {
+        $this->__seasonid = $id ;
+    }
+
+    /**
+     * Get the season id
+     *
+     * @return - int - id of the season
+     */
+    function getSeasonId()
+    {
+        return ($this->__seasonid) ;
+    }
+
+    /**
+     * Build the InfoTable
+     *
+     */
+    function constructSwimTeamUserJobsInfoTable()
+    {
+        $this->setCredits(0) ;
+
+        require_once('textmap.class.php') ;
+
+        $this->set_alt_color_flag(true) ;
+        $this->set_show_cellborders(true) ;
+
+        $attrs = array("width" => "25%", "align" => "right",
+            "valign" => "top", "style" => "padding-right: 5px") ;
+
+        $this->add_column_header('Date', '10%', 'left') ;
+        $this->add_column_header('Position', '40%', 'left') ;
+        $this->add_column_header('Credits', '10%', 'left') ;
+        $this->add_column_header('Opponent', '30%', 'left') ;
+        $this->add_column_header('Location', '10%', 'left') ;
+
+        //  Get all of the Job assignmnts for the specficied user.
+
+        $ja = new SwimTeamJobAssignment() ;
+        $ja->setUserId($this->getUserId()) ;
+        $ja->setSeasonId($this->getSeasonId()) ;
+        $jaids = $ja->getJobAssignmentIdsBySeasonIdAndUserId(null, null, false) ;
+
+        //  Loop through the Job assignment ids
+
+        foreach ($jaids as $jaid)
+        {
+            $ja->loadJobAssignmentByJobAssignmentId($jaid['jobassignmentid']) ;
+            $ja->loadJobByJobId($ja->getJobId()) ;
+            $season = SwimTeamTextMap::__mapSeasonIdToText($ja->getSeasonId()) ;
+
+            //  Is the job a full season job?
+
+            if ($ja->getMeetId() == WPST_NULL_ID)
+            {
+                $meet['date'] = ucwords(WPST_FULL . ' ' . WPST_SEASON) ;
+                $meet['opponent'] = strtoupper(WPST_NA) ;
+                $meet['location'] = strtoupper(WPST_NA) ;
+            }
+            else
+            {
+                $meet = SwimTeamTextMap::__mapMeetIdToText($ja->getMeetId()) ;
+            }
+
+            $this->add_row($meet['date'], $ja->getJobPosition(),
+                $ja->getJobCredits(), $meet['opponent'], $meet['location']) ;
+
+            $this->__credits += $ja->getJobCredits() ;
+        }
+    }
+}
 ?>

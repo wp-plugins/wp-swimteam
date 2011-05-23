@@ -47,6 +47,9 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_init_elements($filters = true)
     {
+        $internalid = new FECheckBox("Internal Id") ;
+        $this->add_element($internalid) ;
+
         $firstname = new FECheckBox("First Name") ;
         $this->add_element($firstname) ;
 
@@ -96,8 +99,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         //$tshirtsize = new FECheckBox("T-Shirt Size") ;
         //$this->add_element($tshirtsize) ;
 
-        $swimmerlabel = new FECheckBox("Swimmer Label") ;
-        $this->add_element($swimmerlabel) ;
+        //$swimmerlabel = new FECheckBox("Swimmer Label") ;
+        //$this->add_element($swimmerlabel) ;
 
         $websitreid = new FECheckBox("Web Site Id") ;
         $this->add_element($websitreid) ;
@@ -171,6 +174,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_init_data($filters = true)
     {
+        $this->set_element_value("Internal Id", false) ;
         $this->set_element_value("First Name", true) ;
         $this->set_element_value("Last Name", true) ;
         $this->set_element_value("Username", false) ;
@@ -276,6 +280,9 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         $table->add_row($this->element_form($plabel),
             $this->element_form($slabel)) ;
 
+        $table->add_row($this->element_form("Internal Id"),
+            _HTML_SPACE) ;
+
         //  How many user options does this configuration support?
 
         $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
@@ -374,6 +381,9 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         //  $rpt is a shortcut to the class property
 
         $rpt = &$this->__report ;
+
+        if (!is_null($this->get_element_value("Internal Id")))
+            $rpt->setinternalId(true) ;
 
         if (!is_null($this->get_element_value("First Name")))
             $rpt->setFirstName(true) ;
@@ -876,6 +886,331 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @access public
+ * @see WpSwimTeamUsersReportGeneratorForm
+ */
+class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportGeneratorForm
+{
+    /**
+     * season id property - used to track the swim season
+     */
+
+    var $__seasonid ;
+
+    /**
+     * Set the season id property
+     *
+     * @param int - $id - season id
+     */
+    function setMeetId($id)
+    {
+        $this->__seasonid = $id ;
+    }
+
+    /**
+     * Get the season id property
+     *
+     * @return int - $id - season id
+     */
+    function getMeetId()
+    {
+        return $this->__seasonid ;
+    }
+
+    /**
+     * Get the array of swim season key and value pairs
+     *
+     * @return mixed - array of swim season key value pairs
+     */
+    function _swimseasonSelections($seasonid = null)
+    {
+        $s = array() ;
+
+        $season = new SwimTeamSeason() ;
+
+        //  Season Id supplied?  If not, use the active season.
+
+        if ($seasonid == null)
+            $seasonid = $season->getActiveSeasonId() ;
+
+        //  Find all of the seasons in the season
+
+        $season = new SwimTeamSeason() ;
+        //$seasonIds = $season->getAllSeasonIds(sprintf("seasonid=\"%s\"", $seasonid)) ;
+        $seasonIds = $season->getAllSeasonIds() ;
+
+        //  Handle case where no seasons have been scheduled yet
+
+        if (!is_null($seasonIds))
+        {
+            foreach ($seasonIds as $seasonId)
+            {
+                $season->loadSeasonById($seasonId['seasonid']) ;
+    
+                $seasonstart = date("M j, Y", strtotime($season->getSeasonStart())) ;
+                $seasonend = date("M j, Y", strtotime($season->getSeasonEnd())) ;
+
+                $s[sprintf("%s [%s - %s] (%s)", $season->getSeasonLabel(), $seasonstart,
+                    $seasonend, $season->getSeasonStatus())] = $seasonId['seasonid'] ;
+            }
+        }
+
+        return $s ;
+    }
+
+    /**
+     * This method gets called EVERY time the object is
+     * created.  It is used to build all of the 
+     * FormElement objects used in this Form.
+     *
+     */
+    function form_init_elements()
+    {
+        //  Pick up the form elements from the parent form
+        parent::form_init_elements(false) ;
+
+        //  Swim  Meet check box list
+
+        $seasons = new FECheckBoxList("Swim Seasons", true, "100%", "100px");
+        $seasons->set_list_data($this->_swimseasonSelections()) ;
+        $seasons->enable_checkall(true) ;
+
+        $this->add_element($seasons) ;
+
+        $jobposition = new FECheckBox("Position") ;
+        $this->add_element($jobposition) ;
+
+        $jobdescription = new FECheckBox("Description") ;
+        $this->add_element($jobdescription) ;
+
+        $jobduration = new FECheckBox("Duration") ;
+        $this->add_element($jobduration) ;
+
+        $jobtype = new FECheckBox("Type") ;
+        $this->add_element($jobtype) ;
+
+        $jobcredits = new FECheckBox("Credits") ;
+        $this->add_element($jobcredits) ;
+
+        $jobnotes = new FECheckBox("Notes") ;
+        $this->add_element($jobnotes) ;
+
+        $jobdurationfilter = new FECheckBox("Duration" . FEFILTER) ;
+        $jobdurationfilter->set_disabled(true) ;
+        $this->add_element($jobdurationfilter) ;
+
+        $jobdurationfilterlb = new FEListBox("Duration" . FEFILTERLB, true, "100px");
+        $jobdurationfilterlb->set_list_data(array(
+             ucwords(WPST_JOB_DURATION_FULL_MEET) => WPST_JOB_DURATION_FULL_MEET
+            ,ucwords(WPST_JOB_DURATION_PARTIAL_MEET) => WPST_JOB_DURATION_PARTIAL_MEET
+            ,ucwords(WPST_JOB_DURATION_FULL_SEASON) => WPST_JOB_DURATION_FULL_SEASON
+            ,ucwords(WPST_JOB_DURATION_PARTIAL_SEASON) => WPST_JOB_DURATION_PARTIAL_SEASON
+            ,ucwords(WPST_JOB_DURATION_EVENT) => WPST_JOB_DURATION_EVENT
+        )) ;
+        $this->add_element($jobdurationfilterlb) ;
+
+        $jobtypefilter = new FECheckBox("Type" . FEFILTER) ;
+        $jobtypefilter->set_disabled(true) ;
+        $this->add_element($jobtypefilter) ;
+
+        $jobtypefilterlb = new FEListBox("Type" . FEFILTERLB, true, "100px");
+        $jobtypefilterlb->set_list_data(array(
+             ucwords(WPST_JOB_TYPE_VOLUNTEER) => WPST_JOB_TYPE_VOLUNTEER
+            ,ucwords(WPST_JOB_TYPE_PAID) => WPST_JOB_TYPE_PAID
+        )) ;
+        $this->add_element($jobtypefilterlb) ;
+    }
+
+    /**
+     * This method is called only the first time the form
+     * page is hit.  This enables u to query a DB and 
+     * pre populate the FormElement objects with data.
+     *
+     */
+    function form_init_data()
+    {
+        //  Pick up the form initialization from the parent form
+        parent::form_init_data(false) ;
+
+        $this->set_element_value("Position", true) ;
+        $this->set_element_value("Description", false) ;
+        $this->set_element_value("Duration", true) ;
+        $this->set_element_value("Type", false) ;
+        $this->set_element_value("Credits", false) ;
+        $this->set_element_value("Notes", true) ;
+        $this->set_element_value("Duration" . FEFILTER, false) ;
+        $this->set_element_value("Duration" . FEFILTERLB, WPST_JOB_DURATION_FULL_MEET) ;
+        $this->set_element_value("Type" . FEFILTER, false) ;
+        $this->set_element_value("Type" . FEFILTERLB, WPST_JOB_TYPE_VOLUNTEER) ;
+    }
+
+    /**
+     * This is the method that builds the layout of where the
+     * FormElements will live.  You can lay it out any way
+     * you like.
+     *
+     */
+    function form_content()
+    {
+        $this->add_form_block("Swim Seasons", $this->_swim_meet_options()) ;
+        $this->add_form_block("Job Commitment Fields", $this->_job_commitment_options()) ;
+        $this->add_form_block("Contact Fields", $this->_contact_options()) ;
+        $this->add_form_block("Report Filters", $this->_report_filters()) ;
+        $this->add_form_block("Report Output", $this->_send_report_to()) ;
+    }
+
+    /**
+     * This is the method that builds the layout of
+     * the Swim Team plugin options.
+     *
+     */
+    function &_swim_meet_options()
+    {
+        $table = html_table($this->_width, 0, 4) ;
+        //$table->set_style("border: 1px solid") ;
+
+        $table->add_row($this->element_form("Swim Seasons")) ;
+
+        return $table ;
+    }
+
+    /**
+     * This is the method that builds the layout of
+     * the Swim Team plugin options.
+     *
+     */
+    function &_job_commitment_options()
+    {
+        $table = html_table($this->_width, 0, 4) ;
+        //$table->set_style("border: 1px solid") ;
+
+        $table->add_row($this->element_form("Position"),
+            $this->element_form("Description")) ;
+
+        $table->add_row($this->element_form("Duration"),
+            $this->element_form("Type")) ;
+
+        $table->add_row($this->element_form("Credits"),
+            $this->element_form("Notes")) ;
+
+        return $table ;
+    }
+
+    /**
+     * This is the method that builds the layout of
+     * the Swim Team plugin options.
+     *
+     */
+    function &_report_filters()
+    {
+        //$table = parent::_report_filters() ;
+        $table = html_table($this->_width, 0, 4) ;
+
+        $table->add_row($this->element_form("Duration" . FEFILTER),
+            $this->element_form("Duration" . FEFILTERLB)) ;
+
+        $table->add_row($this->element_form("Type" . FEFILTER),
+            $this->element_form("Type" . FEFILTERLB)) ;
+
+        return $table ;
+    }
+
+    /**
+     * Set the report options based on form state
+     *
+     */
+    function __set_report_options()
+    {
+        parent::__set_report_options(false) ;
+
+        //  $rpt is a shortcut to the class property
+
+        $rpt = &$this->__report ;
+
+        if (!is_null($this->get_element_value("Position")))
+            $rpt->setJobPosition(true) ;
+
+        if (!is_null($this->get_element_value("Description")))
+            $rpt->setJobDescription(true) ;
+
+        if (!is_null($this->get_element_value("Duration")))
+            $rpt->setJobDuration(true) ;
+
+        if (!is_null($this->get_element_value("Type")))
+            $rpt->setJobType(true) ;
+
+        if (!is_null($this->get_element_value("Credits")))
+            $rpt->setJobCredits(true) ;
+
+        if (!is_null($this->get_element_value("Notes")))
+            $rpt->setJobNotes(true) ;
+
+        $rpt->setSwimMeetIds($this->get_element_value("Swim Seasons")) ;
+
+        //  Filters
+ 
+        if (!is_null($this->get_element_value("Duration" . FEFILTER)))
+        {
+            $rpt->setJobDurationFilter(true) ;
+            $rpt->setJobDurationFilterValue($this->get_element_value("Duration" . FEFILTERLB)) ;
+        }
+ 
+        if (!is_null($this->get_element_value("Type" . FEFILTER)))
+        {
+            $rpt->setJobTypeFilter(true) ;
+            $rpt->setJobTypeFilterValue($this->get_element_value("Type" . FEFILTERLB)) ;
+        }
+    }
+
+    /**
+     * This method is called ONLY after ALL validation has
+     * passed.  This is the method that allows you to 
+     * do something with the data, say insert/update records
+     * in the DB.
+     */
+    function form_action()
+    {
+        if ($this->get_element_value("Report") == WPST_GENERATE_STATIC_WEB_PAGE)
+        {
+            $csv = false ;
+            $this->__report = new SwimTeamJobCommitmentsReportGenerator() ;
+            
+        }
+        else if ($this->get_element_value("Report") == WPST_GENERATE_CSV)
+        {
+            $csv = true ;
+            $this->__report = new SwimTeamJobCommitmentsReportGeneratorCSV() ;
+        }
+        else
+        {
+            return false ;
+        }
+
+        //  $rpt is a shortcut to the class property
+
+        $rpt = &$this->__report ;
+
+        //  Set up the report based on form options
+
+        $this->__set_report_options() ;
+
+        //  Generate the report
+
+        $rpt->generateReport() ;
+        
+        $this->set_action_message(sprintf("Swim Team Job Commitments Report Generated,
+            %s record%s returned.", $rpt->getRecordCount(),
+            $rpt->getRecordCount() == 1 ? "" : "s")) ;
+
+        return true ;
+    }
+
+}
+
+/**
+ * Construct the Report Generator form
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
  * @see WpSwimTeamForm
  */
 class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
@@ -947,6 +1282,9 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         $nicknameoverride = new FECheckBox("Nickname Override") ;
         $this->add_element($nicknameoverride) ;
+
+        $internalid = new FECheckBox("Internal Id") ;
+        $this->add_element($internalid) ;
 
         $genderfilter = new FECheckBox("Gender" . FEFILTER) ;
         $this->add_element($genderfilter) ;
@@ -1046,6 +1384,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
         $this->set_element_value("Swimmer Label", true) ;
         $this->set_element_value("Web Site Id", false) ;
         $this->set_element_value("Nickname Override", false) ;
+        $this->set_element_value("Internal Id", false) ;
         $this->set_element_value("Results" . FEFILTER, false) ;
         $this->set_element_value("Status" . FEFILTER, true) ;
         $this->set_element_value("Gender" . FEFILTERLB, WPST_GENDER_BOTH) ;
@@ -1102,7 +1441,8 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
         $table->add_row($this->element_form("Swimmer Label"),
             $this->element_form("Web Site Id")) ;
 
-        $table->add_row($this->element_form("Nickname Override"), _HTML_SPACE) ;
+        $table->add_row($this->element_form("Nickname Override"),
+            $this->element_form("Internal Id")) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -1274,6 +1614,9 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         if (!is_null($this->get_element_value("Nickname Override")))
             $rpt->setNickNameOverride(true) ;
+
+        if (!is_null($this->get_element_value("Internal Id")))
+            $rpt->setInternalId(true) ;
 
         //  How many swimmer options does this configuration support?
 

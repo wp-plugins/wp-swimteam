@@ -74,6 +74,8 @@ class UsersMenuTabContainer extends Container
             $tab_index++, "profile.php", "UserProfileTabContainer") ;
         $tab_content[] = new TabWidgetContent("My Swimmers",
             $tab_index++, "swimmers.php", "SwimmersTabContainer") ;
+        $tab_content[] = new TabWidgetContent("My Jobs",
+            $tab_index++, "myjobs.php", "MyJobsTabContainer") ;
         $tab_content[] = new TabWidgetContent("Team Roster",
             $tab_index++, "roster.php", "RosterTabContainer") ;
         $tab_content[] = new TabWidgetContent("Swim Meets",

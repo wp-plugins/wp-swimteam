@@ -1044,14 +1044,25 @@ class SwimTeamSwimmer extends SwimTeamDBI
     {
         //  Select the records for the season
 
-        if (get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) == 0)
+        $options_count = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
+
+        //  If the options count is zero or non-existant, don't reference
+        //  the meta table because it will result in an empty set being returned.
+
+        if (($options_count === false) || ((int)$options_count === 0))
+        {
             $query = sprintf("SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s",
                 WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE,
                 WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
+        }
         else
+        {
             $query = sprintf("SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s, %s",
                 WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE, WPST_ROSTER_TABLE,
                 WPST_SEASONS_TABLE, WPST_OPTIONS_META_TABLE) ;
+        }
+
+        //  Build the filters
 
         if (!is_null($filter) && ($filter != ""))
             $query .= sprintf(" WHERE %s", $filter) ;

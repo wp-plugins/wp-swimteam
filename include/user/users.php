@@ -109,6 +109,75 @@ class UsersTabContainer extends SwimTeamTabContainer
         }
     }
 
+    /**
+     * Generate a report of jobs for a user
+     *
+     * @param int userid
+     * @return mixed div container
+     */
+    function UserJobReport($userid)
+    {
+        $div = html_div() ;
+        $ud = get_userdata($userid) ;
+        $name = $ud->first_name . ' ' . $ud->last_name . ' (' . $ud->user_login . ')' ;
+
+        $season = new SwimTeamSeason() ;
+        $active = $season->getActiveSeasonId() ;
+        $seasonlabel = SwimTeamTextMap::__MapSeasonIdToText($active) ;
+
+        $jobs = array() ;
+        $jobs[$active] = new SwimTeamUserJobsInfoTable('User Jobs - ' . $seasonlabel['label'], '100%') ;
+
+        $userjobs = &$jobs[$active] ;
+
+        $userjobs->setUserId($userid) ;
+        $userjobs->setSeasonId($active) ;
+        $userjobs->constructSwimTeamUserJobsInfoTable() ;
+
+        //  Report credits versus team requirements
+        $required = get_option(WPST_OPTION_JOB_CREDITS_REQUIRED) ;
+        if ($required === false) $required = 0 ;
+
+        $div->add(html_h3('Current  Season Jobs - ' . $name)) ;
+        $div->add($userjobs) ;
+
+        //  Summarize credits versus requirements
+ 
+        $div->add(html_h5(sprintf('%s credits assigned / %s credits required.',
+            $userjobs->getCredits(), $required))) ;
+
+        if ($userjobs->getCredits() < $required)
+        {
+            $notice = html_div('error fade',
+                html_h4(sprintf('Notice:  %s has not met the team Jobs requirement of %s credits.',
+                $name, $required))) ;
+            $div->add($notice) ;
+        }
+
+        //  Summarize prior seasons if they exist
+
+        $seasonIds = $season->getAllSeasonIds() ;
+
+        $div->add(html_h3('Prior Season Jobs - ' . $name)) ;
+
+        foreach ($seasonIds as $seasonId)
+        {
+            if ((int)$seasonId['seasonid'] != (int)$active)
+            {
+                $seasonlabel = SwimTeamTextMap::__MapSeasonIdToText($seasonId['seasonid']) ;
+                $jobs[$seasonId['seasonid']] =
+                    new SwimTeamUserJobsInfoTable('User Jobs - ' . $seasonlabel['label'], '100%') ;
+                $userjobs = &$jobs[$seasonId['seasonid']] ;
+                $userjobs->setUserId($userid) ;
+                $userjobs->setSeasonId($seasonId['seasonid']) ;
+                $userjobs->constructSwimTeamUserJobsInfoTable() ;
+                $div->add($userjobs, html_br()) ;
+            }
+        }
+
+        return $div ;
+    }
+
 
     /**
      * Construct the content of the User Tab Container
@@ -160,7 +229,7 @@ class UsersTabContainer extends SwimTeamTabContainer
 
             switch ($action)
             {
-                case WPST_USERS_PROFILE_USER:
+                case WPST_ACTION_PROFILE:
                     $c = container() ;
                     $profile = new SwimTeamUserProfileInfoTable("Web Site User Profile", "500px") ;
                     $profile->set_alt_color_flag(true) ;
@@ -170,7 +239,7 @@ class UsersTabContainer extends SwimTeamTabContainer
                     $c->add($profile) ;
                     break ;
 
-                case WPST_USERS_UPDATE_USER:
+                case WPST_ACTION_UPDATE:
                     $form = new WpSwimTeamUserProfileForm("Update User",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($userid) ;
@@ -178,7 +247,16 @@ class UsersTabContainer extends SwimTeamTabContainer
                     $this->setFormInstructionsHeader('Update User Profile') ;
                     break ;
 
-                case WPST_USERS_EXPORT_CSV:
+                case WPST_ACTION_JOBS:
+                    $c = container() ;
+                    //$userjobs = new SwimTeamUserJobsInfoTable('User Jobs', '100%') ;
+                    //$userjobs->setUserId($userid) ;
+                    //$userjobs->constructSwimTeamUserJobsInfoTable() ;
+                    //$c->add($userjobs) ;
+                    $c->add($this->UserJobReport($userid)) ;
+                    break ;
+
+                case WPST_ACTION_EXPORT_CSV:
                     $c = container() ;
 
                     $csv = new SwimTeamUsersReportGeneratorCSV() ;
@@ -274,10 +352,12 @@ class AdminUsersTabContainer extends UsersTabContainer
     {
         $table = parent::__buildActionSummary() ;
 
-        $table->add_row(html_b(__(WPST_USERS_UPDATE_USER)),
+        $table->add_row(html_b(__(WPST_ACTION_UPDATE)),
             __("Update a user\'s information.  Use this action to correct
             any of the information about one or more of user.")) ;
-        $table->add_row(html_b(__(WPST_USERS_EXPORT_CSV)),
+        $table->add_row(html_b(__(WPST_ACTION_JOBS)),
+            __("Report the user\'s Job Assignments.")) ;
+        $table->add_row(html_b(__(WPST_ACTION_EXPORT_CSV)),
             __("Export the list of users as a CSV file.  A CSV file can
             be loaded into tools such as Microsoft Excel.  All of the user
             information appears in the file, each field separated by the

@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 562 $
+ * @version $Revision: 590 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -180,6 +180,7 @@ define('WPST_DEFAULT_SWIMMER_LABEL_FORMAT', WPST_SIMPLE_NUMERIC) ;
 define('WPST_DEFAULT_SWIMMER_LABEL_FORMAT_CODE', '%-05s') ;
 define('WPST_DEFAULT_JOB_SIGN_UP', WPST_USER) ;
 define('WPST_DEFAULT_JOB_CREDITS', 5) ;
+define('WPST_DEFAULT_JOB_CREDITS_REQUIRED', 0) ;
 define('WPST_DEFAULT_JOB_EMAIL_FORMAT', WPST_HTML) ;
 define('WPST_DEFAULT_GEOGRAPHY', WPST_INTERNATIONAL) ;
 define('WPST_DEFAULT_POSTAL_CODE_LABEL', 'Postal Code') ;
@@ -218,6 +219,7 @@ define('WPST_OPTION_GENDER_LABEL_FEMALE', WPST_OPTION_PREFIX . 'gender_label_fem
 define('WPST_OPTION_MEASUREMENT_UNITS', WPST_OPTION_PREFIX . 'measurement_units') ;
 define('WPST_OPTION_JOB_SIGN_UP', WPST_OPTION_PREFIX . 'job_sign_up') ;
 define('WPST_OPTION_JOB_CREDITS', WPST_OPTION_PREFIX . 'job_credits') ;
+define('WPST_OPTION_JOB_CREDITS_REQUIRED', WPST_OPTION_PREFIX . 'job_credits_required') ;
 define('WPST_OPTION_JOB_EMAIL_ADDRESS', WPST_OPTION_PREFIX . 'job_email_address') ;
 define('WPST_OPTION_JOB_EMAIL_FORMAT', WPST_OPTION_PREFIX . 'job_email_format') ;
 define('WPST_OPTION_JOB_EXPECTATIONS_URL', WPST_OPTION_PREFIX . 'job_expecations_url') ;

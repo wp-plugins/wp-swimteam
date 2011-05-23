@@ -678,19 +678,24 @@ class SwimTeamUserProfile extends SwimTeamDBI
      * @return - array - array of user ids
      */
     function getUserIds($orderbyusername = false,
-        $orderbylastcommafirst = true, $filter = "")
+        $orderbylastcommafirst = true, $filter = '')
     {
         //  Select the records for the season
 
-        /*
-        $query = sprintf("SELECT %s FROM %s",
-            WPST_USERS_COLUMNS,
-            WPST_USERS_TABLES
-        ) ;
-         */
+        $options_count = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
-        $query = sprintf("SELECT DISTINCT ID as userid FROM %s, %s",
-            WPST_OPTIONS_META_TABLE, WPST_USERS_TABLES) ;
+        //  If the options count is zero or non-existant, don't reference
+        //  the meta table because it will result in an empty set being returned.
+
+        if (($options_count === false) || ((int)$options_count === 0))
+        {
+            $query = sprintf("SELECT DISTINCT ID as userid FROM %s", WPST_USERS_TABLES) ;
+        }
+        else
+        {
+            $query = sprintf("SELECT DISTINCT ID as userid FROM %s, %s",
+                WPST_OPTIONS_META_TABLE, WPST_USERS_TABLES) ;
+        }
 
         //  Filter?
 
@@ -734,7 +739,7 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
      * Property to store the possible actions - used to build action buttons
      */
     var $__normal_actions = array(
-         "profile" => WPST_ACTION_PROFILE
+         WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
     ) ;
 
     /**
@@ -799,7 +804,7 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
 	         	    "200", "username", SORTABLE, SEARCHABLE, "left") ;
 
 	  	$this->add_header_item("Swimmers",
-	         	    "200", "swimmers", SORTABLE, SEARCHABLE, "left") ;
+	         	    "200", "swimmers", SORTABLE, NOT_SEARCHABLE, "left") ;
 
 /*	  	$this->add_header_item("Date of Birth",
 	         	    "250", "birthdate", SORTABLE, SEARCHABLE, "left") ;
@@ -898,29 +903,26 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
      *
      * @return container - container holding action bar content
      */
-    function actionbar_cell()
+    function actionbar_cell($gdl_actions = array())
     {
         //  Add an ActionBar button based on the action the page
         //  was called with.
 
         $c = container() ;
 
-        foreach($this->__normal_actions as $key => $button)
-        {
-            //$b = $this->action_button($button, $_SERVER['REQUEST_URI']) ;
+        $actions = array() ;
 
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
+        if (empty($gdl_actions)) $gdl_actions = $this->__normal_actions ;
 
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
+        foreach($gdl_actions as $key => $action)
+            $actions[$action] = $key ;
+
+        
+        $lb = $this->action_select("_action", $actions,
+            "", false, array("style" => "width: 150px; margin-right: 10px;"),
+            $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
+
+        $c->add($lb) ;
 
         return $c ;
     }
@@ -972,9 +974,10 @@ class SwimTeamUsersAdminGUIDataList extends SwimTeamUsersGUIDataList
      * Property to store the possible actions - used to build action buttons
      */
     var $__normal_actions = array(
-         "profile" => WPST_USERS_PROFILE_USER
-        ,"update" => WPST_USERS_UPDATE_USER
-        ,"exportcsv" => WPST_USERS_EXPORT_CSV
+         WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
+        ,WPST_ACTION_UPDATE => WPST_ACTION_UPDATE
+        ,WPST_ACTION_JOBS => WPST_ACTION_JOBS
+        ,WPST_ACTION_EXPORT_CSV => WPST_ACTION_EXPORT_CSV
     ) ;
 
     /**

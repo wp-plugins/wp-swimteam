@@ -64,6 +64,14 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.6 =
+* Fixed bug when optional user and/or swimmer field count is zero preventing reports from running.
+* Added My Jobs tab for all users.  User can now easily see which jobs they've signed up for.
+* Added e-mail field to user profile.  Users are familiar with the swim team profile, easy to update.
+* Exposed Swim Meet report to all users allowing users to see their swimmer opt-in/out and jobs easily.
+* Added Dashboard widget.
+* Fixed quite a few minor bugs - too many to list!
+
 = 1.5 =
 * Fixed bug with duplicate e-mails for Registration, Opt-In/Opt-Out, and Job Sign Up.
 * Fixed confirmation messages after saving Options to utlize WordPress message standard.

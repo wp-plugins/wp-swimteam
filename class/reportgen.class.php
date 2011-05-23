@@ -45,6 +45,11 @@ class SwimTeamReportGenerator extends SwimTeamDBI
     var $__lastname = false ;
 
     /**
+     * internal id
+     */
+    var $__internalid = false ;
+
+    /**
      * optional fields
      */
     var $__optionalfields = array() ;
@@ -107,6 +112,26 @@ class SwimTeamReportGenerator extends SwimTeamDBI
     function getLastName()
     {
         return $this->__lastname ;
+    }
+
+    /**
+     * set internal id field inclusion
+     *
+     * @param boolean - flag to turn field inclusion on or off
+     */
+    function setInternalId($flag = true)
+    {
+        $this->__internalid = $flag ;
+    }
+
+    /**
+     * get internal id field inclusion
+     *
+     * @return boolean - flag to turn field inclusion on or off
+     */
+    function getInternalId()
+    {
+        return $this->__internalid ;
     }
 
     /**
@@ -607,6 +632,7 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
      */
     function getHTMLTableHeader(&$tr)
     {
+        if ($this->getInternalId()) $tr[] = "Internal Id" ;
         if ($this->getFirstName()) $tr[] = "First Name" ;
         if ($this->getLastName()) $tr[] = "Last Name" ;
         if ($this->getUsername()) $tr[] = "Username" ;
@@ -660,6 +686,11 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
      */
     function getHTMLTableRow(&$u, &$om, &$tr)
     {
+        //  Internal Id
+
+        if ($this->getInternalId())
+            $tr[] = $u->getId() ;
+
         if ($this->getFirstName())
             $tr[] = $u->getFirstName() ;
 
@@ -766,7 +797,13 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
         {
             $this->__recordcount++ ;
 
-            $user->loadUserProfileByUserId($userId["userid"]) ;
+            $valid = $user->loadUserProfileByUserId($userId['userid']) ;
+
+            //  The query will be invalid if the user exists in the standard
+            //  WordPress user table but doesn't exist in the wp-SwimTeam user
+            //  table.  Force the user id so the report will emit something useful.
+
+            if (!$valid) $user->setId($userId['userid']) ;
 
             $tr = array() ;
             $tr = $this->getHTMLTableRow($user, $ometa, $tr) ;
@@ -917,7 +954,6 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
         if (empty($options)) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
             
         //  Handle the optional fields
-
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
             $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
@@ -949,6 +985,10 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
     function getCSVRecord(&$u, &$om, $eol = false)
     {
         $csv = "" ;
+
+        if ($this->getInternalId())
+            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
+                "\"" . $u->getId() . "\"" ;
 
         if ($this->getFirstName())
             $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
@@ -1073,7 +1113,13 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
         {
             $this->__recordcount++ ;
 
-            $user->loadUserProfileByUserId($userId["userid"]) ;
+            $valid = $user->loadUserProfileByUserId($userId['userid']) ;
+
+            //  The query will be invalid if the user exists in the standard
+            //  WordPress user table but doesn't exist in the wp-SwimTeam user
+            //  table.  Force the user id so the report will emit something useful.
+
+            if (!$valid) $user->setId($userId['userid']) ;
 
             $csv .= $this->getCSVRecord($user, $ometa) ;
 
@@ -2302,207 +2348,6 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
     }
 
     /**
-     * Generate the Report
-     *
-     */
-    function generateReport2()
-    {
-        $this->__reporttable = new SwimTeamInfoTable("Swim Team Swimmers Report", "100%") ;
-        $table = &$this->__reporttable ;
-        $table->set_alt_color_flag(true) ;
-
-        $season = new SwimTeamSeason() ;
-
-        $tr = array() ;
-
-        if ($this->getFirstName()) $tr[] = "First Name" ;
-        if ($this->getMiddleName()) $tr[] = "Middle Name" ;
-        if ($this->getNickName()) $tr[] = "Nick Name" ;
-        if ($this->getLastName()) $tr[] = "Last Name" ;
-        if ($this->getBirthDate()) $tr[] = "Birth Date" ;
-        if ($this->getAge()) $tr[] = "Age" ;
-        if ($this->getAgeGroup()) $tr[] = "Age Group" ;
-        if ($this->getGender()) $tr[] = "Gender" ;
-        if ($this->getStatus()) $tr[] = "Status" ;
-        if ($this->getSwimmerLabel()) $tr[] = "Swimmer Label" ;
-        if ($this->getResults()) $tr[] = "Results" ;
-        if ($this->getWebSiteId()) $tr[] = "Web Site Id" ;
-
-        //  Handle the optional fields
-
-        /*
-        if ($this->getOption1())
-            $tr[] = get_option(WPST_OPTION_SWIMMER_OPTION1_LABEL) ;
-
-        if ($this->getOption2())
-            $tr[] = get_option(WPST_OPTION_SWIMMER_OPTION2_LABEL) ;
-
-        if ($this->getOption3())
-            $tr[] = get_option(WPST_OPTION_SWIMMER_OPTION3_LABEL) ;
-
-        if ($this->getOption4())
-            $tr[] = get_option(WPST_OPTION_SWIMMER_OPTION4_LABEL) ;
-
-        if ($this->getOption5())
-            $tr[] = get_option(WPST_OPTION_SWIMMER_OPTION5_LABEL) ;
-         */
-
-        //  Primary Contact
-
-        if ($this->getPrimaryContact())
-            $tr[] = "Primary Contact" ;
-
-        //  Secondary Contact
-
-        if ($this->getSecondaryContact())
-            $tr[] = "Secondary Contact" ;
-
-        //  Generate the column headers
- 
-        for ($i = 0 ; $i < count($tr) ; $i++)
-            $table->set_column_header($i, $tr[$i], null, "left") ;
-
-        //  Get all the swimmer ids using the appropriate filter
-
-        $swimmer = new SwimTeamSwimmer() ;
-        $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
-
-        //  Loop through the swimmers
-
-        $this->__recordcount = 0 ;
-
-        foreach ($swimmerIds as $swimmerId)
-        {
-            $this->__recordcount++ ;
-
-            $tr = array() ;
-
-            $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
-
-            if ($this->getFirstName())
-            {
-                if ($this->getNickNameOverride() && $swimmer->getNickName() == "")
-                    $tr[] = $swimmer->getFirstName() ;
-                else
-                    $tr[] = $swimmer->getNickName() ;
-            }
-
-            if ($this->getMiddleName())
-                $tr[] = $swimmer->getMiddleName() ;
-
-            if ($this->getNickName())
-                $tr[] = $swimmer->getNickName() ;
-
-            if ($this->getLastName())
-                $tr[] = $swimmer->getLastName() ;
-
-            if ($this->getBirthDate())
-                $tr[] = $swimmer->getDateOfBirthAsDate() ;
-
-            if ($this->getAge())
-                $tr[] = $swimmer->getAge() . " (" .
-                   $swimmer->getAgeGroupAge() . ")" ;
-
-            if ($this->getAgeGroup())
-                $tr[] = $swimmer->getAgeGroupText() ;
-
-            if ($this->getGender())
-                $tr[] = ucfirst($swimmer->getGender()) ;
-
-            if ($this->getStatus())
-                $tr[] = ucfirst($swimmer->getStatus()) ;
-
-            if ($this->getSwimmerLabel())
-                $tr[] = $this->getCurrentSwimmerLabel($swimmerId["swimmerid"]) ;
-
-            if ($this->getResults())
-                $tr[] = ucfirst($swimmer->getResults()) ;
-            if ($this->getWebSiteId())
-            {
-                if ($swimmer->getWPUserId() == WPST_NONE)
-                {
-                    $tr[] = _HTML_SPACE ;
-                }
-                else
-                {
-                    $u = get_userdata($swimmer->getWPUserId()) ;
-                    $tr[] = $u->user_login ;
-                }
-            }
-
-            //  How many swimmer options does this configuration support?
-
-            $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
-
-            if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
-
-            $om->setUserId($u->getUserId()) ;
-
-            //  Load the swimmer options
-
-            for ($oc = 1 ; $oc <= $options ; $oc++)
-            {
-                $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-        
-                if (get_option($oconst) != WPST_DISABLED)
-                {
-                    if ($this->getOptionalField($oconst))
-                    {
-                        $om->loadOptionMetaByUserIdAndKey($u->getUserId(), $oconst) ;
-                        $tr[] = $om->getOptionMetaValue() ;
-                    }
-                }
-            }
-
-            //  Primary Contact
-
-            if ($this->getPrimaryContact())
-            {
-                if ($swimmer->getContact1Id() == WPST_NULL_ID)
-                {
-                    $tr[] = _HTML_SPACE ;
-                }
-                else
-                {
-                    $u = get_userdata($swimmer->getContact1Id()) ;
-                    $tr[] = $u->first_name . " " . $u->last_name ;
-                }
-
-            }
-
-            //  Secondary Contact
-
-            if ($this->getSecondaryContact())
-            {
-                if ($swimmer->getContact2Id() == WPST_NULL_ID)
-                {
-                    $tr[] = _HTML_SPACE ;
-                }
-                else
-                {
-                    $u = get_userdata($swimmer->getContact2Id()) ;
-                    $tr[] = $u->first_name . " " . $u->last_name ;
-                }
-            }
-
-            /*
-            if ($this->getPrimaryContactDetail())
-            {
-                $p = new SwimTeamUserProfile() ;
-                $p->loadUserProfileByUserId($swimmer->getContact1Id()) ;
-            }
-            */
-
-            //  Can't simply add a row to the table because we
-            //  don't know how many cells the table has.  Use this
-            //  PHP trick to pass an undetermined number of arguments
-            //  to a method.
-
-            call_user_method_array('add_row', $table, $tr) ;
-        }
-    }
-
-    /**
      * Get HTML table header
      *
      * @param mixed - array to populate
@@ -2510,6 +2355,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      */
     function getHTMLTableHeader(&$tr)
     {
+        if ($this->getInternalId()) $tr[] = "Internal Id" ;
         if ($this->getFirstName()) $tr[] = "First Name" ;
         if ($this->getMiddleName()) $tr[] = "Middle Name" ;
         if ($this->getNickName()) $tr[] = "Nick Name" ;
@@ -2558,6 +2404,10 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      */
     function getHTMLTableRow(&$s, &$om, $label, &$tr)
     {
+        //  Internal Id
+
+        if ($this->getInternalId()) $tr[] = $s->getSwimmerId() ;
+
         if ($this->getFirstName())
         {
             if ($this->getNickNameOverride() && $s->getNickName() != "")
@@ -2819,6 +2669,9 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
         $csv = "" ;
         //  Generate the column headers
  
+        if ($this->getInternalId())
+            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Internal Id\"" ;
+
         if ($this->getFirstName())
             $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"First Name\"" ;
 
@@ -2854,6 +2707,7 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
 
         if ($this->getWebSiteId())
             $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Web Site Id\"" ;
+
         //  Primary Contact
 
         if ($this->getPrimaryContact())
@@ -2908,6 +2762,10 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
     function getCSVRecord(&$s, &$om, $sid, $eol = false)
     {
         $csv = "" ;
+
+        if ($this->getInternalId())
+            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
+                "\"" . $s->getSwimmerId() . "\"" ;
 
         if ($this->getFirstName())
         {

@@ -57,7 +57,7 @@ function swimteam_add_menu_pages()
 
     // Add a submenu to the custom top-level menu:
     $swimteamPluginHooks['Reports'] = add_submenu_page($swimteamFileName, 'Reports',
-        'Reports', 'publish_posts', 'swimteam_reports_page',
+        'Reports', 'read', 'swimteam_reports_page',
         'swimteam_reports_page') ;
 
     // Add a submenu to the custom top-level menu:

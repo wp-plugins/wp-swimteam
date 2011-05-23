@@ -84,12 +84,13 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $this->add_hidden_element("UserId") ;
 
         $firstname = new FEText("First Name", true, "200px") ;
-        //$firstname->set_disabled(true) ;
         $this->add_element($firstname) ;
 
         $lastname = new FEText("Last Name", true, "200px") ;
-        //$lastname->set_disabled(true) ;
         $this->add_element($lastname) ;
+
+        $emailaddress = new FEText("E-Mail Address", true, "300px") ;
+        $this->add_element($emailaddress) ;
 
         $street1 = new FEText("Street 1", true, "250px") ;
         $this->add_element($street1) ;
@@ -240,6 +241,9 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         //  Set the last name field to what is stored in the WP profile
         $this->set_element_value("Last Name", $userinfo->user_lastname) ;
 
+        //  Set the email address field to what is stored in the WP profile
+        $this->set_element_value("E-Mail Address", $userinfo->user_email) ;
+
         $geography = get_option(WPST_OPTION_GEOGRAPHY) ;
 
         if ($geography == WPST_US_ONLY)
@@ -341,6 +345,9 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
 
         $table->add_row($this->element_label("Last Name"),
             $this->element_form("Last Name")) ;
+
+        $table->add_row($this->element_label("E-Mail Address"),
+            $this->element_form("E-Mail Address")) ;
 
         $table->add_row($this->element_label("Street 1"),
             $this->element_form("Street 1")) ;
@@ -507,10 +514,17 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $success = $u->saveUserProfile() ;
 
         //  Update the User Meta Data table with the first and last names
-        $success |= update_user_meta($u->getUserId(),
-            "first_name", $this->get_element_value("First Name")) ;
-        $success |- update_user_meta($u->getUserId(),
-            "last_name", $this->get_element_value("Last Name")) ;
+        $first = $this->get_element_value('First Name') ; 
+        $last = $this->get_element_value('Last Name') ; 
+        $success |= update_user_meta($u->getUserId(), "first_name", $first) ;
+        $success |= update_user_meta($u->getUserId(), "last_name", $last) ;
+
+        //  Update the Display Name in the WordPress user table
+        $ID = $u->getUserId() ;
+        $display_name = $first . ' ' . $last ;
+        $user_email = $this->get_element_value('E-Mail Address') ; 
+        $userdata = compact('ID', 'display_name', 'user_email') ;
+        $success |= wp_update_user($userdata) ;
 
         //  If successful, store the added swimmer id in so it can be used later.
         if ($success) 
