@@ -208,7 +208,35 @@ class UsersTabContainer extends SwimTeamTabContainer
         else
             $userid = null ;
 
-        
+        //  Show the list of users or process an action.  If
+        //  there is no $_POST or if there isn't an action
+        //  specififed, then simply display the GDL.
+
+       if (array_key_exists("_action", $scriptargs))
+            $action = $scriptargs['_action'] ;
+        else if (array_key_exists("_form_action", $scriptargs))
+            $action = $scriptargs['_form_action'] ;
+        else
+            $action = null ;
+
+        //  If one of the GDL controls was selected, then
+        //  the action maybe confusing the processor.  Flush
+        //  any action that doesn't make sense.
+
+        if ($action == WPST_ACTION_SELECT_ACTION) $action = null ;
+
+        //  Is requested action "Execute"?  If so, need
+        //  to get the select action from the drop down
+        //  list.
+
+        if ($action == WPST_ACTION_EXECUTE)
+        {
+            if (array_key_exists("_select_action", $scriptargs))
+                $action = $scriptargs['_select_action'] ;
+            else
+                $action = null ;
+        }
+
         //  So, how did we get here?  If $_POST is empty
         //  then it wasn't via a form submission.
 
@@ -216,7 +244,7 @@ class UsersTabContainer extends SwimTeamTabContainer
         //  there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
-        if (empty($scriptargs) || (!array_key_exists("_action", $scriptargs) && !array_key_exists("_form_action", $scriptargs)))
+        if (empty($scriptargs) || is_null($action))
         {
             $div->add($this->__buildGDL()) ;
             $this->setShowActionSummary() ;
@@ -224,9 +252,6 @@ class UsersTabContainer extends SwimTeamTabContainer
         }
         else  //  Crank up the form processing process
         {
-            $action = empty($scriptargs['_action']) ?
-                $scriptargs['_form_action'] : $scriptargs['_action'] ;
-
             switch ($action)
             {
                 case WPST_ACTION_PROFILE:

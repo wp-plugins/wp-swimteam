@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.7 =
+* Fixed bug with Users List which prevented using the GUI controls.
+
 = 1.6 =
 * Fixed bug when optional user and/or swimmer field count is zero preventing reports from running.
 * Added My Jobs tab for all users.  User can now easily see which jobs they've signed up for.
