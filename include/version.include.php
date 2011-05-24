@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 595 $
+ * @version $Revision: 608 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -23,9 +23,9 @@
  * Define constants used for the plugin version number
  */
 define("WPST_MAJOR_VERSION", '1') ;
-define("WPST_MINOR_VERSION", '6') ;
-define("WPST_BUILD_NUMBER", '607') ;
+define("WPST_MINOR_VERSION", '7') ;
+define("WPST_BUILD_NUMBER", '$WCREV$') ;
 define("WPST_VERSION", WPST_MAJOR_VERSION .
     "." . WPST_MINOR_VERSION . "." . WPST_BUILD_NUMBER) ;
-define("WPST_BUILD_TIME", '2011/05/24 17:35:20') ;
+define("WPST_BUILD_TIME", '$WCNOW$') ;
 ?>
