@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.7.608
- * Last Modified:  2011/05/24 17:37:14
+ * Version: 1.8.642
+ * Last Modified:  2011/06/01 19:33:32
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 607 2011-05-24 16:34:35Z mpwalsh8 $
+ * $Id: swimteam.php 642 2011-06-01 18:33:32Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,7 +20,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 607 $
+ * @version $Rev: 642 $
  * @lastmodified $Date$
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
@@ -301,7 +301,7 @@ function swimteam_database_init()
  
     $wpst_db_version = get_option(WPST_DB_OPTION) ;
 
-    if ($wpst_db_version != WPST_DB_VERSION)
+    if (version_compare($wpst_db_version, WPST_DB_VERSION, '!='))
     {
         //  Construct or update the Job table
 
@@ -478,6 +478,20 @@ function swimteam_database_init()
 
         //  Construct or update the Meets table
 
+        //  Strucuture of Swim Meet Meta table changed at v0.83 so
+        //  if database is older, change the column for the 'participation'
+        //  column as it was incorrectly labeled.
+
+//        if (version_compare($wpst_db_version, '0.84', '<'))
+//        {
+//            if ($wpdb->get_var(sprintf("SHOW TABLES LIKE \"%s\"",
+//                WPST_SWIMMEETS_TABLE)) == WPST_SWIMMEETS_TABLE)
+//            {
+//	            $wpdb->query("ALTER TABLE " . WPST_SWIMMEETS_TABLE . 
+//                    " CHANGE COLUMN `participation` `participation` ENUM('" . WPST_OPT_IN . "', '" . WPST_OPT_OUT . "', '" . WPST_CLOSED . "') NOT NULL NOT NULL AFTER `opponentscore`;") ;
+//            }
+//        }
+
         $sql = "CREATE TABLE " . WPST_SWIMMEETS_TABLE . " (
             meetid INT(11) NOT NULL AUTO_INCREMENT,
             seasonid INT(11) NOT NULL,
@@ -490,6 +504,7 @@ function swimteam_database_init()
             teamscore FLOAT NOT NULL DEFAULT 0,
             opponentscore FLOAT NOT NULL DEFAULT 0,
             participation ENUM('" . WPST_OPT_IN . "', '" . WPST_OPT_OUT . "') NOT NULL,
+            meetstatus ENUM('" . WPST_OPEN . "', '" . WPST_CLOSED . "') NOT NULL,
             KEY seasonid (seasonid),
             KEY opponentswimclubid (opponentswimclubid),
             PRIMARY KEY  (meetid)
@@ -531,12 +546,29 @@ function swimteam_database_init()
 
         //  Construct or update the Swim Meets Meta table
 
+        //  Strucuture of Swim Meet Meta table changed at v0.83 so
+        //  if database is older, change the column for the 'eventcode'
+        //  column as it was incorrectly labeled.
+
+        if (version_compare($wpst_db_version, '0.83', '<'))
+        {
+            if ($wpdb->get_var(sprintf("SHOW TABLES LIKE \"%s\"",
+                WPST_SWIMMEETS_META_TABLE)) == WPST_SWIMMEETS_META_TABLE)
+            {
+	            $wpdb->query("ALTER TABLE " . WPST_SWIMMEETS_META_TABLE . 
+                    " CHANGE COLUMN `eventcode` `strokecode` BIGINT(20) NOT NULL DEFAULT '0'") ;
+            }
+        }
+
+        //  SQL to create or alter the table
+
         $sql = "CREATE TABLE " . WPST_SWIMMEETS_META_TABLE . " (
             smetaid BIGINT(20) NOT NULL AUTO_INCREMENT,
             userid BIGINT(20) NOT NULL DEFAULT '0',
             swimmerid BIGINT(20) NOT NULL DEFAULT '0',
             swimmeetid BIGINT(20) NOT NULL DEFAULT '0',
-            eventcode BIGINT(20) NOT NULL DEFAULT '0',
+            strokecode BIGINT(20) NOT NULL DEFAULT '0',
+            eventid BIGINT(20) NOT NULL DEFAULT '0',
             participation ENUM('" . WPST_OPT_IN . "', '" . WPST_OPT_OUT . "') NOT NULL,
             smetakey VARCHAR(255) DEFAULT NULL,
             smetavalue LONGTEXT,
@@ -544,7 +576,8 @@ function swimteam_database_init()
             KEY userid (userid),
             KEY swimmerid (swimmerid),
             KEY swimmeetid (swimmeetid),
-            KEY eventcode (eventcode),
+            KEY strokecode (strokecode),
+            KEY eventid (eventid),
             KEY smetakey (smetakey),
             PRIMARY KEY  (smetaid)
 	    );" ;
@@ -572,7 +605,7 @@ function swimteam_database_init()
         //  Strucuture of Jobs table changed at v0.77 so
         //  if database is older, drop the index for the 'id' column.
 
-        if ($wpst_db_version < 0.77)
+        if (version_compare($wpst_db_version, '0.77', '<'))
         {
             if ($wpdb->get_var(sprintf("SHOW TABLES LIKE \"%s\"",
                 WPST_JOBS_TABLE)) == WPST_JOBS_TABLE)
@@ -587,7 +620,7 @@ function swimteam_database_init()
         //  'option2', 'option3', 'option4', and 'option5' columns
         //  as optional data is now handled via the Meta Table.
 
-        if ($wpst_db_version < 0.81)
+        if (version_compare($wpst_db_version, '0.81', '<'))
         {
             $obsolete_columns = array(
                 array('table' => WPST_USERS_TABLE, 'column' => 'tshirtsize')
@@ -617,7 +650,6 @@ function swimteam_database_init()
                 }
             }
         }
-
 
         //  Update the WordPress option which stores the database version
 

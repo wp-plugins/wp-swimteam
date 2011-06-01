@@ -19,11 +19,11 @@
  *
  */
 
-require_once("forms.class.php") ;
-require_once("swimmers.class.php") ;
-require_once("seasons.class.php") ;
-require_once("swimmeets.class.php") ;
-require_once("textmap.class.php") ;
+require_once('forms.class.php') ;
+require_once('swimmers.class.php') ;
+require_once('seasons.class.php') ;
+require_once('swimmeets.class.php') ;
+require_once('textmap.class.php') ;
 
 define('CHECKBOX_SUFFIX', ' CheckBox') ;
 
@@ -71,7 +71,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         //  Retrieve the list of valid Wordpress User unique IDs
  
-        $db->setQuery(sprintf("SELECT %susers.ID AS id FROM %susers",
+        $db->setQuery(sprintf('SELECT %susers.ID AS id FROM %susers',
             $wpdb->prefix, $wpdb->prefix)) ;
         $db->runSelectQuery() ;
 
@@ -84,7 +84,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         foreach ($idList as $id)
         {
-            $u = get_userdata($id["id"]) ;
+            $u = get_userdata($id['id']) ;
 
             if (array_key_exists('last_name', get_object_vars($u)))
                 $last = $u->last_name ;
@@ -96,9 +96,9 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
             else
                 $first = strtoupper(WPST_NA) ;
 
-            $k = $last . ", " . $first . " (" . $u->user_login . ")" ;
+            $k = $last . ', ' . $first . ' (' . $u->user_login . ')' ;
 
-            $dataList[$k] = $id["id"] ;
+            $dataList[$k] = $id['id'] ;
         }
 
         //  Sort the datalist based on the contructed keys
@@ -108,7 +108,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         //  Allow a "none" selection?
  
         if ($allowNone)
-            $dataList = array_merge(array(__("None") => WPST_NULL_ID), $dataList) ;
+            $dataList = array_merge(array(__('None') => WPST_NULL_ID), $dataList) ;
 
         return $dataList ;
     }
@@ -168,73 +168,73 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         //  the delete operation, the fields are displayed
         //  but are set in the disabled state.
         $disabled_field = (strtoupper(get_class($this))
-            == strtoupper("WpSwimTeamSwimmerDeleteForm")) ? true : false ;
+            == strtoupper('WpSwimTeamSwimmerDeleteForm')) ? true : false ;
 
-        $this->add_hidden_element("swimmerid") ;
+        $this->add_hidden_element('swimmerid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
         //  First Name Field
-        $firstName = new FEText("First Name", !$disabled_field, "150px") ;
+        $firstName = new FEText('First Name', !$disabled_field, '150px') ;
         $firstName->set_readonly($disabled_field) ;
         $this->add_element($firstName) ;
 
         //  Middle Name Field
-        $middleName = new FEText("Middle Name", false, "150px") ;
+        $middleName = new FEText('Middle Name', false, '150px') ;
         $middleName->set_readonly($disabled_field) ;
         $this->add_element($middleName) ;
 
         //  Nick Name Field
-        $nickName = new FEText("Nick Name", false, "150px") ;
+        $nickName = new FEText('Nick Name', false, '150px') ;
         $nickName->set_readonly($disabled_field) ;
         $this->add_element($nickName) ;
 
         //  Last Name Field
-        $lastName = new FEText("Last Name", !$disabled_field, "150px") ;
+        $lastName = new FEText('Last Name', !$disabled_field, '150px') ;
         $lastName->set_readonly($disabled_field) ;
         $this->add_element($lastName) ;
 
         //  Gender options and labels are set based on
         //  the plugin options
 
-        $gender = new FEListBox("Gender", !$disabled_field, "150px");
+        $gender = new FEListBox('Gender', !$disabled_field, '150px');
         $gender->set_list_data($this->_genderSelections()) ;
         $gender->set_readonly($disabled_field) ;
 
         $this->add_element($gender) ;
  
         //  Date of Birth field
-        $dob = new FEDate("Date of Birth", !$disabled_field, null, null,
-            "Fdy", date("Y"), date("Y") - get_option(WPST_OPTION_MAX_AGE) - 1) ;
+        $dob = new FEDate('Date of Birth', !$disabled_field, null, null,
+            'Fdy', date('Y'), date('Y') - get_option(WPST_OPTION_MAX_AGE) - 1) ;
         $dob->set_readonly($disabled_field) ;
 
         $this->add_element($dob) ;
 
         //  Contact1 field
-        $contact1 = new FEListBox("Primary Contact", true, "250px") ;
+        $contact1 = new FEListBox('Primary Contact', true, '250px') ;
         $contact1->set_list_data($this->_contactSelections()) ;
         $contact1->set_readonly($disabled_field) ;
 
         $this->add_element($contact1) ;
 
         //  Contact2 field
-        $contact2 = new FEListBox("Secondary Contact", true, "250px") ;
+        $contact2 = new FEListBox('Secondary Contact', true, '250px') ;
         $contact2->set_list_data($this->_contactSelections(true)) ;
         $contact2->set_readonly($disabled_field) ;
 
         $this->add_element($contact2) ;
 
         //  Swimmer WP Id field
-        $swmrWpId = new FEListBox("Web Site Id", false, "250px") ;
+        $swmrWpId = new FEListBox('Web Site Id', false, '250px') ;
         $swmrWpId->set_list_data($this->_contactSelections(true)) ;
         $swmrWpId->set_readonly($disabled_field) ;
 
         $this->add_element($swmrWpId) ;
 
-        $results = new FEListBox("Results", !$disabled_field, "150px");
+        $results = new FEListBox('Results', !$disabled_field, '150px');
         $results->set_list_data($this->_resultsSelections()) ;
         $results->set_readonly($disabled_field) ;
 
@@ -252,9 +252,9 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
@@ -264,50 +264,50 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
             switch (get_option($oconst))
             {
                 case WPST_REQUIRED:
-                    $oe[$oc] = new FEText($label, !$disabled_field, "250px") ;
+                    $oe[$oc] = new FEText($label, !$disabled_field, '250px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_OPTIONAL:
-                    $oe[$oc] = new FEText($label, false, "250px") ;
+                    $oe[$oc] = new FEText($label, false, '250px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_EMAIL_OPTIONAL:
-                    $oe[$oc] = new FEEmail($label, false, "250px") ;
+                    $oe[$oc] = new FEEmail($label, false, '250px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_EMAIL_REQUIRED:
-                    $oe[$oc] = new FEEmail($label, !$disabled_field, "250px") ;
+                    $oe[$oc] = new FEEmail($label, !$disabled_field, '250px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_URL_OPTIONAL:
-                    $oe[$oc] = new FEUrl($label, false, "250px") ;
+                    $oe[$oc] = new FEUrl($label, false, '250px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_URL_REQUIRED:
-                    $oe[$oc] = new FEUrl($label, !$disabled_field, "250px") ;
+                    $oe[$oc] = new FEUrl($label, !$disabled_field, '250px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_YES_NO:
                 case WPST_NO_YES:
-                    $oe[$oc] = new FEYesNoListBox($label, !$disabled_field, "75px") ;
+                    $oe[$oc] = new FEYesNoListBox($label, !$disabled_field, '75px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_CLOTHING_SIZE:
-                    $oe[$oc] = new FEClothingSizeListBox($label, !$disabled_field, "150px") ;
+                    $oe[$oc] = new FEClothingSizeListBox($label, !$disabled_field, '150px') ;
                     $oe[$oc]->set_readonly($disabled_field) ;
                     $this->add_element($oe[$oc]) ;
                     break ;
@@ -327,14 +327,14 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         if ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION)
         {
-            $override = new FEYesNoListBox("Override Age Range Checks",
-                !$disabled_field, "75px", null, WPST_YES, WPST_NO);
+            $override = new FEYesNoListBox('Override Age Range Checks',
+                !$disabled_field, '75px', null, WPST_YES, WPST_NO);
             $override->set_readonly($disabled_field) ;
             $this->add_element($override) ;
         }
         else
         {
-            $this->add_hidden_element("Override Age Range Checks") ;
+            $this->add_hidden_element('Override Age Range Checks') ;
         }
     }
 
@@ -352,23 +352,23 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         get_currentuserinfo() ;
 
         //  Initialize the form fields
-        $this->set_hidden_element_value("_action", $action) ;
-        $this->set_element_value("First Name", "") ;
-        $this->set_element_value("Middle Name", "") ;
-        $this->set_element_value("Nick Name", "") ;
+        $this->set_hidden_element_value('_action', $action) ;
+        $this->set_element_value('First Name', '') ;
+        $this->set_element_value('Middle Name', '') ;
+        $this->set_element_value('Nick Name', '') ;
         
         //  Set the last name field to what is stored in the WP profile
-        $this->set_element_value("Last Name", $userdata->user_lastname) ;
+        $this->set_element_value('Last Name', $userdata->user_lastname) ;
         
         //  Set the contact fields based on current user
-        $this->set_element_value("Primary Contact", $userdata->ID) ;
-        $this->set_element_value("Secondary Contact", WPST_NULL_ID) ;
-        $this->set_element_value("Web Site Id", WPST_NULL_ID) ;
+        $this->set_element_value('Primary Contact', $userdata->ID) ;
+        $this->set_element_value('Secondary Contact', WPST_NULL_ID) ;
+        $this->set_element_value('Web Site Id', WPST_NULL_ID) ;
 
-        $this->set_element_value("Gender", WPST_GENDER_MALE) ;
-        $this->set_element_value("Date of Birth", array("year" => date("Y"),
-            "month" => date("m"), "day" => date("d"))) ;
-        $this->set_element_value("Results", WPST_PUBLIC) ;
+        $this->set_element_value('Gender', WPST_GENDER_MALE) ;
+        $this->set_element_value('Date of Birth', array('year' => date('Y'),
+            'month' => date('m'), 'day' => date('d'))) ;
+        $this->set_element_value('Results', WPST_PUBLIC) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -380,9 +380,9 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
@@ -421,9 +421,9 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         //  Override age checks?  Only available to admin
 
         if ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION)
-            $this->set_element_value("Override Age Range Checks", WPST_NO) ;
+            $this->set_element_value('Override Age Range Checks', WPST_NO) ;
         else
-            $this->set_hidden_element_value("Override Age Range Checks", WPST_NO) ;
+            $this->set_hidden_element_value('Override Age Range Checks', WPST_NO) ;
     }
 
 
@@ -440,40 +440,40 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         get_currentuserinfo() ;
 
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("First Name"),
-            $this->element_form("First Name")) ;
+        $table->add_row($this->element_label('First Name'),
+            $this->element_form('First Name')) ;
 
-        $table->add_row($this->element_label("Middle Name"),
-            $this->element_form("Middle Name")) ;
+        $table->add_row($this->element_label('Middle Name'),
+            $this->element_form('Middle Name')) ;
 
-        $table->add_row($this->element_label("Nick Name"),
-            $this->element_form("Nick Name")) ;
+        $table->add_row($this->element_label('Nick Name'),
+            $this->element_form('Nick Name')) ;
 
-        $table->add_row($this->element_label("Last Name"),
-            $this->element_form("Last Name")) ;
+        $table->add_row($this->element_label('Last Name'),
+            $this->element_form('Last Name')) ;
 
-        $table->add_row($this->element_label("Gender"),
-            $this->element_form("Gender")) ;
+        $table->add_row($this->element_label('Gender'),
+            $this->element_form('Gender')) ;
 
-        //$table->add_row($this->element_label("T-Shirt Size"),
-            //$this->element_form("T-Shirt Size")) ;
+        //$table->add_row($this->element_label('T-Shirt Size'),
+            //$this->element_form('T-Shirt Size')) ;
 
-        $table->add_row($this->element_label("Date of Birth"),
-            $this->element_form("Date of Birth")) ;
+        $table->add_row($this->element_label('Date of Birth'),
+            $this->element_form('Date of Birth')) ;
 
-        $table->add_row($this->element_label("Primary Contact"),
-            $this->element_form("Primary Contact")) ;
+        $table->add_row($this->element_label('Primary Contact'),
+            $this->element_form('Primary Contact')) ;
 
-        $table->add_row($this->element_label("Secondary Contact"),
-            $this->element_form("Secondary Contact")) ;
+        $table->add_row($this->element_label('Secondary Contact'),
+            $this->element_form('Secondary Contact')) ;
 
-        $table->add_row($this->element_label("Web Site Id"),
-            $this->element_form("Web Site Id")) ;
+        $table->add_row($this->element_label('Web Site Id'),
+            $this->element_form('Web Site Id')) ;
 
-        $table->add_row($this->element_label("Results"),
-            $this->element_form("Results")) ;
+        $table->add_row($this->element_label('Results'),
+            $this->element_form('Results')) ;
 
         //  Show optional fields if they are enabled
  
@@ -487,9 +487,9 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
@@ -508,8 +508,8 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         if ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION)
         {
-            $table->add_row($this->element_label("Override Age Range Checks"),
-                $this->element_form("Override Age Range Checks")) ;
+            $table->add_row($this->element_label('Override Age Range Checks'),
+                $this->element_form('Override Age Range Checks')) ;
         }
 
         $this->add_form_block(null, $table) ;
@@ -534,7 +534,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         if ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION)
         {
-            $override = $this->get_element_value("Override Age Range Checks") ;
+            $override = $this->get_element_value('Override Age Range Checks') ;
         }
 
         $override = ($override == WPST_YES) ;
@@ -542,16 +542,16 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         //  Need to validate several fields ...
 
         $swimmer = new SwimTeamSwimmer() ;
-        $swimmer->setFirstName($this->get_element_value("First Name")) ;
-        $swimmer->setMiddleName($this->get_element_value("Middle Name")) ;
-        $swimmer->setNickName($this->get_element_value("Nick Name")) ;
-        $swimmer->setLastName($this->get_element_value("Last Name")) ;
-        $swimmer->setContact1Id($this->get_element_value("Primary Contact")) ;
-        $swimmer->setContact2Id($this->get_element_value("Secondary Contact")) ;
-        $swimmer->setWPUserId($this->get_element_value("Web Site Id")) ;
-        $swimmer->setGender($this->get_element_value("Gender")) ;
-        $swimmer->setResults($this->get_element_value("Results")) ;
-        $swimmer->setDateOfBirth($this->get_element_value("Date of Birth")) ;
+        $swimmer->setFirstName($this->get_element_value('First Name')) ;
+        $swimmer->setMiddleName($this->get_element_value('Middle Name')) ;
+        $swimmer->setNickName($this->get_element_value('Nick Name')) ;
+        $swimmer->setLastName($this->get_element_value('Last Name')) ;
+        $swimmer->setContact1Id($this->get_element_value('Primary Contact')) ;
+        $swimmer->setContact2Id($this->get_element_value('Secondary Contact')) ;
+        $swimmer->setWPUserId($this->get_element_value('Web Site Id')) ;
+        $swimmer->setGender($this->get_element_value('Gender')) ;
+        $swimmer->setResults($this->get_element_value('Results')) ;
+        $swimmer->setDateOfBirth($this->get_element_value('Date of Birth')) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -563,9 +563,9 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -582,12 +582,12 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         
         if ($swimmer->swimmerExist($exact))
         {
-            $this->add_error("First Name", "Swimmer already exists.");
-            $this->add_error("Middle Name", "Swimmer already exists.");
-            $this->add_error("Nick Name", "Swimmer already exists.");
-            $this->add_error("Last Name", "Swimmer already exists.");
-            $this->add_error("Gender", "Swimmer already exists.");
-            $this->add_error("Date of Birth", "Swimmer already exists.");
+            $this->add_error('First Name', 'Swimmer already exists.');
+            $this->add_error('Middle Name', 'Swimmer already exists.');
+            $this->add_error('Nick Name', 'Swimmer already exists.');
+            $this->add_error('Last Name', 'Swimmer already exists.');
+            $this->add_error('Gender', 'Swimmer already exists.');
+            $this->add_error('Date of Birth', 'Swimmer already exists.');
             $valid = false ;
         }
 
@@ -598,8 +598,8 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         {
             if (!$override)
             {
-                $this->add_error("Date of Birth",
-                    "Swimmer is too young, check date of birth.");
+                $this->add_error('Date of Birth',
+                    'Swimmer is too young, check date of birth.');
                 $valid = false ;
             }
         }
@@ -609,8 +609,8 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         {
             if (!$override)
             {
-                $this->add_error("Date of Birth",
-                    "Swimmer is too old, check date of birth.");
+                $this->add_error('Date of Birth',
+                    'Swimmer is too old, check date of birth.');
                 $valid = false ;
             }
         }
@@ -629,16 +629,16 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         global $userdata ;
 
         $swimmer = new SwimTeamSwimmer() ;
-        $swimmer->setFirstName($this->get_element_value("First Name")) ;
-        $swimmer->setMiddleName($this->get_element_value("Middle Name")) ;
-        $swimmer->setNickName($this->get_element_value("Nick Name")) ;
-        $swimmer->setLastName($this->get_element_value("Last Name")) ;
-        $swimmer->setContact1Id($this->get_element_value("Primary Contact")) ;
-        $swimmer->setContact2Id($this->get_element_value("Secondary Contact")) ;
-        $swimmer->setWPUserId($this->get_element_value("Web Site Id")) ;
-        $swimmer->setGender($this->get_element_value("Gender")) ;
-        $swimmer->setResults($this->get_element_value("Results")) ;
-        $swimmer->setDateOfBirth($this->get_element_value("Date of Birth")) ;
+        $swimmer->setFirstName($this->get_element_value('First Name')) ;
+        $swimmer->setMiddleName($this->get_element_value('Middle Name')) ;
+        $swimmer->setNickName($this->get_element_value('Nick Name')) ;
+        $swimmer->setLastName($this->get_element_value('Last Name')) ;
+        $swimmer->setContact1Id($this->get_element_value('Primary Contact')) ;
+        $swimmer->setContact2Id($this->get_element_value('Secondary Contact')) ;
+        $swimmer->setWPUserId($this->get_element_value('Web Site Id')) ;
+        $swimmer->setGender($this->get_element_value('Gender')) ;
+        $swimmer->setResults($this->get_element_value('Results')) ;
+        $swimmer->setDateOfBirth($this->get_element_value('Date of Birth')) ;
         $swimmer->setStatus(WPST_INACTIVE) ;
 
         //  How many swimmer options does this configuration support?
@@ -653,9 +653,9 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -707,21 +707,21 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
                 if ($success && $updated) 
                 {
                     $roster->setId($success) ;
-                    $this->set_action_message("Swimmer successfully added and registered for the active season.") ;
+                    $this->set_action_message('Swimmer successfully added and registered for the active season.') ;
                 }
                 else
                 {
-                    $this->set_action_message("Swimmer was added but not successfully registered for the current season.") ;
+                    $this->set_action_message('Swimmer was added but not successfully registered for the current season.') ;
                 }
             }
             else
             {
-                $this->set_action_message("Swimmer successfully added.") ;
+                $this->set_action_message('Swimmer successfully added.') ;
             }
         }
         else
         {
-            $this->set_action_message("Swimmer was not successfully added.") ;
+            $this->set_action_message('Swimmer was not successfully added.') ;
         }
 
         return true ;
@@ -761,18 +761,18 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
         $swimmer->loadSwimmerById($this->getId()) ;
 
         //  Initialize the form fields
-        $this->set_hidden_element_value("swimmerid", $this->getId()) ;
-        $this->set_hidden_element_value("_action", $action) ;
-        $this->set_element_value("First Name", $swimmer->getFirstName()) ;
-        $this->set_element_value("Middle Name", $swimmer->getMiddleName()) ;
-        $this->set_element_value("Nick Name", $swimmer->getNickName()) ;
-        $this->set_element_value("Last Name", $swimmer->getLastName()) ;
-        $this->set_element_value("Primary Contact", $swimmer->getContact1Id()) ;
-        $this->set_element_value("Secondary Contact", $swimmer->getContact2Id()) ;
-        $this->set_element_value("Web Site Id", $swimmer->getWPUserId()) ;
-        $this->set_element_value("Gender", $swimmer->getGender()) ;
-        $this->set_element_value("Results", $swimmer->getResults()) ;
-        $this->set_element_value("Date of Birth", $swimmer->getDateOfBirth()) ;
+        $this->set_hidden_element_value('swimmerid', $this->getId()) ;
+        $this->set_hidden_element_value('_action', $action) ;
+        $this->set_element_value('First Name', $swimmer->getFirstName()) ;
+        $this->set_element_value('Middle Name', $swimmer->getMiddleName()) ;
+        $this->set_element_value('Nick Name', $swimmer->getNickName()) ;
+        $this->set_element_value('Last Name', $swimmer->getLastName()) ;
+        $this->set_element_value('Primary Contact', $swimmer->getContact1Id()) ;
+        $this->set_element_value('Secondary Contact', $swimmer->getContact2Id()) ;
+        $this->set_element_value('Web Site Id', $swimmer->getWPUserId()) ;
+        $this->set_element_value('Gender', $swimmer->getGender()) ;
+        $this->set_element_value('Results', $swimmer->getResults()) ;
+        $this->set_element_value('Date of Birth', $swimmer->getDateOfBirth()) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -786,9 +786,9 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
@@ -805,9 +805,9 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
         //  Override age checks?  Only available to admin
 
         if ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION)
-            $this->set_element_value("Override Age Range Checks", WPST_NO) ;
+            $this->set_element_value('Override Age Range Checks', WPST_NO) ;
         else
-            $this->set_hidden_element_value("Override Age Range Checks", WPST_NO) ;
+            $this->set_hidden_element_value('Override Age Range Checks', WPST_NO) ;
     }
 
     /**
@@ -829,10 +829,10 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
         get_currentuserinfo() ;
 
         if ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION)
-            $override = $this->get_element_value("Override Age Range Checks") ;
+            $override = $this->get_element_value('Override Age Range Checks') ;
 
         $swimmer = new SwimTeamSwimmer() ;
-        $swimmer->setId($this->get_hidden_element_value("swimmerid")) ;
+        $swimmer->setId($this->get_hidden_element_value('swimmerid')) ;
 
         //  Make sure the swimmer record exists
  
@@ -840,16 +840,16 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
         {
             //  Need to validate several fields ...
 
-            $swimmer->setFirstName($this->get_element_value("First Name")) ;
-            $swimmer->setMiddleName($this->get_element_value("Middle Name")) ;
-            $swimmer->setNickName($this->get_element_value("Nick Name")) ;
-            $swimmer->setLastName($this->get_element_value("Last Name")) ;
-            $swimmer->setContact1Id($this->get_element_value("Primary Contact")) ;
-            $swimmer->setContact2Id($this->get_element_value("Secondary Contact")) ;
-            $swimmer->setWPUserId($this->get_element_value("Web Site Id")) ;
-            $swimmer->setGender($this->get_element_value("Gender")) ;
-            $swimmer->setResults($this->get_element_value("Results")) ;
-            $swimmer->setDateOfBirth($this->get_element_value("Date of Birth")) ;
+            $swimmer->setFirstName($this->get_element_value('First Name')) ;
+            $swimmer->setMiddleName($this->get_element_value('Middle Name')) ;
+            $swimmer->setNickName($this->get_element_value('Nick Name')) ;
+            $swimmer->setLastName($this->get_element_value('Last Name')) ;
+            $swimmer->setContact1Id($this->get_element_value('Primary Contact')) ;
+            $swimmer->setContact2Id($this->get_element_value('Secondary Contact')) ;
+            $swimmer->setWPUserId($this->get_element_value('Web Site Id')) ;
+            $swimmer->setGender($this->get_element_value('Gender')) ;
+            $swimmer->setResults($this->get_element_value('Results')) ;
+            $swimmer->setDateOfBirth($this->get_element_value('Date of Birth')) ;
             //  How many swimmer options does this configuration support?
 
             $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
@@ -860,9 +860,9 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
 
             for ($oc = 1 ; $oc <= $options ; $oc++)
             {
-                $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-                $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-                $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+                $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+                $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+                $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
                 if (get_option($oconst) != WPST_DISABLED)
                 {
@@ -883,14 +883,14 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
             {
                 $qr = $swimmer->getQueryResult() ;
 
-                if ($qr["id"] != $swimmer->getId())
+                if ($qr['id'] != $swimmer->getId())
                 {
-                    $this->add_error("First Name", "Swimmer already exists.");
-                    $this->add_error("Middle Name", "Swimmer already exists.");
-                    $this->add_error("Nick Name", "Swimmer already exists.");
-                    $this->add_error("Last Name", "Swimmer already exists.");
-                    $this->add_error("Gender", "Swimmer already exists.");
-                    $this->add_error("Date of Birth", "Swimmer already exists.");
+                    $this->add_error('First Name', 'Swimmer already exists.');
+                    $this->add_error('Middle Name', 'Swimmer already exists.');
+                    $this->add_error('Nick Name', 'Swimmer already exists.');
+                    $this->add_error('Last Name', 'Swimmer already exists.');
+                    $this->add_error('Gender', 'Swimmer already exists.');
+                    $this->add_error('Date of Birth', 'Swimmer already exists.');
                     $valid = false ;
                 }
             }
@@ -902,8 +902,8 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
             {
                 if (!$override)
                 {
-                    $this->add_error("Date of Birth",
-                        "Swimmer is too young, check date of birth.");
+                    $this->add_error('Date of Birth',
+                        'Swimmer is too young, check date of birth.');
                     $valid = false ;
                 }
             }
@@ -913,8 +913,8 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
             {
                 if (!$override)
                 {
-                    $this->add_error("Date of Birth",
-                        "Swimmer is too old, check date of birth.");
+                    $this->add_error('Date of Birth',
+                        'Swimmer is too old, check date of birth.');
                     $valid = false ;
                 }
             }
@@ -934,19 +934,19 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
         global $userdata ;
 
         $swimmer = new SwimTeamSwimmer() ;
-        $swimmer->setId($this->get_hidden_element_value("swimmerid")) ;
+        $swimmer->setId($this->get_hidden_element_value('swimmerid')) ;
         $swimmer->loadSwimmerById() ;
 
-        $swimmer->setFirstName($this->get_element_value("First Name")) ;
-        $swimmer->setMiddleName($this->get_element_value("Middle Name")) ;
-        $swimmer->setNickName($this->get_element_value("Nick Name")) ;
-        $swimmer->setLastName($this->get_element_value("Last Name")) ;
-        $swimmer->setContact1Id($this->get_element_value("Primary Contact")) ;
-        $swimmer->setContact2Id($this->get_element_value("Secondary Contact")) ;
-        $swimmer->setWPUserId($this->get_element_value("Web Site Id")) ;
-        $swimmer->setGender($this->get_element_value("Gender")) ;
-        $swimmer->setResults($this->get_element_value("Results")) ;
-        $swimmer->setDateOfBirth($this->get_element_value("Date of Birth")) ;
+        $swimmer->setFirstName($this->get_element_value('First Name')) ;
+        $swimmer->setMiddleName($this->get_element_value('Middle Name')) ;
+        $swimmer->setNickName($this->get_element_value('Nick Name')) ;
+        $swimmer->setLastName($this->get_element_value('Last Name')) ;
+        $swimmer->setContact1Id($this->get_element_value('Primary Contact')) ;
+        $swimmer->setContact2Id($this->get_element_value('Secondary Contact')) ;
+        $swimmer->setWPUserId($this->get_element_value('Web Site Id')) ;
+        $swimmer->setGender($this->get_element_value('Gender')) ;
+        $swimmer->setResults($this->get_element_value('Results')) ;
+        $swimmer->setDateOfBirth($this->get_element_value('Date of Birth')) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -959,9 +959,9 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -982,15 +982,15 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
         if ($success) 
         {
             $swimmer->setId($success) ;
-            $this->set_action_message("Swimmer successfully updated.") ;
+            $this->set_action_message('Swimmer successfully updated.') ;
         }
         else if ($success === null)
         {
-            $this->set_action_message("Swimmer was not successfully updated.") ;
+            $this->set_action_message('Swimmer was not successfully updated.') ;
         }
         else
         {
-            $this->set_action_message("No changes, swimmer was not updated.") ;
+            $this->set_action_message('No changes, swimmer was not updated.') ;
         }
 
         //  Force success otherwise the form will be displayed again.
@@ -1056,13 +1056,13 @@ class WpSwimTeamSwimmerDeleteForm extends WpSwimTeamSwimmerUpdateForm
     function form_action()
     {
         $swimmer = new SwimTeamSwimmer() ;
-        $swimmer->setId($this->get_hidden_element_value("swimmerid")) ;
+        $swimmer->setId($this->get_hidden_element_value('swimmerid')) ;
         $success = $swimmer->deleteSwimmer() ;
 
         if ($success) 
-            $this->set_action_message("Swimmer successfully deleted.") ;
+            $this->set_action_message('Swimmer successfully deleted.') ;
         else
-            $this->set_action_message("Swimmer was not successfully deleted.") ;
+            $this->set_action_message('Swimmer was not successfully deleted.') ;
 
         return $success ;
     }
@@ -1113,16 +1113,16 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
     var $__swimmerid ;
 
     /**
-     * div to hold the full events selection
+     * div to hold the full strokes selection
      */
-    var $__full_events_div ;
+    var $__full_strokes_div ;
 
     /**
-     * div to hold the partial events selection
+     * div to hold the partial strokes selection
      */
-    var $__partial_events_div ;
+    var $__partial_strokes_div ;
 
-    var $__events ;
+    var $__strokes ;
 
     /**
      * Set the action property
@@ -1197,7 +1197,7 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
         $swimclub = new SwimClubProfile() ;
         $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
 
-        return $swimclub->getClubOrPoolName() . " " . $swimclub->getTeamName() ;
+        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
     }
 
     /**
@@ -1227,7 +1227,7 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
         {
             foreach ($meetIds as $meetId)
             {
-                $meet->loadSwimMeetByMeetId($meetId["meetid"]) ;
+                $meet->loadSwimMeetByMeetId($meetId['meetid']) ;
     
                 if ($meet->getMeetType() == WPST_DUAL_MEET)
                     $opponent = $this->__mapOpponentSwimClubIdToText(
@@ -1235,10 +1235,10 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
                 else
                     $opponent = $meet->getMeetDescription() ;
     
-                $meetdate = date("D M j, Y", strtotime($meet->getMeetDate())) ;
+                $meetdate = date('D M j, Y', strtotime($meet->getMeetDate())) ;
 
-                $m[sprintf("%s %s (%s)", $meetdate, $opponent,
-                    ucfirst($meet->getLocation()))] = $meetId["meetid"] ;
+                $m[sprintf('%s %s (%s)', $meetdate, $opponent,
+                    ucfirst($meet->getLocation()))] = $meetId['meetid'] ;
             }
         }
 
@@ -1276,8 +1276,8 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
         {
             foreach ($swimmerIds as $swimmerId)
             {
-                $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
-                $s[$swimmer->getFirstName() . " " .
+                $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+                $s[$swimmer->getFirstName() . ' ' .
                     $swimmer->getLastName()] = $swimmer->getId() ;
             }
         }
@@ -1286,15 +1286,15 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
     }
 
     /**
-     * Get the array of event key and value pairs
+     * Get the array of stroke key and value pairs
      *
-     * @return mixed - array of event key value pairs
+     * @return mixed - array of stroke key value pairs
      */
-    function _eventSelections()
+    function _strokeSelections()
     {
-        //  Event codes and labels 
+        //  Stroke codes and labels 
 
-        $allevents = array(
+        $allstrokes = array(
             WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_LABEL =>
             WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE
            ,WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_LABEL =>
@@ -1311,15 +1311,15 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
             WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE
         ) ;
 
-        //  Only show the events that are set up for Opt-In/Opt-Out
+        //  Only show the strokes that are set up for Opt-In/Opt-Out
 
-        $optinoptoutevents = get_option(WPST_OPTION_OPT_IN_OPT_OUT_EVENTS) ;
+        $optinoptoutstrokes = get_option(WPST_OPTION_OPT_IN_OPT_OUT_STROKES) ;
 
-        if (empty($optinoptoutevents)) $optinoptoutevents = $allevents ;
+        if (empty($optinoptoutstrokes)) $optinoptoutstrokes = $allstrokes ;
 
-        foreach ($allevents as $key => $value)
+        foreach ($allstrokes as $key => $value)
         {
-            if (in_array($value, $optinoptoutevents))
+            if (in_array($value, $optinoptoutstrokes))
                 $s[$key] = $value ;
         }
 
@@ -1334,37 +1334,37 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $this->add_hidden_element("userid") ;
-        $this->add_hidden_element("swimmerid") ;
+        $this->add_hidden_element('userid') ;
+        $this->add_hidden_element('swimmerid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
-        $swimmeets = new FECheckBoxList("Swim Meets", true, "450px", "120px");
+        $swimmeets = new FECheckBoxList('Swim Meets', true, '450px', '120px');
         $swimmeets->set_list_data($this->_swimmeetSelections()) ;
         $swimmeets->enable_checkall(true) ;
         $this->add_element($swimmeets) ;
 
-        $this->__events = new FEActiveDIVRadioButtonGroup(
-            $this->getActionLabel() . " Type", array(
+        $this->__strokes = new FEActiveDIVRadioButtonGroup(
+            $this->getActionLabel() . ' Type', array(
                 ucwords(WPST_FULL) => WPST_FULL
                ,ucwords(WPST_PARTIAL) => WPST_PARTIAL
             ), true) ;
-        $this->__events->set_readonly(get_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE) != WPST_BOTH) ;
-        $this->add_element($this->__events) ;
+        $this->__strokes->set_readonly(get_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE) != WPST_BOTH) ;
+        $this->add_element($this->__strokes) ;
 
-        $fullevents = new FECheckBoxList("Full Events",
-            false, "200px", "120px");
-        $fullevents->set_list_data($this->_eventSelections()) ;
-        $fullevents->set_disabled(true) ;
-        $this->add_element($fullevents) ;
+        $fullstrokes = new FECheckBoxList('Full Strokes',
+            false, '200px', '120px');
+        $fullstrokes->set_list_data($this->_strokeSelections()) ;
+        $fullstrokes->set_disabled(true) ;
+        $this->add_element($fullstrokes) ;
 
-        $partialevents = new FECheckBoxList("Partial Events",
-            false, "200px", "120px");
-        $partialevents->set_list_data($this->_eventSelections()) ;
-        $this->add_element($partialevents) ;
+        $partialstrokes = new FECheckBoxList('Partial Strokes',
+            false, '200px', '120px');
+        $partialstrokes->set_list_data($this->_strokeSelections()) ;
+        $this->add_element($partialstrokes) ;
     }
 
     /**
@@ -1377,13 +1377,13 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
     {
         //  Initialize the form fields
 
-        $this->set_hidden_element_value("swimmerid", $this->getSwimmerId()) ;
-        $this->set_hidden_element_value("_action", $this->getAction()) ;
+        $this->set_hidden_element_value('swimmerid', $this->getSwimmerId()) ;
+        $this->set_hidden_element_value('_action', $this->getAction()) ;
 
         if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE) == WPST_PARTIAL)
-            $this->set_element_value($this->getActionLabel() . " Type", WPST_PARTIAL) ;
+            $this->set_element_value($this->getActionLabel() . ' Type', WPST_PARTIAL) ;
         else
-            $this->set_element_value($this->getActionLabel() . " Type", WPST_FULL) ;
+            $this->set_element_value($this->getActionLabel() . ' Type', WPST_FULL) ;
     }
 
 
@@ -1395,54 +1395,54 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
      */
     function form_content()
     {
-        $it = new SwimTeamSwimmerProfileInfoTable("Swimmer Details") ;
-        $it->setSwimmerId($this->get_hidden_element_value("swimmerid")) ;
+        $it = new SwimTeamSwimmerProfileInfoTable('Swimmer Details') ;
+        $it->setSwimmerId($this->get_hidden_element_value('swimmerid')) ;
         $it->constructSwimmerProfile(true) ;
 
         $table = html_table($this->_width, 0, 4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
         $td = html_td() ;
-        $td->set_tag_attributes(array("rowspan" => "4",
-            "valign" => "middle", "style" => "padding-right: 10px;")) ;
+        $td->set_tag_attributes(array('rowspan' => '4',
+            'valign' => 'middle', 'style' => 'padding-right: 10px;')) ;
         $td->add($it) ;
 
         $table->add_row(_HTML_SPACE, _HTML_SPACE, $td) ;
-        $table->add_row($this->element_label($this->getActionLabel() . " Type"),
-            $this->element_form($this->getActionLabel() . " Type")) ;
+        $table->add_row($this->element_label($this->getActionLabel() . ' Type'),
+            $this->element_form($this->getActionLabel() . ' Type')) ;
         $table->add_row(_HTML_SPACE) ;
 
-        //  Initialize the Full Events here instead of in 
+        //  Initialize the Full Strokes here instead of in 
         //  the form_init_data() method because it is a disabled
         //  widget and the values won't be preserved if the
         //  form has to be displayed again due to a validation
         //  problem.
 
-        $this->set_element_value("Full Events", $this->_eventSelections()) ;
+        $this->set_element_value('Full Strokes', $this->_strokeSelections()) ;
 
         //  Build the Magic Divs
 
-        $this->__full_events_div = $this->__events->build_div(0) ;
-        $this->__partial_events_div = $this->__events->build_div(1) ;
-        $this->__full_events_div->add($this->element_form("Full Events")) ;
-        $this->__partial_events_div->add($this->element_form("Partial Events")) ;
-        $events = html_div(null, $this->__full_events_div, $this->__partial_events_div) ;
+        $this->__full_strokes_div = $this->__strokes->build_div(0) ;
+        $this->__partial_strokes_div = $this->__strokes->build_div(1) ;
+        $this->__full_strokes_div->add($this->element_form('Full Strokes')) ;
+        $this->__partial_strokes_div->add($this->element_form('Partial Strokes')) ;
+        $strokes = html_div(null, $this->__full_strokes_div, $this->__partial_strokes_div) ;
 
-        $table->add_row("Events", $events) ;
+        $table->add_row('Strokes', $strokes) ;
 
         $table->add_row(_HTML_SPACE) ;
 
         $td = html_td() ;
-        $td->set_tag_attributes(array("colspan" => "2",
-            "valign" => "middle", "style" => "padding-right: 10px;")) ;
-        $td->add($this->element_form("Swim Meets")) ;
-        $table->add_row($this->element_label("Swim Meets"), $td) ;
+        $td->set_tag_attributes(array('colspan' => '2',
+            'valign' => 'middle', 'style' => 'padding-right: 10px;')) ;
+        $td->add($this->element_form('Swim Meets')) ;
+        $table->add_row($this->element_label('Swim Meets'), $td) ;
  
         $table->add_row(_HTML_SPACE) ;
 
         $td = html_td() ;
-        $td->set_tag_attributes(array("colspan" => "3", "align" => "center")) ;
-        $td->add(div_font8bold("This information replaces any existing information on a per swimmer basis.")) ;
+        $td->set_tag_attributes(array('colspan' => '3', 'align' => 'center')) ;
+        $td->add(div_font8bold('This information replaces any existing information on a per swimmer basis.')) ;
 
         $table->add_row($td) ;
 
@@ -1459,12 +1459,12 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
     {
         $valid = true ;
 
-        $optinoptouttype = $this->get_element_value($this->getActionLabel() . " Type") ;
-        $partialevents = $this->get_element_value("Partial Events") ;
+        $optinoptouttype = $this->get_element_value($this->getActionLabel() . ' Type') ;
+        $partialstrokes = $this->get_element_value('Partial Strokes') ;
 
-        if (($optinoptouttype == WPST_PARTIAL) && empty($partialevents))
+        if (($optinoptouttype == WPST_PARTIAL) && empty($partialstrokes))
         {
-            $this->add_error($this->element_label($this->getActionLabel() . " Type"), "You must select at least one (1) event.");
+            $this->add_error($this->element_label($this->getActionLabel() . ' Type'), 'You must select at least one (1) stroke.');
             $valid = false ;
         }
 
@@ -1490,23 +1490,23 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
 
         //  Loop through the swimmers
 
-        $eventlabels = $this->_eventSelections() ;
+        $strokelabels = $this->_strokeSelections() ;
 
-        $optinoptouttype = $this->get_element_value($this->getActionLabel() . " Type") ;
+        $optinoptouttype = $this->get_element_value($this->getActionLabel() . ' Type') ;
 
         //  Use the available Event Selections for a Full Opt-In
         //  Opt-Out since the element is disabled and won't be passed
         //  through the form processor.
 
         if ($optinoptouttype == WPST_PARTIAL)
-            $events = $this->get_element_value("Partial Events") ;
+            $strokes = $this->get_element_value('Partial Strokes') ;
         else
-            $events = $this->_eventSelections() ;
+            $strokes = $this->_strokeSelections() ;
 
-        $meetIds = $this->get_element_value("Swim Meets") ;
+        $meetIds = $this->get_element_value('Swim Meets') ;
 
-        $swimmerid = $this->get_hidden_element_value("swimmerid") ;
-        $action = $this->get_hidden_element_value("_action") ;
+        $swimmerid = $this->get_hidden_element_value('swimmerid') ;
+        $action = $this->get_hidden_element_value('_action') ;
 
         if (strtolower($action) == strtolower(WPST_OPT_IN))
             $actionlabel = get_option(WPST_OPTION_OPT_IN_LABEL) ;
@@ -1522,6 +1522,7 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
         $sm->setSwimmerId($swimmerid) ;
         $sm->setUserId($userdata->ID) ;
         $sm->setParticipation($action) ;
+        $sm->setEventId(WPST_NULL_ID) ;
 
         //  This is wrong - needs to be fixed.
         foreach ($meetIds as $meetId)
@@ -1535,24 +1536,24 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
 
             if ($prior)
             {
-                $actionmsgs[] = sprintf("Previous record%s (%s) removed for %s %s <i>(%s - %s - %s)</i>.",
-                    ($prior == 1 ? "" : "s"), $prior, 
+                $actionmsgs[] = sprintf('Previous record%s (%s) removed for %s %s <i>(%s - %s - %s)</i>.',
+                    ($prior == 1 ? '' : 's'), $prior, 
                     $swimmer->getFirstName(), $swimmer->getLastName(),
-                    $meetdetails["opponent"], $meetdetails["date"],
-                    $meetdetails["location"]) ;
+                    $meetdetails['opponent'], $meetdetails['date'],
+                    $meetdetails['location']) ;
             }
 
             //  Add or Update meta data for each stroke
 
-            foreach ($events as $event)
+            foreach ($strokes as $stroke)
             {
-                $sm->setEventCode($event) ;
+                $sm->setStrokeCode($stroke) ;
                 $success &= $sm->saveSwimmerSwimMeetMeta() ;
-                $actionmsgs[] = sprintf("%s (%s) recorded for swimmer %s %s <i>(%s - %s - %s)</i>.",
-                    $actionlabel, array_search($event, $eventlabels),
+                $actionmsgs[] = sprintf('%s (%s) recorded for swimmer %s %s <i>(%s - %s - %s)</i>.',
+                    $actionlabel, array_search($stroke, $strokelabels),
                     $swimmer->getFirstName(), $swimmer->getLastName(),
-                    $meetdetails["opponent"], $meetdetails["date"],
-                    $meetdetails["location"]) ;
+                    $meetdetails['opponent'], $meetdetails['date'],
+                    $meetdetails['location']) ;
             }
         }
 
@@ -1576,7 +1577,7 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
         }
         else
         {
-            $actionmsg = sprintf("No %s actions recorded.", $actionlabel) ;
+            $actionmsg = sprintf('No %s actions recorded.', $actionlabel) ;
         }
 
         $this->set_action_message($actionmsg) ;
@@ -1661,16 +1662,16 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
         //  Results Field
-        $results = new FEListBox("Results", false, "150px");
+        $results = new FEListBox('Results', false, '150px');
         $results->set_list_data($this->_resultsSelections()) ;
         $this->add_element($results) ;
-        $results_cb = new FECheckbox("Results CheckBox", "") ;
+        $results_cb = new FECheckbox('Results CheckBox', '') ;
         $this->add_element($results_cb) ;
  
-        //var_dump(basename(__FILE__) . "::" . __LINE__) ;
+        //var_dump(basename(__FILE__) . '::' . __LINE__) ;
         //  How many swimmer options does this configuration support?
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
@@ -1683,58 +1684,58 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
             if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
             {
-            $oe[$oc . CHECKBOX_SUFFIX] = new FECheckbox($label . CHECKBOX_SUFFIX, "") ;
+            $oe[$oc . CHECKBOX_SUFFIX] = new FECheckbox($label . CHECKBOX_SUFFIX, '') ;
             $this->add_element($oe[$oc . CHECKBOX_SUFFIX]) ;
 
             switch (get_option($oconst))
             {
                 case WPST_REQUIRED:
-                    $oe[$oc] = new FEText($label, false, "250px") ;
+                    $oe[$oc] = new FEText($label, false, '250px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_OPTIONAL:
-                    $oe[$oc] = new FEText($label, false, "250px") ;
+                    $oe[$oc] = new FEText($label, false, '250px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_EMAIL_OPTIONAL:
-                    $oe[$oc] = new FEEmail($label, false, "250px") ;
+                    $oe[$oc] = new FEEmail($label, false, '250px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_EMAIL_REQUIRED:
-                    $oe[$oc] = new FEEmail($label, false, "250px") ;
+                    $oe[$oc] = new FEEmail($label, false, '250px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_URL_OPTIONAL:
-                    $oe[$oc] = new FEUrl($label, false, "250px") ;
+                    $oe[$oc] = new FEUrl($label, false, '250px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_URL_REQUIRED:
-                    $oe[$oc] = new FEUrl($label, false, "250px") ;
+                    $oe[$oc] = new FEUrl($label, false, '250px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_YES_NO:
                 case WPST_NO_YES:
-                    $oe[$oc] = new FEYesNoListBox($label, false, "75px") ;
+                    $oe[$oc] = new FEYesNoListBox($label, false, '75px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
                 case WPST_CLOTHING_SIZE:
-                    $oe[$oc] = new FEClothingSizeListBox($label, false, "150px") ;
+                    $oe[$oc] = new FEClothingSizeListBox($label, false, '150px') ;
                     $this->add_element($oe[$oc]) ;
                     break ;
 
@@ -1759,8 +1760,8 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
     function form_init_data()
     {
         //  Initialize the form fields
-        $this->set_hidden_element_value("_action", WPST_ACTION_GLOBAL_UPDATE) ;
-        $this->set_element_value("Results", WPST_PUBLIC) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_GLOBAL_UPDATE) ;
+        $this->set_element_value('Results', WPST_PUBLIC) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -1772,9 +1773,9 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
@@ -1827,11 +1828,11 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
         get_currentuserinfo() ;
 
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_form("Results CheckBox"),
-            $this->element_label("Results"),
-            $this->element_form("Results")) ;
+        $table->add_row($this->element_form('Results CheckBox'),
+            $this->element_label('Results'),
+            $this->element_form('Results')) ;
 
         //  Show optional fields if they are enabled
  
@@ -1845,9 +1846,9 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
@@ -1878,7 +1879,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         //  Need at least one checkbox selected to do anything ...
 
-        $valid |= ($this->get_element_value("Results" . CHECKBOX_SUFFIX) !== null) ;
+        $valid |= ($this->get_element_value('Results' . CHECKBOX_SUFFIX) !== null) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -1890,9 +1891,9 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -1907,20 +1908,20 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
         //  If no checkboxes selected, note an error on all fields
         if (!$valid)
         {
-            $this->add_error("Results", "At least one field must be selected for update.");
+            $this->add_error('Results', 'At least one field must be selected for update.');
             for ($oc = 1 ; $oc <= $options ; $oc++)
             {
-                $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-                $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-                $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+                $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+                $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+                $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
                 if (get_option($oconst) != WPST_DISABLED)
                 {
                     $mode = get_option($mconst) ;
                     $label = get_option($lconst) ;
-                    $label_cb = $label . " Checkbox" ;
+                    $label_cb = $label . ' Checkbox' ;
 
-                    $this->add_error($label, "At least one field must be selected for update.");
+                    $this->add_error($label, 'At least one field must be selected for update.');
                 }
             }
         }
@@ -1941,7 +1942,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         //  Need at least one checkbox selected to do anything ...
 
-        //$valid |= ($this->get_element_value("Results" . CHECKBOX_SUFFIX) !== null) ;
+        //$valid |= ($this->get_element_value('Results' . CHECKBOX_SUFFIX) !== null) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -1953,9 +1954,9 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -1972,7 +1973,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
             }
         }
 
-        $this->set_action_message(sprintf("Updated %s swimmer records.", $updates)) ;
+        $this->set_action_message(sprintf('Updated %s swimmer records.', $updates)) ;
 
 	    return true ;
 

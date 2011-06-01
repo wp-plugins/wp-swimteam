@@ -191,6 +191,11 @@ class SwimTeamOptions extends SwimTeamDBI
     var $__opt_in_opt_out_email_format ;
 
     /**
+     * opt in opt out usage model property
+     */
+    var $__opt_in_opt_out_usage_model ;
+
+    /**
      * opt in opt out mode property
      */
     var $__opt_in_opt_out_mode ;
@@ -894,6 +899,26 @@ class SwimTeamOptions extends SwimTeamDBI
     }
 
     /**
+     * Set the opt in opt out usage model
+     *
+     * @param - string - opt in opt out usage model
+     */
+    function setOptInOptOutUsageModel($model)
+    {
+        $this->__opt_in_opt_out_usage_model = $model ;
+    }
+
+    /**
+     * Get the opt in opt out usage model
+     *
+     * @return - string - opt in opt out usage model
+     */
+    function getOptInOptOutUsageModel()
+    {
+        return ($this->__opt_in_opt_out_usage_model) ;
+    }
+
+    /**
      * Set the opt in opt out mode
      *
      * @param - string - opt in opt out mode
@@ -904,9 +929,9 @@ class SwimTeamOptions extends SwimTeamDBI
     }
 
     /**
-     * Get the opt in opt out email format
+     * Get the opt in opt out mode
      *
-     * @return - string - opt in opt out mode format
+     * @return - string - opt in opt out mode
      */
     function getOptInOptOutMode()
     {
@@ -916,21 +941,21 @@ class SwimTeamOptions extends SwimTeamDBI
     /**
      * Set the opt in opt out events
      *
-     * @param - array - opt in opt out events in SDIF numbering
+     * @param - array - opt in opt out strokes in SDIF numbering
      */
-    function setOptInOptOutEvents($events)
+    function setOptInOptOutStrokes($strokes)
     {
-        $this->__opt_in_opt_out_events = $events ;
+        $this->__opt_in_opt_out_strokes = $strokes ;
     }
 
     /**
      * Get the opt in opt out events
      *
-     * @return - array - opt in opt out events in SDIF numbering
+     * @return - array - opt in opt out strokes in SDIF numbering
      */
-    function getOptInOptOutEvents()
+    function getOptInOptOutStrokes()
     {
-        return ($this->__opt_in_opt_out_events) ;
+        return ($this->__opt_in_opt_out_strokes) ;
     }
 
     /**
@@ -1294,7 +1319,7 @@ class SwimTeamOptions extends SwimTeamDBI
         }
         else
         {
-            $this->setJobCreditsRequired(WPST_DEFAULT_JOB_CREDITS) ;
+            $this->setJobCredits(WPST_DEFAULT_JOB_CREDITS) ;
             update_option(WPST_OPTION_JOB_CREDITS, WPST_DEFAULT_JOB_CREDITS) ;
         }
 
@@ -1308,7 +1333,7 @@ class SwimTeamOptions extends SwimTeamDBI
         }
         else
         {
-            $this->setJobCredits(WPST_DEFAULT_JOB_CREDITS_REQUIRED) ;
+            $this->setJobCreditsRequired(WPST_DEFAULT_JOB_CREDITS_REQUIRED) ;
             update_option(WPST_OPTION_JOB_CREDITS_REQUIRED, WPST_DEFAULT_JOB_CREDITS_REQUIRED) ;
         }
 
@@ -1815,6 +1840,20 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_FORMAT, WPST_DEFAULT_OPT_IN_OPT_OUT_EMAIL_FORMAT) ;
         }
  
+        //  opt in opt out usage model
+        $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) ;
+
+        //  If option isn't stored out the database, use the default
+        if ($option !== false)
+        {
+            $this->setOptInOptOutUsageModel($option) ;
+        }
+        else
+        {
+            $this->setOptInOptOutUsageModel(WPST_STROKE) ;
+            update_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL, STROKE) ;
+        }
+ 
         //  opt in opt out mode
         $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE) ;
 
@@ -1829,17 +1868,17 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE, WPST_DEFAULT_OPT_IN_OPT_OUT_MODE) ;
         }
  
-        //  opt-in opt-out events
-        $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_EVENTS) ;
+        //  opt-in opt-out strokes
+        $option = get_option(WPST_OPTION_OPT_IN_OPT_OUT_STROKES) ;
 
         //  If option isn't stored out the database, use the default
         if ($option !== false)
         {
-            $this->setOptInOptOutEvents($option) ;
+            $this->setOptInOptOutStrokes($option) ;
         }
         else
         {
-            $optinoptoutevents = array(
+            $optinoptoutstrokes = array(
                 WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE
                ,WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_VALUE
                ,WPST_SDIF_EVENT_STROKE_CODE_BREASTSTROKE_VALUE
@@ -1848,8 +1887,8 @@ class SwimTeamOptions extends SwimTeamDBI
                ,WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE
                ,WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE
             ) ;
-            $this->setOptInOptOutEvents($optinoptoutevents) ;
-            update_option(WPST_OPTION_OPT_IN_OPT_OUT_EVENTS, $optinoptoutevents) ;
+            $this->setOptInOptOutStrokes($optinoptoutstrokes) ;
+            update_option(WPST_OPTION_OPT_IN_OPT_OUT_STROKES, $optinoptoutstrokes) ;
         }
     }
 
@@ -1872,7 +1911,8 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS, $this->getOptInOptOutEmailAddress()) ;
         update_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_FORMAT, $this->getOptInOptOutEmailFormat()) ;
         update_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE, $this->getOptInOptOutMode()) ;
-        update_option(WPST_OPTION_OPT_IN_OPT_OUT_EVENTS, $this->getOptInOptOutEvents()) ;
+        update_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL, $this->getOptInOptOutUsageModel()) ;
+        update_option(WPST_OPTION_OPT_IN_OPT_OUT_STROKES, $this->getOptInOptOutStrokes()) ;
         update_option(WPST_OPTION_GEOGRAPHY, $this->getGeography()) ;
         //update_option(WPST_OPTION_MEASUREMENT_UNITS, $this->getMeasurementUnits()) ;
         update_option(WPST_OPTION_JOB_SIGN_UP, $this->getJobSignUp()) ;

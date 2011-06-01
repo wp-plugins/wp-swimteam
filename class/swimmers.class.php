@@ -1169,11 +1169,16 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
             $this->__normal_actions[WPST_ACTION_UNREGISTER] = WPST_ACTION_UNREGISTER . " (" . WPST_SEASON . ")" ;
         }
 
-        $optin = get_option(WPST_OPTION_OPT_IN_LABEL) ;
-        $this->__normal_actions[WPST_ACTION_OPT_IN] = $optin . " (" . WPST_SWIMMEET . ")" ;
+        //  If Opt-In/Opt-Out usage model is set to Stroke, then allow the actions.
 
-        $optout = get_option(WPST_OPTION_OPT_OUT_LABEL) ;
-        $this->__normal_actions[WPST_ACTION_OPT_OUT] = $optout . " (" . WPST_SWIMMEET . ")" ;
+        if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
+        {
+            $optin = get_option(WPST_OPTION_OPT_IN_LABEL) ;
+            $this->__normal_actions[WPST_ACTION_OPT_IN] = $optin . " (" . WPST_SWIMMEET . ")" ;
+
+            $optout = get_option(WPST_OPTION_OPT_OUT_LABEL) ;
+            $this->__normal_actions[WPST_ACTION_OPT_OUT] = $optout . " (" . WPST_SWIMMEET . ")" ;
+        }
     }
 
     /**

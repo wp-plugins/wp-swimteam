@@ -512,6 +512,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         //  Generate the report
 
+        $rpt->setReportTitle('Swim Team Users Report') ;
         $rpt->generateReport() ;
 
         //  In CSV mode, also force the HTML report to be generated
@@ -870,6 +871,7 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 
         //  Generate the report
 
+        $rpt->setReportTitle('Swim Team Job Assignments Report') ;
         $rpt->generateReport() ;
         
         $this->set_action_message(sprintf("Swim Team Job Assignments Report Generated,
@@ -970,54 +972,55 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 
         //  Swim  Meet check box list
 
-        $seasons = new FECheckBoxList("Swim Seasons", true, "100%", "100px");
+        //$seasons = new FECheckBoxList("Swim Seasons", true, "100%", "100px");
+        $seasons = new FEListBox("Swim Seasons", true, "100%", "100px");
         $seasons->set_list_data($this->_swimseasonSelections()) ;
-        $seasons->enable_checkall(true) ;
+        //$seasons->enable_checkall(true) ;
 
         $this->add_element($seasons) ;
 
-        $jobposition = new FECheckBox("Position") ;
-        $this->add_element($jobposition) ;
+        //$jobposition = new FECheckBox("Position") ;
+        //$this->add_element($jobposition) ;
 
-        $jobdescription = new FECheckBox("Description") ;
-        $this->add_element($jobdescription) ;
+        //$jobdescription = new FECheckBox("Description") ;
+        //$this->add_element($jobdescription) ;
 
-        $jobduration = new FECheckBox("Duration") ;
-        $this->add_element($jobduration) ;
+        //$jobduration = new FECheckBox("Duration") ;
+        //$this->add_element($jobduration) ;
 
-        $jobtype = new FECheckBox("Type") ;
-        $this->add_element($jobtype) ;
+        //$jobtype = new FECheckBox("Type") ;
+        //$this->add_element($jobtype) ;
 
-        $jobcredits = new FECheckBox("Credits") ;
-        $this->add_element($jobcredits) ;
+        //$jobcredits = new FECheckBox("Credits") ;
+        //$this->add_element($jobcredits) ;
 
-        $jobnotes = new FECheckBox("Notes") ;
-        $this->add_element($jobnotes) ;
+        //$jobnotes = new FECheckBox("Notes") ;
+        //$this->add_element($jobnotes) ;
 
-        $jobdurationfilter = new FECheckBox("Duration" . FEFILTER) ;
-        $jobdurationfilter->set_disabled(true) ;
-        $this->add_element($jobdurationfilter) ;
+        //$jobdurationfilter = new FECheckBox("Duration" . FEFILTER) ;
+        //$jobdurationfilter->set_disabled(true) ;
+        //$this->add_element($jobdurationfilter) ;
 
-        $jobdurationfilterlb = new FEListBox("Duration" . FEFILTERLB, true, "100px");
-        $jobdurationfilterlb->set_list_data(array(
-             ucwords(WPST_JOB_DURATION_FULL_MEET) => WPST_JOB_DURATION_FULL_MEET
-            ,ucwords(WPST_JOB_DURATION_PARTIAL_MEET) => WPST_JOB_DURATION_PARTIAL_MEET
-            ,ucwords(WPST_JOB_DURATION_FULL_SEASON) => WPST_JOB_DURATION_FULL_SEASON
-            ,ucwords(WPST_JOB_DURATION_PARTIAL_SEASON) => WPST_JOB_DURATION_PARTIAL_SEASON
-            ,ucwords(WPST_JOB_DURATION_EVENT) => WPST_JOB_DURATION_EVENT
-        )) ;
-        $this->add_element($jobdurationfilterlb) ;
+        //$jobdurationfilterlb = new FEListBox("Duration" . FEFILTERLB, true, "100px");
+        //$jobdurationfilterlb->set_list_data(array(
+             //ucwords(WPST_JOB_DURATION_FULL_MEET) => WPST_JOB_DURATION_FULL_MEET
+            //,ucwords(WPST_JOB_DURATION_PARTIAL_MEET) => WPST_JOB_DURATION_PARTIAL_MEET
+            //,ucwords(WPST_JOB_DURATION_FULL_SEASON) => WPST_JOB_DURATION_FULL_SEASON
+            //,ucwords(WPST_JOB_DURATION_PARTIAL_SEASON) => WPST_JOB_DURATION_PARTIAL_SEASON
+            //,ucwords(WPST_JOB_DURATION_EVENT) => WPST_JOB_DURATION_EVENT
+        //)) ;
+        //$this->add_element($jobdurationfilterlb) ;
 
-        $jobtypefilter = new FECheckBox("Type" . FEFILTER) ;
-        $jobtypefilter->set_disabled(true) ;
-        $this->add_element($jobtypefilter) ;
+        //$jobtypefilter = new FECheckBox('Type' . FEFILTER) ;
+        //$jobtypefilter->set_disabled(true) ;
+        //$this->add_element($jobtypefilter) ;
 
-        $jobtypefilterlb = new FEListBox("Type" . FEFILTERLB, true, "100px");
-        $jobtypefilterlb->set_list_data(array(
-             ucwords(WPST_JOB_TYPE_VOLUNTEER) => WPST_JOB_TYPE_VOLUNTEER
-            ,ucwords(WPST_JOB_TYPE_PAID) => WPST_JOB_TYPE_PAID
-        )) ;
-        $this->add_element($jobtypefilterlb) ;
+        //$jobtypefilterlb = new FEListBox('Type' . FEFILTERLB, true, '100px');
+        //$jobtypefilterlb->set_list_data(array(
+             //ucwords(WPST_JOB_TYPE_VOLUNTEER) => WPST_JOB_TYPE_VOLUNTEER
+            //,ucwords(WPST_JOB_TYPE_PAID) => WPST_JOB_TYPE_PAID
+        //)) ;
+        //$this->add_element($jobtypefilterlb) ;
     }
 
     /**
@@ -1031,16 +1034,16 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         //  Pick up the form initialization from the parent form
         parent::form_init_data(false) ;
 
-        $this->set_element_value("Position", true) ;
-        $this->set_element_value("Description", false) ;
-        $this->set_element_value("Duration", true) ;
-        $this->set_element_value("Type", false) ;
-        $this->set_element_value("Credits", false) ;
-        $this->set_element_value("Notes", true) ;
-        $this->set_element_value("Duration" . FEFILTER, false) ;
-        $this->set_element_value("Duration" . FEFILTERLB, WPST_JOB_DURATION_FULL_MEET) ;
-        $this->set_element_value("Type" . FEFILTER, false) ;
-        $this->set_element_value("Type" . FEFILTERLB, WPST_JOB_TYPE_VOLUNTEER) ;
+        //$this->set_element_value('Position', true) ;
+        //$this->set_element_value('Description', false) ;
+        //$this->set_element_value('Duration', true) ;
+        //$this->set_element_value('Type', false) ;
+        //$this->set_element_value('Credits', false) ;
+        //$this->set_element_value('Notes', true) ;
+        //$this->set_element_value('Duration' . FEFILTER, false) ;
+        //$this->set_element_value('Duration' . FEFILTERLB, WPST_JOB_DURATION_FULL_MEET) ;
+        //$this->set_element_value('Type' . FEFILTER, false) ;
+        //$this->set_element_value('Type' . FEFILTERLB, WPST_JOB_TYPE_VOLUNTEER) ;
     }
 
     /**
@@ -1051,11 +1054,11 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
      */
     function form_content()
     {
-        $this->add_form_block("Swim Seasons", $this->_swim_meet_options()) ;
-        $this->add_form_block("Job Commitment Fields", $this->_job_commitment_options()) ;
-        $this->add_form_block("Contact Fields", $this->_contact_options()) ;
-        $this->add_form_block("Report Filters", $this->_report_filters()) ;
-        $this->add_form_block("Report Output", $this->_send_report_to()) ;
+        $this->add_form_block('Swim Seasons', $this->_swim_meet_options()) ;
+        //$this->add_form_block('Job Commitment Fields', $this->_job_commitment_options()) ;
+        $this->add_form_block('Contact Fields', $this->_contact_options()) ;
+        //$this->add_form_block('Report Filters', $this->_report_filters()) ;
+        $this->add_form_block('Report Output', $this->_send_report_to()) ;
     }
 
     /**
@@ -1066,9 +1069,9 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
     function &_swim_meet_options()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_form("Swim Seasons")) ;
+        $table->add_row($this->element_form('Swim Seasons')) ;
 
         return $table ;
     }
@@ -1081,16 +1084,16 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
     function &_job_commitment_options()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_form("Position"),
-            $this->element_form("Description")) ;
+        $table->add_row($this->element_form('Position'),
+            $this->element_form('Description')) ;
 
-        $table->add_row($this->element_form("Duration"),
-            $this->element_form("Type")) ;
+        $table->add_row($this->element_form('Duration'),
+            $this->element_form('Type')) ;
 
-        $table->add_row($this->element_form("Credits"),
-            $this->element_form("Notes")) ;
+        $table->add_row($this->element_form('Credits'),
+            $this->element_form('Notes')) ;
 
         return $table ;
     }
@@ -1105,11 +1108,11 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         //$table = parent::_report_filters() ;
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_form("Duration" . FEFILTER),
-            $this->element_form("Duration" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Duration' . FEFILTER),
+            $this->element_form('Duration' . FEFILTERLB)) ;
 
-        $table->add_row($this->element_form("Type" . FEFILTER),
-            $this->element_form("Type" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Type' . FEFILTER),
+            $this->element_form('Type' . FEFILTERLB)) ;
 
         return $table ;
     }
@@ -1126,39 +1129,39 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 
         $rpt = &$this->__report ;
 
-        if (!is_null($this->get_element_value("Position")))
-            $rpt->setJobPosition(true) ;
+        //if (!is_null($this->get_element_value('Position')))
+            //$rpt->setJobPosition(true) ;
 
-        if (!is_null($this->get_element_value("Description")))
-            $rpt->setJobDescription(true) ;
+        //if (!is_null($this->get_element_value('Description')))
+            //$rpt->setJobDescription(true) ;
 
-        if (!is_null($this->get_element_value("Duration")))
-            $rpt->setJobDuration(true) ;
+        //if (!is_null($this->get_element_value('Duration')))
+            //$rpt->setJobDuration(true) ;
 
-        if (!is_null($this->get_element_value("Type")))
-            $rpt->setJobType(true) ;
+        //if (!is_null($this->get_element_value('Type')))
+            //$rpt->setJobType(true) ;
 
-        if (!is_null($this->get_element_value("Credits")))
-            $rpt->setJobCredits(true) ;
+        //if (!is_null($this->get_element_value('Credits')))
+            //$rpt->setJobCredits(true) ;
 
-        if (!is_null($this->get_element_value("Notes")))
-            $rpt->setJobNotes(true) ;
+        //if (!is_null($this->get_element_value('Notes')))
+            //$rpt->setJobNotes(true) ;
 
-        $rpt->setSwimMeetIds($this->get_element_value("Swim Seasons")) ;
+        $rpt->setSeasonId($this->get_element_value('Swim Seasons')) ;
 
         //  Filters
  
-        if (!is_null($this->get_element_value("Duration" . FEFILTER)))
-        {
-            $rpt->setJobDurationFilter(true) ;
-            $rpt->setJobDurationFilterValue($this->get_element_value("Duration" . FEFILTERLB)) ;
-        }
+        //if (!is_null($this->get_element_value('Duration' . FEFILTER)))
+        //{
+            //$rpt->setJobDurationFilter(true) ;
+            //$rpt->setJobDurationFilterValue($this->get_element_value('Duration' . FEFILTERLB)) ;
+        //}
  
-        if (!is_null($this->get_element_value("Type" . FEFILTER)))
-        {
-            $rpt->setJobTypeFilter(true) ;
-            $rpt->setJobTypeFilterValue($this->get_element_value("Type" . FEFILTERLB)) ;
-        }
+        //if (!is_null($this->get_element_value('Type' . FEFILTER)))
+        //{
+            //$rpt->setJobTypeFilter(true) ;
+            //$rpt->setJobTypeFilterValue($this->get_element_value('Type' . FEFILTERLB)) ;
+        //}
     }
 
     /**
@@ -1169,13 +1172,15 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
      */
     function form_action()
     {
-        if ($this->get_element_value("Report") == WPST_GENERATE_STATIC_WEB_PAGE)
+        $seasonid = $this->get_element_value('Swim Seasons') ;
+
+        if ($this->get_element_value('Report') == WPST_GENERATE_STATIC_WEB_PAGE)
         {
             $csv = false ;
             $this->__report = new SwimTeamJobCommitmentsReportGenerator() ;
             
         }
-        else if ($this->get_element_value("Report") == WPST_GENERATE_CSV)
+        else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
             $this->__report = new SwimTeamJobCommitmentsReportGeneratorCSV() ;
@@ -1195,11 +1200,14 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 
         //  Generate the report
 
+        $rpt->CalculateCredits($seasonid) ;
+
+        $rpt->setReportTitle('Swim Team Job Commitments Report') ;
         $rpt->generateReport() ;
         
-        $this->set_action_message(sprintf("Swim Team Job Commitments Report Generated,
-            %s record%s returned.", $rpt->getRecordCount(),
-            $rpt->getRecordCount() == 1 ? "" : "s")) ;
+        $this->set_action_message(sprintf('Swim Team Job Commitments Report Generated,
+            %s record%s returned.', $rpt->getRecordCount(),
+            $rpt->getRecordCount() == 1 ? '' : 's')) ;
 
         return true ;
     }
@@ -1673,10 +1681,8 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
         
         //  In CSV mode, also force the HTML report to be generated
 
-        if ($csv) $rpt->generateReport(null, true) ;
+        //if ($csv) $rpt->generateReport(null, true) ;
         
-        //$this->__report = $rpt->getReport() ;
-
         $this->set_action_message(sprintf("Swim Team Report Generated,
             %s record%s returned.", $rpt->getRecordCount(),
             $rpt->getRecordCount() == 1 ? "" : "s")) ;
@@ -1692,26 +1698,6 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
     function form_success()
     {
         $c = container() ;
-
-        /*
-        $rpt = &$this->__report ;
-
-        if ($this->get_element_value("Report") == WPST_GENERATE_STATIC_WEB_PAGE)
-        {
-            $c->add($rpt->getReport()) ;
-        }
-        else if ($this->get_element_value("Report") == WPST_GENERATE_CSV)
-        {
-            $rpt->generateCSVFile() ;
-
-            $arg = urlencode($rpt->getCSVFile()) ;
-
-            $if = html_iframe(sprintf("%s/include/user/reportgenCSV.php?file=%s", WPST_PLUGIN_URL, $arg)) ;
-            $if->set_tag_attributes(array("width" => 0, "height" => 0)) ;
-            $c->add($if) ;
-        }
-         */
-            
         $c->add($this->_action_message) ;
 
         return $c ;

@@ -3,7 +3,7 @@ Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
 Requires at least: 3.0
-Tested up to: 3.1
+Tested up to: 3.1.3
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -64,8 +64,17 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
-= 1.7 =
+= 1.8 =
 * Fixed bug with Users List which prevented using the GUI controls.
+* Added new Event model for Opt-In/Opt-Out.  Can now opt in or out of specific events instead of strokes.
+* Exposed Job Assignments Report to Users.  Users can now generate a report of their own Assignments.
+* Added "Job Commitments" Report which reports Job Commitments versus Parents/Guardians of active swimmers.
+
+= 1.7 =
+* Added "My Jobs" tab to allow users to quickly see the jobs they have committed to.
+* Added notification when a user has not met the minimum job commitment requirement.
+* Fixed a plethora of small bugs and made numerous code improvements, particularly in the Reports module.
+* Added new field to swim meet definition to allow participation to be open or closed.
 
 = 1.6 =
 * Fixed bug when optional user and/or swimmer field count is zero preventing reports from running.

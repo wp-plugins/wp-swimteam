@@ -17,14 +17,15 @@
  */
 
 
-require_once("forms.class.php") ;
-require_once("seasons.class.php") ;
-require_once("swimmeets.class.php") ;
-require_once("swimclubs.class.php") ;
-require_once("roster.class.php") ;
-require_once("jobs.class.php") ;
-require_once("textmap.class.php") ;
-require_once("print.class.php") ;
+require_once('forms.class.php') ;
+require_once('events.class.php') ;
+require_once('seasons.class.php') ;
+require_once('swimmeets.class.php') ;
+require_once('swimclubs.class.php') ;
+require_once('roster.class.php') ;
+require_once('jobs.class.php') ;
+require_once('textmap.class.php') ;
+require_once('print.class.php') ;
 
 /**
  * Class definition of the meets
@@ -103,7 +104,7 @@ class SwimMeetReport extends SwimMeet
     /**
      * Stroke lookup table
      */
-    var $__eventcodelut = array(
+    var $__strokecodelut = array(
         WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE =>
             WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_LABEL
        ,WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_VALUE =>
@@ -395,7 +396,7 @@ class SwimMeetReport extends SwimMeet
 
         if ($this->getMeetSummary())
         {
-            $summary = new SwimMeetInfoTable("Meet Summary", "100%") ;
+            $summary = new SwimMeetInfoTable('Meet Summary', '100%') ;
             $summary->setSwimMeetId($this->getMeetId()) ;
             $summary->constructSwimMeetInfoTable() ;
             if (empty($c->_content))
@@ -408,7 +409,7 @@ class SwimMeetReport extends SwimMeet
 
         if ($this->getJobAssignments())
         {
-            $jobassignments = new SwimMeetJobAssignmentInfoTable("Job Assignments", "100%") ;
+            $jobassignments = new SwimMeetJobAssignmentInfoTable('Job Assignments', '100%') ;
             $jobassignments->setMeetId($this->getMeetId()) ;
             $jobassignments->setShowUsername(true) ;
             $jobassignments->setShowEmail(true) ;
@@ -432,7 +433,7 @@ class SwimMeetReport extends SwimMeet
         {
             if ($this->getOpponentSwimClubId() != WPST_NONE)
             {
-                $profile = new SwimClubProfileInfoTable("Club Profile", "100%") ;
+                $profile = new SwimClubProfileInfoTable('Club Profile', '100%') ;
                 $profile->setSwimClubId($this->getOpponentSwimClubId()) ;
                 $profile->constructSwimClubProfile(true) ;
 
@@ -444,9 +445,9 @@ class SwimMeetReport extends SwimMeet
             else
             {
                 if (empty($c->_content))
-                    $c->add(html_h4("No club profile information available.")) ;
+                    $c->add(html_h4('No club profile information available.')) ;
                 else
-                    $c->add(html_br(2), html_h4("No club profile information available.")) ;
+                    $c->add(html_br(2), html_h4('No club profile information available.')) ;
             }
         }
  
@@ -469,27 +470,39 @@ class SwimMeetReport extends SwimMeet
             else
                 $opponent = $this->getMeetDescription() ;
 
-            $meetdate = date("D M j, Y", strtotime($this->getMeetDate())) ;
+            $meetdate = date('D M j, Y', strtotime($this->getMeetDate())) ;
  
             //  Full meet scratches
 
-            $full = new SwimTeamInfoTable(sprintf("Full Meet %s:  %s %s",
-                $participation, $opponent, $meetdate), "100%") ;
+            $full = new SwimTeamInfoTable(sprintf('Full Meet %s:  %s %s',
+                $participation, $opponent, $meetdate), '100%') ;
             $full->set_alt_color_flag(true) ;
 
             if  ($this->getShowTimeStamp())
-                $full->add_row(html_b("Name"), html_b("Swimmer Number"), html_b("Recorded")) ;
+                $full->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Recorded')) ;
             else
-                $full->add_row(html_b("Name"), html_b("Swimmer Number")) ;
+                $full->add_row(html_b('Name'), html_b('Swimmer Number')) ;
 
-            $partial = new SwimTeamInfoTable(sprintf("Partial Meet %s:  %s %s",
-                $participation, $opponent, $meetdate), "100%") ;
+            $partial = new SwimTeamInfoTable(sprintf('Partial Meet %s:  %s %s',
+                $participation, $opponent, $meetdate), '100%') ;
             $partial->set_alt_color_flag(true) ;
 
             if  ($this->getShowTimeStamp())
-                $partial->add_row(html_b("Name"), html_b("Swimmer Number"), html_b("Stroke"), html_b("Recorded")) ;
+                $partial->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Stroke'), html_b('Recorded')) ;
             else
-                $partial->add_row(html_b("Name"), html_b("Swimmer Number"), html_b("Stroke")) ;
+                $partial->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Stroke')) ;
+
+            $event = new SwimTeamInfoTable(sprintf('Meet Event %s:  %s %s',
+                $participation, $opponent, $meetdate), '100%') ;
+            $event->set_alt_color_flag(true) ;
+
+            if  ($this->getShowTimeStamp())
+                $event->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Event'),
+                    html_b('Age Group'), html_b('Stroke'), html_b('Distance'),
+                    html_b('Recorded')) ;
+            else
+                $event->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Event'),
+                    html_b('Age Group'), html_b('Stroke'), html_b('Distance')) ;
 
             //$season = new SwimTeamSeason() ;
             //$season->loadActiveSeason() ;
@@ -503,19 +516,20 @@ class SwimMeetReport extends SwimMeet
 
             $swimmer = new SwimTeamSwimmer() ;
 
+            $fullrows = 0 ;
+            $partialrows = 0 ;
+            $eventrows = 0 ;
+
             if (empty($swimmerIds))
             {
-                    $td = html_td(null, null, "No swimmers found.") ;
-                    $td->set_tag_attributes(array("class" => "contentnovertical", "colspan" => $this->getShowTimeStamp() ? 3 : 2)) ;
+                    $td = html_td(null, null, 'No swimmers found.') ;
+                    $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $this->getShowTimeStamp() ? 3 : 2)) ;
                     $full->add_row($td) ;
-                    $td->set_tag_attributes(array("class" => "contentnovertical", "colspan" => $this->getShowTimeStamp() ? 4 : 3)) ;
+                    $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $this->getShowTimeStamp() ? 4 : 3)) ;
                     $partial->add_row($td) ;
             }
             else
             {
-                $fullrows = 0 ;
-                $partialrows = 0 ;
-
                 foreach ($swimmerIds as $swimmerId)
                 {
                     $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
@@ -524,102 +538,196 @@ class SwimMeetReport extends SwimMeet
                         (get_current_user_id() == $swimmer->getContact1Id()) ||
                         (get_current_user_id() == $swimmer->getContact2Id()))
                     {
-                    $roster->setSwimmerId($swimmerId['swimmerid']) ;
-                    $roster->loadRosterBySeasonIdAndSwimmerId() ;
-
-                    $fn = $swimmer->getFirstName() ;
-                    $mn = $swimmer->getMiddleName() ;
-                    $ln = $swimmer->getLastName() ;
-                    $nn = $swimmer->getNickName() ;
-
-                    //  Override first name with nickname?
-
-                    if ($this->getUseNickname())
-                        $name = empty($nn) ? $fn : $nn ;
-                    else
-                        $name = $fn ;
-
-                    //  Use first intial?
-
-                    if ($this->getUseFirstInitial())
-                        $name = substr($name, 0, 1) . ". " ;
-                    else
-                        $name .= " " ;
-
-                    //  Use last intial?
-
-                    if ($this->getUseLastInitial())
-                        $name .= substr($ln, 0, 1) . "." ;
-                    else
-                        $name .= $ln ;
-
-                    $eventcodes = $meta->getEventCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
-                        $this->getMeetId(), $this->getParticipation()) ;
-
-                    //  Full meet opt-in / opt-out?
-
-                    if (count($eventcodes) >= count(get_option(WPST_OPTION_OPT_IN_OPT_OUT_EVENTS)))
-                    {
-                        if ($this->getShowTimeStamp())
-                        {
-                            $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndEventCode($this->getMeetId(),
-                                $swimmerId['swimmerid'], $eventcodes[0]['eventcode']) ;
-                            $full->add_row($name, $roster->getSwimmerLabel(),
-                                $timestamp['modified']) ;
-                        }
+                        $roster->setSwimmerId($swimmerId['swimmerid']) ;
+                        $roster->loadRosterBySeasonIdAndSwimmerId() ;
+    
+                        $fn = $swimmer->getFirstName() ;
+                        $mn = $swimmer->getMiddleName() ;
+                        $ln = $swimmer->getLastName() ;
+                        $nn = $swimmer->getNickName() ;
+    
+                        //  Override first name with nickname?
+    
+                        if ($this->getUseNickname())
+                            $name = empty($nn) ? $fn : $nn ;
                         else
-                        {
-                            $full->add_row($name, $roster->getSwimmerLabel()) ;
-                        }
+                            $name = $fn ;
+    
+                        //  Use first intial?
+    
+                        if ($this->getUseFirstInitial())
+                            $name = substr($name, 0, 1) . '. ' ;
+                        else
+                            $name .= ' ' ;
+    
+                        //  Use last intial?
+    
+                        if ($this->getUseLastInitial())
+                            $name .= substr($ln, 0, 1) . '.' ;
+                        else
+                            $name .= $ln ;
+    
+                        // Which mode is the data in?  Stroke or Event?
 
-                        $fullrows++ ;
-                    }
-                    else
-                    {
-                        foreach ($eventcodes as $eventcode)
+                        if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
                         {
-                            if ($this->getShowTimeStamp())
+                            $strokecodes = $meta->getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
+                                $this->getMeetId(), $this->getParticipation()) ;
+        
+                            //  Full meet opt-in / opt-out?
+        
+                            if (count($strokecodes) >= count(get_option(WPST_OPTION_OPT_IN_OPT_OUT_STROKES)))
                             {
-                                $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndEventCode($this->getMeetId(),
-                                    $swimmerId['swimmerid'], $eventcode['eventcode']) ;
-                                $partial->add_row($name, $roster->getSwimmerLabel(),
-                                    $this->__eventcodelut[$eventcode["eventcode"]],
-                                    $timestamp['modified']) ;
+                                if ($this->getShowTimeStamp())
+                                {
+                                    $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndStrokeCode($this->getMeetId(),
+                                        $swimmerId['swimmerid'], $strokecodes[0]['strokecode']) ;
+                                    $full->add_row($name, $roster->getSwimmerLabel(),
+                                        $timestamp['modified']) ;
+                                }
+                                else
+                                {
+                                    $full->add_row($name, $roster->getSwimmerLabel()) ;
+                                }
+        
+                                $fullrows++ ;
                             }
                             else
                             {
-                                $partial->add_row($name, $roster->getSwimmerLabel(),
-                                    $this->__eventcodelut[$eventcode["eventcode"]]) ;
+                                foreach ($strokecodes as $strokecode)
+                                {
+                                    if ($this->getShowTimeStamp())
+                                    {
+                                        $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndStrokeCode($this->getMeetId(),
+                                            $swimmerId['swimmerid'], $strokecode['strokecode']) ;
+                                        $partial->add_row($name, $roster->getSwimmerLabel(),
+                                            $this->__strokecodelut[$strokecode['strokecode']],
+                                            $timestamp['modified']) ;
+                                    }
+                                    else
+                                    {
+                                        $partial->add_row($name, $roster->getSwimmerLabel(),
+                                            $this->__strokecodelut[$strokecode['strokecode']]) ;
+                                    }
+                                }
+        
+                                $partialrows++ ;
                             }
                         }
+                        else
+                        {
+                            $eventids = $meta->getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
+                            $this->getMeetId(), $this->getParticipation()) ;
+        
+                            $e = new SwimMeetEvent() ;
 
-                        $partialrows++ ;
-                    }
+                            foreach ($eventids as $eventid)
+                            {
+                                $e->loadSwimMeetEventByEventId($eventid['eventid']) ;
+
+                                //  If the Event Number is null then we're dealing with data that was
+                                //  entered under the stroke model before switching over to the event
+                                //  model.  In this scenario, simply display N/A for the details which
+                                //  aren't available.
+
+                                if (!is_null($e->getEventNumber()))
+                                {
+                                    //  Full event details are available
+
+                                    if ($this->getShowTimeStamp())
+                                    {
+                                        $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndEventId($this->getMeetId(),
+                                            $swimmerId['swimmerid'], $eventid['eventid']) ;
+                                        $event->add_row($name, $roster->getSwimmerLabel(),
+                                            sprintf('%04s', $e->getEventNumber()),
+                                            SwimTeamTextMap::__mapAgeGroupIdToText($e->getAgeGroupId()),
+                                            SwimTeamTextMap::__mapStrokeCodeToText($e->getStroke()), $e->getDistance() .
+                                            ' ' . SwimTeamTextMap::__mapCourseCodeToText($e->getCourse()),
+                                            $timestamp['modified']) ;
+                                    }
+                                    else
+                                    {
+                                        $event->add_row($name, $roster->getSwimmerLabel(),
+                                            sprintf('%04s', $e->getEventNumber()),
+                                            SwimTeamTextMap::__mapAgeGroupIdToText($e->getAgeGroupId()),
+                                            SwimTeamTextMap::__mapStrokeCodeToText($e->getStroke()), $e->getDistance() .
+                                            ' ' . SwimTeamTextMap::__mapCourseCodeToText($e->getCourse())) ;
+                                    }
+                                }
+                                else
+                                {
+                                    //  Full event details are not available
+
+                                    $na = strtoupper(WPST_NA) ;
+                                    if ($this->getShowTimeStamp())
+                                    {
+                                        $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndEventId($this->getMeetId(),
+                                            $swimmerId['swimmerid'], $eventid['eventid']) ;
+                                        $event->add_row($name, $roster->getSwimmerLabel(),
+                                            $na, $na, $na, $na, $timestamp['modified']) ;
+                                    }
+                                    else
+                                    {
+                                        $event->add_row($name, $roster->getSwimmerLabel(), $na, $na, $na, $na) ;
+                                    }
+                                }
+                            }
+    
+                            $eventrows++ ;
+                        }
                     }
                 }
 
-                if ($fullrows == 0)
-                {
-                    $td = html_td(null, null, "No swimmers found.") ;
-                    $td->set_tag_attributes(array("class" => "contentnovertical", "colspan" => 3)) ;
-                    $full->add_row($td) ;
-                }
+                // Which mode is the data in?  Stroke or Event?
 
-                if ($partialrows == 0)
+                if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
                 {
-                    $td = html_td(null, null, "No swimmers found.") ;
-                    $td->set_tag_attributes(array("class" => "contentnovertical", "colspan" => 4)) ;
-                    $partial->add_row($td) ;
+                    if ($fullrows == 0)
+                    {
+                        $td = html_td(null, null, 'No swimmers found.') ;
+                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => 3)) ;
+                        $full->add_row($td) ;
+                    }
+
+                    if ($partialrows == 0)
+                    {
+                        $td = html_td(null, null, 'No swimmers found.') ;
+                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => 4)) ;
+                        $partial->add_row($td) ;
+                    }
+                }
+                else
+                {
+                    if ($eventrows == 0)
+                    {
+                        $td = html_td(null, null, 'No swimmers found.') ;
+                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => 4)) ;
+                        $event->add_row($td) ;
+                    }
                 }
             }
 
-            $fullmsg = html_h4(sprintf("%d swimmer(s) found.", $fullrows)) ;
-            $partialmsg = html_h4(sprintf("%d swimmer(s) found.", $partialrows)) ;
+            // Which mode is the data in?  Stroke or Event?
 
-            if (empty($c->_content))
-                $c->add($full, $fullmsg, html_br(2), $partial, $partialmsg) ;
+            if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
+            {
+                $fullmsg = html_h4(sprintf('%d swimmer(s) found.', $fullrows)) ;
+                $partialmsg = html_h4(sprintf('%d swimmer(s) found.', $partialrows)) ;
+
+                if (empty($c->_content))
+                    $c->add($full, $fullmsg, html_br(2), $partial, $partialmsg) ;
+                else
+                    $c->add(html_br(2), $full, $fullmsg, html_br(2), $partial, $partialmsg) ;
+            }
             else
-                $c->add(html_br(2), $full, $fullmsg, html_br(2), $partial, $partialmsg) ;
+            {
+                $eventmsg = html_h4(sprintf('%d swimmer(s) found.', $eventrows)) ;
+
+                if (empty($c->_content))
+                    $c->add($event, $eventmsg) ;
+                else
+                    $c->add(html_br(2), $event, $eventmsg) ;
+            }
         }
 
         $sc = null ;
@@ -643,22 +751,22 @@ class SwimMeetReport extends SwimMeet
                 $infowindow = 'n' ;
 
                 $address = $sc->getStreet1() ;
-                if ($sc->getStreet2() != "")
-                    $address .= "<br/>" . $sc->getStreet2() ;
-                if ($sc->getStreet3() != "")
-                    $address .= "<br/>" . $sc->getStreet3() ;
+                if ($sc->getStreet2() != '')
+                    $address .= '<br/>' . $sc->getStreet2() ;
+                if ($sc->getStreet3() != '')
+                    $address .= '<br/>' . $sc->getStreet3() ;
 
-                $address .= "<br/>" . $sc->getCity() ;
-                $address .= ", " . $sc->getStateOrProvince() ;
-                $address .= "<br/>" . $sc->getPostalCode() ;
+                $address .= '<br/>' . $sc->getCity() ;
+                $address .= ', ' . $sc->getStateOrProvince() ;
+                $address .= '<br/>' . $sc->getPostalCode() ;
 
                 if ($sc->getCountry() != WPST_NULL_STRING)
-                    $address .= "<br/>" . $sc->getCountry() ;
+                    $address .= '<br/>' . $sc->getCountry() ;
 
                 $map = new GoogleMapDIVtag() ;
-                $map->set_style("border: 3px solid #afb5ff") ;
+                $map->set_style('border: 3px solid #afb5ff') ;
 
-                $map->setAddress(preg_replace("/<.*?>/", ", ", $address)) ;
+                $map->setAddress(preg_replace('/<.*?>/', ', ', $address)) ;
                 $map->setInfoText($address) ;
                 $map->setMapHeight($height) ;
                 $map->setMapWidth($width) ;
@@ -679,9 +787,9 @@ class SwimMeetReport extends SwimMeet
             else
             {
                 if (empty($c->_content))
-                    $c->add(html_h4("No club profile information available to map.")) ;
+                    $c->add(html_h4('No club profile information available to map.')) ;
                 else
-                    $c->add(html_br(2), html_h4("No club profile information available to map.")) ;
+                    $c->add(html_br(2), html_h4('No club profile information available to map.')) ;
             }
         }
 
@@ -703,7 +811,7 @@ class SwimMeetReport extends SwimMeet
                 if (!empty($url))
                 {
                     $c->add(html_br(), html_a($url,
-                        "View this map on Google Maps."), html_br()) ;
+                        'View this map on Google Maps.'), html_br()) ;
                 }
 
                 //  Show the MapQuest link if it exists
@@ -711,15 +819,15 @@ class SwimMeetReport extends SwimMeet
                 if (!empty($url))
                 {
                     $c->add(html_br(), html_a($url,
-                        "View this location on MapQuest."), html_br()) ;
+                        'View this location on MapQuest.'), html_br()) ;
                 }
             }
             else
             {
                 if (empty($c->_content))
-                    $c->add(html_h4("No club profile information available to map.")) ;
+                    $c->add(html_h4('No club profile information available to map.')) ;
                 else
-                    $c->add(html_br(2), html_h4("No club profile information available to map.")) ;
+                    $c->add(html_br(2), html_h4('No club profile information available to map.')) ;
             }
 
         }
@@ -840,7 +948,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
         {
             foreach ($meetIds as $meetId)
             {
-                $meet->loadSwimMeetByMeetId($meetId["meetid"]) ;
+                $meet->loadSwimMeetByMeetId($meetId['meetid']) ;
     
                 if ($meet->getMeetType() == WPST_DUAL_MEET)
                     $opponent = SwimTeamTextMap::__mapOpponentSwimClubIdToText(
@@ -848,10 +956,10 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
                 else
                     $opponent = $meet->getMeetDescription() ;
     
-                $meetdate = date("D M j, Y", strtotime($meet->getMeetDate())) ;
+                $meetdate = date('D M j, Y', strtotime($meet->getMeetDate())) ;
 
-                $m[sprintf("%s %s (%s)", $meetdate, $opponent,
-                    ucfirst($meet->getLocation()))] = $meetId["meetid"] ;
+                $m[sprintf('%s %s (%s)', $meetdate, $opponent,
+                    ucfirst($meet->getLocation()))] = $meetId['meetid'] ;
             }
         }
 
@@ -866,55 +974,55 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $this->add_hidden_element("seasonid") ;
+        $this->add_hidden_element('seasonid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
-        $this->add_hidden_element("_userid") ;
+        $this->add_hidden_element('_action') ;
+        $this->add_hidden_element('_userid') ;
 
         //  Swim  Meet drop down list
 
-        $meets = new FECheckBoxList("Swim Meet", true, "400px", "100px");
+        $meets = new FECheckBoxList('Swim Meet', true, '400px', '100px');
         $meets->set_list_data($this->_swimmeetSelections()) ;
         $meets->enable_checkall(true) ;
 
         $this->add_element($meets) ;
 
-        $summary = new FECheckBox("Meet Summary") ;
+        $summary = new FECheckBox('Meet Summary') ;
         $this->add_element($summary) ;
 
-        $jobs = new FECheckBox("Job Assignments") ;
+        $jobs = new FECheckBox('Job Assignments') ;
         $this->add_element($jobs) ;
 
-        $profile = new FECheckBox("Opponent Profile") ;
+        $profile = new FECheckBox('Opponent Profile') ;
         $this->add_element($profile) ;
 
-        $showmap = new FECheckBox("Show Map") ;
+        $showmap = new FECheckBox('Show Map') ;
         $this->add_element($showmap) ;
 
         $optinoptout = new FECheckBox(get_option(WPST_OPTION_OPT_IN_LABEL) .
-            " / " . get_option(WPST_OPTION_OPT_OUT_LABEL) . " List") ;
+            ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List') ;
         $this->add_element($optinoptout) ;
 
-        $sortby = new FERadioGroup("Sort By",
+        $sortby = new FERadioGroup('Sort By',
             array(ucfirst(WPST_SORT_BY_NAME) => WPST_SORT_BY_NAME,
             ucfirst(WPST_SORT_BY_SWIMMER_LABEL) => WPST_SORT_BY_SWIMMER_LABEL,
             ucfirst(WPST_SORT_CHRONOLOGICALLY) => WPST_SORT_CHRONOLOGICALLY),
-            true, "200px");
+            true, '200px');
         $this->add_element($sortby) ;
 
-        $firstname = new FECheckBox("First Initial Only") ;
+        $firstname = new FECheckBox('First Initial Only') ;
         $this->add_element($firstname) ;
 
-        $lastname = new FECheckBox("Last Initial Only") ;
+        $lastname = new FECheckBox('Last Initial Only') ;
         $this->add_element($lastname) ;
 
-        $nickname = new FECheckBox("Nickname Override") ;
+        $nickname = new FECheckBox('Nickname Override') ;
         $this->add_element($nickname) ;
 
-        $output = new FEListBox("Report Format", true, "200px");
+        $output = new FEListBox('Report Format', true, '200px');
         $output->set_list_data(array(
              ucfirst(WPST_GENERATE_STATIC_WEB_PAGE) => WPST_GENERATE_STATIC_WEB_PAGE
             ,ucfirst(WPST_GENERATE_PRINTABLE_WEB_PAGE) => WPST_GENERATE_PRINTABLE_WEB_PAGE
@@ -933,8 +1041,8 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
         //  Initialize the form fields
 
         $this->set_element_value(get_option(WPST_OPTION_OPT_IN_LABEL) .
-            " / " . get_option(WPST_OPTION_OPT_OUT_LABEL) . " List", true) ;
-        $this->set_element_value("Sort By", WPST_SORT_BY_NAME) ;
+            ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List', true) ;
+        $this->set_element_value('Sort By', WPST_SORT_BY_NAME) ;
         $this->set_hidden_element_value('_userid', get_current_user_id()) ;
     }
 
@@ -949,30 +1057,30 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width,0,4) ;
 
-        $table->add_row($this->element_label("Swim Meet"),
-            $this->element_form("Swim Meet")) ;
+        $table->add_row($this->element_label('Swim Meet'),
+            $this->element_form('Swim Meet')) ;
 
-        $table->add_row(_HTML_SPACE, html_b(html_br(), "Report Options")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("Meet Summary")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("Job Assignments")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("Opponent Profile")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("Show Map")) ;
+        $table->add_row(_HTML_SPACE, html_b(html_br(), 'Report Options')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Meet Summary')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Job Assignments')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Opponent Profile')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Show Map')) ;
 
         $table->add_row(_HTML_SPACE,
             html_b(html_br(), get_option(WPST_OPTION_OPT_IN_LABEL) .
-            " / " . get_option(WPST_OPTION_OPT_OUT_LABEL) . " List Options")) ;
+            ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List Options')) ;
 
         $table->add_row(_HTML_SPACE, 
             $this->element_form(get_option(WPST_OPTION_OPT_IN_LABEL) .
-            " / " . get_option(WPST_OPTION_OPT_OUT_LABEL) . " List")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("Sort By")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("First Initial Only")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("Last Initial Only")) ;
-        $table->add_row(_HTML_SPACE, $this->element_form("Nickname Override")) ;
+            ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Sort By')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('First Initial Only')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Last Initial Only')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Nickname Override')) ;
 
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
-        $table->add_row($this->element_label("Report Format"),
-            $this->element_form("Report Format")) ;
+        $table->add_row($this->element_label('Report Format'),
+            $this->element_form('Report Format')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -987,7 +1095,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
     {
         $valid = true ;
         
-        //printf("%s:%s<br>", basename(__FILE__), __LINE__) ;
+        //printf('%s:%s<br>', basename(__FILE__), __LINE__) ;
 	    return $valid ;
     }
 
@@ -1003,7 +1111,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
 
         //  Which type of report to generate?
  
-        $this->__report = ($this->get_element_value("Report Format")
+        $this->__report = ($this->get_element_value('Report Format')
             == WPST_GENERATE_PRINTABLE_WEB_PAGE)
             ? new PrintableSwimMeetReport() : new SwimMeetReport() ;
 
@@ -1020,31 +1128,31 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
         {
             $rpt->loadSwimMeetByMeetId($meet) ;
 
-            if (!is_null($this->get_element_value("Meet Summary")))
+            if (!is_null($this->get_element_value('Meet Summary')))
                 $rpt->setMeetSummary(true) ;
         
-            if (!is_null($this->get_element_value("Job Assignments")))
+            if (!is_null($this->get_element_value('Job Assignments')))
                 $rpt->setJobAssignments(true) ;
         
-            if (!is_null($this->get_element_value("Opponent Profile")))
+            if (!is_null($this->get_element_value('Opponent Profile')))
                 $rpt->setOpponentProfile(true) ;
         
-            if (!is_null($this->get_element_value("Show Map")))
+            if (!is_null($this->get_element_value('Show Map')))
                 $rpt->setShowMap(true) ;
         
             if (!is_null($this->get_element_value(
-                get_option(WPST_OPTION_OPT_IN_LABEL) . " / " .
-                get_option(WPST_OPTION_OPT_OUT_LABEL) . " List")))
+                get_option(WPST_OPTION_OPT_IN_LABEL) . ' / ' .
+                get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List')))
             {
                 $rpt->setOptInOptOut(true) ;
-                $rpt->setOptInOptOutSortBy($this->get_element_value("Sort By")) ;
-                if (!is_null($this->get_element_value("First Initial Only")))
+                $rpt->setOptInOptOutSortBy($this->get_element_value('Sort By')) ;
+                if (!is_null($this->get_element_value('First Initial Only')))
                     $rpt->setUseFirstInitial(true) ;
         
-                if (!is_null($this->get_element_value("Last Initial Only")))
+                if (!is_null($this->get_element_value('Last Initial Only')))
                     $rpt->setUseLastInitial(true) ;
         
-                if (!is_null($this->get_element_value("Nickname Override")))
+                if (!is_null($this->get_element_value('Nickname Override')))
                     $rpt->setUseNickName(true) ;
 
                 $rpt->setShowTimeStamp(true) ;
@@ -1053,7 +1161,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
             $rpt->generateReport() ;
         }
         
-        $this->set_action_message("Report generated.") ;
+        $this->set_action_message('Report generated.') ;
 
         return true ;
     }

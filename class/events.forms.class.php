@@ -750,8 +750,8 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
 
         foreach ($eventIds as $eventId)
         {
-            $event->loadSwimMeetEventByEventId($eventId["eventid"]) ;
-            $desc = sprintf("%s:  %s %s %s %s", 
+            $event->loadSwimMeetEventByEventId($eventId['eventid']) ;
+            $desc = sprintf('%04s:  %s %s %s %s', 
                 $event->getEventNumber(),
                 $this->__mapAgeGroupIdToText($event->getAgeGroupId()),
                 $event->getDistance(),
@@ -775,17 +775,17 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
-        $this->add_hidden_element("_meetid") ;
+        $this->add_hidden_element('_action') ;
+        $this->add_hidden_element('_meetid') ;
 
-        $eventlist = new FEComboListBoxVertical("Events", true,
-            "400px", "150px", $this->_buildEventList(), array()) ;
-        $eventlist->enable_ordering(false) ;
+        $eventlist = new FECheckBoxList('Events', true, '100%', '400px');
+        $eventlist->set_list_data($this->_buildEventList()) ;
+        $eventlist->enable_checkall(true) ;
         $this->add_element($eventlist) ;
 
  		//  Event Number field
 
-        //$eventnumber = new FENumber("First Event Number", true, "50px");
+        //$eventnumber = new FENumber('First Event Number', true, '50px');
         //$this->add_element($eventnumber) ;
 }
 
@@ -799,9 +799,11 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
     {
         //  Initialize the form fields
 
-        $this->set_hidden_element_value("_action", WPST_ACTION_EVENTS_LOAD) ;
-        $this->set_hidden_element_value("_meetid", $this->getMeetId()) ;
-        //$this->set_element_value("First Event Number", "1") ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_EVENTS_LOAD) ;
+
+        //if (is_null($this->getMeetId())) wp_die(basename(__FILE__) . '::' . __LINE__) ;
+        $this->set_hidden_element_value('_meetid', $this->getMeetId()) ;
+        //$this->set_element_value('First Event Number', '1') ;
     }
 
 
@@ -814,14 +816,12 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
     function form_content()
     {
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
         $table->add_row(html_td(null, null,
-            $this->element_label("Events")), html_td(null, null,
-            $this->element_form("Events"),
-            div_font8bold("Note:  Events remaining in the",
-            html_i("Available"),
-            "list will not be added to the Swim Meet Events list."))) ;
+            $this->element_label('Events')), html_td(null, null,
+            $this->element_form('Events'), html_br(),
+            div_font8bold('Note:  Only checked events will be added to the Swim Meet.'))) ;
 
         $table->add_row(html_br()) ;
 
@@ -862,19 +862,21 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
      */
     function form_action()
     {
+        $actionmsgs = array() ;
+
         //  Assume success ...
 
         $success = true ;
 
         $event = new SwimMeetEvent() ;
 
-        $eventIds = $this->get_element_value("Events") ;
+        $eventIds = $this->get_element_value('Events') ;
 
         //  Handle the odd behavior when all events are removed ...
         //  in this case, all events are passed through the form 
         //  processor as if they are all in the selected list!
 
-        if (empty($_POST["Events"])) $eventIds = array() ;
+        //if (empty($_POST["Events"])) $eventIds = array() ;
 
         /*
         //  Do any events need to be deleted?  If so, take care of
@@ -908,9 +910,19 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
 
             $event->loadSwimMeetEventByEventId($eventId) ;
             $event->setMeetId($meetid) ;
-            $success &= ($event->addSwimMeetEvent() != null) ;
+            $success = ($event->addSwimMeetEvent() != null) ;
+
+            if ($success)
+                $actionmsgs[] = sprintf('Event added to swim meet:  %s',
+                    SwimTeamTextMap::__mapEventIdToText($eventId)) ;
+            else
+                $actionmsgs[] = sprintf('Event not added to swim meet:  %s',
+                    SwimTeamTextMap::__mapEventIdToText($eventId)) ;
+
         }
 
+        if (0)
+        {
         if ($success) 
         {
             $this->set_action_message("Events successfully loaded.") ;
@@ -921,6 +933,28 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
         }
 
         return $success ;
+        }
+        //  Construct action message
+
+        if (!empty($actionmsgs))
+        {
+            $c = container() ;
+
+            foreach($actionmsgs as $actionmsg)
+            {
+                $c->add($actionmsg, html_br()) ;
+            }
+
+            $actionmsg = $c->render() ;
+        }
+        else
+        {
+            $actionmsg = sprintf('No events loaded.') ;
+        }
+
+        $this->set_action_message($actionmsg) ;
+
+        return true ;
     }
 
     /**

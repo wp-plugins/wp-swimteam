@@ -97,8 +97,9 @@ class ReportJobAssignmentsTabContainer extends SwimTeamTabContainer
                 $if->set_tag_attributes(array("width" => 0, "height" => 0)) ;
                 $c->add($if) ;
 
+                $c->add($rpt->getReport()) ;
 
-                $fp->set_render_form_after_success(true) ;
+                $fp->set_render_form_after_success(false) ;
 
 	            $div->add($fp, html_br(), $c) ;
             }

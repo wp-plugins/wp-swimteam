@@ -74,6 +74,8 @@ class ReportsTabContainer extends Container
             $tab_index++, "overview.php", "ReportsOverviewTabContainer") ;
         $tab_content[] = new TabWidgetContent("Swim Meets",
             $tab_index++, "report_swimmeets.php", "ReportSwimMeetsTabContainer") ;
+        $tab_content[] = new TabWidgetContent("Job Assignments",
+            $tab_index++, "report_jobassignments.php", "ReportJobAssignmentsTabContainer") ;
 
         //  Users can't access all of the reports ...
 
@@ -83,10 +85,8 @@ class ReportsTabContainer extends Container
                 $tab_index++, "report_swimmers.php", "ReportGeneratorTabContainer") ;
             $tab_content[] = new TabWidgetContent("Users",
                 $tab_index++, "report_users.php", "ReportUsersTabContainer") ;
-            $tab_content[] = new TabWidgetContent("Job Assignments",
-                $tab_index++, "report_jobassignments.php", "ReportJobAssignmentsTabContainer") ;
-            //$tab_content[] = new TabWidgetContent("Job Commitments",
-            //    $tab_index++, "report_commitments.php", "ReportJobCommitmentsTabContainer") ;
+            $tab_content[] = new TabWidgetContent("Job Commitments",
+                $tab_index++, "report_jobcommitments.php", "ReportJobCommitmentsTabContainer") ;
         }
 
         $tabs = new TabControlWidget() ;

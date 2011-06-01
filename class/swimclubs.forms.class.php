@@ -127,8 +127,6 @@ class WpSwimTeamSwimClubAddForm extends WpSwimTeamTeamProfileForm
         if ($geography == WPST_US_ONLY)
         {
             $this->set_element_value("Country", ucwords(WPST_US_ONLY)) ;
-            var_dump(get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL));
-            var_dump(get_option(WPST_OPTION_TEAM_STATE_OR_PROVINCE)) ;
             $this->set_element_value(get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL),
                  get_option(WPST_OPTION_TEAM_STATE_OR_PROVINCE)) ;
         }

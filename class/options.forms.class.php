@@ -32,11 +32,26 @@ require_once("options.class.php") ;
 class WpSwimTeamOptionsForm extends WpSwimTeamForm
 {
     /**
+     * div to hold the stroke model opt-in/opt-out selection
+     */
+    var $__stroke_model_div ;
+
+    /**
+     * div to hold the event model opt-in/opt-out selection
+     */
+    var $__event_model_div ;
+
+    /**
+     * div to hold the stroke model opt-in/opt-out model selection
+     */
+    var $__opt_in_opt_out_model_div ;
+
+    /**
      * Get the array of event key and value pairs
      *
      * @return mixed - array of event key value pairs
      */
-    function _eventSelections()
+    function _strokeSelections()
     {
         //  Event codes and labels 
 
@@ -114,7 +129,15 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         )) ;
         $this->add_element($optinoptoutemailformat) ;
 
-        $optinoptoutmode = new FEListBox("Opt-In Opt-Out Mode", true, "100px");
+        //  Build the Active DIV Radio Button Group
+        $this->__opt_in_opt_out_model_div = new FEActiveDIVRadioButtonGroup(
+            'Opt-In Opt-Out Usage Model', array(
+                ucwords(WPST_STROKE) => WPST_STROKE
+               ,ucwords(WPST_EVENT) => WPST_EVENT
+            ), true) ;
+        $this->add_element($this->__opt_in_opt_out_model_div) ;        
+
+        $optinoptoutmode = new FEListBox('Opt-In Opt-Out Stroke Mode', true, '100px');
         $optinoptoutmode->set_list_data(array(
              ucwords(WPST_BOTH) => WPST_BOTH
             ,ucwords(WPST_FULL) => WPST_FULL
@@ -122,11 +145,11 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         )) ;
         $this->add_element($optinoptoutmode) ;
 
-        $events = new FECheckBoxList("Opt-In Opt-Out Events", true, "200px", "120px");
-        $events->set_list_data($this->_eventSelections()) ;
-        $this->add_element($events) ;
+        $strokes = new FECheckBoxList('Opt-In Opt-Out Strokes', true, '200px', '120px');
+        $strokes->set_list_data($this->_strokeSelections()) ;
+        $this->add_element($strokes) ;
 
-        $geography = new FEListBox("Geography", true, "150px");
+        $geography = new FEListBox('Geography', true, '150px');
         $geography->set_list_data(array(
              ucwords(WPST_US_ONLY) => WPST_US_ONLY
             ,ucwords(WPST_EU_ONLY) => WPST_EU_ONLY
@@ -134,16 +157,16 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         )) ;
         $this->add_element($geography) ;
 
-        $stateorprovincelabel = new FERegEx("State or Province Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $stateorprovincelabel = new FERegEx('State or Province Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($stateorprovincelabel) ;
 
-        $postalcodelabel = new FERegEx("Postal Code Label", true, "200px",
+        $postalcodelabel = new FERegEx('Postal Code Label', true, '200px',
             null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($postalcodelabel) ;
 
         /*
-        $measurementunits = new FEListBox("Measurement Units", true, "150px");
+        $measurementunits = new FEListBox('Measurement Units', true, '150px');
         $measurementunits->set_list_data(array(
              ucfirst(WPST_YARDS) => WPST_YARDS
             ,ucfirst(WPST_METERS) => WPST_METERS
@@ -173,10 +196,11 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $this->set_element_value("Opt-Out Label", $options->getOptOutLabel()) ;
         $this->set_element_value("Opt-In Opt-Out E-mail Address", $options->getOptInOptOutEmailAddress()) ;
         $this->set_element_value("Opt-In Opt-Out E-mail Format", $options->getOptInOptOutEmailFormat()) ;
-        $this->set_element_value("Opt-In Opt-Out Mode", $options->getOptInOptOutMode()) ;
-        $this->set_element_value("Opt-In Opt-Out Events", $options->getOptInOptOutEvents()) ;
+        $this->set_element_value("Opt-In Opt-Out Usage Model", $options->getOptInOptOutUsageModel()) ;
+        $this->set_element_value("Opt-In Opt-Out Stroke Mode", $options->getOptInOptOutMode()) ;
+        $this->set_element_value("Opt-In Opt-Out Strokes", $options->getOptInOptOutStrokes()) ;
         /*
-        $this->set_element_value("Opt-In Opt-Out Events", array(
+        $this->set_element_value("Opt-In Opt-Out Strokes", array(
             WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE,
             WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_VALUE,
             WPST_SDIF_EVENT_STROKE_CODE_BREASTSTROKE_VALUE,
@@ -200,6 +224,9 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
     function form_content()
     {
         $table = html_table($this->_width, 0, 4) ;
+
+        $stable = html_table('100%', 3, 0) ;
+ 
         //$table->set_style("border: 1px solid") ;
 
         $table->add_row($this->element_label("Gender"),
@@ -229,20 +256,48 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $table->add_row($this->element_label("Opt-In Opt-Out E-mail Format"),
             $this->element_form("Opt-In Opt-Out E-mail Format")) ;
 
-        $table->add_row($this->element_label("Opt-In Opt-Out Mode"),
-            $this->element_form("Opt-In Opt-Out Mode")) ;
+        $table->add_row($this->element_label('Opt-In Opt-Out Usage Model'),
+            $this->element_form('Opt-In Opt-Out Usage Model')) ;
 
-        $table->add_row($this->element_label("Opt-In Opt-Out Events"),
-            $this->element_form("Opt-In Opt-Out Events")) ;
+        //  Build the Magic Divs to show the strokes only in stroke mode
 
-        $table->add_row($this->element_label("Geography"),
-            $this->element_form("Geography")) ;
+        $this->__stroke_model_div = $this->__opt_in_opt_out_model_div->build_div(0) ;
+        $this->__event_model_div = $this->__opt_in_opt_out_model_div->build_div(1) ;
 
-        $table->add_row($this->element_label("State or Province Label"),
-            $this->element_form("State or Province Label")) ;
+        $tdl = html_td() ;
+        $tdr = html_td() ;
+        $tdl->add($this->element_label('Opt-In Opt-Out Stroke Mode')) ;
+        $tdr->add($this->element_form('Opt-In Opt-Out Stroke Mode')) ;
+        $tdr->set_style('padding: 3px 0px;width: 335px') ;
+        $stable->add_row($tdl, $tdr) ;
+        $tdl = html_td() ;
+        $tdr = html_td() ;
+        $tdl->add($this->element_label('Opt-In Opt-Out Strokes')) ;
+        $tdr->add($this->element_form('Opt-In Opt-Out Strokes')) ;
+        $tdr->set_style('padding: 3px 0px;width: 335px') ;
+        $stable->add_row($tdl, $tdr) ;
 
-        $table->add_row($this->element_label("Postal Code Label"),
-            $this->element_form("Postal Code Label")) ;
+        $this->__stroke_model_div->add($stable) ;
+
+        $this->__event_model_div->add(null) ;
+
+        $model = html_div(null, $this->__stroke_model_div, $this->__event_model_div) ;
+
+        $td = html_td() ;
+        $td->set_tag_attributes(array('colspan' => '2',
+            'valign' => 'middle', 'style' => 'padding-top: 5px; padding-right: 0px;')) ;
+        $td->add($model) ;
+
+        $table->add_row($td) ;
+
+        $table->add_row($this->element_label('Geography'),
+            $this->element_form('Geography')) ;
+
+        $table->add_row($this->element_label('State or Province Label'),
+            $this->element_form('State or Province Label')) ;
+
+        $table->add_row($this->element_label('Postal Code Label'),
+            $this->element_form('Postal Code Label')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -260,15 +315,15 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         //  Need to validate several fields ...
 
         $options = new SwimTeamOptions() ;
-        $options->setMinAge($this->get_element_value("Minimum Age")) ;
-        $options->setMaxAge($this->get_element_value("Maximum Age")) ;
+        $options->setMinAge($this->get_element_value('Minimum Age')) ;
+        $options->setMaxAge($this->get_element_value('Maximum Age')) ;
 
         //  Make sure min and max age make sense
 
         if ($options->getMinAge() >= $options->getMaxAge())
         {
-            $this->add_error("Minimum Age", "Minimum age must be less than Maximum age.") ;
-            $this->add_error("Maximum Age", "Maximum age must be greater than Maximum age.") ;
+            $this->add_error('Minimum Age', 'Minimum age must be less than Maximum age.') ;
+            $this->add_error('Maximum Age', 'Maximum age must be greater than Maximum age.') ;
             $valid = false ;
         }
         
@@ -285,24 +340,25 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
     {
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
-        $options->setGender($this->get_element_value("Gender")) ;
-        $options->setMinAge($this->get_element_value("Minimum Age")) ;
-        $options->setMaxAge($this->get_element_value("Maximum Age")) ;
-        $options->setAgeCutoffMonth($this->get_element_value("Age Cutoff Month")) ;
-        $options->setAgeCutoffDay($this->get_element_value("Age Cutoff Day")) ;
+        $options->setGender($this->get_element_value('Gender')) ;
+        $options->setMinAge($this->get_element_value('Minimum Age')) ;
+        $options->setMaxAge($this->get_element_value('Maximum Age')) ;
+        $options->setAgeCutoffMonth($this->get_element_value('Age Cutoff Month')) ;
+        $options->setAgeCutoffDay($this->get_element_value('Age Cutoff Day')) ;
 
-        $options->setOptInLabel($this->get_element_value("Opt-In Label")) ;
-        $options->setOptOutLabel($this->get_element_value("Opt-Out Label")) ;
-        $options->setOptInOptOutEmailAddress($this->get_element_value("Opt-In Opt-Out E-mail Address")) ;
-        $options->setOptInOptOutEmailFormat($this->get_element_value("Opt-In Opt-Out E-mail Format")) ;
-        $options->setOptInOptOutMode($this->get_element_value("Opt-In Opt-Out Mode")) ;
-        $options->setOptInOptOutEvents($this->get_element_value("Opt-In Opt-Out Events")) ;
-        $options->setGeography($this->get_element_value("Geography")) ;
-        $options->setStateOrProvinceLabel($this->get_element_value("State or Province Label")) ;
-        $options->setPostalCodeLabel($this->get_element_value("Postal Code Label")) ;
+        $options->setOptInLabel($this->get_element_value('Opt-In Label')) ;
+        $options->setOptOutLabel($this->get_element_value('Opt-Out Label')) ;
+        $options->setOptInOptOutEmailAddress($this->get_element_value('Opt-In Opt-Out E-mail Address')) ;
+        $options->setOptInOptOutEmailFormat($this->get_element_value('Opt-In Opt-Out E-mail Format')) ;
+        $options->setOptInOptOutUsageModel($this->get_element_value('Opt-In Opt-Out Usage Model')) ;
+        $options->setOptInOptOutMode($this->get_element_value('Opt-In Opt-Out Stroke Mode')) ;
+        $options->setOptInOptOutStrokes($this->get_element_value('Opt-In Opt-Out Strokes')) ;
+        $options->setGeography($this->get_element_value('Geography')) ;
+        $options->setStateOrProvinceLabel($this->get_element_value('State or Province Label')) ;
+        $options->setPostalCodeLabel($this->get_element_value('Postal Code Label')) ;
         $options->updateOptions() ;
 
-        $this->set_action_message("Swim Team options updated.") ;
+        $this->set_action_message('Swim Team options updated.') ;
 
         return true ;
     }

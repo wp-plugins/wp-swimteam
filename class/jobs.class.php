@@ -2057,12 +2057,12 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
     /**
      * Get Job Assignment Ids by Meet Id
      *
-     * @param int - $id - swim meet id
+     * @param int - $meetid - swim meet id
      * @return mixed - array of job assignment ids
      */
-    function getJobAssignmentIdsByMeetId($id = null, $fullseasonjobs = false)
+    function getJobAssignmentIdsByMeetId($meetid = null, $fullseasonjobs = false)
     {
-        if (is_null($id)) $id = $this->getMeetId() ;
+        if (is_null($meetid)) $meetid = $this->getMeetId() ;
 
         //  Select the records for the meet
 
@@ -2071,7 +2071,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
                 %s.meetid=\"%s\" AND %s.jobid = %s.jobid
                 ORDER BY %s.jobposition, %s.jobassignmentid",
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
-                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE) ;
         else
@@ -2080,7 +2080,45 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
                 %s.jobduration != \"%s\" ORDER BY %s.jobposition,
                 %s.jobassignmentid",
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
-                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_DURATION_FULL_SEASON, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResults() ;
+    }
+
+    /**
+     * Get Job Assignment Ids by Meet Id
+     *
+     * @param int - $meetid - swim meet id
+     * @return mixed - array of job assignment ids
+     */
+    function getJobAssignmentIdsByMeetIdAndUserId($meetid = null, $userid = null, $fullseasonjobs = false)
+    {
+        if (is_null($meetid)) $meetid = $this->getMeetId() ;
+        if (is_null($userid)) $userid = $this->getUserId() ;
+
+        //  Select the records for the meet
+
+        if ($fullseasonjobs)
+            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid=\"%s\" AND %s.meetid=\"%s\" AND %s.jobid = %s.jobid
+                ORDER BY %s.jobposition, %s.jobassignmentid",
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE, $userid, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE) ;
+        else
+            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid=\"%s\" AND %s.meetid=\"%s\" AND %s.jobid = %s.jobid AND
+                %s.jobduration != \"%s\" ORDER BY %s.jobposition,
+                %s.jobassignmentid",
+                WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE,
+                WPST_JOB_ASSIGNMENTS_TABLE, $userid, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_DURATION_FULL_SEASON, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE) ;

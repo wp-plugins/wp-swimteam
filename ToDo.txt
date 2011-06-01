@@ -14,7 +14,7 @@ To-Do List:
 
 3)  Manage volunteers - need to define and manage volunteer jobs.
 
-    Status:  Open
+    Status:  Complete.
 
 4)  Support swimmers as end users - older kids want to register
     with the site and access their own data.  Right now the only
@@ -35,10 +35,27 @@ To-Do List:
     out) in swim meet or particular events.  This functionality is
     also known as a Scratch Sheet or Scratch List.
 
-    Status:  Under development.
+    Status:  Complete
 
 7)  Heat Sheet management - depends on opt-in/opt-out, allows coach
     and/or someone else to generate a heat sheet and rearrange the 
     swimmers to the desired event/heat/lane assignments.
+
+    Status:  Open
+
+8)  Export Meet Entries via SDIF.  Now that Events module is working
+    and opt-in/opt-out supports events, the ability to export a set
+    of meet entries is possible.
+
+    Status:  Open
+
+9)  Chart swimmer results.  Allow charting of results for one or more
+    swimmers  using something like Open Flash Chart or similar.
+
+
+    Status:  Open
+
+10) Team Records.  Allow a team to store their team records as part of
+    the database.
 
     Status:  Open

@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 590 $
+ * @version $Revision: 614 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -94,7 +94,9 @@ define('WPST_OPT_IN', 'opt in') ;
 define('WPST_OPT_OUT', 'opt out') ;
 define('WPST_FULL', 'full') ;
 define('WPST_PARTIAL', 'partial') ;
-define('WPST_SEASON', 'Season') ;
+define('WPST_SEASON', 'season') ;
+define('WPST_EVENT', 'event') ;
+define('WPST_STROKE', 'stroke') ;
 define('WPST_SWIMMEET', 'Swim Meet') ;
 define('WPST_DASHBOARD_PAGE', 'dashboard page') ;
 define('WPST_SWIMTEAM_OVERVIEW_PAGE', 'swim team overview page') ;
@@ -191,6 +193,7 @@ define('WPST_DEFAULT_OPT_IN_LABEL', 'Register') ;
 define('WPST_DEFAULT_OPT_OUT_LABEL', 'Scratch') ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_EMAIL_FORMAT', WPST_HTML) ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_MODE', WPST_BOTH) ;
+define('WPST_DEFAULT_OPT_IN_OPT_OUT_USAGE_MODEL', WPST_STROKE) ;
 define('WPST_DEFAULT_GOOGLE_API_KEY', 'Google API Key') ;
 define('WPST_DEFAULT_GDL_ROWS_TO_DISPLAY', 20) ;
 define('WPST_DEFAULT_USER_OPTION_COUNT', 5) ;
@@ -235,7 +238,9 @@ define('WPST_OPTION_OPT_OUT_LABEL', WPST_OPTION_PREFIX . 'opt_out_label') ;
 define('WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS', WPST_OPTION_PREFIX . 'opt_in_opt_out_email_address') ;
 define('WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_FORMAT', WPST_OPTION_PREFIX . 'opt_in_opt_out_email_format') ;
 define('WPST_OPTION_OPT_IN_OPT_OUT_EVENTS', WPST_OPTION_PREFIX . 'opt_in_opt_out_events') ;
+define('WPST_OPTION_OPT_IN_OPT_OUT_STROKES', WPST_OPTION_PREFIX . 'opt_in_opt_out_strokes') ;
 define('WPST_OPTION_OPT_IN_OPT_OUT_MODE', WPST_OPTION_PREFIX . 'opt_in_opt_out_mode') ;
+define('WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL', WPST_OPTION_PREFIX . 'opt_in_opt_out_usage_model') ;
 define('WPST_OPTION_REG_PREFIX_LABEL', WPST_OPTION_PREFIX . 'reg_prefix_label') ;
 define('WPST_OPTION_REG_FEE_LABEL', WPST_OPTION_PREFIX . 'reg_fee_label') ;
 define('WPST_OPTION_REG_FEE_CURRENCY_LABEL', WPST_OPTION_PREFIX . 'reg_fee_currency_label') ;

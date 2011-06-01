@@ -16,11 +16,12 @@
  *
  */
 
-require_once("db.class.php") ;
-require_once("swimteam.include.php") ;
-require_once("events.include.php") ;
-require_once("swimclubs.class.php") ;
-require_once("widgets.class.php") ;
+require_once('db.class.php') ;
+require_once('swimteam.include.php') ;
+require_once('events.include.php') ;
+require_once('swimclubs.class.php') ;
+require_once('widgets.class.php') ;
+require_once('textmap.class.php') ;
 
 /**
  * Class definition of the events
@@ -329,6 +330,7 @@ class SwimMeetEvent extends SwimTeamDBI
             $this->setQuery($query) ;
             $this->runInsertQuery() ;
             $success = $this->getInsertId() ;
+            
         }
 
         return $success ;
@@ -371,7 +373,7 @@ class SwimMeetEvent extends SwimTeamDBI
         }
         else
         {
-            wp_die("Unable to update event record.") ;
+            wp_die('Unable to update event record.') ;
         }
 
         return true ;
@@ -389,11 +391,17 @@ class SwimMeetEvent extends SwimTeamDBI
     {
         $success = null ;
 
-        //  Make sure the event doesn't exist yet
+        //  Make sure the event exists yet
 
         if ($this->getSwimMeetEventExistsByEventId())
         {
-            //  Construct the insert query
+            //  Before deleting the event, need to make sure any registrations
+            //  associated with it are deleted as well to prevent orphan registrations.
+ 
+            $sm = new SwimMeetMeta() ;
+            $sm->deleteSwimMeetMetaByEventId($this->getEventId()) ;
+
+            //  Construct the delete query
  
             $query = sprintf("DELETE FROM %s
                 WHERE eventid=\"%s\"",
@@ -457,15 +465,15 @@ class SwimMeetEvent extends SwimTeamDBI
      * @param - string - optional filter to restrict query
      * @return - array - array of swimmers ids
      */
-    function getAllEventIds($filter = null, $orderby = "eventnumber")
+    function getAllEventIds($filter = null, $orderby = 'eventnumber')
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT eventid FROM %s", WPST_EVENTS_TABLE) ;
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        $query = sprintf('SELECT eventid FROM %s', WPST_EVENTS_TABLE) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -479,7 +487,7 @@ class SwimMeetEvent extends SwimTeamDBI
      * @param - optional - meet id, default to the standard events
      * @return - array - array of swimmers ids
      */
-    function getAllEventIdsByMeetId($meetid = WPST_NULL_ID, $orderby = "eventnumber")
+    function getAllEventIdsByMeetId($meetid = WPST_NULL_ID, $orderby = 'eventnumber')
     {
         $filter = sprintf("meetid=\"%s\"", $meetid) ;
 
@@ -495,13 +503,13 @@ class SwimMeetEvent extends SwimTeamDBI
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT MAX(eventnumber) as maxeventnumber FROM %s", WPST_EVENTS_TABLE) ;
+        $query = sprintf('SELECT MAX(eventnumber) as maxeventnumber FROM %s', WPST_EVENTS_TABLE) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 
         $qr = $this->getQueryResult() ;
-        return $qr["maxeventnumber"] ;
+        return $qr['maxeventnumber'] ;
     }
 }
 
@@ -526,7 +534,7 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimMeetEventsGUIDataList($title, $width = "100%",
+    function SwimMeetEventsGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_EVENTS_DEFAULT_COLUMNS,
         $tables = WPST_EVENTS_DEFAULT_TABLES,
@@ -558,23 +566,23 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
 		//add the columns in the display that you want to view.
 		//The API is :
 		//Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-		$this->add_header_item("ID",
-	       	    "50", "eventid", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Event',
+	       	    '100', 'eventnumber', SORTABLE, SEARCHABLE, 'left') ;
 
-		$this->add_header_item("Event",
-	       	    "100", "eventnumber", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Age Group',
+	       	    '150', 'agegroupid', SORTABLE, SEARCHABLE, 'left') ;
 
-		$this->add_header_item("Age Group",
-	       	    "150", "agegroupid", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Distance',
+	         	'100', 'distance', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Distance",
-	         	"100", "distance", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Course',
+	         	'150', 'course', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Course",
-	         	"150", "course", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Stroke',
+	         	'150', 'stroke', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Stroke",
-	         	"150", "stroke", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('ID',
+	       	    '50', 'eventid', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
@@ -604,16 +612,16 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
     {
 		switch ($col_name)
         {
-            case "Course" :
-                $obj = $this->__mapCourseCodeToText($row_data["course"]) ;
+            case 'Course' :
+                $obj = SwimTeamTextMap::__mapCourseCodeToText($row_data['course']) ;
                 break ;
 
-            case "Age Group" :
-                $obj = $this->__mapAgeGroupIdToText($row_data["agegroupid"]) ;
+            case 'Age Group' :
+                $obj = SwimTeamTextMap::__mapAgeGroupIdToText($row_data['agegroupid']) ;
                 break ;
 
-            case "Stroke" :
-                $obj = $this->__mapStrokeCodeToText($row_data["stroke"]) ;
+            case 'Stroke' :
+                $obj = SwimTeamTextMap::__mapStrokeCodeToText($row_data['stroke']) ;
                 break ;
 
 		    default:
@@ -621,97 +629,6 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
 			    break;
 		}
 		return $obj;
-    }
-
-    /**
-     * Map the age group id into text for the GDL
-     *
-     * @return string - season text description
-     */
-    function __mapAgeGroupIdToText($agegroupid)
-    {
-        $agegroup = new SwimTeamAgeGroup() ;
-        $agegroup->loadAgeGroupById($agegroupid) ;
-
-        return $agegroup->getAgeGroupText() ;
-    }
-
-    /**
-     * Map the season id into text for the GDL
-     *
-     * @return string - season text description
-     */
-    function __mapCourseCodeToText($course)
-    {
-        switch($course)
-        {
-            case WPST_SDIF_COURSE_STATUS_CODE_SCM_VALUE :
-                $obj = WPST_SDIF_COURSE_STATUS_CODE_SCM_LABEL ;
-                break ;
-
-            case WPST_SDIF_COURSE_STATUS_CODE_SCY_VALUE :
-                $obj = WPST_SDIF_COURSE_STATUS_CODE_SCY_LABEL ;
-                break ;
-
-            case WPST_SDIF_COURSE_STATUS_CODE_LCM_VALUE :
-                $obj = WPST_SDIF_COURSE_STATUS_CODE_LCM_LABEL ;
-                break ;
-
-            case WPST_SDIF_COURSE_STATUS_CODE_DQ_VALUE :
-                $obj = WPST_SDIF_COURSE_STATUS_CODE_DQ_LABEL ;
-                break ;
-
-            default :
-                $obj = WPST_UNKNOWN ;
-                break ;
-        }
-
-        return $obj ;
-    }
-
-    /**
-     * Map the opponent swim club id into text for the GDL
-     *
-     * @return string - opponent text description
-     */
-    function __mapStrokeCodeToText($stroke)
-    {
-        switch($stroke)
-        {
-            case WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE :
-                $obj = WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_LABEL ;
-                break ;
-
-            case WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_VALUE :
-                $obj = WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_LABEL ;
-                break ;
-
-            case WPST_SDIF_EVENT_STROKE_CODE_BREASTSTROKE_VALUE :
-                $obj = WPST_SDIF_EVENT_STROKE_CODE_BREASTSTROKE_LABEL ;
-                break ;
-
-            case WPST_SDIF_EVENT_STROKE_CODE_BUTTERFLY_VALUE :
-                $obj = WPST_SDIF_EVENT_STROKE_CODE_BUTTERFLY_LABEL ;
-                break ;
-
-            case WPST_SDIF_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_VALUE :
-                $obj = WPST_SDIF_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_LABEL ;
-                break ;
-
-            case WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE :
-                $obj = WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_LABEL ;
-                break ;
-
-            case WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE :
-                $obj = WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_LABEL ;
-                break ;
-
-            default :
-                $obj = WPST_UNKNOWN ;
-                break ;
-        }
-
-        return $obj ;
     }
 }
 
@@ -786,8 +703,8 @@ class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
 
         parent::user_setup() ;
 
-		//$this->add_header_item("Id",
-	    //   	    "50", "eventid", SORTABLE, SEARCHABLE, "left") ;
+		//$this->add_header_item('Id',
+	    //   	    '50', 'eventid', SORTABLE, SEARCHABLE, 'left') ;
 
         //  turn on the 'collapsable' search block.
         //  The word 'Search' in the output will be clickable,
@@ -801,7 +718,7 @@ class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
 
         //  The unique item is the second column.
 
-	    $this->add_action_column('radio', 'FIRST', "eventid") ;
+	    $this->add_action_column('radio', 'FIRST', 'eventid') ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -847,9 +764,9 @@ class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
         foreach($this->__normal_actions as $key => $action)
             $actions[$action] = $action ;
 
-        $lb = $this->action_select("_action", $actions,
-            "", false, array("style" => "width: 150px; margin-right: 10px;"),
-            $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
+        $lb = $this->action_select('_action', $actions,
+            '', false, array('style' => 'width: 150px; margin-right: 10px;'),
+            $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']) ;
 
         $c->add($lb) ;
 
@@ -881,7 +798,7 @@ class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
              */
 
             $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
+            $b->set_tag_attribute('type', 'submit') ;
             $c->add($b) ;
         }
 
@@ -899,23 +816,6 @@ class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
 class SwimMeetEventScheduleInfoTable extends SwimTeamInfoTable
 {
     /**
-     * Map the opponent swim club id into text for the GDL
-     *
-     * @return string - opponent text description
-     */
-    function __mapOpponentSwimClubIdToText($swimclubid)
-    {
-        //  Handle null id gracefully for non-dual events
-
-        if ($swimclubid == WPST_NULL_ID) return ucfirst(WPST_NONE) ;
-
-        $swimclub = new SwimClubProfile() ;
-        $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
-
-        return $swimclub->getClubOrPoolName() . " " . $swimclub->getTeamName() ;
-    }
-
-    /**
      * Construct a summary of the active season.
      *
      */
@@ -925,10 +825,10 @@ class SwimMeetEventScheduleInfoTable extends SwimTeamInfoTable
 
         //  Alternate the row colors
         $this->set_alt_color_flag(true) ;
-        $this->set_column_header($hdr++, "Date", null, "left") ;
-        $this->set_column_header($hdr++, "Opponent", null, "left") ;
-        $this->set_column_header($hdr++, "Location", null, "left") ;
-        $this->set_column_header($hdr++, "Result", null, "left") ;
+        $this->set_column_header($hdr++, 'Date', null, 'left') ;
+        $this->set_column_header($hdr++, 'Opponent', null, 'left') ;
+        $this->set_column_header($hdr++, 'Location', null, 'left') ;
+        $this->set_column_header($hdr++, 'Result', null, 'left') ;
 
         $season = new SwimTeamSeason() ;
 
@@ -944,10 +844,10 @@ class SwimMeetEventScheduleInfoTable extends SwimTeamInfoTable
 
         foreach ($eventIds as $eventId)
         {
-            $event->loadSwimMeetEventByEventId($eventId["eventid"]) ;
+            $event->loadSwimMeetEventByEventId($eventId['eventid']) ;
 
             if ($event->getEventType() == WPST_DUAL_MEET)
-                $opponent = $this->__mapOpponentSwimClubIdToText(
+                $opponent = SwimTeamTextMap::__mapOpponentSwimClubIdToText(
                     $event->getOpponentSwimClubId()) ;
             else
                 $opponent = $event->getEventDescription() ;
@@ -961,23 +861,23 @@ class SwimMeetEventScheduleInfoTable extends SwimTeamInfoTable
                 $os = $event->getOpponentScore() ;
 
                 if  ($ts > $os)
-                    $winloss = sprintf("Win:  %s - %s", $ts, $os) ;
+                    $winloss = sprintf('Win:  %s - %s', $ts, $os) ;
                 else if  ($ts < $os)
-                    $winloss = sprintf("Loss:  %s - %s", $ts, $os) ;
-                else if ((strtotime("now") > strtotime($event->getEventDate()))
+                    $winloss = sprintf('Loss:  %s - %s', $ts, $os) ;
+                else if ((strtotime('now') > strtotime($event->getEventDate()))
                     && ($ts == 0) && ($os == 0))
-                    $winloss = sprintf("Tie:  %s - %s", $ts, $os) ;
+                    $winloss = sprintf('Tie:  %s - %s', $ts, $os) ;
                 else if (($ts == 0) && ($os == 0))
-                    $winloss = "TBD" ;
+                    $winloss = 'TBD' ;
                 else
-                    $winloss = sprintf("Tie:  %s - %s", $ts, $os) ;
+                    $winloss = sprintf('Tie:  %s - %s', $ts, $os) ;
             }
             else
             {
-                $winloss = "N/A" ;
+                $winloss = 'N/A' ;
             }
 
-            $eventdate = date("D M j, Y", strtotime($event->getEventDate())) ;
+            $eventdate = date('D M j, Y', strtotime($event->getEventDate())) ;
             $this->add_row($eventdate, $opponent,
                 ucfirst($event->getLocation()), $winloss) ;
         }

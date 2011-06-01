@@ -39,7 +39,10 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
      */
     function __getForm($label, $action, $width)
     {
-        return new WpSwimTeamSwimMeetOptInOutForm($label, $action, $width) ;
+        if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_EVENT)
+            return new WpSwimTeamSwimMeetEventOptInOutForm($label, $action, $width) ;
+        else
+            return new WpSwimTeamSwimMeetOptInOutForm($label, $action, $width) ;
     }
 
     /**
@@ -242,7 +245,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     //$form = new WpSwimTeamSwimMeetOptInOutForm("Swim Meet:  " .
                     //    $optin, $_SERVER['HTTP_REFERER'], 600) ;
                     $form = $this->__getForm("Swim Meet:  " .
-                        $optin, $_SERVER['HTTP_REFERER'], 600) ;
+                        $optin, $_SERVER['HTTP_REFERER'], 700) ;
                     $form->setAction(WPST_ACTION_OPT_IN) ;
                     $form->setMeetId($swimmeetid) ;
                     break ;
@@ -252,7 +255,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     //$form = new WpSwimTeamSwimMeetOptInOutForm("Swim Meet:  " .
                         //$optout, $_SERVER['HTTP_REFERER'], 600) ;
                     $form = $this->__getForm("Swim Meet:  " .
-                        $optout, $_SERVER['HTTP_REFERER'], 600) ;
+                        $optout, $_SERVER['HTTP_REFERER'], 700) ;
                     $form->setAction(WPST_ACTION_OPT_OUT) ;
                     $form->setMeetId($swimmeetid) ;
                     break ;
@@ -378,7 +381,10 @@ class AdminSwimMeetsTabContainer extends SwimMeetsTabContainer
      */
     function __getForm($label, $action, $width)
     {
-        return new WpSwimTeamSwimMeetOptInOutAdminForm($label, $action, $width) ;
+        if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_EVENT)
+            return new WpSwimTeamSwimMeetEventOptInOutAdminForm($label, $action, $width) ;
+        else
+            return new WpSwimTeamSwimMeetOptInOutAdminForm($label, $action, $width) ;
     }
 
     /**

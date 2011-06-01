@@ -37,6 +37,11 @@ class SwimTeamReportGenerator extends SwimTeamDBI
     /**
      * first name field
      */
+    var $__reporttitle = 'Swim Team Report' ;
+
+    /**
+     * first name field
+     */
     var $__firstname = false ;
 
     /**
@@ -73,6 +78,26 @@ class SwimTeamReportGenerator extends SwimTeamDBI
      * report table
      */
     var $__reporttable = null ;
+
+    /**
+     * set report title
+     *
+     * @param string - title of report
+     */
+    function setReportTitle($title)
+    {
+        $this->__reporttitle = $title ;
+    }
+
+    /**
+     * get report title
+     *
+     * @return string - title of report
+     */
+    function getReportTitle()
+    {
+        return $this->__reporttitle ;
+    }
 
     /**
      * set first name field inclusion
@@ -569,6 +594,25 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
     }
 
     /**
+     * get userids
+     *
+     * @return mixed - array of user ids
+     */
+    function getUserIds()
+    {
+        $u = array() ;
+        $user = new SwimTeamUserProfile() ;
+        $userIds = $user->getUserIds(false, true, $this->getFilter()) ;
+
+        //  Strip the extra level of array off the values
+
+        foreach ($userIds as $userId)
+            $u[] = $userId['userid'] ;
+
+        return $u ;
+    }
+
+    /**
      * Create the filter used to during the report generation.
      *
      * @return string - filter - filter string used with SQL WHERE clause.
@@ -766,7 +810,16 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
      */
     function generateReport()
     {
-        $this->__reporttable = new SwimTeamInfoTable("Swim Team Report", "100%") ;
+        $this->generateHTMLReport() ;
+    }
+
+    /**
+     * Generate the HTML Report
+     *
+     */
+    function generateHTMLReport()
+    {
+        $this->__reporttable = new SwimTeamInfoTable($this->getReportTitle(), '100%') ;
         $table = &$this->__reporttable ;
         $table->set_alt_color_flag(true) ;
 
@@ -787,7 +840,8 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 
         $user = new SwimTeamUserProfile() ;
         $ometa = new SwimTeamOptionMeta() ;
-        $userIds = $user->getUserIds(false, true, $this->getFilter()) ;
+        //$userIds = $user->getUserIds(false, true, $this->getFilter()) ;
+        $userIds = $this->getUserIds() ;
 
         //  Loop through the users
 
@@ -797,13 +851,15 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
         {
             $this->__recordcount++ ;
 
-            $valid = $user->loadUserProfileByUserId($userId['userid']) ;
+            //$valid = $user->loadUserProfileByUserId($userId['userid']) ;
+            $valid = $user->loadUserProfileByUserId($userId) ;
 
             //  The query will be invalid if the user exists in the standard
             //  WordPress user table but doesn't exist in the wp-SwimTeam user
             //  table.  Force the user id so the report will emit something useful.
 
-            if (!$valid) $user->setId($userId['userid']) ;
+            //if (!$valid) $user->setId($userId['userid']) ;
+            if (!$valid) $user->setId($userId) ;
 
             $tr = array() ;
             $tr = $this->getHTMLTableRow($user, $ometa, $tr) ;
@@ -815,6 +871,26 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 
             call_user_method_array('add_row', $table, $tr) ;
         }
+    }
+
+    /**
+     * Get HTML report table
+     *
+     * @return html_table - report table
+     */
+    function getHTMLReport()
+    {
+        return $this->__reporttable ;
+    }
+
+    /**
+     * Get HTML report table
+     *
+     * @return html_table - report table
+     */
+    function getReport()
+    {
+        return $this->getHTMLReport() ;
     }
 }
 
@@ -872,17 +948,24 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
         $this->__csvFile = $f ;
     }
 
+   /**
+     * Get CSV report
+     *
+     * @return mixed - report CSV
+     */
+    function getCSVReport()
+    {
+        return new Container(html_pre($this->__csvData)) ;
+    }
+
     /**
      * Get report
      *
      * @return html_table - report table
      */
-    function getReport($html = false)
+    function getReport()
     {
-        if ($html)
-            return parent::getReport() ;
-        else
-            return new Container(html_pre($this->__csvData)) ;
+        return parent::getHTMLReport() ;
     }
 
     /**
@@ -1083,9 +1166,21 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
      * Generate the Report
      *
      */
-    function generateReport($html = false)
+    function generateReport()
     {
+        $this->generateCSVReport() ;
 
+        //  Generate the HTML representation too!
+
+        parent::generateHTMLReport() ;
+    }
+
+    /**
+     * Generate the Report
+     *
+     */
+    function generateCSVReport()
+    {
         $this->__csvData = "" ;
 
         $csv = &$this->__csvData ;
@@ -1103,7 +1198,7 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
 
         $user = new SwimTeamUserProfile() ;
         $ometa = new SwimTeamOptionMeta() ;
-        $userIds = $user->getUserIds(false, true, $this->getFilter()) ;
+        $userIds = $this->getUserIds() ;
 
         //  Loop through the users
 
@@ -1113,22 +1208,18 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
         {
             $this->__recordcount++ ;
 
-            $valid = $user->loadUserProfileByUserId($userId['userid']) ;
+            $valid = $user->loadUserProfileByUserId($userId) ;
 
             //  The query will be invalid if the user exists in the standard
             //  WordPress user table but doesn't exist in the wp-SwimTeam user
             //  table.  Force the user id so the report will emit something useful.
 
-            if (!$valid) $user->setId($userId['userid']) ;
+            if (!$valid) $user->setId($userId) ;
 
             $csv .= $this->getCSVRecord($user, $ometa) ;
 
             $csv .= "\r\n" ;
         }
-
-        //  Generate the HTML representation too?
-
-        if ($html) parent::generateReport($html) ;
     }
 
     /**
@@ -1153,11 +1244,11 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
 }
 
 /**
- * Class definition of the CSV report generator
+ * Class definition of the Job Assignments report generator
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @access public
- * @see SwimTeamUsersReportGenerator
+ * @see SwimTeamUsersReportGeneratorCSV
  */
 class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGeneratorCSV
 {
@@ -1408,7 +1499,7 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
     }
 
     /**
-     * Get HTML table header
+     * Get HTML table row
      *
      * @param mixed - array to populate
      * @return mixed - array of table headers
@@ -1444,7 +1535,17 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
      */
     function generateReport()
     {
-        $this->__reporttable = new SwimTeamInfoTable("Swim Team Job Assignments Report", "100%") ;
+        $this->generateHTMLReport() ;
+    }
+
+    /**
+     * Generate the HTML Report
+     *
+     */
+    function generateHTMLReport()
+    {
+
+        $this->__reporttable = new SwimTeamInfoTable($this->getReportTitle(), '100%') ;
         $table = &$this->__reporttable ;
         $table->set_alt_color_flag(true) ;
 
@@ -1475,21 +1576,39 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
 
             $swimmeet->loadSwimMeetByMeetId($swimmeetid) ;
 
-            //  Get season long job ids
-            $jaids = $ja->getJobAssignmentIdsBySeasonId($swimmeet->getSeasonId()) ;
+            //  Get season long job ids for all users (admin)
+            //  or just the current user (non-admin users)
+
+            if (current_user_can('edit_posts'))
+            {
+                $jaids = $ja->getJobAssignmentIdsBySeasonId($swimmeet->getSeasonId()) ;
+            }
+            else
+            {
+                global $current_user ;
+                get_currentuserinfo() ;
+                $jaids = $ja->getJobAssignmentIdsBySeasonIdAndUserId($swimmeet->getSeasonId(), $current_user->ID) ;
+            }
 
             if (is_null($jaids)) $jaids = array() ;
 
+            //  Get meet job ids for all users (admin)
+            //  or just the current user (non-admin users)
+            //
             //  Merge with meet job ids
-            $jaids = array_merge($jaids, $ja->getJobAssignmentIdsByMeetId(null, true)) ;
 
-            if (empty($jaids))
+            if (current_user_can('edit_posts'))
             {
-                $jaids = array() ;
-                $this->add_row(sprintf("No job assignments for swim meet %s.",
-                    SwimTeamTextMap::__mapMeetIdToText($swimmeetid))) ;
+                $jaids = array_merge($jaids, $ja->getJobAssignmentIdsByMeetId(null, true)) ;
             }
             else
+            {
+                global $current_user ;
+                get_currentuserinfo() ;
+                $jaids = array_merge($jaids, $ja->getJobAssignmentIdsByMeetIdAndUserId(null, $current_user->ID, true)) ;
+            }
+
+            if (!empty($jaids))
             {
                 //  Add job assignments
 
@@ -1498,7 +1617,7 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
                     $this->__recordcount++ ;
 
                     $row = array() ;
-                    $key = &$jaid["jobassignmentid"] ;
+                    $key = &$jaid['jobassignmentid'] ;
 
                     $ja->loadJobAssignmentByJobAssignmentId($key) ;
                     $job->loadJobByJobId($ja->getJobId()) ;
@@ -1524,9 +1643,9 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
      *
      * @return html_table - report table
      */
-    function getReport($html = true)
+    function getReport()
     {
-            return parent::getReport($html) ;
+            return parent::getHTMLReport() ;
     }
 }
 
@@ -1540,19 +1659,6 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
 class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsReportGenerator
 {
     /**
-     * Get report
-     *
-     * @return html_table - report table
-     */
-    function getReport($html = false)
-    {
-        if ($html)
-            return parent::getReport() ;
-        else
-            return new Container(html_pre($this->__csvData)) ;
-    }
-
-    /**
      * Get the CSV Header
      *
      * @param optional boolean - add the line ending, defaults to false
@@ -1565,30 +1671,30 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
         $csv = "\"Date\",\"Opponent\",\"Location\"" ;
 
         if ($this->getJobPosition() )
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Position\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). "\"Position\"" ;
 
         if ($this->getJobDescription())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Description\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . "\"Description\"" ;
 
         if ($this->getJobDuration())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Duration\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). "\"Duration\"" ;
 
         if ($this->getJobType())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Type\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). "\"Type\"" ;
 
         if ($this->getJobCredits())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Credits\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . "\"Credits\"" ;
 
         if ($this->getJobNotes())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Notes\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . "\"Notes\"" ;
 
         //  Call the parent CSV Header method to get the rest of the header fields
 
-        $csv .= "," . parent::getCSVHeader(false) ;
+        $csv .= ',' . parent::getCSVHeader(false) ;
 
         //  Handle line endings
 
-        if ($eol) $csv .= "\r\n" ;
+        if ($eol) $csv .= '\r\n' ;
 
         return $csv ;
     }
@@ -1604,7 +1710,7 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
     function getCSVRecord(&$ja, &$job, &$u, &$om, $eol = false)
     {
         if ($this->getJobPosition())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
                 "\"" . $job->getJobPosition() . "\"" ;
 
         if ($this->getJobDescription())
@@ -1641,7 +1747,20 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
      * Generate the Report
      *
      */
-    function generateReport($html = false)
+    function generateReport()
+    {
+        $this->generateCSVReport() ;
+
+        //  Generate the HTML representation too!
+
+        parent::generateHTMLReport() ;
+    }
+
+    /**
+     * Generate the CSV Report
+     *
+     */
+    function generateCSVReport()
     {
         $this->__csvData = "" ;
         $this->__recordcount = 0 ;
@@ -1670,13 +1789,37 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
 
             $swimmeet->loadSwimMeetByMeetId($swimmeetid) ;
 
-            //  Get season long job ids
-            $jaids = $ja->getJobAssignmentIdsBySeasonId($swimmeet->getSeasonId()) ;
+            //  Get season long job ids for all users (admin)
+            //  or just the current user (non-admin users)
+
+            if (current_user_can('edit_posts'))
+            {
+                $jaids = $ja->getJobAssignmentIdsBySeasonId($swimmeet->getSeasonId()) ;
+            }
+            else
+            {
+                global $current_user ;
+                get_currentuserinfo() ;
+                $jaids = $ja->getJobAssignmentIdsBySeasonIdAndUserId($swimmeet->getSeasonId(), $current_user->ID) ;
+            }
 
             if (is_null($jaids)) $jaids = array() ;
 
+            //  Get meet job ids for all users (admin)
+            //  or just the current user (non-admin users)
+            //
             //  Merge with meet job ids
-            $jaids = array_merge($jaids, $ja->getJobAssignmentIdsByMeetId(null, true)) ;
+
+            if (current_user_can('edit_posts'))
+            {
+                $jaids = array_merge($jaids, $ja->getJobAssignmentIdsByMeetId(null, true)) ;
+            }
+            else
+            {
+                global $current_user ;
+                get_currentuserinfo() ;
+                $jaids = array_merge($jaids, $ja->getJobAssignmentIdsByMeetIdAndUserId(null, $current_user->ID, true)) ;
+            }
 
             if (!empty($jaids))
             {
@@ -1703,6 +1846,283 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
                 }
             }
         }
+    }
+
+    /**
+     * Get HTML report table
+     *
+     * @return html_table - report table
+     */
+    function getReport()
+    {
+        return parent::getHTMLReport() ;
+    }
+}
+
+/**
+ * Class definition of the Job Commitments report generator
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see SwimTeamUsersReportGeneratorCSV
+ */
+class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGeneratorCSV
+{
+    /**
+     * Credits property
+     */
+    var $__credits = array() ;
+
+    /**
+     * Season Id property
+     */
+    var $__seasonid ;
+
+    /**
+     * Set the credits
+     *
+     * @param - int - credits
+     */
+    function setCredits($userid, $credits)
+    {
+        $this->__credits[$userid] = $credits ;
+    }
+
+    /**
+     * Get the credits
+     *
+     * @return - int - credits
+     */
+    function getCredits($userid)
+    {
+        return ($this->__credits[$userid]) ;
+    }
+
+    /**
+     * Set the season id
+     *
+     * @param - int - id of the season
+     */
+    function setSeasonId($id)
+    {
+        $this->__seasonid = $id ;
+    }
+
+    /**
+     * Get the season id
+     *
+     * @return - int - id of the season
+     */
+    function getSeasonId()
+    {
+        return ($this->__seasonid) ;
+    }
+
+    /**
+     * Get the user ids
+     *
+     * @return - mixed - array of user ids
+     */
+    function getUserIds()
+    {
+        return (array_keys($this->__credits)) ;
+    }
+
+    /**
+     *  Calcualte Credits - determine how many credits each user is committed to
+     *
+     *  @param - int $seasonid - the season id to base the calculation on
+     */
+    function CalculateCredits($seasonid = null)
+    {
+        $swimmer = new SwimTeamSwimmer() ;
+        $user = new SwimTeamUserProfile() ;
+        $ja = new SwimTeamJobAssignment() ;
+        $roster = new SwimTeamRoster() ;
+        $roster->setSeasonId($seasonid) ;
+
+        $userids = $user->getUserIds() ;
+
+        //  Loop through the users
+
+        foreach ($userids as $userid)
+        {
+            $activeswimmers = false ;
+
+            //  Select the swimmers connected to the user
+
+            $filter = sprintf('(%s.contact1id="%s" OR %s.contact2id="%s")',
+                WPST_SWIMMERS_TABLE, $userid['userid'], WPST_SWIMMERS_TABLE, $userid['userid']) ;
+
+            $swimmerids = $swimmer->getAllSwimmerIds($filter) ;
+
+            //  Loop through the swimmers, determine if any are active
+ 
+            foreach ($swimmerids as $swimmerid)
+            {
+                $roster->setSwimmerId($swimmerid['swimmerid']) ;
+                $activeswimmers |= $roster->isSwimmerRegistered() ;
+            }
+
+            //  If user has active swimmers then include them in the report
+
+            if ($activeswimmers)
+            {
+                $credits = 0 ;
+
+                $ja->setUserId($userid['userid']) ;
+                $ja->setSeasonId($seasonid) ;
+                $jaids = $ja->getJobAssignmentIdsBySeasonIdAndUserId(null, null, false) ;
+
+                //  Loop through the Job assignment ids and calculate credits
+
+                foreach ($jaids as $jaid)
+                {
+                    $ja->loadJobAssignmentByJobAssignmentId($jaid['jobassignmentid']) ;
+                    $ja->loadJobByJobId($ja->getJobId()) ;
+
+                    $credits += $ja->getJobCredits() ;
+                }
+
+                $this->setCredits($userid['userid'], $credits) ;
+            }
+        }
+    }
+
+    /**
+     * Get HTML table header
+     *
+     * @param mixed - array to populate
+     * @return mixed - array of table headers
+     */
+    function getHTMLTableHeader(&$tr)
+    {
+        $tr = parent::getHTMLTableHeader($tr) ;
+        $tr[] = 'Credits' ;
+
+        return $tr ;
+    }
+
+    /**
+     * Get HTML table header
+     *
+     * @param mixed - array to populate
+     * @return mixed - array of table headers
+     */
+    function getHTMLTableRow(&$u, &$om, &$tr)
+    {
+        $tr = parent::getHTMLTableRow($u, $om, $tr) ;
+        $credits = $this->getCredits($u->getUserId()) ;
+
+        $credits = ($credits != null) ? $credits : 0 ;
+
+        //  If the credits is below the threshhold, show it in red!
+
+        if ($credits < get_option(WPST_OPTION_JOB_CREDITS_REQUIRED))
+        {
+            $span = html_span(null, ($credits != null) ? $credits : "0") ;
+            $span->set_style('font-weight: bold; color: red;') ;
+            $tr[] = $span ;
+        }
+        else
+        {
+            $tr[] = ($credits != null) ? $credits : "0" ;
+        }
+
+        return $tr ;
+    }
+
+    /**
+     * Generate the Report
+     *
+     */
+    function generateReport()
+    {
+        $this->generateHTMLReport() ;
+    }
+
+    /**
+     * Get HTML report table
+     *
+     * @return html_table - report table
+     */
+    function getReport()
+    {
+        return parent::getHTMLReport() ;
+    }
+}
+
+/**
+ * Class definition of the Job Commitments CSV report generator
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see SwimTeamJobCommitmentsReportGenerator
+ */
+class SwimTeamJobCommitmentsReportGeneratorCSV extends SwimTeamJobCommitmentsReportGenerator
+{
+    /**
+     * Get the CSV Header
+     *
+     * @param optional boolean - add the line ending, defaults to false
+     * @return string
+     */
+    function getCSVHeader($eol = false)
+    {
+        $csv = parent::getCSVHeader() ;
+
+        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Credits\"" ;
+
+        if ($eol) $csv .= "\r\n" ;
+
+        return $csv ;
+    }
+
+    /**
+     * Get the CSV Record
+     *
+     * @param mixed - user profile record, passed by reference
+     * @param mixed - user meta record, passed by reference
+     * @param optional boolean - add the line ending, defaults to true
+     * @return string - CSV record with optional EOL
+     */
+    function getCSVRecord(&$u, &$om, $eol = false)
+    {
+        $csv = parent::getCSVRecord($u, $om) ;
+
+        $credits = $this->getCredits($u->getUserId()) ;
+
+        $credits = ($credits != null) ? $credits : 0 ;
+
+        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"$credits\"" ;
+
+        if ($eol) $csv .= "\r\n" ;
+
+        return $csv ;
+
+    }
+
+    /**
+     * Generate the Report
+     *
+     */
+    function generateReport()
+    {
+        $this->generateCSVReport() ;
+
+        //  Generate the HTML representation too!
+
+        parent::generateHTMLReport() ;
+    }
+
+    /**
+     * Get CSV report table
+     *
+     * @return mixed - report table array
+     */
+    function getReport()
+    {
+        return parent::getHTMLReport() ;
     }
 }
 
@@ -2489,7 +2909,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      */
     function generateReport($swimmerid = null)
     {
-        $this->__reporttable = new SwimTeamInfoTable("Swim Team Report", "100%") ;
+        $this->__reporttable = new SwimTeamInfoTable($this->getReportTitle(), '100%') ;
         $table = &$this->__reporttable ;
         $table->set_alt_color_flag(true) ;
 

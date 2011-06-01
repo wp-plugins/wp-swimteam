@@ -394,8 +394,6 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
 
             if ($qr["id"] != $this->get_hidden_element_value("seasonid"))
             {
-                //var_dump($this->get_hidden_element_value("seasonid")) ;
-                //var_dump($qr) ;
                 $this->add_error("Description", "Similar season already exists.");
                 $this->add_error("Start", "Similar season already exists.");
                 $this->add_error("End", "Similar season already exists.");

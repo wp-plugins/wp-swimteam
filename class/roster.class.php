@@ -216,8 +216,9 @@ class SwimTeamRoster extends SwimTeamDBI
 	    //  Is the swimmer already in the database?
 
         $query = sprintf("SELECT seasonid, swimmerid FROM %s WHERE
-            seasonid = \"%s\" AND swimmerid = \"%s\"",
-            WPST_ROSTER_TABLE, $this->getSeasonId(), $this->getSwimmerId()) ;
+            seasonid = \"%s\" AND swimmerid = \"%s\" AND status=\"%s\"",
+            WPST_ROSTER_TABLE, $this->getSeasonId(), $this->getSwimmerId(),
+            WPST_ACTIVE) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery(false) ;

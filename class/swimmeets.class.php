@@ -58,6 +58,11 @@ class SwimMeet extends SwimTeamDBI
     var $__participation ;
 
     /**
+     * meet status property - type of meet status - 'open', 'closed'.
+     */
+    var $__meetstatus ;
+
+    /**
      * meet description property - description of meet
      */
     var $__meetdescription ;
@@ -185,6 +190,26 @@ class SwimMeet extends SwimTeamDBI
     function getParticipation()
     {
         return ($this->__participation) ;
+    }
+
+    /**
+     * Set the meet status
+     *
+     * @param - string - meet status
+     */
+    function setMeetStatus($status)
+    {
+        $this->__meetstatus = $status ;
+    }
+
+    /**
+     * Get the meet status
+     *
+     * @return - string - meet status
+     */
+    function getMeetStatus()
+    {
+        return ($this->__meetstatus) ;
     }
 
     /**
@@ -421,6 +446,7 @@ class SwimMeet extends SwimTeamDBI
                 opponentswimclubid=\"%s\",
                 meettype=\"%s\",
                 participation=\"%s\",
+                meetstatus=\"%s\",
                 meetdescription=\"%s\",
                 location=\"%s\",
                 meetdate=\"%s\",
@@ -432,6 +458,7 @@ class SwimMeet extends SwimTeamDBI
                 $this->getOpponentSwimClubId(),
                 $this->getMeetType(),
                 $this->getParticipation(),
+                $this->getMeetStatus(),
                 $this->getMeetDescription(),
                 $this->getLocation(),
                 $this->getMeetDateAsDate(),
@@ -466,6 +493,7 @@ class SwimMeet extends SwimTeamDBI
                 opponentswimclubid=\"%s\",
                 meettype=\"%s\",
                 participation=\"%s\",
+                meetstatus=\"%s\",
                 meetdescription=\"%s\",
                 location=\"%s\",
                 meetdate=\"%s\",
@@ -478,6 +506,7 @@ class SwimMeet extends SwimTeamDBI
                 $this->getOpponentSwimClubId(),
                 $this->getMeetType(),
                 $this->getParticipation(),
+                $this->getMeetStatus(),
                 $this->getMeetDescription(),
                 $this->getLocation(),
                 $this->getMeetDateAsDate(),
@@ -562,6 +591,7 @@ class SwimMeet extends SwimTeamDBI
             $this->setOpponentSwimClubId($result['opponentswimclubid']) ;
             $this->setMeetType($result['meettype']) ;
             $this->setParticipation($result['participation']) ;
+            $this->setMeetStatus($result['meetstatus']) ;
             $this->setMeetDescription($result['meetdescription']) ;
             $this->setLocation($result['location']) ;
             $this->setMeetDate($result['meetdate']) ;
@@ -681,6 +711,7 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
             $this->__normal_actions[WPST_ACTION_JOBS] = WPST_ACTION_JOBS ;
         }
 
+
         $optin = get_option(WPST_OPTION_OPT_IN_LABEL) ;
         $this->__normal_actions[WPST_ACTION_OPT_IN] = $optin ;
 
@@ -715,8 +746,11 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
 	  	$this->add_header_item("Location",
 	         	"100", "location", SORTABLE, SEARCHABLE, "left") ;
 
-	  	//$this->add_header_item("Participation",
-	    //     	"100", "participation", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item("Participation",
+	         	"100", "participation", SORTABLE, SEARCHABLE, "left") ;
+
+	  	$this->add_header_item("Status",
+	         	"100", "meetstatus", SORTABLE, SEARCHABLE, "left") ;
 
 	  	$this->add_header_item("Score",
 	         	"125", "teamscore", SORTABLE, SEARCHABLE, "left") ;
@@ -725,11 +759,6 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
         $this->_datasource->setup_db_options($this->getColumns(),
             $this->getTables(), $this->getWhereClause()) ;
 
-        //  turn on the 'collapsable' search block.
-        //  The word 'Search' in the output will be clickable,
-        //  and hide/show the search box.
-
-        //$this->_collapsable_search = true ;
         //  turn on the 'collapsable' search block.
         //  The word 'Search' in the output will be clickable,
         //  and hide/show the search box.
@@ -790,6 +819,10 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
 
             case "Location" :
                 $obj = ucfirst($row_data["location"]) ;
+                break ;
+
+            case "Status" :
+                $obj = ucfirst($row_data["meetstatus"]) ;
                 break ;
 
             case "Participation" :
@@ -1095,9 +1128,13 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
 
 
             if ($meet->getParticipation() == WPST_OPT_IN)
-                $this->add_row(html_b("Participation"), get_option(WPST_OPTION_OPT_IN_LABEL)) ;
+                $this->add_row(html_b("Participation"), ucwords(get_option(WPST_OPTION_OPT_IN_LABEL))) ;
+            else if ($meet->getParticipation() == WPST_OPT_OUT)
+                $this->add_row(html_b("Participation"), ucwords(get_option(WPST_OPTION_OPT_OUT_LABEL))) ;
             else
-                $this->add_row(html_b("Participation"), get_option(WPST_OPTION_OPT_OUT_LABEL)) ;
+                $this->add_row(html_b("Participation"), ucwords(WPST_CLOSED)) ;
+
+            $this->add_row(html_b("Status"), ucfirst($meet->getMeetStatus())) ;
         }
         else
         {
@@ -1246,6 +1283,11 @@ class SwimMeetMeta extends SwimTeamDBI
     var $__swimmeet_id ;
 
     /**
+     * stroke code property - unique id of stroke affected by meta data
+     */
+    var $__stroke_code ;
+
+    /**
      * event id property - unique id of event affected by meta data
      */
     var $__event_id ;
@@ -1356,23 +1398,43 @@ class SwimMeetMeta extends SwimTeamDBI
     }
 
     /**
-     * Set Swim Meet Event Code
+     * Set Swim Meet Event Id
      *
-     * @param int - $code - Code of the event
+     * @param int - $id - Id of the event
      */
-    function setEventCode($code)
+    function setEventId($id)
     {
-        $this->__event_code = $code ;
+        $this->__event_id = $id ;
     }
 
     /**
-     * Get Swim Meet Event Code
+     * Get Swim Meet Event Id
      *
-     * @return int - Code of the event
+     * @return int - Id of the event
      */
-    function getEventCode()
+    function getEventId()
     {
-        return $this->__event_code ;
+        return $this->__event_id ;
+    }
+
+    /**
+     * Set Swim Meet Stroke Code
+     *
+     * @param int - $code - Code of the stroke
+     */
+    function setStrokeCode($code)
+    {
+        $this->__stroke_code = $code ;
+    }
+
+    /**
+     * Get Swim Meet Stroke Code
+     *
+     * @return int - Code of the stroke
+     */
+    function getStrokeCode()
+    {
+        return $this->__stroke_code ;
     }
 
     /**
@@ -1481,7 +1543,8 @@ class SwimMeetMeta extends SwimTeamDBI
             $this->setUserId($sm['userid']) ;
             $this->setSwimmerId($sm['swimmerid']) ;
             $this->setSwimMeetId($sm['swimmeetid']) ;
-            $this->setEventCode($sm['eventcode']) ;
+            $this->setStrokeCode($sm['strokecode']) ;
+            $this->setEventId($sm['eventid']) ;
             $this->setParticipation($sm['participation']) ;
             $this->setSwimMeetMetaKey($sm['smetakey']) ;
             $this->setSwimMeetMetaValue($sm['smetavalue']) ;
@@ -1493,7 +1556,8 @@ class SwimMeetMeta extends SwimTeamDBI
             $this->setUserId(null) ;
             $this->setSwimmerId(null) ;
             $this->setSwimMeetId(null) ;
-            $this->setEventCode(null) ;
+            $this->setStrokeCode(null) ;
+            $this->setEventId(null) ;
             $this->setParticipation(null) ;
             $this->setSwimMeetMetaKey(null) ;
             $this->setSwimMeetMetaValue(null) ;
@@ -1612,14 +1676,31 @@ class SwimMeetMeta extends SwimTeamDBI
     }
 
     /**
-     * get Swimmer Ids by Meet Id and Participation
+     * get Stroke Codes by Meet Id and Participation
      *
      * @param - int - $meetid - meet id
      * @param - string - $participation - participation value
      */
-    function getEventCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
+    function getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
     {
-        $query = sprintf("SELECT eventcode FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
+        $query = sprintf("SELECT strokecode FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
+            WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $participation) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResults() ;
+    }
+
+    /**
+     * get Event Ids by Meet Id and Participation
+     *
+     * @param - int - $meetid - meet id
+     * @param - string - $participation - participation value
+     */
+    function getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
+    {
+        $query = sprintf("SELECT eventid FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $participation) ;
 
         $this->setQuery($query) ;
@@ -1633,12 +1714,30 @@ class SwimMeetMeta extends SwimTeamDBI
      *
      * @param - int - $meetid - meet id
      * @param - int - $swimmerid - swimmer id
-     * @param - int - $eventcode - event code
+     * @param - int - $strokecode - event code
      */
-    function getMetaModifiedByMeetIdSwimmerIdAndEventCode($meetid, $swimmerid, $eventcode)
+    function getMetaModifiedByMeetIdSwimmerIdAndStrokeCode($meetid, $swimmerid, $strokecode)
     {
-        $query = sprintf("SELECT modified FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND eventcode='%s'",
-            WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $eventcode) ;
+        $query = sprintf("SELECT modified FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND strokecode='%s'",
+            WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $strokecode) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResult() ;
+    }
+
+    /**
+     * get Time Stamp by Meet Id, Swimmer Id, and Event Id
+     *
+     * @param - int - $meetid - meet id
+     * @param - int - $swimmerid - swimmer id
+     * @param - int - $event id - event id
+     */
+    function getMetaModifiedByMeetIdSwimmerIdAndEventId($meetid, $swimmerid, $eventid)
+    {
+        $query = sprintf("SELECT modified FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND eventid='%s'",
+            WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $eventid) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -1731,14 +1830,14 @@ class SwimMeetMeta extends SwimTeamDBI
      *
      * @param - int - $swimmeetid - swim meet id
      * @param - int - $swimmerid - swimmer id
-     * @param - int - $eventcode - event code
+     * @param - int - $strokecode - event code
      */
-    function existSwimMeetMetaBySwimMeetIdAndSwimmerIdAndEventCode($swimmeetid,
-        $swimmerid, $eventcode)
+    function existSwimMeetMetaBySwimMeetIdAndSwimmerIdAndStrokeCode($swimmeetid,
+        $swimmerid, $strokecode)
     {
         $query = sprintf("SELECT smetaid FROM %s
-            WHERE swimmeetid='%s' AND swimmerid='%s' AND eventcode='%s'",
-            WPST_SWIMMEETS_META_TABLE, $swimmeetid, $swimmerid, $eventcode) ;
+            WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+            WPST_SWIMMEETS_META_TABLE, $swimmeetid, $swimmerid, $strokecode) ;
 
         return $this->existSwimMeetMeta($query) ;
     }
@@ -1769,14 +1868,16 @@ class SwimMeetMeta extends SwimTeamDBI
             userid=\"%s\",
             swimmerid=\"%s\",
             swimmeetid=\"%s\",
-            eventcode=\"%s\",
+            strokecode=\"%s\",
+            eventid=\"%s\",
             participation=\"%s\",
             smetakey=\"%s\",
             smetavalue=\"%s\"",
             $this->getUserId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
-            $this->getEventCode(),
+            $this->getStrokeCode(),
+            $this->getEventId(),
             $this->getParticipation(),
             $this->getSwimMeetMetaKey(),
             $this->getSwimMeetMetaValue()) ;
@@ -1816,8 +1917,8 @@ class SwimMeetMeta extends SwimTeamDBI
 			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swim Meet Id")) ;
         //  Update or new save?
  
-        $update = $this->existSwimMeetMetaBySwimMeetIdAndSwimmerIdAndEventCode(
-            $this->getSwimMeetId(), $this->getSwimmerId(), $this->getEventCode()) ;
+        $update = $this->existSwimMeetMetaBySwimMeetIdAndSwimmerIdAndStrokeCode(
+            $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
         if ($update)
             $query = sprintf("UPDATE %s ", WPST_SWIMMEETS_META_TABLE) ;
@@ -1828,14 +1929,16 @@ class SwimMeetMeta extends SwimTeamDBI
             userid=\"%s\",
             swimmerid=\"%s\",
             swimmeetid=\"%s\",
-            eventcode=\"%s\",
+            strokecode=\"%s\",
+            eventid=\"%s\",
             participation=\"%s\",
             smetakey=\"%s\",
             smetavalue=\"%s\"",
             $this->getUserId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
-            $this->getEventCode(),
+            $this->getStrokeCode(),
+            $this->getEventId(),
             $this->getParticipation(),
             $this->getSwimMeetMetaKey(),
             $this->getSwimMeetMetaValue()) ;
@@ -1844,8 +1947,8 @@ class SwimMeetMeta extends SwimTeamDBI
 
         if ($update)
         {
-            $query .= sprintf(" WHERE swimmeetid='%s' AND swimmerid='%s' AND eventcode='%s'",
-                $this->getSwimMeetId(), $this->getSwimmerId(), $this->getEventCode()) ;
+            $query .= sprintf(" WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+                $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
             $this->setQuery($query) ;
             $success = $this->runUpdateQuery() ;
@@ -1986,6 +2089,21 @@ class SwimMeetMeta extends SwimTeamDBI
     {
         $query = sprintf("DELETE FROM %s WHERE swimmeetid='%s' AND swimmerid='%s'",
             WPST_SWIMMEETS_META_TABLE, $swimmeetid, $swimmerid) ;
+
+        return $this->deleteSwimMeetMeta($query) ;
+    }
+
+    /**
+     * Delete Swim Meet Meta by Event Id - deletes
+     * all Swim Meet Meta data associated with a Swimmer Id.
+     *
+     * @param - int - $eventid - event id
+     * @return - int - number of affected rows
+     */
+    function deleteSwimMeetMetaByEventId($eventid)
+    {
+        $query = sprintf("DELETE FROM %s WHERE eventid='%s'",
+            WPST_SWIMMEETS_META_TABLE, $eventid) ;
 
         return $this->deleteSwimMeetMeta($query) ;
     }
@@ -2415,9 +2533,9 @@ class SwimMeetResults extends SwimTeamDBI
      * @param - int - $meetid - meet id
      * @param - string - $participation - participation value
      */
-    function getEventCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
+    function getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
     {
-        $query = sprintf("SELECT eventcode FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
+        $query = sprintf("SELECT strokecode FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmerid, $meetid, $participation) ;
 
         $this->setQuery($query) ;
@@ -2511,14 +2629,14 @@ class SwimMeetResults extends SwimTeamDBI
      *
      * @param - int - $swimmeetid - swim meet id
      * @param - int - $swimmerid - swimmer id
-     * @param - int - $eventcode - event code
+     * @param - int - $strokecode - event code
      */
-    function existSwimMeetResultsBySwimMeetIdAndSwimmerIdAndEventCode($swimmeetid,
-        $swimmerid, $eventcode)
+    function existSwimMeetResultsBySwimMeetIdAndSwimmerIdAndStrokeCode($swimmeetid,
+        $swimmerid, $strokecode)
     {
         $query = sprintf("SELECT resultsid FROM %s
-            WHERE swimmeetid='%s' AND swimmerid='%s' AND eventcode='%s'",
-            WPST_SWIMMEETS_RESULTS_TABLE, $swimmeetid, $swimmerid, $eventcode) ;
+            WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+            WPST_SWIMMEETS_RESULTS_TABLE, $swimmeetid, $swimmerid, $strokecode) ;
 
         return $this->existSwimMeetResults($query) ;
     }
@@ -2549,14 +2667,16 @@ class SwimMeetResults extends SwimTeamDBI
             eventid=\"%s\",
             swimmerid=\"%s\",
             swimmeetid=\"%s\",
-            eventcode=\"%s\",
+            strokecode=\"%s\",
+            eventid=\"%s\",
             participation=\"%s\",
             resultsswimmerid=\"%s\",
             resultsvalue=\"%s\"",
             $this->getEventId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
-            $this->getEventCode(),
+            $this->getStrokeCode(),
+            $this->getEventId(),
             $this->getParticipation(),
             $this->getSwimMeetResultsSwimmerId(),
             $this->getSwimMeetResultsValue()) ;
@@ -2596,8 +2716,8 @@ class SwimMeetResults extends SwimTeamDBI
 			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swim Meet Id")) ;
         //  Update or new save?
  
-        $update = $this->existSwimMeetResultsBySwimMeetIdAndSwimmerIdAndEventCode(
-            $this->getSwimMeetId(), $this->getSwimmerId(), $this->getEventCode()) ;
+        $update = $this->existSwimMeetResultsBySwimMeetIdAndSwimmerIdAndStrokeCode(
+            $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
         if ($update)
             $query = sprintf("UPDATE %s ", WPST_SWIMMEETS_RESULTS_TABLE) ;
@@ -2608,14 +2728,16 @@ class SwimMeetResults extends SwimTeamDBI
             eventid=\"%s\",
             swimmerid=\"%s\",
             swimmeetid=\"%s\",
-            eventcode=\"%s\",
+            strokecode=\"%s\",
+            eventid=\"%s\",
             participation=\"%s\",
             resultsswimmerid=\"%s\",
             resultsvalue=\"%s\"",
             $this->getEventId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
-            $this->getEventCode(),
+            $this->getStrokeCode(),
+            $this->getEventId(),
             $this->getParticipation(),
             $this->getSwimMeetResultsSwimmerId(),
             $this->getSwimMeetResultsValue()) ;
@@ -2624,8 +2746,8 @@ class SwimMeetResults extends SwimTeamDBI
 
         if ($update)
         {
-            $query .= sprintf(" WHERE swimmeetid='%s' AND swimmerid='%s' AND eventcode='%s'",
-                $this->getSwimMeetId(), $this->getSwimmerId(), $this->getEventCode()) ;
+            $query .= sprintf(" WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+                $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
             $this->setQuery($query) ;
             $success = $this->runUpdateQuery() ;
