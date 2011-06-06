@@ -2465,6 +2465,149 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
         return $status ;
     }
+
+    /**
+     * Send Reminder E-mail
+     *
+     * Send an e-mail to the user reminding them they have
+     * a job assignment coming up soon.
+     *
+     */
+    function sendReminderEmail() 
+    {
+        $mode = get_option(WPST_OPTION_JOB_EMAIL_FORMAT) ;
+        $from = get_option(WPST_OPTION_JOB_EMAIL_ADDRESS) ;
+
+        $meetdetails = SwimTeamTextMap::__mapMeetIdToText($this->getMeetId()) ;
+        $jobdetails = SwimTeamTextMap::__mapJobIdToText($this->getJobId()) ;
+        $seasondetails = SwimTeamTextMap::__mapSeasonIdToText($this->getSeasonId(), true) ;
+
+        $u = get_userdata($this->getUserId()) ;
+    
+        if ($this->getMeetId() == WPST_NULL_ID)
+        {
+            $actionmsgs[] = sprintf('Name:  %s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
+            $actionmsgs[] = sprintf('Job:  %s', $jobdetails) ;
+            $actionmsgs[] = sprintf('Swim Season:  %s - %s - %s',
+                $seasondetails["label"], $seasondetails["start"], $seasondetails["end"]) ;
+        }
+        else
+        {
+            $actionmsgs[] = sprintf('Name:  %s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
+            $actionmsgs[] = sprintf('Job:  %s', $jobdetails) ;
+            $actionmsgs[] = sprintf('Swim Meet:  %s - %s - %s',
+                $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
+        }
+
+        $c1data = get_userdata($userid) ;
+        $c1email = $c1data->user_email ;
+
+        // To send HTML mail, the Content-type header must be set
+
+        if ($mode == WPST_HTML)
+        {
+            $headers  = 'MIME-Version: 1.0' . "\r\n" ;
+            $headers .= 'Content-type: text/html; charset=iso-8859-1' . "\r\n" ;
+        }
+        else
+        {
+            $headers = '' ;
+        }
+
+        //  Build the headers
+
+        $headers .= sprintf('From: %s <%s>', get_bloginfo('name'), $from) . "\r\n" ;
+        $headers .= sprintf('Cc: %s', $from) . "\r\n" ;
+        $headers .= sprintf('Bcc: %s', get_bloginfo('admin_email')) . "\r\n" ;
+        $headers .= sprintf('Reply-To: %s', $from) . "\r\n" ;
+        $headers .= sprintf('X-Mailer: PHP/%s', phpversion()) ;
+
+        if ($mode == WPST_HTML)
+        {
+            $htmlhdr = '
+                <html>
+                <head>
+                <title>%s</title>
+                </head>
+                <body>
+                <p>
+                %s -
+                </p>
+                <p>
+                Reminder:  %s has an upcoming Job Assignment.
+                </p>
+                <ul>
+                ' ;
+
+            $htmlftr = '
+                </ul>
+                <p>
+                View all <a href="%s">Job Descriptions and Expectations</a>.
+                </p>
+                <p>
+                Thank you,<br/><br/>
+                %s
+                </p>
+                <p>
+                Visit <a href="%s">%s</a> for all your swim team news.
+                </p>
+                </body>
+                </html>
+                ' ;
+
+            $htmlbody = '' ;
+
+            foreach ($actionmsgs as $actionmsg)
+                $htmlbody .= sprintf("<li>%s</li>", $actionmsg) ;
+
+            $message = sprintf($htmlhdr,
+                get_bloginfo('url'),
+                $u->user_firstname,
+                $u->user_firstname . " " . $u->user_lastname) ;
+
+            $message .= $htmlbody ;
+
+            $message .= sprintf($htmlftr,
+                get_option(WPST_OPTION_JOB_EXPECTATIONS_URL),
+                get_bloginfo('name'),
+                get_bloginfo('url'),
+                get_bloginfo('url')) ;
+        }
+        else
+        {
+            $plain = "%s -\r\n\r\n" ;
+            $plain .= "Reminder:  %s has an upcoming Job Assignment.\r\n\r\n" ;
+                
+
+            //  Add each action message to the e-mail body
+  
+            foreach ($actionmsgs as $actionmsg)
+                $plain .= strip_tags($actionmsg) . "\r\n" ;
+
+            $plain .= "\r\n\r\nView job descriptions and expectations:  %s\r\n\r\n" ;
+            $plain .= "\r\n\r\nThank you,\r\n\r\n" ;
+            $plain .= "%s\r\n\r\n" ;
+            $plain .= "Visit %s for all your swim team news." ;
+
+            $message = sprintf($plain,
+                $u->user_firstname,
+                $u->user_firstname . " " . $u->user_lastname,
+                get_option(WPST_OPTION_JOB_EXPECTATIONS_URL),
+                get_bloginfo('name'),
+                get_bloginfo('url'),
+                get_bloginfo('url')) ;
+        }
+
+        $to = sprintf("%s %s <%s>", $u->user_firstname,
+            $u->user_lastname, $u->user_email) ;
+
+        $subject = sprintf("Job Assignment Reminder for %s",
+            $u->user_firstname . " " . $u->user_lastname) ;
+
+        $status = wp_mail($to, $subject, $message, $headers) ;
+
+        return $status ;
+    }
 }
 
 /**

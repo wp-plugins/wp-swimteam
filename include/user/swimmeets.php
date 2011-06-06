@@ -196,6 +196,14 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     $this->setFormInstructionsHeader('Assign Swim Meeet Jobs') ;
                     break ;
 
+                case WPST_ACTION_JOB_REMINDERS:
+                    $form = new WpSwimTeamSwimMeetJobRemindersForm("Send Job Reminders for Swim Meet",
+                        $_SERVER['HTTP_REFERER'], 600) ;
+                    $form->setMeetId($swimmeetid) ;
+                    $this->setShowFormInstructions() ;
+                    $this->setFormInstructionsHeader('Send Job Reminder Emails') ;
+                    break ;
+
                 case WPST_ACTION_IMPORT_EVENTS:
 
                     //  Does the meet have events to load results against?

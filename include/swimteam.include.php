@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 614 $
+ * @version $Revision: 645 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -156,6 +156,7 @@ define('WPST_ACTION_IMPORT_RESULTS', 'Import Results') ;
 define('WPST_ACTION_EXPORT_RESULTS', 'Export Results') ;
 define('WPST_ACTION_GLOBAL_UPDATE', 'Global Update') ;
 define('WPST_ACTION_JOBS', 'Jobs') ;
+define('WPST_ACTION_JOB_REMINDERS', 'Job Reminders') ;
 define('WPST_ACTION_ASSIGN_JOBS', 'Assign Jobs') ;
 define('WPST_ACTION_DEFINE_JOBS', 'Define Jobs') ;
 define('WPST_ACTION_DEFINE', 'Define') ;

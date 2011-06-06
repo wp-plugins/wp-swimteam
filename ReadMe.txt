@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.9 =
+* Added ablity to send out Job Reminder e-mails on a per meet basis from the Manage->Swim Meets tab.
+
 = 1.8 =
 * Fixed bug with Users List which prevented using the GUI controls.
 * Added new Event model for Opt-In/Opt-Out.  Can now opt in or out of specific events instead of strokes.

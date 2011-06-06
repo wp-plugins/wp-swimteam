@@ -1912,4 +1912,182 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
 class WpSwimTeamSwimMeetImportStrokesForm extends WpSwimTeamSwimMeetFileUploadForm
 {
 }
+
+/**
+ * Construct the Swim Meet Job Reminders form
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see WpSwimTeamSwimMeetForm
+ */
+class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
+{
+    /**
+     * This method gets called EVERY time the object is
+     * created.  It is used to build all of the 
+     * FormElement objects used in this Form.
+     *
+     */
+    function form_init_elements()
+    {
+        parent::form_init_elements() ;
+
+        //  Allow the user to select which class of jobs should get a reminder
+
+        $jobs = new FECheckBoxList('Jobs', true, '200px', '120px');
+        $jobs->set_list_data(array(
+             ucwords(WPST_JOB_DURATION_FULL_MEET) => WPST_JOB_DURATION_FULL_MEET
+            ,ucwords(WPST_JOB_DURATION_PARTIAL_MEET) => WPST_JOB_DURATION_PARTIAL_MEET
+            ,ucwords(WPST_JOB_DURATION_FULL_SEASON) => WPST_JOB_DURATION_FULL_SEASON
+            ,ucwords(WPST_JOB_DURATION_PARTIAL_SEASON) => WPST_JOB_DURATION_PARTIAL_SEASON
+            ,ucwords(WPST_JOB_DURATION_EVENT) => WPST_JOB_DURATION_EVENT
+        )) ;
+        $jobs->enable_checkall(true) ;
+        $this->add_element($jobs) ;
+    }
+
+    /**
+     * This method is called only the first time the form
+     * page is hit.  This enables u to query a DB and 
+     * pre populate the FormElement objects with data.
+     *
+     */
+    function form_init_data()
+    {
+        //  Initialize the form fields
+
+        if (!is_null($this->getMeetId()))
+            $this->set_hidden_element_value('meetid', $this->getMeetId()) ;
+
+        $this->set_hidden_element_value("_action", WPST_ACTION_JOB_REMINDERS) ;
+        $jobs = $this->get_element('Jobs') ;
+        $jobs->set_value(array(
+             WPST_JOB_DURATION_FULL_MEET
+            ,WPST_JOB_DURATION_PARTIAL_MEET
+        )) ;
+    }
+
+    /**
+     * This is the method that builds the layout of where the
+     * FormElements will live.  You can lay it out any way
+     * you like.
+     *
+     */
+    function form_content()
+    {
+        $it = new SwimMeetInfoTable('Swim Meet Details') ;
+        $it->setSwimMeetId($this->get_hidden_element_value('meetid')) ;
+        $it->constructSwimMeetInfoTable() ;
+
+        $table = html_table($this->_width,0,4) ;
+        $table->set_style('border: 1px solid') ;
+
+        $td = html_td() ;
+        $td->set_tag_attributes(array('valign' => 'middle', 'style' => 'padding-right: 10px;')) ;
+        $td->add($it) ;
+
+        $table->add_row($this->element_label('Jobs'),
+            $this->element_form('Jobs'), $td) ;
+ 
+        $this->add_form_block(null, $table) ;
+    }
+
+    /**
+     * This method gets called after the FormElement data has
+     * passed the validation.  This enables you to validate the
+     * data against some backend mechanism, say a DB.
+     *
+     */
+    function form_backend_validation()
+    {
+        return true ;
+    }
+
+    /**
+     * This method is called ONLY after ALL validation has
+     * passed.  This is the method that allows you to 
+     * do something with the data, say insert/update records
+     * in the DB.
+     */
+    function form_action()
+    {
+        $actionmsgs = array() ;
+
+        $jobs = $this->get_element_value('Jobs') ;
+        $this->setMeetId($this->get_hidden_element_value('meetid')) ;
+
+        $ja = new SwimTeamJobAssignment() ;
+        $jaids = $ja->getJobAssignmentIdsByMeetId($this->getMeetId()) ;
+
+        //  Loop through all of the job assignment ids and send out
+        //  an e-mail  for each one that has a person assigned to it.
+ 
+        foreach ($jaids as $jaid)
+        {
+            //  Load the Job Assignment
+            $ja->loadJobAssignmentByJobAssignmentId($jaid['jobassignmentid']) ;
+
+            //  Load the Job Details
+            $ja->loadJobByJobId() ;
+
+
+            //  Is the job assigned?
+
+            if ($ja->getUserId() != WPST_NULL_ID)
+            {
+                //  Is the job duration one of the selected on the form?
+ 
+                if (array_search($ja->getJobDuration(), $jobs) !== false)
+                {
+                    //printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
+                    $ja->sendReminderEmail() ;
+                    $jobdetails = SwimTeamTextMap::__mapJobIdToText($ja->getJobId()) ;
+
+                    $u = get_userdata($ja->getUserId()) ;
+    
+                    $actionmsgs[] = sprintf('Job Assignment Reminder (%s) sent to:  %s %s (%s)',
+                        $jobdetails, $u->first_name, $u->last_name, $u->user_login) ;
+                }
+            }
+        }
+
+        //  Construct action message
+
+        if (!empty($actionmsgs))
+        {
+            $c = container() ;
+
+            $meetdetails = SwimTeamTextMap::__MapMeetIdToText($this->getMeetId()) ;
+            $actionmsgs[] = sprintf('%d Job Assignment Reminders sent for Swim Meet:  %s - %s - %s',
+                count($actionmsgs), $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
+
+            foreach($actionmsgs as $actionmsg)
+            {
+                $c->add($actionmsg, html_br()) ;
+            }
+
+            $actionmsg = $c->render() ;
+        }
+        else
+        {
+            $meetdetails = SwimTeamTextMap::__MapMeetIdToText($this->getMeetId()) ;
+            $actionmsg = sprintf('No Job Assignment Reminders sent for Swim Meet:  %s - %s - %s',
+                $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
+        }
+
+        $this->set_action_message($actionmsg) ;
+
+        return true ;
+    }
+
+    /**
+     * Overload form_content_buttons() method to have the
+     * button display "Upload" instead of the default "Save".
+     *
+     */
+    function form_content_buttons()
+    {
+        return $this->form_content_buttons_Confirm_Cancel() ;
+    }
+}
 ?>
