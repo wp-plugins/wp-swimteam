@@ -416,6 +416,7 @@ function wpst_meet_report_sc_handler($atts)
     //  Set up the meet report
 
     $meetreport = new SwimMeetReport() ;
+    $meetreport->setShortCodeMode(true) ;
     $meetreport->loadSwimMeetByMeetId($meetid) ;
 
     //  Display the meet summary?

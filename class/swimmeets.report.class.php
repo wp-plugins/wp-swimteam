@@ -37,6 +37,11 @@ require_once('print.class.php') ;
 class SwimMeetReport extends SwimMeet
 {
     /**
+     * Short Code Report Mode
+     */
+    var $__short_code_mode = false ;
+
+    /**
      * User Id 
      */
     var $__userid = null ;
@@ -120,6 +125,26 @@ class SwimMeetReport extends SwimMeet
        ,WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE =>
             WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_LABEL
     ) ;
+
+    /**
+     * set short code report mode
+     *
+     * @param boolean - report is being generated from a short code
+     */
+    function setShortCodeMode($mode = true)
+    {
+        $this->__short_code_mode = $mode ;
+    }
+
+    /**
+     * get short code report mode
+     *
+     * @return boolean - report is being generated from a short code
+     */
+    function getShortCodeMode()
+    {
+        return $this->__short_code_mode ;
+    }
 
     /**
      * set user id
@@ -416,7 +441,7 @@ class SwimMeetReport extends SwimMeet
             $jobassignments->setShowPhone(true) ;
             $jobassignments->setShowNotes(true) ;
 
-            if (user_can(get_current_user_id(), 'publish_posts'))
+            if ($this->getShortCodeMode() || user_can(get_current_user_id(), 'publish_posts'))
                 $jobassignments->constructSwimMeetJobAssignmentInfoTable() ;
             else
                 $jobassignments->constructSwimMeetJobAssignmentInfoTable(null, $this->getUserId()) ;
@@ -534,7 +559,8 @@ class SwimMeetReport extends SwimMeet
                 {
                     $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
 
-                    if (user_can(get_current_user_id(), 'publish_posts') ||
+                    if ($this->getShortCodeMode() ||
+                        user_can(get_current_user_id(), 'publish_posts') ||
                         (get_current_user_id() == $swimmer->getContact1Id()) ||
                         (get_current_user_id() == $swimmer->getContact2Id()))
                     {

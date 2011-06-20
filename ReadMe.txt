@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.10 =
+* Fixed bug which prevented opt-in/opt-out list from being displayed properly by the wpst_meet_report short code.
+
 = 1.9 =
 * Added ablity to send out Job Reminder e-mails on a per meet basis from the Manage->Swim Meets tab.
 
