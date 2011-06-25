@@ -983,6 +983,7 @@ class SwimMeetsAdminGUIDataList extends SwimMeetsGUIDataList
         ,WPST_ACTION_UPDATE => WPST_ACTION_UPDATE
         ,WPST_ACTION_DELETE => WPST_ACTION_DELETE
         ,WPST_ACTION_EVENTS => WPST_ACTION_EVENTS
+        ,WPST_ACTION_EXPORT_SDIF => WPST_ACTION_EXPORT_SDIF
         ,WPST_ACTION_JOBS => WPST_ACTION_JOBS
         ,WPST_ACTION_JOB_REMINDERS => WPST_ACTION_JOB_REMINDERS
         //,WPST_ACTION_IMPORT_EVENTS => WPST_ACTION_IMPORT_EVENTS
@@ -1729,6 +1730,24 @@ class SwimMeetMeta extends SwimTeamDBI
     }
 
     /**
+     * get Entered By by Meet Id, Swimmer Id, and Event Code
+     *
+     * @param - int - $meetid - meet id
+     * @param - int - $swimmerid - swimmer id
+     * @param - int - $strokecode - event code
+     */
+    function getMetaEnteredByMeetIdSwimmerIdAndStrokeCode($meetid, $swimmerid, $strokecode)
+    {
+        $query = sprintf("SELECT userid FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND strokecode='%s'",
+            WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $strokecode) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResult() ;
+    }
+
+    /**
      * get Time Stamp by Meet Id, Swimmer Id, and Event Id
      *
      * @param - int - $meetid - meet id
@@ -1738,6 +1757,24 @@ class SwimMeetMeta extends SwimTeamDBI
     function getMetaModifiedByMeetIdSwimmerIdAndEventId($meetid, $swimmerid, $eventid)
     {
         $query = sprintf("SELECT modified FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND eventid='%s'",
+            WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $eventid) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResult() ;
+    }
+
+    /**
+     * get Entered By by Meet Id, Swimmer Id, and Event Id
+     *
+     * @param - int - $meetid - meet id
+     * @param - int - $swimmerid - swimmer id
+     * @param - int - $event id - event id
+     */
+    function getMetaEnteredByMeetIdSwimmerIdAndEventId($meetid, $swimmerid, $eventid)
+    {
+        $query = sprintf("SELECT userid FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND eventid='%s'",
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $eventid) ;
 
         $this->setQuery($query) ;
@@ -2165,7 +2202,7 @@ class SwimMeetMeta extends SwimTeamDBI
         $headers .= sprintf("From: %s <%s>",
             get_bloginfo('name'), get_bloginfo('admin_email')) . "\r\n" ;
 
-        $headers .= sprintf("Cc: %s", get_option(WPST_OPTION_REG_EMAIL)) . "\r\n" ;
+        $headers .= sprintf("Cc: %s", get_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_FORMAT)) . "\r\n" ;
         $headers .= sprintf("Bcc: %s", get_bloginfo('admin_email')) . "\r\n" ;
         $headers .= sprintf("Reply-To: %s", get_bloginfo('admin_email')) . "\r\n" ;
         $headers .= sprintf("X-Mailer: PHP/%s", phpversion()) ;

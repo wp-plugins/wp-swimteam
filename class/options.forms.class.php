@@ -399,7 +399,7 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         )) ;
         $this->add_element($regsystem) ;
 
-        $regprefixlabel = new FEText("Registration Prefix Label", true, "75px");
+        $regprefixlabel = new FEText("Registration Prefix Label", false, "75px");
         $this->add_element($regprefixlabel) ;
 
         $regfeelabel = new FERegEx("Registration Fee Label", true,

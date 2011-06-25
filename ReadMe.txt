@@ -2,7 +2,7 @@
 Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
-Requires at least: 3.0
+Requires at least: 3.1
 Tested up to: 3.1.3
 Stable tag: trunk
 
@@ -63,6 +63,11 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.11 =
+* Added ability to display which user entered an opt-in/opt-out record on the Swim Meet report.
+* Added ability to control inclusion of time stamp for opt-in/opt-out records on the Swim Meet report.
+* Fixed bug which was sending Opt-In/Opt-Out confirmation e-mails to Registration e-mail address instead of Opt-In/Opt-Out e-mail address.
 
 = 1.10 =
 * Fixed bug which prevented opt-in/opt-out list from being displayed properly by the wpst_meet_report short code.

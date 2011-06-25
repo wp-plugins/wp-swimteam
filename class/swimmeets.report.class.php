@@ -77,6 +77,11 @@ class SwimMeetReport extends SwimMeet
     var $__show_timestamp = false ;
 
     /**
+     * Show Entered By flag
+     */
+    var $__show_entered_by = false ;
+
+    /**
      * Show Map flag
      */
     var $__show_map = false ;
@@ -307,6 +312,26 @@ class SwimMeetReport extends SwimMeet
     }
 
     /**
+     * set show entered by flag inclusion
+     *
+     * @param boolean - flag to turn show entered by inclusion on or off
+     */
+    function setShowEnteredBy($flag = true)
+    {
+        $this->__show_entered_by = $flag ;
+    }
+
+    /**
+     * get show entered by flag inclusion
+     *
+     * @return boolean - flag to turn show entered by inclusion on or off
+     */
+    function getShowEnteredBy()
+    {
+        return $this->__show_entered_by ;
+    }
+
+    /**
      * set show map flag inclusion
      *
      * @param boolean - flag to turn show map inclusion on or off
@@ -503,40 +528,53 @@ class SwimMeetReport extends SwimMeet
                 $participation, $opponent, $meetdate), '100%') ;
             $full->set_alt_color_flag(true) ;
 
-            if  ($this->getShowTimeStamp())
-                $full->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Recorded')) ;
+            if ($this->getShowTimeStamp() && $this->getShowEnteredBy())
+                $full->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Recorded'), html_b('Entered By')) ;
+            else if  ($this->getShowTimeStamp())
+                $full->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Recorded')) ;
+            else if  ($this->getShowEnteredBy())
+                $full->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Entered By')) ;
             else
-                $full->add_row(html_b('Name'), html_b('Swimmer Number')) ;
+                $full->add_row(html_b('Name'), html_b('Swimmer Label')) ;
 
             $partial = new SwimTeamInfoTable(sprintf('Partial Meet %s:  %s %s',
                 $participation, $opponent, $meetdate), '100%') ;
             $partial->set_alt_color_flag(true) ;
 
-            if  ($this->getShowTimeStamp())
-                $partial->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Stroke'), html_b('Recorded')) ;
+            if ($this->getShowTimeStamp() && $this->getShowEnteredBy())
+                $partial->add_row(html_b('Name'), html_b('Swimmer Label'),
+                    html_b('Stroke'), html_b('Recorded'), html_b('Entered By')) ;
+            else if ($this->getShowTimeStamp())
+                $partial->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Stroke'), html_b('Recorded')) ;
+            else if ($this->getShowEnteredBy())
+                $partial->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Stroke'), html_b('Entered By')) ;
             else
-                $partial->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Stroke')) ;
+                $partial->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Stroke')) ;
 
             $event = new SwimTeamInfoTable(sprintf('Meet Event %s:  %s %s',
                 $participation, $opponent, $meetdate), '100%') ;
             $event->set_alt_color_flag(true) ;
 
-            if  ($this->getShowTimeStamp())
-                $event->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Event'),
+            if ($this->getShowTimeStamp() && $this->getShowEnteredBy())
+                $event->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Event'),
+                    html_b('Age Group'), html_b('Stroke'), html_b('Distance'),
+                    html_b('Recorded'), html_b('Entered By')) ;
+            else if ($this->getShowTimeStamp())
+                $event->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Event'),
                     html_b('Age Group'), html_b('Stroke'), html_b('Distance'),
                     html_b('Recorded')) ;
+            else if ($this->getShowEnteredBy())
+                $event->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Event'),
+                    html_b('Age Group'), html_b('Stroke'), html_b('Distance'),
+                    html_b('Entered By')) ;
             else
-                $event->add_row(html_b('Name'), html_b('Swimmer Number'), html_b('Event'),
+                $event->add_row(html_b('Name'), html_b('Swimmer Label'), html_b('Event'),
                     html_b('Age Group'), html_b('Stroke'), html_b('Distance')) ;
-
-            //$season = new SwimTeamSeason() ;
-            //$season->loadActiveSeason() ;
 
             $swimmeet = new SwimMeet() ;
             $swimmeet->loadSwimMeetByMeetId($this->getMeetId()) ;
 
             $roster = new SwimTeamRoster() ;
-            //$roster->setSeasonId($season->getActiveSeasonId()) ;
             $roster->setSeasonId($swimmeet->getSeasonId()) ;
 
             $swimmer = new SwimTeamSwimmer() ;
@@ -547,11 +585,18 @@ class SwimMeetReport extends SwimMeet
 
             if (empty($swimmerIds))
             {
-                    $td = html_td(null, null, 'No swimmers found.') ;
-                    $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $this->getShowTimeStamp() ? 3 : 2)) ;
-                    $full->add_row($td) ;
-                    $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $this->getShowTimeStamp() ? 4 : 3)) ;
-                    $partial->add_row($td) ;
+                if ($this->getShowTimeStamp() && $this->getShowEnteredBy())
+                    $colspan = 5 ;
+                else if ($this->getShowTimeStamp() || $this->getShowEnteredBy())
+                    $colspan = 4 ;
+                else
+                    $colspan = 3 ;
+
+                $td = html_td(null, null, 'No swimmers found.') ;
+                $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $colspan)) ;
+                $full->add_row($td) ;
+                $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $colspan)) ;
+                $partial->add_row($td) ;
             }
             else
             {
@@ -604,37 +649,64 @@ class SwimMeetReport extends SwimMeet
         
                             if (count($strokecodes) >= count(get_option(WPST_OPTION_OPT_IN_OPT_OUT_STROKES)))
                             {
+                                $tr = array($name, $roster->getSwimmerLabel()) ;
+
+                                //  Shpw the time stamp?
                                 if ($this->getShowTimeStamp())
                                 {
                                     $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndStrokeCode($this->getMeetId(),
                                         $swimmerId['swimmerid'], $strokecodes[0]['strokecode']) ;
-                                    $full->add_row($name, $roster->getSwimmerLabel(),
-                                        $timestamp['modified']) ;
+                                    $tr[] = $timestamp['modified'] ;
                                 }
-                                else
+
+                                //  Show the entered by?
+                                if ($this->getShowEnteredBy())
                                 {
-                                    $full->add_row($name, $roster->getSwimmerLabel()) ;
+                                    $enteredby = $meta->getMetaEnteredByMeetIdSwimmerIdAndStrokeCode($this->getMeetId(),
+                                        $swimmerId['swimmerid'], $strokecodes[0]['strokecode']) ;
+                                    $u = get_userdata($enteredby['userid']) ;
+                                    $tr[] = sprintf('%s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
                                 }
-        
+
+                                //  Can't simply add a row to the table because we
+                                //  don't know how many cells the table has.  Use this
+                                //  PHP trick to pass an undetermined number of arguments
+                                //  to a method.
+
+                                call_user_method_array('add_row', $full, $tr) ;
+
                                 $fullrows++ ;
                             }
                             else
                             {
                                 foreach ($strokecodes as $strokecode)
                                 {
+                                    $tr = array($name, $roster->getSwimmerLabel(),
+                                        $this->__strokecodelut[$strokecode['strokecode']]) ;
+
+                                    //  Shpw the time stamp?
                                     if ($this->getShowTimeStamp())
                                     {
                                         $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndStrokeCode($this->getMeetId(),
-                                            $swimmerId['swimmerid'], $strokecode['strokecode']) ;
-                                        $partial->add_row($name, $roster->getSwimmerLabel(),
-                                            $this->__strokecodelut[$strokecode['strokecode']],
-                                            $timestamp['modified']) ;
+                                            $swimmerId['swimmerid'], $strokecodes[0]['strokecode']) ;
+                                        $tr[] = $timestamp['modified'] ;
                                     }
-                                    else
+
+                                    //  Show the entered by?
+                                    if ($this->getShowEnteredBy())
                                     {
-                                        $partial->add_row($name, $roster->getSwimmerLabel(),
-                                            $this->__strokecodelut[$strokecode['strokecode']]) ;
+                                        $enteredby = $meta->getMetaEnteredByMeetIdSwimmerIdAndStrokeCode($this->getMeetId(),
+                                            $swimmerId['swimmerid'], $strokecodes[0]['strokecode']) ;
+                                        $u = get_userdata($enteredby['userid']) ;
+                                        $tr[] = sprintf('%s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
                                     }
+
+                                    //  Can't simply add a row to the table because we
+                                    //  don't know how many cells the table has.  Use this
+                                    //  PHP trick to pass an undetermined number of arguments
+                                    //  to a method.
+
+                                    call_user_method_array('add_row', $partial, $tr) ;
                                 }
         
                                 $partialrows++ ;
@@ -643,7 +715,7 @@ class SwimMeetReport extends SwimMeet
                         else
                         {
                             $eventids = $meta->getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
-                            $this->getMeetId(), $this->getParticipation()) ;
+                                $this->getMeetId(), $this->getParticipation()) ;
         
                             $e = new SwimMeetEvent() ;
 
@@ -656,53 +728,65 @@ class SwimMeetReport extends SwimMeet
                                 //  model.  In this scenario, simply display N/A for the details which
                                 //  aren't available.
 
+                                $tr = array() ;
+
                                 if (!is_null($e->getEventNumber()))
                                 {
                                     //  Full event details are available
 
-                                    if ($this->getShowTimeStamp())
-                                    {
-                                        $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndEventId($this->getMeetId(),
-                                            $swimmerId['swimmerid'], $eventid['eventid']) ;
-                                        $event->add_row($name, $roster->getSwimmerLabel(),
-                                            sprintf('%04s', $e->getEventNumber()),
-                                            SwimTeamTextMap::__mapAgeGroupIdToText($e->getAgeGroupId()),
-                                            SwimTeamTextMap::__mapStrokeCodeToText($e->getStroke()), $e->getDistance() .
-                                            ' ' . SwimTeamTextMap::__mapCourseCodeToText($e->getCourse()),
-                                            $timestamp['modified']) ;
-                                    }
-                                    else
-                                    {
-                                        $event->add_row($name, $roster->getSwimmerLabel(),
-                                            sprintf('%04s', $e->getEventNumber()),
-                                            SwimTeamTextMap::__mapAgeGroupIdToText($e->getAgeGroupId()),
-                                            SwimTeamTextMap::__mapStrokeCodeToText($e->getStroke()), $e->getDistance() .
-                                            ' ' . SwimTeamTextMap::__mapCourseCodeToText($e->getCourse())) ;
-                                    }
+                                    $tr[] = $name ;
+                                    $tr[] = $roster->getSwimmerLabel() ;
+                                    $tr[] = sprintf('%04s', $e->getEventNumber()) ;
+                                    $tr[] = SwimTeamTextMap::__mapAgeGroupIdToText($e->getAgeGroupId()) ;
+                                    $tr[] = SwimTeamTextMap::__mapStrokeCodeToText($e->getStroke()) ;
+                                    $tr[] = $e->getDistance() . ' ' . SwimTeamTextMap::__mapCourseCodeToText($e->getCourse()) ;
                                 }
                                 else
                                 {
                                     //  Full event details are not available
 
-                                    $na = strtoupper(WPST_NA) ;
-                                    if ($this->getShowTimeStamp())
-                                    {
-                                        $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndEventId($this->getMeetId(),
-                                            $swimmerId['swimmerid'], $eventid['eventid']) ;
-                                        $event->add_row($name, $roster->getSwimmerLabel(),
-                                            $na, $na, $na, $na, $timestamp['modified']) ;
-                                    }
-                                    else
-                                    {
-                                        $event->add_row($name, $roster->getSwimmerLabel(), $na, $na, $na, $na) ;
-                                    }
+                                    $na = strtoupper(__(WPST_NA)) ;
+                                    $tr = array($name, $roster->getSwimmerLabel(), $na, $na, $na, $na) ;
                                 }
+
+                                //  Show the time stamp?
+                                if ($this->getShowTimeStamp())
+                                {
+                                    $timestamp = $meta->getMetaModifiedByMeetIdSwimmerIdAndEventId($this->getMeetId(),
+                                        $swimmerId['swimmerid'], $eventid['eventid']) ;
+                                    $tr[] = $timestamp['modified'] ;
+                                }
+
+                                //  Show the entered by?
+                                if ($this->getShowEnteredBy())
+                                {
+                                    $enteredby = $meta->getMetaEnteredByMeetIdSwimmerIdAndEventId($this->getMeetId(),
+                                        $swimmerId['swimmerid'], $eventid['eventid']) ;
+                                    $u = get_userdata($enteredby['userid']) ;
+                                    $tr[] = sprintf('%s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
+                                }
+
+                                //  Can't simply add a row to the table because we
+                                //  don't know how many cells the table has.  Use this
+                                //  PHP trick to pass an undetermined number of arguments
+                                //  to a method.
+
+                                call_user_method_array('add_row', $event, $tr) ;
                             }
     
                             $eventrows++ ;
                         }
                     }
                 }
+
+                //  Calculate the colspan in case some tables are emoty
+
+                if ($this->getShowTimeStamp() && $this->getShowEnteredBy())
+                    $colspan = 5 ;
+                else if ($this->getShowTimeStamp() || $this->getShowEnteredBy())
+                    $colspan = 4 ;
+                else
+                    $colspan = 3 ;
 
                 // Which mode is the data in?  Stroke or Event?
 
@@ -711,14 +795,14 @@ class SwimMeetReport extends SwimMeet
                     if ($fullrows == 0)
                     {
                         $td = html_td(null, null, 'No swimmers found.') ;
-                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => 3)) ;
+                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $colspan)) ;
                         $full->add_row($td) ;
                     }
 
                     if ($partialrows == 0)
                     {
                         $td = html_td(null, null, 'No swimmers found.') ;
-                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => 4)) ;
+                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $colspan)) ;
                         $partial->add_row($td) ;
                     }
                 }
@@ -727,7 +811,7 @@ class SwimMeetReport extends SwimMeet
                     if ($eventrows == 0)
                     {
                         $td = html_td(null, null, 'No swimmers found.') ;
-                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => 4)) ;
+                        $td->set_tag_attributes(array('class' => 'contentnovertical', 'colspan' => $colspan)) ;
                         $event->add_row($td) ;
                     }
                 }
@@ -1032,13 +1116,6 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
             ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List') ;
         $this->add_element($optinoptout) ;
 
-        $sortby = new FERadioGroup('Sort By',
-            array(ucfirst(WPST_SORT_BY_NAME) => WPST_SORT_BY_NAME,
-            ucfirst(WPST_SORT_BY_SWIMMER_LABEL) => WPST_SORT_BY_SWIMMER_LABEL,
-            ucfirst(WPST_SORT_CHRONOLOGICALLY) => WPST_SORT_CHRONOLOGICALLY),
-            true, '200px');
-        $this->add_element($sortby) ;
-
         $firstname = new FECheckBox('First Initial Only') ;
         $this->add_element($firstname) ;
 
@@ -1047,6 +1124,19 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
 
         $nickname = new FECheckBox('Nickname Override') ;
         $this->add_element($nickname) ;
+
+        $timestamp = new FECheckBox('Time Stamp') ;
+        $this->add_element($timestamp) ;
+
+        $enteredby = new FECheckBox('Entered By') ;
+        $this->add_element($enteredby) ;
+
+        $sortby = new FERadioGroup('Sort By',
+            array(ucfirst(WPST_SORT_BY_NAME) => WPST_SORT_BY_NAME,
+            ucfirst(WPST_SORT_BY_SWIMMER_LABEL) => WPST_SORT_BY_SWIMMER_LABEL,
+            ucfirst(WPST_SORT_CHRONOLOGICALLY) => WPST_SORT_CHRONOLOGICALLY),
+            true, '200px');
+        $this->add_element($sortby) ;
 
         $output = new FEListBox('Report Format', true, '200px');
         $output->set_list_data(array(
@@ -1068,6 +1158,8 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
 
         $this->set_element_value(get_option(WPST_OPTION_OPT_IN_LABEL) .
             ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List', true) ;
+        $this->set_element_value('Time Stamp', true) ;
+        $this->set_element_value('Entered By', true) ;
         $this->set_element_value('Sort By', WPST_SORT_BY_NAME) ;
         $this->set_hidden_element_value('_userid', get_current_user_id()) ;
     }
@@ -1096,13 +1188,15 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
             html_b(html_br(), get_option(WPST_OPTION_OPT_IN_LABEL) .
             ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List Options')) ;
 
+        $table->add_row(_HTML_SPACE, $this->element_form('Time Stamp')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Entered By')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('First Initial Only')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Last Initial Only')) ;
+        $table->add_row(_HTML_SPACE, $this->element_form('Nickname Override')) ;
         $table->add_row(_HTML_SPACE, 
             $this->element_form(get_option(WPST_OPTION_OPT_IN_LABEL) .
             ' / ' . get_option(WPST_OPTION_OPT_OUT_LABEL) . ' List')) ;
         $table->add_row(_HTML_SPACE, $this->element_form('Sort By')) ;
-        $table->add_row(_HTML_SPACE, $this->element_form('First Initial Only')) ;
-        $table->add_row(_HTML_SPACE, $this->element_form('Last Initial Only')) ;
-        $table->add_row(_HTML_SPACE, $this->element_form('Nickname Override')) ;
 
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
         $table->add_row($this->element_label('Report Format'),
@@ -1181,7 +1275,11 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
                 if (!is_null($this->get_element_value('Nickname Override')))
                     $rpt->setUseNickName(true) ;
 
-                $rpt->setShowTimeStamp(true) ;
+                if (!is_null($this->get_element_value('Time Stamp')))
+                    $rpt->setShowTimeStamp(true) ;
+
+                if (!is_null($this->get_element_value('Entered By')))
+                    $rpt->setShowEnteredBy(true) ;
             }
 
             $rpt->generateReport() ;
