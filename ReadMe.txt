@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.12 =
+* Fixed bug which was sending Opt-In/Opt-Out confirmation e-mails to Registration e-mail address instead of Opt-In/Opt-Out e-mail address.  This time it is fixed correctly!
+
 = 1.11 =
 * Added ability to display which user entered an opt-in/opt-out record on the Swim Meet report.
 * Added ability to control inclusion of time stamp for opt-in/opt-out records on the Swim Meet report.

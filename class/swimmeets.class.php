@@ -2202,7 +2202,7 @@ class SwimMeetMeta extends SwimTeamDBI
         $headers .= sprintf("From: %s <%s>",
             get_bloginfo('name'), get_bloginfo('admin_email')) . "\r\n" ;
 
-        $headers .= sprintf("Cc: %s", get_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_FORMAT)) . "\r\n" ;
+        $headers .= sprintf("Cc: %s", get_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS)) . "\r\n" ;
         $headers .= sprintf("Bcc: %s", get_bloginfo('admin_email')) . "\r\n" ;
         $headers .= sprintf("Reply-To: %s", get_bloginfo('admin_email')) . "\r\n" ;
         $headers .= sprintf("X-Mailer: PHP/%s", phpversion()) ;
