@@ -225,9 +225,9 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $stable = html_table('100%', 3, 0) ;
+        $stable = html_table('100%', 0, 0) ;
  
-        //$table->set_style("border: 1px solid") ;
+        //$stable->set_style("border: 1px solid") ;
 
         $table->add_row($this->element_label("Gender"),
             $this->element_form("Gender")) ;
@@ -268,13 +268,13 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $tdr = html_td() ;
         $tdl->add($this->element_label('Opt-In Opt-Out Stroke Mode')) ;
         $tdr->add($this->element_form('Opt-In Opt-Out Stroke Mode')) ;
-        $tdr->set_style('padding: 3px 0px;width: 335px') ;
+        $tdr->set_style('padding: 3px 0px;width: 359px') ;
         $stable->add_row($tdl, $tdr) ;
         $tdl = html_td() ;
         $tdr = html_td() ;
         $tdl->add($this->element_label('Opt-In Opt-Out Strokes')) ;
         $tdr->add($this->element_form('Opt-In Opt-Out Strokes')) ;
-        $tdr->set_style('padding: 3px 0px;width: 335px') ;
+        $tdr->set_style('padding: 3px 0px;width: 359px') ;
         $stable->add_row($tdl, $tdr) ;
 
         $this->__stroke_model_div->add($stable) ;

@@ -862,26 +862,43 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
 	function build_column_item($row_data, $col_name)
     {
         //  Need to the user data from the Wordpress user profile
-        $u = get_userdata($row_data["userid"]) ;
 
 		switch ($col_name)
         {
             case "First Name" :
-                if (array_key_exists('first_name', get_object_vars($u)))
-                    $obj = $u->first_name ;
-                else
+                $obj = $row_data['firstname'] ;
+
+                if (empty($obj))
+                    $obj = get_user_meta($row_data['userid'], 'first_name') ;
+
+                if (empty($obj))
                     $obj = strtoupper(WPST_NA) ;
+
                 break ;
 
             case "Last Name" :
-                if (array_key_exists('last_name', get_object_vars($u)))
-                    $obj = $u->last_name ;
-                else
+                $obj = $row_data['lastname'] ;
+
+                if (empty($obj))
+                    $obj = get_user_meta($row_data['userid'], 'last_name') ;
+
+                if (empty($obj))
                     $obj = strtoupper(WPST_NA) ;
+
                 break ;
 
             case "Username" :
-                $obj = $u->user_login ;
+                $obj = $row_data['user_login'] ;
+
+                if (empty($obj))
+                {
+                    $u = get_userdata($row_data['userid']) ;
+                    $obj = $u->user_login ;
+                }
+
+                if (empty($obj))
+                    $obj = strtoupper(WPST_NA) ;
+
                 break ;
 
             case "Swimmers" :

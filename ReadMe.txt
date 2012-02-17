@@ -3,7 +3,7 @@ Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
 Requires at least: 3.1
-Tested up to: 3.1.3
+Tested up to: 3.3.1
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -63,6 +63,12 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.13 =
+
+* Fixed bug which prevented display of first and last name is user list within the Swim Team and Manage menus.
+* Fixed bug which caused default settings for Postal Code and State or Province not to be used leaving the form inoperable.
+* Cleaned up Options->Swim Team form to remove debug borders (oops) and fix alignment.
 
 = 1.12 =
 * Fixed bug which was sending Opt-In/Opt-Out confirmation e-mails to Registration e-mail address instead of Opt-In/Opt-Out e-mail address.  This time it is fixed correctly!

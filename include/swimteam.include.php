@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 645 $
+ * @version $Revision: 663 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -250,6 +250,8 @@ define('WPST_OPTION_REG_EMAIL', WPST_OPTION_PREFIX . 'reg_email') ;
 define('WPST_OPTION_REG_EMAIL_FORMAT', WPST_OPTION_PREFIX . 'reg_email_format') ;
 define('WPST_OPTION_REG_TOU_URL', WPST_OPTION_PREFIX . 'reg_tou_url') ;
 define('WPST_OPTION_REG_FEE_URL', WPST_OPTION_PREFIX . 'reg_fee_url') ;
+define('WPST_OPTION_STATE_OR_PROVINCE_LABEL', WPST_OPTION_PREFIX . 'stateorprovince_label') ;
+define('WPST_OPTION_POSTAL_CODE_LABEL', WPST_OPTION_PREFIX . 'postalcode_label') ;
 
 //  Define the option fields for the extended user profile
 define('WPST_OPTION_USONLY', WPST_OPTION_PREFIX . 'usonly') ;
