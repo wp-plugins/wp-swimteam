@@ -871,6 +871,8 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
                 if (empty($obj))
                     $obj = get_user_meta($row_data['userid'], 'first_name') ;
 
+                if (is_array($obj) && !empty($obj)) $obj = $obj[0] ;
+
                 if (empty($obj))
                     $obj = strtoupper(WPST_NA) ;
 
@@ -881,6 +883,8 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
 
                 if (empty($obj))
                     $obj = get_user_meta($row_data['userid'], 'last_name') ;
+
+                if (is_array($obj) && !empty($obj)) $obj = $obj[0] ;
 
                 if (empty($obj))
                     $obj = strtoupper(WPST_NA) ;

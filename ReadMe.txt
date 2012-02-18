@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.14 =
+* Fixed odd use case where get_user_meta() sometimes returns an array with an empty string and other times returns an empty array.  This bug manifested itself with a PHP warning from the phpHtmlLib plugin which wp-SwimTeam references.
+
 = 1.13 =
 
 * Fixed bug which prevented display of first and last name is user list within the Swim Team and Manage menus.

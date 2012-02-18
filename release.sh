@@ -22,6 +22,9 @@
 SEVENZIP="C:/Program Files/7-Zip/7z.exe"
 WCREV="C:/Program Files/TortoiseSVN/bin/subWcRev.exe"
 
+MAJOR_RELEASE="1"
+MINOR_RELEASE="14"
+
 ##  Paths and defaults
 BASENAME=`basename $0`
 GBLREVNUM=""
@@ -35,6 +38,7 @@ PLUGIN="swimteam.php"
 VERSION="include/version.include.php"
 ZIPTYPE="-tzip"
 ZIPSUFFIX=".zip"
+FORCE=""
 
 #
 #  procedure show_help()
@@ -60,6 +64,10 @@ show_help()
       --export Path      Specify the "Path" where the Subversion
                          content should be exported to.
                          (e.g. --export I:/export)
+
+      --major Rev        Specify the Major Revision Number or text.
+
+      --minor Rev        Specify the Minor Revision Number or text.
 
       -r Path            Specify the "Path" where the Subversion
                          working repository can be found.
@@ -130,8 +138,16 @@ do
                 --zip)
                     ZIPTYPE="-tzip"
                     ZIPSUFFIX=".zip" ;;
+                --force)
+                    FORCE="--force" ;;
                 --noexport)
                     NOEXPORT="no SVN" ;;
+                --major)
+                    shift
+                    MAJOR_RELEASE="$1" ;;
+                --minor)
+                    shift
+                    MINOR_RELEASE="$1" ;;
                 --target)
                     shift
                     TARGET="$1" ;;
@@ -172,7 +188,7 @@ fi
 ##  Does Export Target exist?
 if [ -d "${EXPORT}/${TARGET}" ]
 then
-    if [ -z "${NOEXPORT}" ]
+    if [ -z "${NOEXPORT}" -a -z "${FORCE}" ]
     then
         echo "Error:  Export Target \"${EXPORT}/${TARGET}\" already exists, aborting."
         exit 1
@@ -185,13 +201,13 @@ fi
 ##  Wierd behavoir - the number ends up with a \r appended to it ...
 GBLREVNUM=`"$WCREV" "$REPOS" | egrep 'Last committed at revision [0-9]?' | cut -d' ' -f5 | cat -v | cut -d'^' -f1`
 echo "wp-SwimTeam repository at revision:  $GBLREVNUM"
-echo "Building wp-SwimTeam release:  Build: ${GBLREVNUM}"
+echo "Building wp-SwimTeam release:  Build: ${MAJOR_RELEASE}.${MINOR_RELEASE}.${GBLREVNUM}"
 
 if [ -z "${NOEXPORT}" ]
 then
     ##  Export the latest version of wp-SwimTeam from the repository for building
     echo "Exporting wp-SwimTeam at revision:  ${GBLREVNUM}"
-    svn export --force --revision ${GBLREVNUM} ${CYG_REPOS} ${CYG_EXPORT}/${TARGET}
+    svn export ${FORCE} --revision ${GBLREVNUM} ${CYG_REPOS} ${CYG_EXPORT}/${TARGET}
 
     if [ $? -ne 0 ]
     then
@@ -206,8 +222,16 @@ echo "Updating export tree with global revision number."
 "$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${PLUGIN}" "${EXPORT}/${TARGET}/${PLUGIN}"
 "$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${VERSION}" "${EXPORT}/${TARGET}/${VERSION}"
 
+echo "Updating export tree with major revision number."
+sed -i -e "s/MAJOR_RELEASE/${MAJOR_RELEASE}/" "${EXPORT}/${TARGET}/${PLUGIN}"
+sed -i -e "s/MAJOR_RELEASE/${MAJOR_RELEASE}/" "${EXPORT}/${TARGET}/${VERSION}"
+
+echo "Updating export tree with minor revision number."
+sed -i -e "s/MINOR_RELEASE/${MINOR_RELEASE}/" "${EXPORT}/${TARGET}/${PLUGIN}"
+sed -i -e "s/MINOR_RELEASE/${MINOR_RELEASE}/" "${EXPORT}/${TARGET}/${VERSION}"
+
 echo "Creating Zip file."
-ZIPFILE="${EXPORT}/${TARGET}/../${TARGET}_Build_${GBLREVNUM}${ZIPSUFFIX}"
+ZIPFILE="${EXPORT}/${TARGET}/../${TARGET}_v${MAJOR_RELEASE}.${MINOR_RELEASE}.${GBLREVNUM}${ZIPSUFFIX}"
 
 ##  Clean up old zip file
 
