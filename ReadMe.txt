@@ -64,6 +64,13 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.16 =
+* Fixed another bug which caused display of "M/A" instead of first and/or last name in some instances.  Propogated this fix to a lower level class and eliminated duplicate code across numerous classes.
+* Fixed inconsistencies across UI where some tabs had actions as drop downs and others had buttons.  All tabs now use the drop down UI model.
+
+= 1.15 =
+* Fixed bug which caused display of "M/A" instead of first and/or last name in some instances.
+
 = 1.14 =
 * Fixed odd use case where get_user_meta() sometimes returns an array with an empty string and other times returns an empty array.  This bug manifested itself with a PHP warning from the phpHtmlLib plugin which wp-SwimTeam references.
 
