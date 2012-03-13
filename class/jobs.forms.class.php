@@ -281,14 +281,21 @@ class WpSwimTeamJobAddForm extends WpSwimTeamForm
         if ($success) 
         {
             $job->setJobId($success) ;
-            $this->set_action_message("Job successfully added.") ;
+            $this->set_action_message('Job successfully added.') ;
+        }
+        else if ($job->SwimTeamDBIWordPressDatabaseError())
+        {
+            $this->setErrorActionMessageDivClass() ;
+            $this->set_action_message('Job was not successfully added.<br/>' .
+               'WordPress Database Error:  ' . $job->wpstdb->last_error) ;
         }
         else
         {
-            $this->set_action_message("Job was not successfully added.") ;
+            $this->setErrorActionMessageDivClass() ;
+            $this->set_action_message('Job was not successfully added.') ;
         }
 
-        return $success ;
+        return true ;
     }
 
     /**
@@ -408,6 +415,7 @@ class WpSwimTeamJobUpdateForm extends WpSwimTeamJobAddForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $this->set_action_message("Job was not updated.") ;
         }
 
@@ -503,6 +511,7 @@ class WpSwimTeamJobDeleteForm extends WpSwimTeamJobUpdateForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $this->set_action_message("Job was not deleted.") ;
         }
 
@@ -991,6 +1000,7 @@ class WpSwimTeamJobsAllocateForm extends WpSwimTeamForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $actionmsg = sprintf("No %s actions recorded.", $actionlabel) ;
         }
 
@@ -1068,6 +1078,7 @@ class WpSwimTeamJobsAllocateForm extends WpSwimTeamForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $actionmsg = sprintf("Job \"%s\", already %sallocated for season  <i>(%s - %s - %s)</i>.",
                 SwimTeamTextMap::__mapJobIdToText($ja->getJobId()), $prefix,
                 $seasondetails["label"], $seasondetails["start"],
@@ -1259,6 +1270,7 @@ class WpSwimTeamJobsDeallocateForm extends WpSwimTeamJobsReallocateForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $actionmsg = sprintf("No %s actions recorded.", $actionlabel) ;
         }
 
@@ -1734,6 +1746,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $actionmsg = sprintf("No %s changes recorded.", WPST_ACTION_ASSIGN_JOBS) ;
         }
 
@@ -1999,6 +2012,7 @@ class WpSwimTeamSwimMeetJobAssignForm extends WpSwimTeamJobAssignForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $actionmsg = sprintf("No %s changes recorded.", WPST_ACTION_ASSIGN_JOBS) ;
         }
 
@@ -2257,6 +2271,7 @@ class WpSwimTeamSeasonJobAssignForm extends WpSwimTeamJobAssignForm
         }
         else
         {
+            $this->setErrorActionMessageDivClass() ;
             $actionmsg = sprintf("No %s changes recorded.", WPST_ACTION_ASSIGN_JOBS) ;
         }
 

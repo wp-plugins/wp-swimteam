@@ -19,8 +19,8 @@
  *
  */
 
-require_once("users.class.php") ;
-require_once("forms.class.php") ;
+require_once('users.class.php') ;
+require_once('forms.class.php') ;
 
 /**
  * Construct the Add Age Group form
@@ -80,26 +80,26 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
     {
         global $userdata ;
 
-        $this->add_hidden_element("_action") ;
-        $this->add_hidden_element("UserId") ;
+        $this->add_hidden_element('_action') ;
+        $this->add_hidden_element('UserId') ;
 
-        $firstname = new FEText("First Name", true, "200px") ;
+        $firstname = new FEText('First Name', true, '200px') ;
         $this->add_element($firstname) ;
 
-        $lastname = new FEText("Last Name", true, "200px") ;
+        $lastname = new FEText('Last Name', true, '200px') ;
         $this->add_element($lastname) ;
 
-        $emailaddress = new FEText("E-Mail Address", true, "300px") ;
+        $emailaddress = new FEText('E-Mail Address', true, '300px') ;
         $this->add_element($emailaddress) ;
 
-        $street1 = new FEText("Street 1", true, "250px") ;
+        $street1 = new FEText('Street 1', true, '250px') ;
         $this->add_element($street1) ;
-        $street2 = new FEText("Street 2", false, "250px") ;
+        $street2 = new FEText('Street 2', false, '250px') ;
         $this->add_element($street2) ;
-        $street3 = new FEText("Street 3", false, "250px") ;
+        $street3 = new FEText('Street 3', false, '250px') ;
         $this->add_element($street3) ;
 
-        $city = new FEText("City", true, "200px") ;
+        $city = new FEText('City', true, '200px') ;
         $this->add_element($city) ;
 
         //  How to handle the portion of the address which is
@@ -112,18 +112,18 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $geography = get_option(WPST_OPTION_GEOGRAPHY) ;
 
         if ($geography == WPST_US_ONLY)
-            $state = new FEUnitedStates($label, true, "200px") ;
+            $state = new FEUnitedStates($label, true, '200px') ;
         else
-            $state = new FEText($label, true, "250px") ;
+            $state = new FEText($label, true, '250px') ;
 
         $this->add_element($state) ;
 
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
 
         if ($geography == WPST_US_ONLY)
-            $postalcode = new FEZipcode($label, true, "75px") ;
+            $postalcode = new FEZipcode($label, true, '75px') ;
         else
-            $postalcode = new FEText($label, true, "200px") ;
+            $postalcode = new FEText($label, true, '200px') ;
 
         $this->add_element($postalcode) ;
 
@@ -132,23 +132,23 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         //  receive a text box.
  
         if ($geography == WPST_EU_ONLY)
-            $country = new FEEuropeanUnion("Country", true, "150px") ;
+            $country = new FEEuropeanUnion('Country', true, '150px') ;
         else
-            $country = new FEText("Country", true, "200px") ;
+            $country = new FEText('Country', true, '200px') ;
 
         if ($geography == WPST_US_ONLY)
             $country->set_disabled(true) ;
         $this->add_element($country) ;
 
         $label = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
-        $primaryphone = new FEText($label, true, "150px") ;
+        $primaryphone = new FEText($label, true, '150px') ;
         $this->add_element($primaryphone) ;
 
         $label = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
-        $secondaryphone = new FEText($label, false, "150px") ;
+        $secondaryphone = new FEText($label, false, '150px') ;
         $this->add_element($secondaryphone) ;
 
-        $contactinfo = new FEListBox("Contact Information", true, "150px");
+        $contactinfo = new FEListBox('Contact Information', true, '150px');
         $contactinfo->set_list_data($this->_contactinfoSelections()) ;
 
         $this->add_element($contactinfo) ;
@@ -165,50 +165,50 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
             if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
             {
-                //printf("%s -->  Mode:  %s  User Level %s  Permission %s<br>",
+                //printf('%s -->  Mode:  %s  User Level %s  Permission %s<br>',
                     //__LINE__, $mode, (int)$userdata->user_level, WPST_EDITOR_PERMISSION) ;
                 switch (get_option($oconst))
                 {
                     case WPST_REQUIRED:
-                        $this->add_element(new FEText($label, true, "250px")) ;
+                        $this->add_element(new FEText($label, true, '250px')) ;
                         break ;
 
                     case WPST_OPTIONAL:
-                        $this->add_element(new FEText($label, false, "250px")) ;
+                        $this->add_element(new FEText($label, false, '250px')) ;
                         break ;
 
                     case WPST_EMAIL_OPTIONAL:
-                        $this->add_element(new FEEmail($label, false, "250px")) ;
+                        $this->add_element(new FEEmail($label, false, '250px')) ;
                         break ;
 
                     case WPST_EMAIL_REQUIRED:
-                        $this->add_element(new FEEmail($label, true, "250px")) ;
+                        $this->add_element(new FEEmail($label, true, '250px')) ;
                         break ;
 
                     case WPST_URL_OPTIONAL:
-                        $this->add_element(new FEUrl($label, false, "250px")) ;
+                        $this->add_element(new FEUrl($label, false, '250px')) ;
                         break ;
 
                     case WPST_URL_REQUIRED:
-                        $this->add_element(new FEUrl($label, true, "250px")) ;
+                        $this->add_element(new FEUrl($label, true, '250px')) ;
                         break ;
 
                     case WPST_YES_NO:
                     case WPST_NO_YES:
-                        $this->add_element(new FEYesNoListBox($label, false, "75px")) ;
+                        $this->add_element(new FEYesNoListBox($label, false, '75px')) ;
                         break ;
 
                     case WPST_CLOTHING_SIZE:
-                        $this->add_element(new FEClothingSizeListBox($label, false, "150px")) ;
+                        $this->add_element(new FEClothingSizeListBox($label, false, '150px')) ;
                         break ;
 
                     case WPST_DISABLED:
@@ -236,40 +236,40 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $userinfo = get_userdata($this->getId()) ;
 
         //  Set the first name field to what is stored in the WP profile
-        $this->set_element_value("First Name", $userinfo->user_firstname) ;
+        $this->set_element_value('First Name', $userinfo->user_firstname) ;
 
         //  Set the last name field to what is stored in the WP profile
-        $this->set_element_value("Last Name", $userinfo->user_lastname) ;
+        $this->set_element_value('Last Name', $userinfo->user_lastname) ;
 
         //  Set the email address field to what is stored in the WP profile
-        $this->set_element_value("E-Mail Address", $userinfo->user_email) ;
+        $this->set_element_value('E-Mail Address', $userinfo->user_email) ;
 
         $geography = get_option(WPST_OPTION_GEOGRAPHY) ;
 
         if ($geography == WPST_US_ONLY)
-            $this->set_element_value("Country", ucwords(WPST_US_ONLY)) ;
+            $this->set_element_value('Country', ucwords(WPST_US_ONLY)) ;
 
         //  Need to pass the WP UserId along to the next step
-        $this->set_hidden_element_value("UserId", $this->getId()) ;
+        $this->set_hidden_element_value('UserId', $this->getId()) ;
 
         //  Need to set the action so the next step knows
         //  what to do when called from a GUIDataList.
         //
-        $this->set_hidden_element_value("_action", WPST_USERS_UPDATE_USER) ;
+        $this->set_hidden_element_value('_action', WPST_USERS_UPDATE_USER) ;
 
         $u = new SwimTeamUserProfile() ;
 
         if ($u->userProfileExistsByUserId($this->getId()))
         {
-        //printf("%s::%s<br>", basename(__FILE__), __LINE__) ;
+        //printf('%s::%s<br>', basename(__FILE__), __LINE__) ;
             $u->setUserId($this->getId()) ;
             $u->loadUserProfileByUserId() ;
 
             //  Initialize the form fields
-            $this->set_element_value("Street 1", $u->getStreet1()) ;
-            $this->set_element_value("Street 2", $u->getStreet2()) ;
-            $this->set_element_value("Street 3", $u->getStreet3()) ;
-            $this->set_element_value("City", $u->getCity()) ;
+            $this->set_element_value('Street 1', $u->getStreet1()) ;
+            $this->set_element_value('Street 2', $u->getStreet2()) ;
+            $this->set_element_value('Street 3', $u->getStreet3()) ;
+            $this->set_element_value('City', $u->getCity()) ;
 
             $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
             $this->set_element_value($label, $u->getStateOrProvince()) ;
@@ -277,16 +277,16 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
             $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
             $this->set_element_value($label, $u->getPostalCode()) ;
 
-            $this->set_element_value("Country", $u->getCountry()) ;
+            $this->set_element_value('Country', $u->getCountry()) ;
 
-            //printf("%s::%s<br>", basename(__FILE__), __LINE__) ;
+            //printf('%s::%s<br>', basename(__FILE__), __LINE__) ;
             $label = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
             $this->set_element_value($label, $u->getPrimaryPhone()) ;
-            //printf("%s::%s<br>", basename(__FILE__), __LINE__) ;
+            //printf('%s::%s<br>', basename(__FILE__), __LINE__) ;
             $label = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
             $this->set_element_value($label, $u->getSecondaryPhone()) ;
-            //printf("%s::%s<br>", basename(__FILE__), __LINE__) ;
-            $this->set_element_value("Contact Information", $u->getContactInfo()) ;
+            //printf('%s::%s<br>', basename(__FILE__), __LINE__) ;
+            $this->set_element_value('Contact Information', $u->getContactInfo()) ;
 
         }
 
@@ -306,14 +306,15 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 if (($mode == WPST_USER) ||
                     ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
@@ -338,28 +339,28 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         global $userdata ;
 
         $table = html_table($this->_width, 0, 4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("First Name"),
-            $this->element_form("First Name")) ;
+        $table->add_row($this->element_label('First Name'),
+            $this->element_form('First Name')) ;
 
-        $table->add_row($this->element_label("Last Name"),
-            $this->element_form("Last Name")) ;
+        $table->add_row($this->element_label('Last Name'),
+            $this->element_form('Last Name')) ;
 
-        $table->add_row($this->element_label("E-Mail Address"),
-            $this->element_form("E-Mail Address")) ;
+        $table->add_row($this->element_label('E-Mail Address'),
+            $this->element_form('E-Mail Address')) ;
 
-        $table->add_row($this->element_label("Street 1"),
-            $this->element_form("Street 1")) ;
+        $table->add_row($this->element_label('Street 1'),
+            $this->element_form('Street 1')) ;
 
-        $table->add_row($this->element_label("Street 2"),
-            $this->element_form("Street 2")) ;
+        $table->add_row($this->element_label('Street 2'),
+            $this->element_form('Street 2')) ;
 
-        $table->add_row($this->element_label("Street 3"),
-            $this->element_form("Street 3")) ;
+        $table->add_row($this->element_label('Street 3'),
+            $this->element_form('Street 3')) ;
 
-        $table->add_row($this->element_label("City"),
-            $this->element_form("City")) ;
+        $table->add_row($this->element_label('City'),
+            $this->element_form('City')) ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
 
@@ -371,8 +372,8 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $table->add_row($this->element_label($label),
             $this->element_form($label)) ;
 
-        $table->add_row($this->element_label("Country"),
-            $this->element_form("Country")) ;
+        $table->add_row($this->element_label('Country'),
+            $this->element_form('Country')) ;
 
         $label = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
         $table->add_row($this->element_label($label),
@@ -382,8 +383,8 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $table->add_row($this->element_label($label),
             $this->element_form($label)) ;
 
-        $table->add_row($this->element_label("Contact Information"),
-            $this->element_form("Contact Information")) ;
+        $table->add_row($this->element_label('Contact Information'),
+            $this->element_form('Contact Information')) ;
 
         //  Show optional fields if they are enabled
  
@@ -399,14 +400,15 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
                 {
@@ -438,8 +440,8 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
 
         if ($p == $s)
         {
-            $this->add_error($plabel, sprintf("%s is the same as the %s.", $plabel, $slabel)) ;
-            $this->add_error($slabel, sprintf("%s is the same as the %s.", $slabel, $plabel)) ;
+            $this->add_error($plabel, sprintf('%s is the same as the %s.', $plabel, $slabel)) ;
+            $this->add_error($slabel, sprintf('%s is the same as the %s.', $slabel, $plabel)) ;
             $valid = false ;
         }
         
@@ -457,12 +459,12 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         global $userdata ;
 
         $u = new SwimTeamUserProfile() ;
-        $u->setUserId($this->get_hidden_element_value("UserId")) ;
-        $u->setStreet1($this->get_element_value("Street 1")) ;
-        $u->setStreet2($this->get_element_value("Street 2")) ;
-        $u->setStreet3($this->get_element_value("Street 3")) ;
-        $u->setCity($this->get_element_value("City")) ;
-        $u->setCity($this->get_element_value("City")) ;
+        $u->setUserId($this->get_hidden_element_value('UserId')) ;
+        $u->setStreet1($this->get_element_value('Street 1')) ;
+        $u->setStreet2($this->get_element_value('Street 2')) ;
+        $u->setStreet3($this->get_element_value('Street 3')) ;
+        $u->setCity($this->get_element_value('City')) ;
+        $u->setCity($this->get_element_value('City')) ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
         $u->setStateOrProvince($this->get_element_value($label)) ;
@@ -475,13 +477,13 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         if ($geography == WPST_US_ONLY)
             $u->setCountry(ucwords(WPST_US_ONLY)) ;
         else
-            $u->setCountry($this->get_element_value("Country")) ;
+            $u->setCountry($this->get_element_value('Country')) ;
 
         $label = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
         $u->setPrimaryPhone($this->get_element_value($label)) ;
         $label = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
         $u->setSecondaryPhone($this->get_element_value($label)) ;
-        $u->setContactInfo($this->get_element_value("Contact Information")) ;
+        $u->setContactInfo($this->get_element_value('Contact Information')) ;
 
         //  How many user options does this configuration support?
 
@@ -495,11 +497,12 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $mconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_MODE") ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $mconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_MODE') ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 $mode = get_option($mconst) ;
                 $label = get_option($lconst) ;
@@ -516,8 +519,8 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         //  Update the User Meta Data table with the first and last names
         $first = $this->get_element_value('First Name') ; 
         $last = $this->get_element_value('Last Name') ; 
-        $success |= update_user_meta($u->getUserId(), "first_name", $first) ;
-        $success |= update_user_meta($u->getUserId(), "last_name", $last) ;
+        $success |= update_user_meta($u->getUserId(), 'first_name', $first) ;
+        $success |= update_user_meta($u->getUserId(), 'last_name', $last) ;
 
         //  Update the Display Name in the WordPress user table
         $ID = $u->getUserId() ;
@@ -530,15 +533,15 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         if ($success) 
         {
             //$this->setId($success) ;
-            $this->set_action_message("Swim Team profile successfully updated.") ;
+            $this->set_action_message('Swim Team profile successfully updated.') ;
         }
         else if ($success === null)
         {
-            $this->set_action_message("Swim Team profile was not successfully updated.") ;
+            $this->set_action_message('Swim Team profile was not successfully updated.') ;
         }
         else
         {
-            $this->set_action_message("No changes, Swim Team profile was not updated.") ;
+            $this->set_action_message('No changes, Swim Team profile was not updated.') ;
         }
 
         //  Force success otherwise the form will be displayed again.

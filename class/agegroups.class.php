@@ -658,16 +658,16 @@ class SwimTeamAgeGroupsAdminGUIDataList extends SwimTeamAgeGroupsGUIDataList
      * Property to store the possible actions - used to build action buttons
      */
     var $__normal_actions = array(
-         "add" => WPST_AGT_ADD_AGE_GROUP
-        ,"update" => WPST_AGT_UPDATE_AGE_GROUP
-        ,"delete" => WPST_AGT_DELETE_AGE_GROUP
+         WPST_ACTION_ADD => WPST_ACTION_ADD
+        ,WPST_ACTION_UPDATE => WPST_ACTION_UPDATE
+        ,WPST_ACTION_DELETE => WPST_ACTION_DELETE
     ) ;
 
     /**
      * Property to store the possible actions - used to build action buttons
      */
     var $__empty_actions = array(
-         "add" => WPST_AGT_ADD_AGE_GROUP
+         WPST_ACTION_ADD => WPST_ACTION_ADD
     ) ;
 
     /**
@@ -738,29 +738,23 @@ class SwimTeamAgeGroupsAdminGUIDataList extends SwimTeamAgeGroupsGUIDataList
      *
      * @return container - container holding action bar content
      */
-    function actionbar_cell()
+    function actionbar_cell($actions = null)
     {
         //  Add an ActionBar button based on the action the page
         //  was called with.
 
         $c = container() ;
 
-        foreach($this->__normal_actions as $key => $button)
-        {
-            //$b = $this->action_button($button, $_SERVER['REQUEST_URI']) ;
+        if (is_null($actions)) $actions = $this->__normal_actions ;
 
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
+        foreach($actions as $key => $action)
+            $actions[$action] = $action ;
 
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
+        $lb = $this->action_select('_action', $actions,
+            '', false, array('style' => 'width: 150px; margin-right: 10px;'),
+            $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']) ;
+
+        $c->add($lb) ;
 
         return $c ;
     }
@@ -772,29 +766,7 @@ class SwimTeamAgeGroupsAdminGUIDataList extends SwimTeamAgeGroupsGUIDataList
      */
     function empty_datalist_actionbar_cell()
     {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        foreach($this->__empty_actions as $key => $button)
-        {
-            //$b = $this->action_button($button, $_SERVER['REQUEST_URI']) ;
-
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
-
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
-
-        return $c ;
+        return $this->actionbar_cell($this->__empty_actions) ;
     }
 }
 

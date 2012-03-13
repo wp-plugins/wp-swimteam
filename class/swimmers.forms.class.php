@@ -59,61 +59,6 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
     }
 
     /**
-     * Get the array of contact names and ID value pairs
-     *
-     * @return mixed - array of contact names and ID value pairs
-     */
-    function _contactSelections($allowNone = false)
-    {
-        global $wpdb ;
-
-        $db = new SwimTeamDBI() ;
-
-        //  Retrieve the list of valid Wordpress User unique IDs
- 
-        $db->setQuery(sprintf('SELECT %susers.ID AS id FROM %susers',
-            $wpdb->prefix, $wpdb->prefix)) ;
-        $db->runSelectQuery() ;
-
-        $idList = $db->getQueryResults();
-
-        //  Construct a list of ID building the array
-        //  key based on the user's Wordpress meta data.
-
-        $dataList = array() ;
-
-        foreach ($idList as $id)
-        {
-            $u = get_userdata($id['id']) ;
-
-            if (array_key_exists('last_name', get_object_vars($u)))
-                $last = $u->last_name ;
-            else
-                $last = strtoupper(WPST_NA) ;
-
-            if (array_key_exists('first_name', get_object_vars($u)))
-                $first = $u->first_name ;
-            else
-                $first = strtoupper(WPST_NA) ;
-
-            $k = $last . ', ' . $first . ' (' . $u->user_login . ')' ;
-
-            $dataList[$k] = $id['id'] ;
-        }
-
-        //  Sort the datalist based on the contructed keys
- 
-        ksort($dataList) ;
-
-        //  Allow a "none" selection?
- 
-        if ($allowNone)
-            $dataList = array_merge(array(__('None') => WPST_NULL_ID), $dataList) ;
-
-        return $dataList ;
-    }
-
-    /**
      * Get the array of gender key and value pairs
      *
      * @return mixed - array of gender key value pairs
@@ -214,22 +159,20 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
         $this->add_element($dob) ;
 
         //  Contact1 field
-        $contact1 = new FEListBox('Primary Contact', true, '250px') ;
-        $contact1->set_list_data($this->_contactSelections()) ;
+
+        $contact1 = new FEWPUserListBox('Primary Contact', false, "250px") ;
         $contact1->set_readonly($disabled_field) ;
 
         $this->add_element($contact1) ;
 
         //  Contact2 field
-        $contact2 = new FEListBox('Secondary Contact', true, '250px') ;
-        $contact2->set_list_data($this->_contactSelections(true)) ;
+        $contact2 = new FEWPUserListBox('Secondary Contact', false, "250px") ;
         $contact2->set_readonly($disabled_field) ;
 
         $this->add_element($contact2) ;
 
         //  Swimmer WP Id field
-        $swmrWpId = new FEListBox('Web Site Id', false, '250px') ;
-        $swmrWpId->set_list_data($this->_contactSelections(true)) ;
+        $swmrWpId = new FEWPUserListBox('Web Site Id', false, "250px") ;
         $swmrWpId->set_readonly($disabled_field) ;
 
         $this->add_element($swmrWpId) ;
@@ -259,63 +202,66 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
+            if (empty($mode)) $mode = WPST_DISABLED ;
+
             if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
             {
-            switch (get_option($oconst))
-            {
-                case WPST_REQUIRED:
-                    $oe[$oc] = new FEText($label, !$disabled_field, '250px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                switch (get_option($oconst))
+                {
+                    case WPST_REQUIRED:
+                        $oe[$oc] = new FEText($label, !$disabled_field, '250px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_OPTIONAL:
-                    $oe[$oc] = new FEText($label, false, '250px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_OPTIONAL:
+                        $oe[$oc] = new FEText($label, false, '250px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_EMAIL_OPTIONAL:
-                    $oe[$oc] = new FEEmail($label, false, '250px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_EMAIL_OPTIONAL:
+                        $oe[$oc] = new FEEmail($label, false, '250px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_EMAIL_REQUIRED:
-                    $oe[$oc] = new FEEmail($label, !$disabled_field, '250px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_EMAIL_REQUIRED:
+                        $oe[$oc] = new FEEmail($label, !$disabled_field, '250px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_URL_OPTIONAL:
-                    $oe[$oc] = new FEUrl($label, false, '250px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_URL_OPTIONAL:
+                        $oe[$oc] = new FEUrl($label, false, '250px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_URL_REQUIRED:
-                    $oe[$oc] = new FEUrl($label, !$disabled_field, '250px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_URL_REQUIRED:
+                        $oe[$oc] = new FEUrl($label, !$disabled_field, '250px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_YES_NO:
-                case WPST_NO_YES:
-                    $oe[$oc] = new FEYesNoListBox($label, !$disabled_field, '75px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_YES_NO:
+                    case WPST_NO_YES:
+                        $oe[$oc] = new FEYesNoListBox($label, !$disabled_field, '75px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_CLOTHING_SIZE:
-                    $oe[$oc] = new FEClothingSizeListBox($label, !$disabled_field, '150px') ;
-                    $oe[$oc]->set_readonly($disabled_field) ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_CLOTHING_SIZE:
+                        $oe[$oc] = new FEClothingSizeListBox($label, !$disabled_field, '150px') ;
+                        $oe[$oc]->set_readonly($disabled_field) ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_DISABLED:
-                default:
-                    break ;
-            }
+                    case WPST_DISABLED:
+                    case WPST_NULL_STRING:
+                    default:
+                        break ;
+                }
             }
             else
             {
@@ -386,6 +332,8 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
+
+            if (empty($mode)) $mode = WPST_DISABLED ;
 
             if (($mode == WPST_USER) ||
                 ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
@@ -494,7 +442,8 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
                 {
@@ -567,7 +516,8 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
             $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
             $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 $mode = get_option($mconst) ;
                 $label = get_option($lconst) ;
@@ -657,7 +607,8 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
             $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
             $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 $mode = get_option($mconst) ;
                 $label = get_option($lconst) ;
@@ -793,7 +744,8 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
                     $this->set_element_value($label, $swimmer->getSwimmerOption($oconst)) ;
@@ -864,7 +816,8 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
                 $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
                 $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
-                if (get_option($oconst) != WPST_DISABLED)
+                if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                    (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
                 {
                     $mode = get_option($mconst) ;
                     $label = get_option($lconst) ;
@@ -963,7 +916,8 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
             $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
             $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 $mode = get_option($mconst) ;
                 $label = get_option($lconst) ;
@@ -1693,56 +1647,57 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
             if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
             {
-            $oe[$oc . CHECKBOX_SUFFIX] = new FECheckbox($label . CHECKBOX_SUFFIX, '') ;
-            $this->add_element($oe[$oc . CHECKBOX_SUFFIX]) ;
+                $oe[$oc . CHECKBOX_SUFFIX] = new FECheckbox($label . CHECKBOX_SUFFIX, '') ;
+                $this->add_element($oe[$oc . CHECKBOX_SUFFIX]) ;
 
-            switch (get_option($oconst))
-            {
-                case WPST_REQUIRED:
-                    $oe[$oc] = new FEText($label, false, '250px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                switch (get_option($oconst))
+                {
+                    case WPST_REQUIRED:
+                        $oe[$oc] = new FEText($label, false, '250px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_OPTIONAL:
-                    $oe[$oc] = new FEText($label, false, '250px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_OPTIONAL:
+                        $oe[$oc] = new FEText($label, false, '250px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_EMAIL_OPTIONAL:
-                    $oe[$oc] = new FEEmail($label, false, '250px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_EMAIL_OPTIONAL:
+                        $oe[$oc] = new FEEmail($label, false, '250px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_EMAIL_REQUIRED:
-                    $oe[$oc] = new FEEmail($label, false, '250px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_EMAIL_REQUIRED:
+                        $oe[$oc] = new FEEmail($label, false, '250px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_URL_OPTIONAL:
-                    $oe[$oc] = new FEUrl($label, false, '250px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_URL_OPTIONAL:
+                        $oe[$oc] = new FEUrl($label, false, '250px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_URL_REQUIRED:
-                    $oe[$oc] = new FEUrl($label, false, '250px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_URL_REQUIRED:
+                        $oe[$oc] = new FEUrl($label, false, '250px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_YES_NO:
-                case WPST_NO_YES:
-                    $oe[$oc] = new FEYesNoListBox($label, false, '75px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_YES_NO:
+                    case WPST_NO_YES:
+                        $oe[$oc] = new FEYesNoListBox($label, false, '75px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_CLOTHING_SIZE:
-                    $oe[$oc] = new FEClothingSizeListBox($label, false, '150px') ;
-                    $this->add_element($oe[$oc]) ;
-                    break ;
+                    case WPST_CLOTHING_SIZE:
+                        $oe[$oc] = new FEClothingSizeListBox($label, false, '150px') ;
+                        $this->add_element($oe[$oc]) ;
+                        break ;
 
-                case WPST_DISABLED:
-                default:
-                    break ;
-            }
+                    case WPST_DISABLED:
+                    case WPST_NULL_STRING:
+                    default:
+                        break ;
+                }
             }
             else
             {
@@ -1787,9 +1742,9 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
                 $this->set_element_value($label_cb, false) ;
                 switch (get_option($oconst))
                 {
-                case WPST_URL:
-                case WPST_EMAIL:
-                case WPST_REQUIRED:
+                    case WPST_URL:
+                    case WPST_EMAIL:
+                    case WPST_REQUIRED:
                     case WPST_OPTIONAL:
                         $this->set_element_value($label, WPST_NULL_STRING) ;
                         break ;
@@ -1853,7 +1808,8 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
             $mode = get_option($mconst) ;
             $label = get_option($lconst) ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 if (($mode == WPST_USER) || ((int)$userdata->user_level >= WPST_EDITOR_PERMISSION))
                 {
@@ -1895,7 +1851,8 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
             $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
             $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 $mode = get_option($mconst) ;
                 $label = get_option($lconst) ;
@@ -1915,7 +1872,8 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
                 $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
                 $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
-                if (get_option($oconst) != WPST_DISABLED)
+                if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                    (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
                 {
                     $mode = get_option($mconst) ;
                     $label = get_option($lconst) ;
@@ -1958,7 +1916,8 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
             $mconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE') ;
             $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
-            if (get_option($oconst) != WPST_DISABLED)
+            if ((get_option($oconst, WPST_DISABLED) != WPST_DISABLED) &&
+                (get_option($oconst, WPST_DISABLED) != WPST_NULL_STRING))
             {
                 $mode = get_option($mconst) ;
                 $label = get_option($lconst) ;

@@ -124,14 +124,14 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
         {
             switch ($action)
             {
-                case WPST_AGT_ADD_AGE_GROUP:
+                case WPST_ACTION_ADD:
                     $form = new WpSwimTeamAgeGroupAddForm("Add Swim Team Age Group",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Age Group') ;
                     break ;
 
-                case WPST_AGT_UPDATE_AGE_GROUP:
+                case WPST_ACTION_UPDATE:
                     $form = new WpSwimTeamAgeGroupUpdateForm("Update Swim Team Age Group",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($agegroupid) ;
@@ -139,7 +139,7 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
                     $this->setFormInstructionsHeader('Update Age Group') ;
                     break ;
 
-                case WPST_AGT_DELETE_AGE_GROUP:
+                case WPST_ACTION_DELETE:
                     $form = new WpSwimTeamAgeGroupDeleteForm("Delete Swim Team Age Group",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($agegroupid) ;

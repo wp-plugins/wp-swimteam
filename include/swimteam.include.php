@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 663 $
+ * @version $Revision: 697 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -143,6 +143,7 @@ define('WPST_ACTION_OPT_OUT', 'Opt Out') ;
 define('WPST_ACTION_EVENTS', 'Events') ;
 define('WPST_ACTION_EVENTS_LOAD', 'Load Events') ;
 define('WPST_ACTION_EVENTS_ADD', 'Add Event') ;
+define('WPST_ACTION_EVENTS_IMPORT', 'Import Events') ;
 define('WPST_ACTION_EVENTS_PROFILE', 'Profile Event') ;
 define('WPST_ACTION_EVENTS_UPDATE', 'Update Event') ;
 define('WPST_ACTION_EVENTS_REORDER', 'Reorder Events') ;

@@ -380,8 +380,10 @@ class SwimTeamUserProfile extends SwimTeamDBI
         {
             switch (get_option($option))
             {
-                case WPST_URL:
-                case WPST_EMAIL:
+                case WPST_URL_REQUIRED:
+                case WPST_URL_OPTIONAL:
+                case WPST_EMAIL_REQUIRED:
+                case WPST_EMAIL_OPTIONAL:
                 case WPST_REQUIRED:
                 case WPST_OPTIONAL:
                     $this->__user_option[$option] = WPST_NULL_STRING ;
@@ -918,67 +920,6 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
 		}
 		return $obj;
     }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function actionbar_cell($gdl_actions = array())
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        $actions = array() ;
-
-        if (empty($gdl_actions)) $gdl_actions = $this->__normal_actions ;
-
-        foreach($gdl_actions as $key => $action)
-            $actions[$action] = $key ;
-
-        
-        $lb = $this->action_select("_action", $actions,
-            "", false, array("style" => "width: 150px; margin-right: 10px;"),
-            $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
-
-        $c->add($lb) ;
-
-        return $c ;
-    }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function empty_datalist_actionbar_cell()
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        foreach($this->__empty_actions as $key => $button)
-        {
-            //$b = $this->action_button($button, $_SERVER['REQUEST_URI']) ;
-
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
-
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
-
-        return $c ;
-    }
 }
 
 /**
@@ -1000,26 +941,6 @@ class SwimTeamUsersAdminGUIDataList extends SwimTeamUsersGUIDataList
         ,WPST_ACTION_JOBS => WPST_ACTION_JOBS
         ,WPST_ACTION_EXPORT_CSV => WPST_ACTION_EXPORT_CSV
     ) ;
-
-    /**
-     * Get admin action
-     *
-     * @return string - action to take
-     */
-    function getAdminAction()
-    {
-        return $this->__action ;
-    }
-
-    /**
-     * Set admin action
-     *
-     * @param string - action to take
-     */
-    function setAdminAction($action)
-    {
-        $this->__action = $action ;
-    }
 }
 
 /**

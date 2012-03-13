@@ -1029,6 +1029,118 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
 }
 
 /**
+ * Construct the Event Load form
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see WpSwimTeamForm
+ */
+class WpSwimMeetEventsImportForm extends WpSwimTeamFileUploadForm
+{
+    /**
+     * This method gets called after the FormElement data has
+     * passed the validation.  This enables you to validate the
+     * data against some backend mechanism, say a DB.
+     *
+     */
+    function form_backend_validation()
+    {
+        //   Need to make sure file contains meet results.
+        //
+        //   What is a results file?
+        //
+        //   -  1 A0 record
+        //   -  1 B1 record
+        //   -  1 B2 record (optional)
+        //   -  1 or more C1 records
+        //   -  1 or more C2 records
+        //   -  0 or more D0 records
+        //   -  0 or more D3 records
+        //   -  0 or more G0 records
+        //   -  0 or more E0 records
+        //   -  0 or more F0 records
+        //   -  0 or more G0 records
+        //   -  1 Z0 record
+        //
+        //  A results file can contain results for more than
+        //  one team - so what to do if that happens?
+
+        $legal_records = array("A0" => 1, "B1" => 1, "B2" => 0,
+            "C1" => 1, "C2" => 0, "D0" => 0, "D3" => 0, "G0" => 0,
+            "E0" => 0, "F0" => 0, "Z0" => 1) ;
+ 
+        $record_counts = array("A0" => 0, "B1" => 0, "B2" => 0,
+            "C1" => 0, "C2" => 0, "D0" => 0, "D3" => 0, "G0" => 0,
+            "E0" => 0, "F0" => 0, "Z0" => 0) ;
+ 
+        $file = $this->get_element("SDIF Filename") ; 
+        $fileInfo = $file->get_file_info() ; 
+
+        $lines = file($fileInfo['tmp_name']) ; 
+
+        //  Scan the records to make sure there isn't something odd in the file
+
+        $line_number = 1 ;
+
+        foreach ($lines as $line)
+        {
+            if (trim($line) == WPST_NULL_STRING) continue ;
+
+            $record_type = substr($line, 0, 2) ;
+
+            if (!array_key_exists($record_type, $legal_records))
+            {
+                $this->add_error("SDIF File", sprintf("Invalid record \"%s\" encountered in SDIF file on line %s.", $record_type, $line_number)) ;
+                return false ;
+            }
+            else
+            {
+                $record_counts[$record_type]++ ;
+            }
+
+            $line_number++ ;
+        }
+
+        //  Got this far, the file has the right records in it, do
+        //  the counts make sense?
+        
+        foreach ($record_counts as $record_type => $record_count)
+        {
+            if ($record_count < $legal_records[$record_type])
+            {
+                $this->add_error("SDIF File", sprintf("Missing required \"%s\" record(s) in SDIF file.", $record_type)) ;
+                return false ;
+            }
+        }
+
+        unset($lines) ; 
+
+	    return true ;
+    }
+
+    /**
+     * This method is called ONLY after ALL validation has
+     * passed.  This is the method that allows you to 
+     * do something with the data, say insert/update records
+     * in the DB.
+     */
+    function form_action()
+    {
+        return parent::form_action() ;
+    }
+
+    /**
+     * Overload form_content_buttons() method to have the
+     * button display "Upload" instead of the default "Save".
+     *
+     */
+    function form_content_buttons()
+    {
+        return $this->form_content_buttons_Upload_Cancel(WPST_ACTION_EVENTS_IMPORT) ;
+    }
+}
+
+/**
  * Construct the Reorder Event form
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>

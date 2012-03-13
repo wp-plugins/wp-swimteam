@@ -1865,8 +1865,8 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
 
         $this->set_file_info_table($fileInfo) ; 
 
-        $results = new SwimMeetResults() ;
-        $results->setMeetId($meet->getMeetId()) ;
+        //$results = new SwimMeetResults() ;
+        //$results->setMeetId($meet->getMeetId()) ;
 
         //  Delete the file so we don't keep a lot of stuff around. 
 

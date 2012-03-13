@@ -48,30 +48,45 @@ class SwimTeamDBI
      */
     var $_query ;
 
-   /**
-    * Property to store the results of the query
-    * assuming the query submitted was a SELECT query.
-    */
+    /**
+     * Property to store the results of the query
+     * assuming the query submitted was a SELECT query.
+     */
     var $_queryResults ;
 
-   /**
-    * Property to store the number of rows returned by
-    * a select query.
-    */
+    /**
+     * Property to store the number of rows returned by
+     * a select query.
+     */
     var $_queryCount ;
 
-   /**
-    * Property to store the ID of an INSERT query.
-    */
+    /**
+     * Property to store the ID of an INSERT query.
+     */
     var $_insertId ;
 
-   /**
-    * Mode to fetch query results through the WordPress
-    * DB class.  By default, use associative mode which
-    * constructs rows indexed by the column headers as
-    * opposed to numeric index.
-    */
+    /**
+     * Property to store the status of the WordPress Query
+     */
+    var $_wpstWpQuery ;
+
+    /**
+     * Mode to fetch query results through the WordPress
+     * DB class.  By default, use associative mode which
+     * constructs rows indexed by the column headers as
+     * opposed to numeric index.
+     */
     var $_output = ARRAY_A ;
+
+    /**
+     * Get the WordPress Query Status
+     *
+     * @return boolean - true if WordPress database error
+     */
+    function SwimTeamDBIWordPressDatabaseError()
+    {
+        return ($this->_wpstWpQuery === false) ;
+    }
 
     /**
      * Set the DB fetch mode.
@@ -129,7 +144,7 @@ class SwimTeamDBI
 
         //  Execute the query
  
-        $this->wpstdb->query($this->getQuery()) ;
+        $this->_wpstWpQuery = $this->wpstdb->query($this->getQuery()) ;
 
         $this->_insertId = $this->wpstdb->insert_id ;
 
@@ -182,7 +197,9 @@ class SwimTeamDBI
 
         //  Execute the query
  
-        $this->_affectedRows = $this->wpstdb->query($this->getQuery()) ;
+        $this->_wpstWpQuery = $this->wpstdb->query($this->getQuery()) ;
+        $this->_affectedRows = $this->_wpstWpQuery !== false ? $this->_wpstWpQuery : 0 ;
+        //$this->_affectedRows = $this->wpstdb->query($this->getQuery()) ;
 
         return $this->_affectedRows ;
     }
@@ -219,7 +236,8 @@ class SwimTeamDBI
         }
         else
         {
-            $this->setQueryCount($this->wpstdb->query($this->getQuery())) ;
+            $this->_wpstWpQuery = $this->wpstdb->query($this->getQuery()) ;
+            $this->setQueryCount($this->_wpstWpQuery !== false ? $this->_wpstWpQuery : 0) ;
         }
 
         return $this->getQueryCount() ;

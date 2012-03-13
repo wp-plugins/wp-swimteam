@@ -480,22 +480,17 @@ class SwimClubProfile extends SwimTeamProfile
 class SwimTeamSwimClubsGUIDataList extends SwimTeamGUIDataList
 {
     /**
-     * Property to store the requested action
-     */
-    var $__action ;
-
-    /**
      * Property to store the possible actions - used to build action buttons
      */
     var $__normal_actions = array(
-         "profile" => WPST_SWIMCLUBS_PROFILE_SWIMCLUB
+         WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
     ) ;
 
     /**
      * Property to store the possible actions - used to build action buttons
      */
     var $__empty_actions = array(
-         "add" => WPST_SWIMCLUBS_ADD_SWIMCLUB
+         WPST_ACTION_ADD => WPST_ACTION_ADD
     ) ;
 
     /**
@@ -619,70 +614,6 @@ class SwimTeamSwimClubsGUIDataList extends SwimTeamGUIDataList
 		}
 		return $obj;
     }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function actionbar_cell()
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        foreach($this->__normal_actions as $key => $button)
-        {
-            //$b = $this->action_button($button, $_SERVER['REQUEST_URI']) ;
-
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
-
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
-
-        return $c ;
-    }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function empty_datalist_actionbar_cell()
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        foreach($this->__empty_actions as $key => $button)
-        {
-            //$b = $this->action_button($button, $_SERVER['REQUEST_URI']) ;
-
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
-
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
-
-        return $c ;
-    }
 }
 
 /**
@@ -699,31 +630,11 @@ class SwimTeamSwimClubsAdminGUIDataList extends SwimTeamSwimClubsGUIDataList
      * Property to store the possible actions - used to build action buttons
      */
     var $__normal_actions = array(
-         "profile" => WPST_SWIMCLUBS_PROFILE_SWIMCLUB
-        ,"add" => WPST_SWIMCLUBS_ADD_SWIMCLUB
-        ,"update" => WPST_SWIMCLUBS_UPDATE_SWIMCLUB
-        //,"delete" => WPST_SWIMCLUBS_DELETE_SWIMCLUB
+         WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
+        ,WPST_ACTION_ADD => WPST_ACTION_ADD
+        ,WPST_ACTION_UPDATE => WPST_ACTION_UPDATE
+        //,WPST_ACTION_DELETE => WPST_ACTION_DELETE
     ) ;
-
-    /**
-     * Get admin action
-     *
-     * @return string - action to take
-     */
-    function getAdminAction()
-    {
-        return $this->__action ;
-    }
-
-    /**
-     * Set admin action
-     *
-     * @param string - action to take
-     */
-    function setAdminAction($action)
-    {
-        $this->__action = $action ;
-    }
 
     /**
      * This method is used to setup the options

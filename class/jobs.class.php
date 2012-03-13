@@ -714,70 +714,6 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
 		}
 		return $obj;
     }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function actionbar_cell()
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        foreach($this->__actions as $key => $button)
-        {
-            //$b = $this->action_button($button[0], $_SERVER['REQUEST_URI']) ;
-
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
-
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
-
-        return $c ;
-    }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function empty_datalist_actionbar_cell()
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        foreach($this->__empty_actions as $key => $button)
-        {
-            //$b = $this->action_button($button, $_SERVER['REQUEST_URI']) ;
-
-            /**
-             * The above line is commented out because it doesn't work
-             * under Safari.  For some reason Safari doesn't pass the value
-             * argument of the submit button via Javascript.  The below line
-             * will work as long as the intended target is the same as
-             * what is specified in the FORM's action tag.
-             */
-
-            $b = $this->action_button($button) ;
-            $b->set_tag_attribute("type", "submit") ;
-            $c->add($b) ;
-        }
-
-        return $c ;
-    }
 }
 
 /**
@@ -793,7 +729,7 @@ class SwimTeamJobsAdminGUIDataList extends SwimTeamJobsGUIDataList
     /**
      * Property to store the possible actions - used to build buttons
      */
-    var $__actions = array(
+    var $__normal_actions = array(
          WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
         ,WPST_ACTION_SIGN_UP => WPST_ACTION_SIGN_UP
         ,WPST_ACTION_ADD => WPST_ACTION_ADD
@@ -811,26 +747,6 @@ class SwimTeamJobsAdminGUIDataList extends SwimTeamJobsGUIDataList
     var $__empty_actions = array(
          WPST_ACTION_ADD => WPST_ACTION_ADD
     ) ;
-
-    /**
-     * Get admin action
-     *
-     * @return string - action to take
-     */
-    function getAdminAction()
-    {
-        return $this->__action ;
-    }
-
-    /**
-     * Set admin action
-     *
-     * @param string - action to take
-     */
-    function setAdminAction($action)
-    {
-        $this->__action = $action ;
-    }
 
     /**
      * The constructor
@@ -880,37 +796,6 @@ class SwimTeamJobsAdminGUIDataList extends SwimTeamJobsGUIDataList
 
 	  	$this->add_header_item("Status",
 	         	    "100", "jobstatus", SORTABLE, SEARCHABLE, "left") ;
-    }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function actionbar_cell()
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        $actions = array() ;
-
-        foreach($this->__actions as $key => $action)
-        {
-            $actions[$action] = $key ;
-        }
-        
-        $lb = $this->action_select("_action", $actions,
-            "", false, array("style" => "width: 150px; margin-right: 10px;"),
-            $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
-
-        //$b = $this->action_button(WPST_ACTION_EXECUTE) ;
-        //$b->set_tag_attribute("type", "submit") ;
-        //$c->add($lb, _HTML_SPACE, $b) ;
-        $c->add($lb) ;
-
-        return $c ;
     }
 }
 

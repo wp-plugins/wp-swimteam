@@ -258,6 +258,41 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
     var $__where_clause ;
 
     /**
+     * Property to store the requested action
+     */
+    var $__action = null ;
+
+    /**
+     * Property to store the possible actions - used to build action buttons
+     */
+    var $__normal_actions = array() ;
+
+    /**
+     * Property to store the possible actions - used to build action buttons
+     */
+    var $__empty_actions = array() ;
+
+    /**
+     * Get admin action
+     *
+     * @return string - action to take
+     */
+    function getAdminAction()
+    {
+        return $this->__action ;
+    }
+
+    /**
+     * Set admin action
+     *
+     * @param string - action to take
+     */
+    function setAdminAction($action)
+    {
+        $this->__action = $action ;
+    }
+
+    /**
      * The constructor
      *
      * @param string - the title of the data list
@@ -399,7 +434,7 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
      */
     function user_setup()
     {
-        user_error("SwimTeamGUIDataList::actionbar_cell() - child class " .
+        user_error("SwimTeamGUIDataList::user_setup() - child class " .
             "must override this to set the the database table.") ;
 	}
 
@@ -434,15 +469,39 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
 	}
 
     /**
-     * This function is called automatically by the DataList constructor.
-     * It must be extended by the child class to actually provide buttons
-     * which do something useful.
+     * Action Bar - build a set of Action Bar buttons
      *
+     * @return container - container holding action bar content
      */
-    function actionbar_cell()
+    function actionbar_cell($actions = null)
     {
-        user_error("SwimTeamGUIDataList::actionbar_cell() - child class " .
-            "must override this to set the the database table.") ;
+        //  Add an ActionBar button based on the action the page
+        //  was called with.
+
+        $c = container() ;
+
+        if (is_null($actions)) $actions = $this->__normal_actions ;
+
+        foreach($actions as $key => $action)
+            $actions[$action] = $action ;
+
+        $lb = $this->action_select('_action', $actions,
+            '', false, array('style' => 'width: 150px; margin-right: 10px;'),
+            $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']) ;
+
+        $c->add($lb) ;
+
+        return $c ;
+    }
+
+    /**
+     * Action Bar - build a set of Action Bar buttons
+     *
+     * @return container - container holding action bar content
+     */
+    function empty_datalist_actionbar_cell()
+    {
+        return $this->actionbar_cell($this->__empty_actions) ;
     }
 
     /**

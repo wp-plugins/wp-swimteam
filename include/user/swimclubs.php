@@ -116,7 +116,7 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
         {
             switch ($action)
             {
-                case WPST_SWIMCLUBS_PROFILE_SWIMCLUB:
+                case WPST_ACTION_PROFILE:
                     $c = container() ;
                     $profile = new SwimClubProfileInfoTable("Swim Club Profile", "700px") ;
                     $profile->setSwimClubId($swimclubid) ;
@@ -125,14 +125,14 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
 
                     break ;
 
-                case WPST_SWIMCLUBS_ADD_SWIMCLUB:
+                case WPST_ACTION_ADD:
                     $form = new WpSwimTeamSwimClubAddForm("Add Swim Club",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Swim Club') ;
                     break ;
 
-                case WPST_SWIMCLUBS_UPDATE_SWIMCLUB:
+                case WPST_ACTION_UPDATE:
                     $form = new WpSwimTeamSwimClubUpdateForm("Update Swim Club",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setSwimClubId($swimclubid) ;
@@ -140,7 +140,7 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
                     $this->setFormInstructionsHeader('Update Swim Club') ;
                     break ;
 
-                case WPST_SWIMCLUBS_DELETE_SWIMCLUB:
+                case WPST_ACTION_DELETE:
                     $form = new WpSwimTeamSwimClubDeleteForm("Delete Swim Club",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setSwimClubId($swimclubid) ;

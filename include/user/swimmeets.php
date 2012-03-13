@@ -286,10 +286,27 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     $swimmeet = new SwimMeet() ;
                     $swimmeet->loadSwimMeetByMeetId($swimmeetid) ;
                     
-                    $opponent = new SwimClubProfile() ;
-                    $opponent->loadSwimClubBySwimClubId($swimmeet->getOpponentSwimClubId()) ;
-                    $desc = sprintf("%s vs %s %s", $swimmeet->getMeetDate(),
-                        $opponent->getClubOrPoolName(), $opponent->getTeamName()) ;
+
+                    //  Handle meets without an opponent ...
+
+                    if ($swimmeet->getMeetType() === WPST_DUAL_MEET)
+                    {
+                        $opponent = new SwimClubProfile() ;
+                        $opponent->loadSwimClubBySwimClubId($swimmeet->getOpponentSwimClubId()) ;
+                    
+                        $desc = sprintf("%s vs %s %s", $swimmeet->getMeetDate(),
+                            $opponent->getClubOrPoolName(), $opponent->getTeamName()) ;
+                    }
+                    else
+                    {
+                        $desc = $swimmeet->getMeetDescription() ;
+
+                        if (!empty($desc))
+                            $desc = sprintf("%s %s", $swimmeet->getMeetDate(), $desc) ;
+                    else
+                        $desc = sprintf("%s %s", $swimmeet->getMeetDate(), ucwords($swimmeet->getMeetType())) ;
+                    }
+
                     //  Leverage the Events tab management code
 
                     require_once("events.php") ;
@@ -298,17 +315,18 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_RESULTS:
+                case WPST_ACTION_EXPORT_SDIF:
                 case WPST_ACTION_EXPORT_RESULTS:
                 case WPST_ACTION_SCRATCH_REPORT:
                 case WPST_ACTION_DETAILS:
                     $c = container() ;
-                    $c->add(sprintf("Requested action (%s) not implemented yet.", $action)) ;
+                    $c->add(html_h3(sprintf("Requested action (%s) has not been implemented yet.", $action))) ;
                     $c->add(html_br(2)) ;
                     break ;
 
                 default:
                     $c = container() ;
-                    $c->add(sprintf("Unkown action requested (%s).", $action)) ;
+                    $c->add(html_h3(sprintf("Unkown action requested (%s).", $action))) ;
                     break ;
             }
 

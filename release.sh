@@ -22,9 +22,6 @@
 SEVENZIP="C:/Program Files/7-Zip/7z.exe"
 WCREV="C:/Program Files/TortoiseSVN/bin/subWcRev.exe"
 
-MAJOR_RELEASE="1"
-MINOR_RELEASE="14"
-
 ##  Paths and defaults
 BASENAME=`basename $0`
 GBLREVNUM=""
@@ -35,7 +32,8 @@ NOEXPORT=""
 REPOS="C:/inetpub/wwwroot/wordpress/wp-content/plugins/${TARGET}"
 CYG_REPOS="`cygpath --unix ${REPOS}`"
 PLUGIN="swimteam.php"
-VERSION="include/version.include.php"
+VERSION="Version.txt"
+VERSIONINCLUDE="include/version.include.php"
 ZIPTYPE="-tzip"
 ZIPSUFFIX=".zip"
 FORCE=""
@@ -169,6 +167,16 @@ done
 ##  Major and Minor release numbers are extracted from the
 ##  Version.txt file if not specified on the command line.
 
+if [ -z "${MAJOR_RELEASE}" ]
+then
+    MAJOR_RELEASE=`grep MAJOR_RELEASE ${REPOS}/${VERSION} | cut -f2 -d'='`
+fi
+
+if [ -z "${MINOR_RELEASE}" ]
+then
+    MINOR_RELEASE=`grep MINOR_RELEASE ${REPOS}/${VERSION} | cut -f2 -d'='`
+fi
+
 ##  Does Repository exist?
 
 if [ ! -d "${REPOS}" ]
@@ -220,15 +228,15 @@ fi
 
 echo "Updating export tree with global revision number."
 "$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${PLUGIN}" "${EXPORT}/${TARGET}/${PLUGIN}"
-"$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${VERSION}" "${EXPORT}/${TARGET}/${VERSION}"
+"$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${VERSIONINCLUDE}" "${EXPORT}/${TARGET}/${VERSIONINCLUDE}"
 
 echo "Updating export tree with major revision number."
 sed -i -e "s/MAJOR_RELEASE/${MAJOR_RELEASE}/" "${EXPORT}/${TARGET}/${PLUGIN}"
-sed -i -e "s/MAJOR_RELEASE/${MAJOR_RELEASE}/" "${EXPORT}/${TARGET}/${VERSION}"
+sed -i -e "s/MAJOR_RELEASE/${MAJOR_RELEASE}/" "${EXPORT}/${TARGET}/${VERSIONINCLUDE}"
 
 echo "Updating export tree with minor revision number."
 sed -i -e "s/MINOR_RELEASE/${MINOR_RELEASE}/" "${EXPORT}/${TARGET}/${PLUGIN}"
-sed -i -e "s/MINOR_RELEASE/${MINOR_RELEASE}/" "${EXPORT}/${TARGET}/${VERSION}"
+sed -i -e "s/MINOR_RELEASE/${MINOR_RELEASE}/" "${EXPORT}/${TARGET}/${VERSIONINCLUDE}"
 
 echo "Creating Zip file."
 ZIPFILE="${EXPORT}/${TARGET}/../${TARGET}_v${MAJOR_RELEASE}.${MINOR_RELEASE}.${GBLREVNUM}${ZIPSUFFIX}"
