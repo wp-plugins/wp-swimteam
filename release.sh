@@ -228,6 +228,7 @@ fi
 
 echo "Updating export tree with global revision number."
 "$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${PLUGIN}" "${EXPORT}/${TARGET}/${PLUGIN}"
+"$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${VERSION}" "${EXPORT}/${TARGET}/${VERSION}"
 "$WCREV" "$REPOS" "${EXPORT}/${TARGET}/${VERSIONINCLUDE}" "${EXPORT}/${TARGET}/${VERSIONINCLUDE}"
 
 echo "Updating export tree with major revision number."
