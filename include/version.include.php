@@ -23,10 +23,10 @@
  * Define constants used for the plugin version number
  */
 define('WPST_MAJOR_VERSION', '1') ;
-define('WPST_MINOR_VERSION', '16') ;
-define('WPST_BUILD_NUMBER', '704') ;
+define('WPST_MINOR_VERSION', '17') ;
+define('WPST_BUILD_NUMBER', '707') ;
 define('WPST_VERSION', WPST_MAJOR_VERSION .
     '.' . WPST_MINOR_VERSION . '.' . WPST_BUILD_NUMBER) ;
-define('WPST_BUILD_TIME', '2012/03/13 17:56:04') ;
+define('WPST_BUILD_TIME', '2012/03/14 01:14:44') ;
 define('WPST_SOFTWARE_NAME', 'wp-SwimTeam') ;
 ?>

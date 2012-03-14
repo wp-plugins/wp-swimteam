@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.17 =
+* Fixed bug with unsupported action on Swimmer Tab introduced with changes to action bar in 1.16.
+
 = 1.16 =
 * Fixed another bug which caused display of "M/A" instead of first and/or last name in some instances.  Propogated this fix to a lower level class and eliminated duplicate code across numerous classes.
 * Fixed inconsistencies across UI where some tabs had actions as drop downs and others had buttons.  All tabs now use the drop down UI model.

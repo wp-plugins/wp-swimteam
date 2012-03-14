@@ -290,7 +290,7 @@ class SwimmersTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_REGISTER:
-                //case WPST_ACTION_REGISTER . " (" . WPST_SEASON . ")":
+                case WPST_ACTION_REGISTER . " (" . WPST_SEASON . ")":
                     $form = new WpSwimTeamSwimmerRegisterForm("Register Swimmer",
                         $_SERVER['HTTP_REFERER'], 500) ;
                     $form->setId($swimmerid) ;
@@ -299,7 +299,7 @@ class SwimmersTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_UNREGISTER:
-                //case WPST_ACTION_UNREGISTER . " (" . WPST_SEASON . ")":
+                case WPST_ACTION_UNREGISTER . " (" . WPST_SEASON . ")":
                     $form = new WpSwimTeamSwimmerUnregisterForm("Unregister Swimmer",
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($swimmerid) ;
@@ -323,7 +323,7 @@ class SwimmersTabContainer extends SwimTeamTabContainer
                     break ;
 
                  case WPST_ACTION_OPT_IN:
-                 //case get_option(WPST_OPTION_OPT_IN_LABEL) . " (" . WPST_SWIMMEET . ")":
+                 case get_option(WPST_OPTION_OPT_IN_LABEL) . " (" . WPST_SWIMMEET . ")":
                     $optin = ucwords(get_option(WPST_OPTION_OPT_IN_LABEL)) ;
                     $form = $this->__getForm("Swimmer:  " .
                         $optin, $_SERVER['HTTP_REFERER'], 600) ;
@@ -334,7 +334,7 @@ class SwimmersTabContainer extends SwimTeamTabContainer
                     break ;
 
                  case WPST_ACTION_OPT_OUT:
-                 //case get_option(WPST_OPTION_OPT_OUT_LABEL) . " (" . WPST_SWIMMEET . ")":
+                 case get_option(WPST_OPTION_OPT_OUT_LABEL) . " (" . WPST_SWIMMEET . ")":
                     $optout = ucwords(get_option(WPST_OPTION_OPT_OUT_LABEL)) ;
                     $form = $this->__getForm("Swimmer:  " .
                         $optout, $_SERVER['HTTP_REFERER'], 600) ;
