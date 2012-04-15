@@ -64,6 +64,13 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.18 =
+* Fixed bug which prevented users from signing up for jobs.
+* Phase 1 of overhauled Event Model is complete.  The new Event Model introduces the concept of Event Groups.  Events are now defined in the context of an Event Group.  Swim meets currently do not have any connection to Events but that will chance in a release fairly shortly in Phase 2.
+* Added ability to import events from a Hy-tek Events File (.hyv) into an Event Group.
+* Added ability to delete all events from an Event Group.
+* Changed Google Maps API Key from required to optional.  If the API key hasn't been entered, wp-SwimTeam will now gracefully work without it.
+
 = 1.17 =
 * Fixed bug with unsupported action on Swimmer Tab introduced with changes to action bar in 1.16.
 

@@ -131,6 +131,11 @@ class SwimTeamOptions extends SwimTeamDBI
     var $__gdl_rows_to_display ;
 
     /**
+     * enable google maps property
+     */
+    var $__enable_google_maps ;
+
+    /**
      * google maps api key property
      */
     var $__google_api_key ;
@@ -723,6 +728,26 @@ class SwimTeamOptions extends SwimTeamDBI
     function setGDLRowsToDisplay($rows)
     {
         $this->__gdl_rows_to_display = $rows ;
+    }
+
+    /**
+     * Get the google maps status
+     *
+     * @return - string - status google maps
+     */
+    function getEnableGoogleMaps()
+    {
+        return ($this->__enable_google_maps) ;
+    }
+
+    /**
+     * Set the google maps status
+     *
+     * @param - string - status google maps
+     */
+    function setEnableGoogleMaps($status)
+    {
+        $this->__enable_google_maps = $status ;
     }
 
     /**
@@ -1418,8 +1443,22 @@ class SwimTeamOptions extends SwimTeamDBI
         }
         else
         {
-            $this->setGoogleAPIKey(WPST_DEFAULT_GDL_ROWS_TO_DISPLAY) ;
+            $this->setGDLRowsToDisplay(WPST_DEFAULT_GDL_ROWS_TO_DISPLAY) ;
             update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, WPST_DEFAULT_GDL_ROWS_TO_DISPLAY) ;
+        }
+
+        //  Enable Google Maps
+        $option = get_option(WPST_OPTION_ENABLE_GOOGLE_MAPS) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setEnableGoogleMaps($option) ;
+        }
+        else
+        {
+            $this->setEnableGoogleMaps(WPST_DEFAULT_ENABLE_GOOGLE_MAPS) ;
+            update_option(WPST_OPTION_ENABLE_GOOGLE_MAPS, WPST_DEFAULT_ENABLE_GOOGLE_MAPS) ;
         }
 
         //  Google API Key
@@ -1925,6 +1964,7 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE, $this->getSwimmerLabelFormatCode()) ;
         update_option(WPST_OPTION_AUTO_REGISTER, $this->getAutoRegister()) ;
         update_option(WPST_OPTION_REGISTRATION_SYSTEM, $this->getRegistrationSystem()) ;
+        update_option(WPST_OPTION_ENABLE_GOOGLE_MAPS, $this->getEnableGoogleMaps()) ;
         update_option(WPST_OPTION_GOOGLE_API_KEY, $this->getGoogleAPIKey()) ;
         update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, $this->getGDLRowsToDisplay()) ;
         update_option(WPST_OPTION_LOGIN_REDIRECT, $this->getLoginRedirectAction()) ;

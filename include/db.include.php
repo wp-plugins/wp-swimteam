@@ -64,7 +64,7 @@ define('WPST_DB_PREFIX', WP_DB_PREFIX . 'st_') ;
 /**
  * Database version - stored as a WP option
  */
-define('WPST_DB_VERSION', '0.85') ;
+define('WPST_DB_VERSION', '0.86') ;
 define('WPST_DB_OPTION', 'swimteam_db_version') ;
 
 ?>

@@ -16,10 +16,10 @@
  *
  */
 
-require_once("db.class.php") ;
-require_once("table.class.php") ;
-require_once("agegroups.include.php") ;
-require_once("widgets.class.php") ;
+require_once('db.class.php') ;
+require_once('table.class.php') ;
+require_once('agegroups.include.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the agegroups
@@ -205,8 +205,8 @@ class SwimTeamAgeGroup extends SwimTeamDBI
     {
 	    //  Is age group already in the database?
 
-        $query = sprintf("SELECT id FROM %s WHERE 
-            minage = \"%s\" AND maxage=\"%s\" AND gender=\"%s\"",
+        $query = sprintf('SELECT id FROM %s WHERE 
+            minage = "%s" AND maxage="%s" AND gender="%s"',
             WPST_AGE_GROUP_TABLE, $this->getMinAge(), $this->getMaxAge(),
             $this->getGender()) ;
 
@@ -234,8 +234,33 @@ class SwimTeamAgeGroup extends SwimTeamDBI
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT id FROM %s WHERE id = \"%s\"",
+        $query = sprintf('SELECT id FROM %s WHERE id = "%s"',
             WPST_AGE_GROUP_TABLE, $id) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery(false) ;
+
+	    //  Make sure id doesn't exist
+
+        $idExists = (bool)($this->getQueryCount() > 0) ;
+
+	    return $idExists ;
+    }
+
+    /**
+     *
+     * Check if an age group already exists in the database for the
+     * min age, max age, and gender and return a boolean accordingly.
+     *
+     * @return - boolean - existance of age group
+     */
+    function ageGroupExistsByMinAgeMaxAgeAndGender()
+    {
+	    //  Is id already in the database?
+
+        $query = sprintf('SELECT id FROM %s WHERE minage="%s" AND
+            maxage="%s" AND gender="%s"', WPST_AGE_GROUP_TABLE,
+            $this->getMinAge(), $this->getMaxAge(), $this->getGender()) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery(false) ;
@@ -270,8 +295,8 @@ class SwimTeamAgeGroup extends SwimTeamDBI
 
 	        //  Is prefix already in the database?
 
-            $query = sprintf("SELECT id FROM %s WHERE
-                swimmerlabelprefix = \"%s\"", WPST_AGE_GROUP_TABLE, $prefix) ;
+            $query = sprintf('SELECT id FROM %s WHERE
+                swimmerlabelprefix = "%s"', WPST_AGE_GROUP_TABLE, $prefix) ;
 
             $this->setQuery($query) ;
             $this->runSelectQuery(false) ;
@@ -301,12 +326,12 @@ class SwimTeamAgeGroup extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET 
-                minage=\"%s\",
-                maxage=\"%s\",
-                gender=\"%s\",
-                swimmerlabelprefix=\"%s\",
-                registrationfee=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET 
+                minage="%s",
+                maxage="%s",
+                gender="%s",
+                swimmerlabelprefix="%s",
+                registrationfee="%s"',
                 WPST_AGE_GROUP_TABLE,
                 $this->getMinAge(),
                 $this->getMaxAge(),
@@ -335,13 +360,13 @@ class SwimTeamAgeGroup extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("UPDATE %s SET
-                minage=\"%s\",
-                maxage=\"%s\",
-                gender=\"%s\",
-                swimmerlabelprefix=\"%s\",
-                registrationfee=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                minage="%s",
+                maxage="%s",
+                gender="%s",
+                swimmerlabelprefix="%s",
+                registrationfee="%s"
+                WHERE id="%s"',
                 WPST_AGE_GROUP_TABLE,
                 $this->getMinAge(),
                 $this->getMaxAge(),
@@ -357,7 +382,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
         }
         else
         {
-            wp_die("Something is wrong, age group not updated.") ;
+            wp_die('Something is wrong, age group not updated.') ;
             $success = false ;
         }
 
@@ -378,10 +403,8 @@ class SwimTeamAgeGroup extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("DELETE FROM %s
-                WHERE id=\"%s\"",
-                WPST_AGE_GROUP_TABLE,
-                $this->getId()
+            $query = sprintf('DELETE FROM %s WHERE id="%s"',
+                WPST_AGE_GROUP_TABLE, $this->getId()
             ) ;
 
             $this->setQuery($query) ;
@@ -411,7 +434,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
         //  Make sure it is a legal age group id
         if ($this->ageGroupExistById())
         {
-            $query = sprintf("SELECT * FROM %s WHERE id = \"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE id = "%s"',
                 WPST_AGE_GROUP_TABLE, $id) ;
 
             $this->setQuery($query) ;
@@ -440,14 +463,14 @@ class SwimTeamAgeGroup extends SwimTeamDBI
     function getAgeGroupText()
     {
         if ($this->getMinAge() == get_option(WPST_OPTION_MIN_AGE))
-            $text = sprintf("%s %s & Under", $this->getGender(), $this->getMaxAge()) ;
+            $text = sprintf('%s %s & Under', $this->getGender(), $this->getMaxAge()) ;
         else
-            $text = sprintf("%s %s-%s", $this->getGender(), $this->getMinAge(), $this->getMaxAge()) ;
+            $text = sprintf('%s %s-%s', $this->getGender(), $this->getMinAge(), $this->getMaxAge()) ;
 
-        $text = preg_replace("/" . WPST_GENDER_FEMALE . "s?/",
-            get_option(WPST_OPTION_GENDER_LABEL_FEMALE) . "s", $text) ;
-        $text = preg_replace("/" . WPST_GENDER_MALE . "s?/",
-            get_option(WPST_OPTION_GENDER_LABEL_MALE) . "s", $text) ;
+        $text = preg_replace('/' . WPST_GENDER_FEMALE . 's?/',
+            get_option(WPST_OPTION_GENDER_LABEL_FEMALE) . 's', $text) ;
+        $text = preg_replace('/' . WPST_GENDER_MALE . 's?/',
+            get_option(WPST_OPTION_GENDER_LABEL_MALE) . 's', $text) ;
 
         $text = ucfirst($text) ;
 
@@ -463,8 +486,8 @@ class SwimTeamAgeGroup extends SwimTeamDBI
      */
     function getAgeGroupIdByAgeAndGender($age, $gender, $setid = false)
     {
-        $query = sprintf("SELECT id FROM %s WHERE %s >= minage
-            AND %s <= maxage AND gender = '%s'", WPST_AGE_GROUP_TABLE,
+        $query = sprintf('SELECT id FROM %s WHERE "%s" >= minage
+            AND "%s" <= maxage AND gender="%s"', WPST_AGE_GROUP_TABLE,
             $age, $age, $gender) ;
 
         $this->setQuery($query) ;
@@ -474,7 +497,36 @@ class SwimTeamAgeGroup extends SwimTeamDBI
 
         //  Only return a unique result
 
-        $id = ($this->getQueryCount() == 1) ? $result["id"] : null ;
+        $id = ($this->getQueryCount() == 1) ? $result['id'] : null ;
+
+        if ($setid)
+            $this->setId($id) ;
+
+        return $id ;
+    }
+
+    /**
+     * Get age group by min age, max age and gender
+     *
+     * @param - int - min age to find age group
+     * @param - int - max age to find age group
+     * @param - string - gender
+     * @return - int - age group id
+     */
+    function getAgeGroupIdByMinAgeMaxAgeAndGender($minage, $maxage, $gender, $setid = false)
+    {
+        $query = sprintf('SELECT id FROM %s WHERE minage="%s"
+            AND maxage="%s" AND gender = "%s"', WPST_AGE_GROUP_TABLE,
+            $minage, $maxage, $gender) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        $result = $this->getQueryResult() ;
+
+        //  Only return a unique result
+
+        $id = ($this->getQueryCount() == 1) ? $result['id'] : null ;
 
         if ($setid)
             $this->setId($id) ;
@@ -491,7 +543,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
     {
         //  Select the records for the age groups
 
-        $query = sprintf("SELECT id FROM %s", WPST_AGE_GROUP_TABLE) ;
+        $query = sprintf('SELECT id FROM %s', WPST_AGE_GROUP_TABLE) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -522,7 +574,7 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimTeamAgeGroupsGUIDataList($title, $width = "100%",
+    function SwimTeamAgeGroupsGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_AGT_DEFAULT_COLUMNS,
         $tables = WPST_AGT_DEFAULT_TABLES,
@@ -554,26 +606,26 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
 		//add the columns in the display that you want to view.
 		//The API is :
 		//Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-	  	$this->add_header_item("Gender",
-	         	    "300", "gender", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Gender',
+	         	    '300', 'gender', SORTABLE, SEARCHABLE, 'left') ;
 
-		$this->add_header_item("Minimum Age",
-	       	    "200", "minage", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Minimum Age',
+	       	    '200', 'minage', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Maximum Age",
-	         	    "200", "maxage", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Maximum Age',
+	         	    '200', 'maxage', SORTABLE, SEARCHABLE, 'left') ;
 
         if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
             WPST_AGE_GROUP_PREFIX_NUMERIC) ||
             (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
             WPST_AGE_GROUP_PREFIX_WPST_ID))
         {
-	  	    $this->add_header_item("Swimmer Label Prefix",
-	         	    "200", "swimmerlabelprefix", SORTABLE, SEARCHABLE, "left") ;
+	  	    $this->add_header_item('Swimmer Label Prefix',
+	         	    '200', 'swimmerlabelprefix', SORTABLE, SEARCHABLE, 'left') ;
         }
 
-	  	$this->add_header_item("Registration Fee",
-	         	    "200", "registrationfee", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Registration Fee',
+	         	    '200', 'registrationfee', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
@@ -604,13 +656,13 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
 		switch ($col_name)
         {
                 /*
-            case "Updated" :
-                $obj = strftime("%Y-%m-%d @ %T", (int)$row_data["updated"]) ;
+            case 'Updated' :
+                $obj = strftime('%Y-%m-%d @ %T', (int)$row_data['updated']) ;
                 break ;
                 */
 
-            case "Gender" :
-                switch ($row_data["gender"])
+            case 'Gender' :
+                switch ($row_data['gender'])
                 {
                     case WPST_GENDER_MALE:
                         $obj = ucfirst(get_option(WPST_OPTION_GENDER_LABEL_MALE)) ;
@@ -621,14 +673,14 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
                         break ;
 
                     default:
-                        $obj = "Error - no gender" ;
+                        $obj = 'Error - no gender' ;
                         break ;
                 }
                 break ;
 
-            case "Registration Fee" :
+            case 'Registration Fee' :
                 $obj = get_option(WPST_OPTION_REG_FEE_CURRENCY_LABEL) .
-                    $row_data["registrationfee"] ;
+                    $row_data['registrationfee'] ;
                 break ;
 
 		    default:
@@ -719,7 +771,7 @@ class SwimTeamAgeGroupsAdminGUIDataList extends SwimTeamAgeGroupsGUIDataList
 
         //  The unique item is the second column.
 
-	    $this->add_action_column('radio', 'FIRST', "id") ;
+	    $this->add_action_column('radio', 'FIRST', 'id') ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -787,7 +839,7 @@ class SwimTeamAgeGroupInfoTable extends SwimTeamInfoTable
      */
     function __buildSelectClause()
     {
-        $cutoffdate = sprintf("%s-%02s-%02s", date("Y"), 
+        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
             get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
             get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
 
@@ -804,7 +856,7 @@ class SwimTeamAgeGroupInfoTable extends SwimTeamInfoTable
      */
     function __buildWhereClause()
     {
-        $cutoffdate = sprintf("%s-%02s-%02s", date("Y"), 
+        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
             get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
             get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
 
@@ -836,7 +888,7 @@ class SwimTeamAgeGroupInfoTable extends SwimTeamInfoTable
         //  Count the number of swimmers in each age group
  
         $a = new SwimTeamDBI() ;
-        $a->setQuery(sprintf("SELECT %s FROM %s WHERE %s",
+        $a->setQuery(sprintf('SELECT %s FROM %s WHERE %s',
             $this->__buildSelectClause(), WPST_ROSTER_COUNT_TABLES,
             $this->__buildWhereClause())) ;
         $a->runSelectQuery() ;
@@ -850,23 +902,23 @@ class SwimTeamAgeGroupInfoTable extends SwimTeamInfoTable
  
         $a = new SwimTeamAgeGroup() ;
 
-        $a->setQuery(sprintf("SELECT id FROM %s
-            ORDER BY minage, maxage, gender", WPST_AGE_GROUP_TABLE)) ;
+        $a->setQuery(sprintf('SELECT id FROM %s
+            ORDER BY minage, maxage, gender', WPST_AGE_GROUP_TABLE)) ;
         $a->runSelectQuery() ;
 
         //  Make sure we have some data
 
         if ($a->getQueryCount() > 0)
         {
-            $totals = array(__(ucfirst("swimmers")) => 0) ;
+            $totals = array(__(ucfirst('swimmers')) => 0) ;
 
-            $this->add_row(html_b(__("Age Group")), html_b(__("Swimmers"))) ;
+            $this->add_row(html_b(__('Age Group')), html_b(__('Swimmers'))) ;
 
             $agegroups = $a->getQueryResults() ;
 
             foreach ($agegroups as $agegroup)
             {
-                $a->setId($agegroup["id"]) ;
+                $a->setId($agegroup['id']) ;
                 $a->loadAgeGroupById() ;
 
                 $agegroupcount = 0 ;
@@ -874,33 +926,33 @@ class SwimTeamAgeGroupInfoTable extends SwimTeamInfoTable
                 for ($i = 0 ; $i < count($agc) ; $i++)
                 {
 
-                    if ($agc[$i]["agegroup"] == $a->getGender() . " " . $a->getMinAge() . " - " . $a->getMaxAge())
+                    if ($agc[$i]['agegroup'] == $a->getGender() . ' ' . $a->getMinAge() . ' - ' . $a->getMaxAge())
                     {
-                        $agegroupcount = $agc[$i]["agegroupcount"] ;
+                        $agegroupcount = $agc[$i]['agegroupcount'] ;
                         break ;
                     }
                 }
 
-                $this->add_row(__(ucfirst($a->getGenderLabel() . "s")) . " " .
-                    $a->getMinAge() . " - " . $a->getMaxAge(),
-                   sprintf("%s", $agegroupcount)) ;
+                $this->add_row(__(ucfirst($a->getGenderLabel() . 's')) . ' ' .
+                    $a->getMinAge() . ' - ' . $a->getMaxAge(),
+                   sprintf('%s', $agegroupcount)) ;
 
                 //  Keep a running total of swimmers by gender and total count
                 
-                if (array_key_exists(__(ucfirst($a->getGenderLabel() . "s")), $totals))
-                    $totals[__(ucfirst($a->getGenderLabel() . "s"))] += $agegroupcount ;
+                if (array_key_exists(__(ucfirst($a->getGenderLabel() . 's')), $totals))
+                    $totals[__(ucfirst($a->getGenderLabel() . 's'))] += $agegroupcount ;
                 else
-                    $totals[__(ucfirst($a->getGenderLabel() . "s"))] = $agegroupcount ;
+                    $totals[__(ucfirst($a->getGenderLabel() . 's'))] = $agegroupcount ;
 
-                $totals[__(ucfirst("swimmers"))] += $agegroupcount ;
+                $totals[__(ucfirst('swimmers'))] += $agegroupcount ;
             }
 
             foreach ($totals as $key => $total)
-                $this->add_row(html_b(__("Total " . $key)), html_b($total)) ;
+                $this->add_row(html_b(__('Total ' . $key)), html_b($total)) ;
         }
         else
         {
-            $this->add_row(html_b("No age groups defined.")) ;
+            $this->add_row(html_b('No age groups defined.')) ;
         }
     }
 }

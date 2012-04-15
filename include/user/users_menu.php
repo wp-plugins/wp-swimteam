@@ -16,7 +16,7 @@
  *
  */
 
-require_once("widgets.class.php") ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the Users Page
@@ -39,10 +39,10 @@ class UsersMenuTabContainer extends Container
         //  the page was reached.
         //
         //  No matter what the container content is, it must be
-        //  enclosed in a DIV with a class of "wrap" to fit in
+        //  enclosed in a DIV with a class of 'wrap' to fit in
         //  the Wordpress admin page structure.
  
-        $div = html_div("wrap") ;
+        $div = html_div('wrap') ;
 
         //  If the wp-SwimTeam database version isn't current,
         //  nag the user as operation of the plugin in unpredicatable.
@@ -51,45 +51,45 @@ class UsersMenuTabContainer extends Container
 
         if ($wpst_db_version != WPST_DB_VERSION)
         {
-            $table = html_table(null, null, "10") ;
-            $table->add_row(html_b("Warning:"), sprintf("The wp-SwimTeam
+            $table = html_table(null, '0', '10') ;
+            $table->add_row(html_b('Warning:'), sprintf('The wp-SwimTeam
                 plugin database version is incorrect (v%s vs. v%s).  Please
-                notify the web site administrator.",
+                notify the web site administrator.',
                 $wpst_db_version, WPST_DB_VERSION)) ;
-            $div->add(html_div("updated fade", $table)) ;
-        }        $div->add(html_h2("Swim Team Users")) ;
+            $div->add(html_div('updated fade', $table)) ;
+        }        $div->add(html_h2('Swim Team Users')) ;
 
         //  Default to Tab #1 if no tab passed as part of URI
 
-        $activetab = (array_key_exists('tab', $_GET)) ? $_GET['tab'] : "1" ;
+        $activetab = (array_key_exists('tab', $_GET)) ? $_GET['tab'] : '1' ;
 
         //  Build up the tab content
  
         $tab_index = 1 ;
         $tab_content = array() ;
 
-        $tab_content[] = new TabWidgetContent("Overview",
-            $tab_index++, "overview.php", "OverviewTabContainer") ;
-        $tab_content[] = new TabWidgetContent("My Profile",
-            $tab_index++, "profile.php", "UserProfileTabContainer") ;
-        $tab_content[] = new TabWidgetContent("My Swimmers",
-            $tab_index++, "swimmers.php", "SwimmersTabContainer") ;
-        $tab_content[] = new TabWidgetContent("My Jobs",
-            $tab_index++, "myjobs.php", "MyJobsTabContainer") ;
-        $tab_content[] = new TabWidgetContent("Team Roster",
-            $tab_index++, "roster.php", "RosterTabContainer") ;
-        $tab_content[] = new TabWidgetContent("Swim Meets",
-            $tab_index++, "swimmeets.php", "SwimMeetsTabContainer") ;
-        $tab_content[] = new TabWidgetContent("Jobs",
-            $tab_index++, "jobs.php", "SwimTeamJobsTabContainer") ;
-        $tab_content[] = new TabWidgetContent("Swim Clubs",
-            $tab_index++, "swimclubs.php", "SwimClubsTabContainer") ;
-        $tab_content[] = new TabWidgetContent("Users",
-            $tab_index++, "users.php", "UsersTabContainer") ;
+        $tab_content[] = new TabWidgetContent('Overview',
+            $tab_index++, 'overview.php', 'OverviewTabContainer') ;
+        $tab_content[] = new TabWidgetContent('My Profile',
+            $tab_index++, 'profile.php', 'UserProfileTabContainer') ;
+        $tab_content[] = new TabWidgetContent('My Swimmers',
+            $tab_index++, 'swimmers.php', 'SwimmersTabContainer') ;
+        $tab_content[] = new TabWidgetContent('My Jobs',
+            $tab_index++, 'myjobs.php', 'MyJobsTabContainer') ;
+        $tab_content[] = new TabWidgetContent('Team Roster',
+            $tab_index++, 'roster.php', 'RosterTabContainer') ;
+        $tab_content[] = new TabWidgetContent('Swim Meets',
+            $tab_index++, 'swimmeets.php', 'SwimMeetsTabContainer') ;
+        $tab_content[] = new TabWidgetContent('Jobs',
+            $tab_index++, 'jobs.php', 'SwimTeamJobsTabContainer') ;
+        $tab_content[] = new TabWidgetContent('Swim Clubs',
+            $tab_index++, 'swimclubs.php', 'SwimClubsTabContainer') ;
+        $tab_content[] = new TabWidgetContent('Users',
+            $tab_index++, 'users.php', 'UsersTabContainer') ;
 
         $tabs = new TabControlWidget() ;
 
-        $url = $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] ;
+        $url = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ;
 
         //  Clean up the URL or the tab=N argument
         //  will continue to be appended indefinitely.
@@ -100,7 +100,7 @@ class UsersMenuTabContainer extends Container
 
         foreach ($tab_content as $tc)
         {
-            $tabs->add_tab(html_a(sprintf("%s&tab=%d",
+            $tabs->add_tab(html_a(sprintf('%s&tab=%d',
                 $url, $tc->getIndex()), $tc->getLabel()),
                 ($activetab == $tc->getIndex()));
         }
@@ -114,7 +114,7 @@ class UsersMenuTabContainer extends Container
             if ($tc->getIndex() == $activetab)
             {
                 require_once(WPST_PATH .
-                    "/include/user/" . $tc->getIncludeFile()) ;
+                    '/include/user/' . $tc->getIncludeFile()) ;
                 $class = $tc->getClassName() ;
                 $div->add(new $class()) ;
                 break ;

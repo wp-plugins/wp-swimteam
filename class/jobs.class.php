@@ -562,10 +562,18 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
     /**
      * Property to store the possible actions - used to build buttons
      */
-    var $__actions = array(
+    var $__normal_actions = array(
          WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
-        //,WPST_ACTION_SIGN_UP => WPST_ACTION_SIGN_UP
+        ,WPST_ACTION_SIGN_UP => WPST_ACTION_SIGN_UP
     ) ;
+
+    /**
+     * Property to store the possible actions - used to build buttons
+     */
+    //var $__actions = array(
+    //     WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
+    //    //,WPST_ACTION_SIGN_UP => WPST_ACTION_SIGN_UP
+    //) ;
 
     /**
      * The constructor

@@ -1272,6 +1272,9 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $gdlrows = new FENumberInRange('Rows to Display', true, '100px', null, 5, 200) ;
         $this->add_element($gdlrows) ;
 
+        $enablegooglemaps = new FEYesNoListBox("Enable Google Maps", true, "75px") ;
+        $this->add_element($enablegooglemaps) ;
+
         $googlemapsapikey = new FETextArea("Google API Key", false, 3, 60, "300px") ;
         $this->add_element($googlemapsapikey) ;
 
@@ -1300,6 +1303,7 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
 
         //  Initialize the form fields
         $this->set_element_value("Rows to Display", $options->getGDLRowsToDisplay()) ;
+        $this->set_element_value("Enable Google Maps", $options->getEnableGoogleMaps()) ;
         $this->set_element_value("Google API Key", $options->getGoogleAPIKey()) ;
         $this->set_element_value("Login Redirect", WPST_NONE) ;
     }
@@ -1325,7 +1329,10 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
 
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
 
-        $table->add_row($this->element_label("Google API Key"),
+        $table->add_row($this->element_label('Enable Google Maps'),
+            $this->element_form("Enable Google Maps")) ;
+
+        $table->add_row( $this->element_label("Google API Key"),
             $this->element_form("Google API Key")) ;
 
         //$table->add_row(_HTML_SPACE, _HTML_SPACE) ;
@@ -1365,6 +1372,7 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
         $options->setGDLRowsToDisplay($this->get_element_value("Rows to Display")) ;
+        $options->setEnableGoogleMaps($this->get_element_value("Enable Google Maps")) ;
         $options->setGoogleAPIKey($this->get_element_value("Google API Key")) ;
         $options->setLoginRedirectAction($this->get_element_value("Login Redirect")) ;
         $options->updateOptions() ;

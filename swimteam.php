@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.17.707
- * Last Modified:  2012/03/14 04:03:21
+ * Version: MAJOR_RELEASE.MINOR_RELEASE.$WCREV$
+ * Last Modified:  $WCDATE$
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 679 2012-03-05 16:34:42Z mpwalsh8 $
+ * $Id: swimteam.php 726 2012-03-29 14:44:36Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,7 +20,7 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 679 $
+ * @version $Rev: 726 $
  * @lastmodified $Date$
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
@@ -114,16 +114,47 @@ function swimteam_wp_head()
     swimteam_head_css() ;
 
     //  Initialize Google Map support
+    swimteam_google_maps_init() ;
+}
 
-    $map = new GoogleMapDivtag() ;
-    $map->setAPIKey(get_option(WPST_OPTION_GOOGLE_API_KEY)) ;
+/**
+ * Add admin_head action
+ *
+ * This function adds the CSS references
+ * required by the SwimTeam plugin.
+ *
+ */
+function swimteam_admin_head()
+{
+    //  Load CSS
+    //swimteam_head_css() ;
 
-    $head_js_link = html_script($map->getHeadJSLink()) ;
-    $head_js_code = html_script() ;
-    $head_js_code->add($map->getHeadJSCode()) ;
+    //  Initialize Google Map support
+    swimteam_google_maps_init() ;
+}
 
-    print $head_js_link->render() ;
-    print $head_js_code->render() ;
+/**
+ * Initialize Google Maps support
+ *
+ * This function adds Google Maps support when
+ * enabled and required by the SwimTeam plugin.
+ *
+ */
+function swimteam_google_maps_init()
+{
+    //  Initialize Google Map support only if enabled
+    if (get_option(WPST_OPTION_ENABLE_GOOGLE_MAPS) == WPST_YES)
+    {
+        $map = new GoogleMapDivtag() ;
+        $map->setAPIKey(get_option(WPST_OPTION_GOOGLE_API_KEY)) ;
+
+        $head_js_link = html_script($map->getHeadJSLink()) ;
+        $head_js_code = html_script() ;
+        $head_js_code->add($map->getHeadJSCode()) ;
+
+        print $head_js_link->render() ;
+        print $head_js_code->render() ;
+    }
 }
 
 /**
@@ -139,8 +170,7 @@ function swimteam_admin_init()
 
     //  Load plugin Javascript
     wp_enqueue_script('tablednd',
-        plugins_url(plugin_basename(dirname(__FILE__)
-        . '/js/jquery.tablednd_0_5.js')),
+        plugins_url('js/jquery.tablednd.0.6.min.js', __FILE__),
         array('jquery', 'jquery-ui-core', 'jquery-ui-dialog')) ;
 
     //  Load CSS files
@@ -183,30 +213,6 @@ function swimteam_admin_init()
             wp_enqueue_style("wp-swimteam-classic-css") ;
             break ;
     }
-}
-
-/**
- * Add admin_head action
- *
- * This function adds the CSS references
- * required by the SwimTeam plugin.
- *
- */
-function swimteam_admin_head()
-{
-    //  Load CSS
-    //swimteam_head_css() ;
-    //  Initialize Google Map support
-
-    $map = new GoogleMapDivtag() ;
-    $map->setAPIKey(get_option(WPST_OPTION_GOOGLE_API_KEY)) ;
-
-    $head_js_link = html_script($map->getHeadJSLink()) ;
-    $head_js_code = html_script() ;
-    $head_js_code->add($map->getHeadJSCode()) ;
-
-    print $head_js_link->render() ;
-    print $head_js_code->render() ;
 }
 
 /**
@@ -516,6 +522,7 @@ function swimteam_database_init()
 
         $sql = "CREATE TABLE " . WPST_EVENTS_TABLE . " (
             eventid INT(11) NOT NULL AUTO_INCREMENT,
+            eventgroupid INT(11) NOT NULL,
             meetid INT(11) NOT NULL,
             agegroupid INT(11) NOT NULL,
             eventnumber INT(11),
@@ -524,6 +531,17 @@ function swimteam_database_init()
             course ENUM('" . WPST_SDIF_COURSE_STATUS_CODE_SCM_VALUE . "', '" . WPST_SDIF_COURSE_STATUS_CODE_SCY_VALUE . "', '" . WPST_SDIF_COURSE_STATUS_CODE_LCM_VALUE. "', '" . WPST_SDIF_COURSE_STATUS_CODE_DQ_VALUE . "') NOT NULL,
             KEY agegroupid (agegroupid),
             PRIMARY KEY  (eventid)
+	    );" ;
+      
+        dbDelta($sql) ;
+
+        //  Construct or update the Event Groups table
+
+        $sql = "CREATE TABLE " . WPST_EVENT_GROUPS_TABLE . " (
+            eventgroupid INT(11) NOT NULL auto_increment,
+            eventgroupdescription VARCHAR(100) NOT NULL default '',
+            eventgroupstatus ENUM('" . WPST_ACTIVE . "', '" . WPST_INACTIVE . "') NOT NULL,
+            PRIMARY KEY  (eventgroupid)
 	    );" ;
       
         dbDelta($sql) ;

@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 697 $
+ * @version $Revision: 738 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -121,6 +121,9 @@ define('WPST_SUBSCRIBER_PERMISSION', 0) ;
 define('WPST_ACTION_SELECT_ACTION', 'Select Action') ;
 define('WPST_ACTION_ADD', 'Add') ;
 define('WPST_ACTION_UPDATE', 'Update') ;
+define('WPST_ACTION_IGNORE', 'Ignore') ;
+define('WPST_ACTION_REPLACE', 'Replace') ;
+define('WPST_ACTION_MANAGE', 'Manage') ;
 define('WPST_ACTION_REORDER', 'Reorder') ;
 define('WPST_ACTION_PROFILE', 'Profile') ;
 define('WPST_ACTION_DETAILS', 'Details') ;
@@ -144,10 +147,14 @@ define('WPST_ACTION_EVENTS', 'Events') ;
 define('WPST_ACTION_EVENTS_LOAD', 'Load Events') ;
 define('WPST_ACTION_EVENTS_ADD', 'Add Event') ;
 define('WPST_ACTION_EVENTS_IMPORT', 'Import Events') ;
+define('WPST_ACTION_EVENTS_EXPORT', 'Export Events') ;
 define('WPST_ACTION_EVENTS_PROFILE', 'Profile Event') ;
 define('WPST_ACTION_EVENTS_UPDATE', 'Update Event') ;
 define('WPST_ACTION_EVENTS_REORDER', 'Reorder Events') ;
 define('WPST_ACTION_EVENTS_DELETE', 'Delete Event') ;
+define('WPST_ACTION_EVENTS_DELETE_ALL', 'Delete All Events') ;
+define('WPST_ACTION_EVENTS_MANAGE', 'Manage Events') ;
+define('WPST_ACTION_EVENTS_REPORT', 'Report Events') ;
 define('WPST_ACTION_OPEN_SEASON', 'Open Season') ;
 define('WPST_ACTION_CLOSE_SEASON', 'Close Season') ;
 define('WPST_ACTION_LOCK_IDS', 'Lock Ids') ;
@@ -196,6 +203,7 @@ define('WPST_DEFAULT_OPT_OUT_LABEL', 'Scratch') ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_EMAIL_FORMAT', WPST_HTML) ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_MODE', WPST_BOTH) ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_USAGE_MODEL', WPST_STROKE) ;
+define('WPST_DEFAULT_ENABLE_GOOGLE_MAPS', WPST_NO) ;
 define('WPST_DEFAULT_GOOGLE_API_KEY', 'Google API Key') ;
 define('WPST_DEFAULT_GDL_ROWS_TO_DISPLAY', 20) ;
 define('WPST_DEFAULT_USER_OPTION_COUNT', 5) ;
@@ -233,6 +241,7 @@ define('WPST_OPTION_REGISTRATION_SYSTEM', WPST_OPTION_PREFIX . 'registration_sys
 define('WPST_OPTION_GEOGRAPHY', WPST_OPTION_PREFIX . 'geography') ;
 define('WPST_OPTION_SWIMMER_LABEL_FORMAT', WPST_OPTION_PREFIX . 'swimmer_label_format') ;
 define('WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE', WPST_OPTION_PREFIX . 'swimmer_label_format_code') ;
+define('WPST_OPTION_ENABLE_GOOGLE_MAPS', WPST_OPTION_PREFIX . 'enable_google_maps') ;
 define('WPST_OPTION_GOOGLE_API_KEY', WPST_OPTION_PREFIX . 'google_api_key') ;
 define('WPST_OPTION_GDL_ROWS_TO_DISPLAY', WPST_OPTION_PREFIX . 'gdl_rows_to_display') ;
 define('WPST_OPTION_OPT_IN_LABEL', WPST_OPTION_PREFIX . 'opt_in_label') ;

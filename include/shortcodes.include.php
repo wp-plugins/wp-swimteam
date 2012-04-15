@@ -16,17 +16,17 @@
  *
  */
 
-require_once(PHPHTMLLIB_ABSPATH . "/widgets/GoogleMap.inc") ;
-require_once("textmap.class.php") ;
+require_once(PHPHTMLLIB_ABSPATH . '/widgets/GoogleMap.inc') ;
+require_once('textmap.class.php') ;
 
 /**
  * wpst_flickr_slideshow shortcode handler
  *
  * Build a short code handler to display a Flickr slide show.
  *
- * [wpst_flickr_slideshow userid="id" slideshowid="id"
- *     frameborder="pixels" *     width="pixels" height="pixels"
- *     scrolling="yes|no" align="left|center|right" view="yes|y"]
+ * [wpst_flickr_slideshow userid='id' slideshowid='id'
+ *     frameborder='pixels' *     width='pixels' height='pixels'
+ *     scrolling='yes|no' align='left|center|right' view='yes|y']
  *
  * To show this Flickr slide show:
  *
@@ -34,7 +34,7 @@ require_once("textmap.class.php") ;
  *
  * Use this shortcode:
  *
- * [wpst_flickr_slideshow userid="27604893@N04" slideshowid="72157605764227907"]
+ * [wpst_flickr_slideshow userid='27604893@N04' slideshowid='72157605764227907']
  *
  * This is the resulting IFRAME tag which is returned to the caller.
  *
@@ -42,7 +42,7 @@ require_once("textmap.class.php") ;
  *     user_id=27604893@N04&set_id=72157605761943480 frameBorder=0
  *     width=500 scrolling=no height=500></iframe>
  *
- * If the 'view="yes"' or 'view="y"' attribute is include, a linl to the
+ * If the 'view='yes'' or 'view='y'' attribute is include, a linl to the
  * Flickr slideshow will be placed under the IFRAME.
  *     
  * @param array - shortcode attributes
@@ -71,14 +71,14 @@ function wpst_flickr_slideshow_sc_handler($atts)
     if (empty($userid) || empty($slideshowid))
     {
         $c->add(html_br(),
-            html_b("wpst_flickr_slideshow::Invalid Shortcode Syntax"),
+            html_b('wpst_flickr_slideshow::Invalid Shortcode Syntax'),
             html_br(2)) ;
 
         return $c->render() ;
     }
 
-    $if_src = "http://www.flickr.com/slideShow/index.gne?" .
-        sprintf("user_id=%s&set_id=%s frameBorder=%s align=%s",
+    $if_src = 'http://www.flickr.com/slideShow/index.gne?' .
+        sprintf('user_id=%s&set_id=%s frameBorder=%s align=%s',
             $userid, $slideshowid, $frameborder, $align) ;
 
 
@@ -86,10 +86,10 @@ function wpst_flickr_slideshow_sc_handler($atts)
 
     if (($view == 'yes') || ($view == 'y'))
     {
-        $link = "http://www.flickr.com/slideShow/index.gne?" .
-        sprintf("user_id=%s&set_id=%s", $userid, $slideshowid) ;
+        $link = 'http://www.flickr.com/slideShow/index.gne?' .
+        sprintf('user_id=%s&set_id=%s', $userid, $slideshowid) ;
 
-        $c->add(html_br(2), html_a($link, "View this slideshow on Flickr."), html_br(2)) ;
+        $c->add(html_br(2), html_a($link, 'View this slideshow on Flickr.'), html_br(2)) ;
     }
 
 	return $c->render() ;
@@ -103,19 +103,19 @@ add_shortcode('wpst_flickr_slideshow', 'wpst_flickr_slideshow_sc_handler');
  *
  * Build a short code handler to display a meet schedule
  *
- * [wpst_meet_schedule seasonid="id"]
+ * [wpst_meet_schedule seasonid='id']
  *
  * Use this shortcode:
  *
- * [wpst_meet_schedule seasonid="2"]
+ * [wpst_meet_schedule seasonid='2']
  *
  * @param array - shortcode attributes
  * @return string -  HTML code
  */
 function wpst_meet_schedule_sc_handler($atts)
 {
-    require_once("seasons.class.php") ;
-    require_once("swimmeets.class.php") ;
+    require_once('seasons.class.php') ;
+    require_once('swimmeets.class.php') ;
 
     $c = container() ;
 
@@ -125,7 +125,7 @@ function wpst_meet_schedule_sc_handler($atts)
 		'seasonid' => '',
 	), $atts)) ;
 
-    $meetsummary = new SwimMeetScheduleInfoTable("Meet Schedule","500px") ;
+    $meetsummary = new SwimMeetScheduleInfoTable('Meet Schedule','500px') ;
 
     //  If the season id is empty, use the current season.
 
@@ -147,18 +147,18 @@ add_shortcode('wpst_meet_schedule', 'wpst_meet_schedule_sc_handler');
  *
  * Build a short code handler to display a meet schedule
  *
- * [wpst_club_profile clubid="id" googlemap=y|yes mapquestmap=y|yes]
+ * [wpst_club_profile clubid='id' googlemap=y|yes mapquestmap=y|yes]
  *
  * Use this shortcode:
  *
- * [wpst_club_profile clubid="2"]
+ * [wpst_club_profile clubid='2']
  *
  * @param array - shortcode attributes
  * @return string -  HTML code
  */
 function wpst_club_profile_sc_handler($atts)
 {
-    require_once("swimclubs.class.php") ;
+    require_once('swimclubs.class.php') ;
 
     $c = container() ;
 
@@ -187,7 +187,7 @@ function wpst_club_profile_sc_handler($atts)
     if (empty($clubid))
     {
         $c->add(html_br(),
-            html_b("wpst_club_profile::Invalid Shortcode Syntax"),
+            html_b('wpst_club_profile::Invalid Shortcode Syntax'),
             html_br(2)) ;
 
         return $c->render() ;
@@ -197,7 +197,7 @@ function wpst_club_profile_sc_handler($atts)
         if (!$sc->loadSwimClubBySwimClubId($clubid))
         {
             $c->add(html_br(),
-                html_b("wpst_club_profile::Invalid Club Id"),
+                html_b('wpst_club_profile::Invalid Club Id'),
                 html_br(2)) ;
 
             return $c->render() ;
@@ -206,30 +206,30 @@ function wpst_club_profile_sc_handler($atts)
 
     if ($sc->getWebSite() != WPST_NULL_STRING)
         $info = new SwimTeamInfoTable(html_a($sc->getWebSite(),
-            $sc->getClubOrPoolName() . " " .
-            $sc->getTeamName()), $width, "center") ;
+            $sc->getClubOrPoolName() . ' ' .
+            $sc->getTeamName()), $width, 'center') ;
     else
-        $info = new SwimTeamInfoTable($sc->getClubOrPoolName() . " " .
-            $sc->getTeamName(), $width, "center") ;
+        $info = new SwimTeamInfoTable($sc->getClubOrPoolName() . ' ' .
+            $sc->getTeamName(), $width, 'center') ;
 
-    $info->add_row("Pool Length", $sc->getPoolLength() .
-        " " . ucfirst($sc->getPoolMeasurementUnits()) .
-        " (" . $sc->getPoolLanes() . " Lanes)") ;
+    $info->add_row('Pool Length', $sc->getPoolLength() .
+        ' ' . ucfirst($sc->getPoolMeasurementUnits()) .
+        ' (' . $sc->getPoolLanes() . ' Lanes)') ;
 
     $address = $sc->getStreet1() ;
-    if ($sc->getStreet2() != "")
-        $address .= "<br/>" . $sc->getStreet2() ;
-    if ($sc->getStreet3() != "")
-        $address .= "<br/>" . $sc->getStreet3() ;
+    if ($sc->getStreet2() != '')
+        $address .= '<br/>' . $sc->getStreet2() ;
+    if ($sc->getStreet3() != '')
+        $address .= '<br/>' . $sc->getStreet3() ;
 
-    $address .= "<br/>" . $sc->getCity() ;
-    $address .= ", " . $sc->getStateOrProvince() ;
-    $address .= "<br/>" . $sc->getPostalCode() ;
+    $address .= '<br/>' . $sc->getCity() ;
+    $address .= ', ' . $sc->getStateOrProvince() ;
+    $address .= '<br/>' . $sc->getPostalCode() ;
 
     if ($sc->getCountry() != WPST_NULL_STRING)
-        $address .= "<br/>" . $sc->getCountry() ;
+        $address .= '<br/>' . $sc->getCountry() ;
 
-    $info->add_row("Address", $address) ;
+    $info->add_row('Address', $address) ;
 
     if ($sc->getPrimaryPhone() != WPST_NULL_STRING)
         $info->add_row(get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL),
@@ -238,50 +238,51 @@ function wpst_club_profile_sc_handler($atts)
         $info->add_row(get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL),
             $sc->getSecondaryPhone()) ;
     if ($sc->getContactName() != WPST_NULL_STRING)
-        $info->add_row("Contact Name", $sc->getContactName()) ;
+        $info->add_row('Contact Name', $sc->getContactName()) ;
 
     if ($sc->getEmailAddress() != WPST_NULL_STRING)
-        $info->add_row("Email Address", html_a("mailto:" .
+        $info->add_row('Email Address', html_a('mailto:' .
             $sc->getEmailAddress(), $sc->getEmailAddress())) ;
 
     if ($sc->getNotes() != WPST_NULL_STRING)
-        $info->add_row("Notes", nl2br($sc->getNotes())) ;
+        $info->add_row('Notes', nl2br($sc->getNotes())) ;
+
+    if ($sc->getGoogleMapsURL() != WPST_NULL_STRING)
+        $info->add_row('Google Maps', html_a($sc->getGoogleMapsURL(), 'View Map')) ;
+
+    if ($sc->getMapQuestURL() != WPST_NULL_STRING)
+        $info->add_row('MapQuest', html_a($sc->getMapQuestURL(), 'View Map')) ;
 
     $div = html_div() ;
-    $div->set_tag_attribute("align", $align) ;
+    $div->set_tag_attribute('align', $align) ;
 
     //  Include Google Map in the output?
 
     if (strtolower(substr($googlemap, 0, 1)) == 'y')
     {
-        $map = new GoogleMapDIVtag() ;
-        $map->set_style("border: 3px solid #afb5ff") ;
-
-        $map->setAddress(preg_replace("/<.*?>/", ", ", $address)) ;
-        $map->setInfoText($address) ;
-        $map->setMapHeight($height) ;
-        $map->setMapWidth($width) ;
-        $map->setZoomLevel($zoom) ;
-        $map->setShowControls(strtolower(substr($control, 0, 1)) == 'y') ;
-        $map->setInfoWindowType(strtolower(substr($infowindow, 0, 1)) == 'y'
-            ? PHL_GMAPS_INFO_WINDOW_HTML : PHL_GMAPS_INFO_WINDOW_NONE) ;
-
-        $map->setAPIKey(get_option(WPST_OPTION_GOOGLE_API_KEY)) ;
-        $map->generateMap() ;
-        $div->add($map) ;
-
-        //  Show the link too?
-
-        if (strtolower(substr($link, 0, 1)) == 'y')
+        //  Make sure Google Maps support is enabled!
+ 
+        if (get_option(WPST_OPTION_ENABLE_GOOGLE_MAPS) == WPST_YES)
         {
-            $div->add(html_br(), html_a($sc->getGoogleMapsURL(),
-                "View this map on Google Maps."), html_br()) ;
+            $map = new GoogleMapDIVtag() ;
+            $map->set_style('border: 3px solid #afb5ff') ;
+
+            $map->setAddress(preg_replace('/<.*?>/', ', ', $address)) ;
+            $map->setInfoText($address) ;
+            $map->setMapHeight($height) ;
+            $map->setMapWidth($width) ;
+            $map->setZoomLevel($zoom) ;
+            $map->setShowControls(strtolower(substr($control, 0, 1)) == 'y') ;
+            $map->setInfoWindowType(strtolower(substr($infowindow, 0, 1)) == 'y'
+                ? PHL_GMAPS_INFO_WINDOW_HTML : PHL_GMAPS_INFO_WINDOW_NONE) ;
+
+            $map->setAPIKey(get_option(WPST_OPTION_GOOGLE_API_KEY)) ;
+            $map->generateMap() ;
+            $div->add($map, html_br()) ;
         }
-
-        if (strtolower(substr($mapquestmap, 0, 1)) == 'y')
+        else
         {
-            $div->add(html_br(), html_a($sc->getMapQuestURL(),
-                "View this location on MapQuest."), html_br()) ;
+            $div->add(html_h4(null, 'Warning:  Google Maps support is not enabled, unable to show map.')) ;
         }
     }
 
@@ -298,11 +299,11 @@ add_shortcode('wpst_club_profile', 'wpst_club_profile_sc_handler');
  *
  * Build a short code handler to display a google map
  *
- * [wpst_google_map address="address"]
+ * [wpst_google_map address='address']
  *
  * Use this shortcode:
  *
- * [wpst_google_map address="430 St. Andres Lane, Cary, NC, 27511"]
+ * [wpst_google_map address='430 St. Andres Lane, Cary, NC, 27511']
  *
  * @param array - shortcode attributes
  * @return string -  HTML code
@@ -326,24 +327,33 @@ function wpst_google_map_sc_handler($atts)
 	), $atts)) ;
 
     $div = html_div() ;
-    $div->set_tag_attribute("align", $align) ;
+    $div->set_tag_attribute('align', $align) ;
 
-    $map = new GoogleMapDIVtag() ;
-    $map->set_style("border: 3px solid #afb5ff") ;
+    //  Make sure Google Maps support is enabled!
 
-    //$map->set_id("map_1") ;
-    $map->setAddress($address) ;
-    $map->setInfoText($address) ;
-    $map->setMapHeight($height) ;
-    $map->setMapWidth($width) ;
-    $map->setZoomLevel($zoom) ;
-    $map->setShowControls(strtolower(substr($control, 0, 1)) == 'y') ;
-    $map->setInfoWindowType(strtolower(substr($infowindow, 0, 1)) == 'y'
-        ? PHL_GMAPS_INFO_WINDOW_HTML : PHL_GMAPS_INFO_WINDOW_NONE) ;
+    if (get_option(WPST_OPTION_ENABLE_GOOGLE_MAPS) == WPST_YES)
+    {
+        $map = new GoogleMapDIVtag() ;
+        $map->set_style('border: 3px solid #afb5ff') ;
 
-    $map->setAPIKey(get_option(WPST_OPTION_GOOGLE_API_KEY)) ;
-    $map->generateMap() ;
-    $div->add($map, html_br()) ;
+        //$map->set_id('map_1') ;
+        $map->setAddress($address) ;
+        $map->setInfoText($address) ;
+        $map->setMapHeight($height) ;
+        $map->setMapWidth($width) ;
+        $map->setZoomLevel($zoom) ;
+        $map->setShowControls(strtolower(substr($control, 0, 1)) == 'y') ;
+        $map->setInfoWindowType(strtolower(substr($infowindow, 0, 1)) == 'y'
+            ? PHL_GMAPS_INFO_WINDOW_HTML : PHL_GMAPS_INFO_WINDOW_NONE) ;
+
+        $map->setAPIKey(get_option(WPST_OPTION_GOOGLE_API_KEY)) ;
+        $map->generateMap() ;
+        $div->add($map, html_br()) ;
+    }
+    else
+    {
+        $div->add(html_h4(null, 'Warning:  Google Maps support is not enabled, unable to show map.')) ;
+    }
 
     $c->add($div) ;
 
@@ -358,7 +368,7 @@ add_shortcode('wpst_google_map', 'wpst_google_map_sc_handler');
  *
  * Build a short code handler to display a meet schedule
  *
- * [wpst_meet_report meetid="id"]
+ * [wpst_meet_report meetid='id']
  *
  * Optional shortcode attributes
  *   summary=y|yes|n|no
@@ -374,14 +384,14 @@ add_shortcode('wpst_google_map', 'wpst_google_map_sc_handler');
  *
  * Use this shortcode:
  *
- * [wpst_meet_report meetid="2" optinoptout="y" sortby="name"]
+ * [wpst_meet_report meetid='2' optinoptout='y' sortby='name']
  *
  * @param array - shortcode attributes
  * @return string -  HTML code
  */
 function wpst_meet_report_sc_handler($atts)
 {
-    require_once("swimmeets.report.class.php") ;
+    require_once('swimmeets.report.class.php') ;
 
     $c = container() ;
 
@@ -407,7 +417,7 @@ function wpst_meet_report_sc_handler($atts)
     if (empty($meetid))
     {
         $c->add(html_br(),
-            html_b("wpst_meet_report::Invalid Shortcode Syntax"),
+            html_b('wpst_meet_report::Invalid Shortcode Syntax'),
             html_br(2)) ;
 
         return $c->render() ;
@@ -489,7 +499,7 @@ add_shortcode('wpst_meet_report', 'wpst_meet_report_sc_handler');
  *
  * Build a short code handler to display meet job assignments
  *
- * [wpst_meet_job_assignments meetid="id"]
+ * [wpst_meet_job_assignments meetid='id']
  *
  * Optional shortcode attributes
  *   firstinitial=y|yes|n|no
@@ -500,14 +510,14 @@ add_shortcode('wpst_meet_report', 'wpst_meet_report_sc_handler');
  *
  * Use this shortcode:
  *
- * [wpst_meet_job_assignments meetid="2" firstinitial="y" email="y"]
+ * [wpst_meet_job_assignments meetid='2' firstinitial='y' email='y']
  *
  * @param array - shortcode attributes
  * @return string -  HTML code
  */
 function wpst_meet_job_assignments_sc_handler($atts)
 {
-    require_once("jobs.class.php") ;
+    require_once('jobs.class.php') ;
 
     $c = container() ;
 
@@ -527,7 +537,7 @@ function wpst_meet_job_assignments_sc_handler($atts)
     if (empty($meetid))
     {
         $c->add(html_br(),
-            html_b("wpst_meet_job_assignments::Invalid Shortcode Syntax"),
+            html_b('wpst_meet_job_assignments::Invalid Shortcode Syntax'),
             html_br(2)) ;
 
         return $c->render() ;
@@ -536,10 +546,10 @@ function wpst_meet_job_assignments_sc_handler($atts)
     //  Set up the job assignment report
 
     $meet =  SwimTeamTextMap::__mapMeetIdToText($meetid, true) ;
-    $title = sprintf("Job Assignments:  %s %s (%s)",
-        $meet["opponent"], $meet["date"], $meet["location"]) ;
+    $title = sprintf('Job Assignments:  %s %s (%s)',
+        $meet['opponent'], $meet['date'], $meet['location']) ;
 
-    $jobassignmentreport = new SwimMeetJobAssignmentInfoTable($title, "100%") ;
+    $jobassignmentreport = new SwimMeetJobAssignmentInfoTable($title, '100%') ;
     $jobassignmentreport->setMeetId($meetid) ;
 
     if (strtolower(substr($firstinitial, 0, 1)) == 'y')
@@ -577,14 +587,14 @@ add_shortcode('wpst_meet_job_assignments', 'wpst_meet_job_assignments_sc_handler
  *
  * Use this shortcode:
  *
- * [wpst_job_descriptions inactive="y"]
+ * [wpst_job_descriptions inactive='y']
  *
  * @param array - shortcode attributes
  * @return string -  HTML code
  */
 function wpst_job_descriptions_sc_handler($atts)
 {
-    require_once("jobs.class.php") ;
+    require_once('jobs.class.php') ;
 
     $c = container() ;
 
@@ -599,7 +609,7 @@ function wpst_job_descriptions_sc_handler($atts)
 
     //  Set up the job descriptions report
 
-    $jobdescriptions = new SwimTeamJobDescriptionsInfoTable("Job Descriptions", "100%") ;
+    $jobdescriptions = new SwimTeamJobDescriptionsInfoTable('Job Descriptions', '100%') ;
 
     if (strtolower(substr($inactive, 0, 1)) == 'y')
         $jobdescriptions->setShowInactive(true) ;

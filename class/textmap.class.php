@@ -235,5 +235,28 @@ class SwimTeamTextMap
 
         return $obj ;
     }
+
+    /**
+     * Map the event group id into text for the GDL
+     *
+     * @return string - season text description
+     */
+    function __mapEventGroupIdToText($eventgroupid)
+    {
+        if ($eventgroupid !== WPST_NULL_ID)
+        {
+            require_once('events.class.php') ;
+
+            $eventgroup = new SwimMeetEventGroup() ;
+            
+            if ($eventgroup->eventgroupExistById($eventgroupid))
+            {
+                $eventgroup->loadEventGroupById($eventgroupid) ;
+                return $eventgroup->getEventGroupDescription() ;
+            }
+        }
+
+        return ucwords(WPST_NONE) ;
+    }
 }   
 ?>
