@@ -16,9 +16,10 @@
  *
  */
 
-require_once("agegroups.class.php") ;
-require_once("agegroups.forms.class.php") ;
-require_once("container.class.php") ;
+require_once('agegroups.class.php') ;
+require_once('agegroups.forms.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the jobs
@@ -39,16 +40,16 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_ACTION_PROFILE)),
-            __("Display detailed information about a particular age group.")) ;
+            __('Display detailed information about a particular age group.')) ;
         $table->add_row(html_b(__(WPST_ACTION_ADD)),
-            __("Add a new age group.  Use this action to define a new age
-            group in the system.")) ;
+            __('Add a new age group.  Use this action to define a new age
+            group in the system.')) ;
         $table->add_row(html_b(__(WPST_ACTION_UPDATE)),
-            __("Update an age group.  Use this action to update the details
-            of an age group in the system.")) ;
+            __('Update an age group.  Use this action to update the details
+            of an age group in the system.')) ;
         $table->add_row(html_b(__(WPST_ACTION_DELETE)),
-            __("Delete an age group.  Use this action to delete an age group
-            in the system.")) ;
+            __('Delete an age group.  Use this action to delete an age group
+            in the system.')) ;
 
         return $table ;
     }
@@ -60,8 +61,8 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimTeamAgeGroupsAdminGUIDataList("Swim Team Age Groups",
-            "100%", "minage") ;
+        $gdl = new SwimTeamAgeGroupsAdminGUIDataList('Swim Team Age Groups',
+            '100%', 'minage') ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;
@@ -81,8 +82,8 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
         //  the page was reached.
 
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
-        $div->add(html_h3("Swim Team Age Groups")) ;
+        $div->set_style('clear: both;') ;
+        $div->add(html_h3('Swim Team Age Groups')) ;
 
         //  This allows passing arguments eithers as a GET or a POST
 
@@ -91,10 +92,10 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
         //  The agegroupid is the argument which must be
         //  dealt with differently for GET and POST operations
 
-        if (array_key_exists(WPST_DB_PREFIX . "radio", $scriptargs))
-            $agegroupid = $scriptargs[WPST_DB_PREFIX . "radio"][0] ;
-        else if (array_key_exists("agegroupid", $scriptargs))
-            $agegroupid = $scriptargs["agegroupid"] ;
+        if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
+            $agegroupid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
+        else if (array_key_exists('agegroupid', $scriptargs))
+            $agegroupid = $scriptargs['agegroupid'] ;
         else
             $agegroupid = null ;
 
@@ -105,9 +106,9 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
         //  If there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
-        if (array_key_exists("_action", $scriptargs))
+        if (array_key_exists('_action', $scriptargs))
             $action = $scriptargs['_action'] ;
-        else if (array_key_exists("_form_action", $scriptargs))
+        else if (array_key_exists('_form_action', $scriptargs))
             $action = $scriptargs['_form_action'] ;
         else
             $action = null ;
@@ -125,14 +126,14 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
             switch ($action)
             {
                 case WPST_ACTION_ADD:
-                    $form = new WpSwimTeamAgeGroupAddForm("Add Swim Team Age Group",
+                    $form = new WpSwimTeamAgeGroupAddForm('Add Swim Team Age Group',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Age Group') ;
                     break ;
 
                 case WPST_ACTION_UPDATE:
-                    $form = new WpSwimTeamAgeGroupUpdateForm("Update Swim Team Age Group",
+                    $form = new WpSwimTeamAgeGroupUpdateForm('Update Swim Team Age Group',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($agegroupid) ;
                     $this->setShowFormInstructions() ;
@@ -140,7 +141,7 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_DELETE:
-                    $form = new WpSwimTeamAgeGroupDeleteForm("Delete Swim Team Age Group",
+                    $form = new WpSwimTeamAgeGroupDeleteForm('Delete Swim Team Age Group',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($agegroupid) ;
                     $this->setShowFormInstructions() ;
@@ -148,7 +149,7 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 default:
-                    $div->add(html_h4(sprintf("Unsupported action \"%s\" requested.", $action))) ;
+                    $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
 
                     break ;
             }
@@ -160,9 +161,7 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
                 //  Create the form processor
 
                 $fp = new FormProcessor($form) ;
-                $fp->set_form_action($_SERVER['PHP_SELF'] .
-                    "?" . $_SERVER['QUERY_STRING']) ;
-                
+                $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
                 //  Display the form again even if processing was successful.
 
@@ -192,11 +191,11 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add(html_br(2), $c) ;
-                $div->add(SwimTeamGUIBackHomeButtons::getButtons()) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Age Groups')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4("No content to display.")) ;
+                $div->add(html_br(2), html_h4('No content to display.')) ;
             }
 
         }

@@ -16,8 +16,9 @@
  *
  */
 
-require_once("options.class.php") ;
-require_once("options.forms.class.php") ;
+require_once('options.class.php') ;
+require_once('options.forms.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the OptionsTab
@@ -40,17 +41,17 @@ class SwimTeamGoogleMapsOptionsTabContainer extends Container
         //  the page was reached.
  
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
+        $div->set_style('clear: both;') ;
 
         //  Start building the form
 
-        $form = new WpSwimTeamGoogleMapsOptionsForm("Google Maps Options",
+        $form = new WpSwimTeamGoogleMapsOptionsForm('Google Maps Options',
             $_SERVER['HTTP_REFERER'], 600) ;
 
         //  Create the form processor
 
         $fp = new FormProcessor($form) ;
-        $fp->set_form_action($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
+        $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
         //  Display the form again even if processing was successful.
 

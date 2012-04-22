@@ -32,7 +32,7 @@ require_once('portlets.class.php') ;
  * @access public
  * @see WpSwimTeamForm
  */
-class WpSwimMeetEventAddForm extends WpSwimTeamForm
+class WpSwimTeamEventAddForm extends WpSwimTeamForm
 {
     /**
      * event id property
@@ -173,7 +173,7 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
         $s = array() ;
         //$s = array(ucwords(WPST_NONE) => WPST_NULL_ID) ;
 
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroupIds = $eventgroup->getEventGroupIds() ;
 
         foreach ($eventgroupIds as $eventgroupId)
@@ -194,7 +194,7 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
     function form_init_elements($action = WPST_ACTION_EVENTS_ADD)
     {
         $this->add_hidden_element('eventid') ;
-        $this->add_hidden_element('_meetid') ;
+        $this->add_hidden_element('_swimmeetid') ;
         $this->add_hidden_element('_eventgroupid') ;
 
         //  This is used to remember the action
@@ -247,7 +247,7 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
     {
         //  Initialize the form fields
 
-        $this->set_hidden_element_value('_meetid', $this->getMeetId()) ;
+        $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
         $this->set_hidden_element_value('_eventgroupid', $this->getEventGroupId()) ;
         $this->set_hidden_element_value('_action', WPST_ACTION_EVENTS_ADD) ;
     }
@@ -319,7 +319,7 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
         //  events can be defined at one time, need to loop
         //  through combination of age groups and strokes.
 
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
 
         $strokes = $this->get_element_value('Stroke') ;
         $agegroups = $this->get_element_value('Age Group') ;
@@ -336,7 +336,7 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
         $event->setCourse($this->get_element_value('Course')) ;
         $event->setDistance($this->get_element_value('Distance')) ;
         $event->setEventGroupId($this->get_element_value('Event Group')) ;
-        $event->setMeetId($this->get_hidden_element_value('_meetid')) ;
+        $event->setMeetId($this->get_hidden_element_value('_swimmeetid')) ;
         $event->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
 
         //  Loop through age groups
@@ -355,7 +355,7 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
  
                 if ($checkexists)
                 {
-                    if ($event->getSwimMeetEventExists())
+                    if ($event->getSwimTeamEventExists())
                     {
                         $this->add_error('Event Group', 'One or more similar events already exists.');
                         $this->add_error('Age Group', 'One or more similar events already exists.');
@@ -386,12 +386,12 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
         //  events can be defined at one time, need to loop
         //  through combination of age groups and strokes.
 
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
 
         $strokes = $this->get_element_value('Stroke') ;
         $agegroups = $this->get_element_value('Age Group') ;
 
-        $event->setMeetId($this->get_hidden_element_value('_meetid')) ;
+        $event->setMeetId($this->get_hidden_element_value('_swimmeetid')) ;
         $event->setCourse($this->get_element_value('Course')) ;
         $event->setDistance($this->get_element_value('Distance')) ;
         $event->setEventGroupId($this->get_element_value('Event Group')) ;
@@ -422,7 +422,7 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
                 //  By 'anding' the successes together,
                 //  we can determine if any of them failed.
 
-                $success &= ($event->addSwimMeetEvent() != null) ;
+                $success &= ($event->addSwimTeamEvent() != null) ;
             }
         }
 
@@ -461,9 +461,9 @@ class WpSwimMeetEventAddForm extends WpSwimTeamForm
  *
  * @author Mike Walsh <mike@walshcrew.com>
  * @access public
- * @see WpSwimMeetEventAddForm
+ * @see WpSwimTeamEventAddForm
  */
-class WpSwimMeetEventUpdateForm extends WpSwimMeetEventAddForm
+class WpSwimTeamEventUpdateForm extends WpSwimTeamEventAddForm
 {
     /**
      * This method gets called EVERY time the object is
@@ -474,7 +474,7 @@ class WpSwimMeetEventUpdateForm extends WpSwimMeetEventAddForm
     function form_init_elements($action = WPST_ACTION_EVENTS_UPDATE)
     {
         $this->add_hidden_element('eventid') ;
-        $this->add_hidden_element('_meetid') ;
+        $this->add_hidden_element('_swimmeetid') ;
         $this->add_hidden_element('_eventgroupid') ;
 
         //  This is used to remember the action
@@ -550,11 +550,11 @@ class WpSwimMeetEventUpdateForm extends WpSwimMeetEventAddForm
     function form_init_data($action = WPST_ACTION_EVENTS_UPDATE)
     {
         $this->set_hidden_element_value('_action', $action) ;
-        $this->set_hidden_element_value('_meetid', $this->getMeetId()) ;
+        $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
         $this->set_hidden_element_value('_eventgroupid', $this->getEventGroupId()) ;
 
-        $event = new SwimMeetEvent() ;
-        $event->loadSwimMeetEventByEventId($this->getEventId()) ;
+        $event = new SwimTeamEvent() ;
+        $event->loadSwimTeamEventByEventId($this->getEventId()) ;
 
         $this->set_hidden_element_value('eventid', $event->getEventId()) ;
         $this->set_element_value('Age Group', $event->getAgeGroupId()) ;
@@ -586,7 +586,7 @@ class WpSwimMeetEventUpdateForm extends WpSwimMeetEventAddForm
      */
     function form_action()
     {
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
 
         $event->setEventId($this->get_hidden_element_value('eventid')) ;
         $event->setAgeGroupId($this->get_element_value('Age Group')) ;
@@ -596,7 +596,7 @@ class WpSwimMeetEventUpdateForm extends WpSwimMeetEventAddForm
         $event->setDistance($this->get_element_value('Distance')) ;
         $event->setCourse($this->get_element_value('Course')) ;
 
-        $success = $event->updateSwimMeetEvent() ;
+        $success = $event->updateSwimTeamEvent() ;
 
         //  If successful, store the updated event id in so it can be used later.
 
@@ -619,9 +619,9 @@ class WpSwimMeetEventUpdateForm extends WpSwimMeetEventAddForm
  *
  * @author Mike Walsh <mike@walshcrew.com>
  * @access public
- * @see WpSwimMeetEventUpdateForm
+ * @see WpSwimTeamEventUpdateForm
  */
-class WpSwimMeetEventDeleteForm extends WpSwimMeetEventUpdateForm
+class WpSwimTeamEventDeleteForm extends WpSwimTeamEventUpdateForm
 {
     /**
      * This method gets called EVERY time the object is
@@ -666,10 +666,10 @@ class WpSwimMeetEventDeleteForm extends WpSwimMeetEventUpdateForm
      */
     function form_action()
     {
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
         $event->setEventId($this->get_hidden_element_value('eventid')) ;
 
-        $success = $event->deleteSwimMeetEvent() ;
+        $success = $event->deleteSwimTeamEvent() ;
 
         if ($success) 
             $this->set_action_message('Event successfully deleted.') ;
@@ -695,9 +695,9 @@ class WpSwimMeetEventDeleteForm extends WpSwimMeetEventUpdateForm
  *
  * @author Mike Walsh <mike@walshcrew.com>
  * @access public
- * @see WpSwimMeetEventUpdateForm
+ * @see WpSwimTeamEventUpdateForm
  */
-class WpSwimMeetEventDeleteAllForm extends WpSwimMeetEventDeleteForm
+class WpSwimTeamEventDeleteAllForm extends WpSwimTeamEventDeleteForm
 {
     /**
      * This method gets called EVERY time the object is
@@ -715,6 +715,9 @@ class WpSwimMeetEventDeleteAllForm extends WpSwimMeetEventDeleteForm
         //  Need to remember the Group Id we're working on
         $this->add_hidden_element('_eventgroupid') ;
         
+        //  Need to remember the Meet Id we're working on
+        $this->add_hidden_element('_swimmeetid') ;
+        
         $confirm = new FECheckBox('Confirm - Delete All Events') ;
         $this->add_element($confirm) ;
     }
@@ -729,6 +732,7 @@ class WpSwimMeetEventDeleteAllForm extends WpSwimMeetEventDeleteForm
     {
         $this->set_element_value('Confirm - Delete All Events', false) ;
         $this->set_hidden_element_value('_action', WPST_ACTION_EVENTS_DELETE_ALL) ;
+        $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
         $this->set_hidden_element_value('_eventgroupid', $this->getEventGroupId()) ;
     }
 
@@ -740,13 +744,24 @@ class WpSwimMeetEventDeleteAllForm extends WpSwimMeetEventDeleteForm
      */
     function form_content()
     {
-        $desc = SwimTeamTextMap::__mapEventGroupIdToText($this->get_hidden_element_value('_eventgroupid')) ;
+        $meetid = $this->get_hidden_element_value('_swimmeetid') ;
 
         $table = html_table($this->_width,0,4) ;
         $table->set_style('border: 1px solid') ;
-
         $table->add_row(html_br()) ;
-        $table->add_row(div_font10bold('Delete all events from Event Group:  ' .$desc)) ;
+
+        if ($meetid != WPST_NULL_ID)
+        {
+            $desc = SwimTeamTextMap::__mapMeetIdToText($meetid) ;
+            $table->add_row(div_font10bold('Delete all events from Swim Meet:', html_br(),
+                sprintf('%s vs %s on %s', ucwords($desc['location']), $desc['opponent'], $desc['date']))) ;
+        }
+        else
+        {
+            $desc = SwimTeamTextMap::__mapEventGroupIdToText($this->get_hidden_element_value('_eventgroupid')) ;
+            $table->add_row(div_font10bold('Delete all events from Event Group:  ' .$desc)) ;
+        }
+
         $table->add_row(html_br()) ;
         $table->add_row($this->element_form('Confirm - Delete All Events')) ;
         $table->add_row(html_br()) ;
@@ -778,24 +793,43 @@ class WpSwimMeetEventDeleteAllForm extends WpSwimMeetEventDeleteForm
     {
         $actionmsgs = array() ;
 
-        $event = new SwimMeetEvent() ;
-        $event->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
+        $event = new SwimTeamEvent() ;
+        $meetid = $this->get_hidden_element_value('_swimmeetid') ;
+        $eventgroupid = $this->get_hidden_element_value('_eventgroupid') ;
+        $event->setMeetId($meetid) ;
+        $event->setEventGroupId($eventgroupid) ;
 
-        $desc = SwimTeamTextMap::__mapEventGroupIdToText($this->get_hidden_element_value('_eventgroupid')) ;
+        //  Deleting events from a meet?
+        //  Tailor the message get the event ids based on either group or meet
 
-        //  Get all of the Event Ids for a Group Id
-        $eventIds = $event->getAllEventIdsByEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
+        if ($meetid != WPST_NULL_ID)
+        {
+            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+            //var_dump($meetid, $eventgroupid) ;
+            $desc = SwimTeamTextMap::__mapMeetIdToText($meetid) ;
+            $desc = sprintf('%s swim meet vs %s on %s', ucwords($desc['location']), $desc['opponent'], $desc['date']) ;
+            $eventIds = $event->getAllEventIdsByMeetId($meetid) ;
+        }
+        else
+        {
+            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+            $desc = SwimTeamTextMap::__mapEventGroupIdToText($this->get_hidden_element_value('_eventgroupid')) ;
+            $desc = sprintf('"%s" event group.', $desc) ;
+            $eventIds = $event->getAllEventIdsByEventGroupId($eventgroupid) ;
+        }
+
+        //  Process all of the events ids
 
         foreach ($eventIds as $eventId)
         {
             $event->setEventId($eventId['eventid']) ;
-            $event->loadSwimMeetEventByEventId() ;
+            $event->loadSwimTeamEventByEventId() ;
 
-            if ($event->deleteSwimMeetEvent())
-                $actionmsgs[] = sprintf('Event Number %s was deleted from "%s" Event Group.',
+            if ($event->deleteSwimTeamEvent())
+                $actionmsgs[] = sprintf('Event Number %s was deleted from %s.',
                     $event->getEventNumber(), $desc) ;
             else
-                $actionmsgs[] = sprintf('Event Number %s was not deleted from "%s" Event Group.',
+                $actionmsgs[] = sprintf('Event Number %s was not deleted from %s.',
                     $event->getEventNumber(), $desc) ;
         }
 
@@ -805,9 +839,17 @@ class WpSwimMeetEventDeleteAllForm extends WpSwimMeetEventDeleteForm
         {
             $c = container() ;
 
-            foreach($actionmsgs as $actionmsg)
+            //  What sort of message(s) do we want to show ...
+            if (get_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES) == WPST_YES)
             {
-                $c->add($actionmsg, html_br()) ;
+                foreach($actionmsgs as $actionmsg)
+                {
+                    $c->add($actionmsg, html_br()) ;
+                }
+            }
+            else
+            {
+                $c->add(sprintf('%d events deleted from %s.', count($actionmsgs), $desc), html_br()) ;
             }
 
             $actionmsg = $c->render() ;
@@ -841,12 +883,17 @@ class WpSwimMeetEventDeleteAllForm extends WpSwimMeetEventDeleteForm
  * @access public
  * @see WpSwimTeamForm
  */
-class WpSwimMeetEventLoadForm extends WpSwimTeamForm
+class WpSwimTeamEventLoadForm extends WpSwimTeamForm
 {
     /**
      * meet id property
      */
     var $__meetid ;
+
+    /**
+     * event group id property
+     */
+    var $__eventgroupid ;
 
     /**
      * Set the meet id property
@@ -865,6 +912,48 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
     }
 
     /**
+     * Set the eventgroup id property
+     */
+    function setEventGroupId($id)
+    {
+        $this->__eventgroupid = $id ;
+    }
+
+    /**
+     * Get the eventgroup id property
+     */
+    function getEventGroupId()
+    {
+        return $this->__eventgroupid ;
+    }
+
+    /**
+     * Get the array of eventgroup key and value pairs
+     *
+     * @return mixed - array of eventgroup key value pairs
+     */
+    function _eventgroupSelections()
+    {
+        //  EventGroup options and labels 
+
+        $s = array() ;
+        //$s = array(ucwords(WPST_NONE) => WPST_NULL_ID) ;
+
+        $eventgroup = new SwimTeamEventGroup() ;
+        $eventgroupIds = $eventgroup->getEventGroupIds() ;
+
+        foreach ($eventgroupIds as $eventgroupId)
+        {
+            $eventgroup->loadEventGroupById($eventgroupId['eventgroupid']) ;
+            $ec = $eventgroup->getEventGroupCount() ;
+            $s[$eventgroup->getEventGroupDescription() .
+                ' (' . $ec['eventcount'] . ' events)' ] = $eventgroup->getEventGroupId() ;
+        }
+
+        return $s ;
+    }
+
+    /**
      * Build the list of events so they can
      * be used in the widget.
      *
@@ -872,7 +961,7 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
      */
     function _buildEventList()
     {
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
 
         $eventIds = $event->getAllEventIds() ;
 
@@ -880,7 +969,7 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
 
         foreach ($eventIds as $eventId)
         {
-            $event->loadSwimMeetEventByEventId($eventId['eventid']) ;
+            $event->loadSwimTeamEventByEventId($eventId['eventid']) ;
             $desc = sprintf('%04s:  %s %s %s %s', 
                 $event->getEventNumber(),
                 SwimTeamTextMap::__mapAgeGroupIdToText($event->getAgeGroupId()),
@@ -906,12 +995,16 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
         //  which originated from the GUIDataList.
  
         $this->add_hidden_element('_action') ;
-        $this->add_hidden_element('_meetid') ;
+        $this->add_hidden_element('_swimmeetid') ;
 
-        $eventlist = new FECheckBoxList('Events', true, '100%', '400px');
-        $eventlist->set_list_data($this->_buildEventList()) ;
-        $eventlist->enable_checkall(true) ;
-        $this->add_element($eventlist) ;
+        $eventgroup = new FEListBox('Event Group', true, '300px');
+        $eventgroup->set_list_data($this->_eventgroupSelections()) ;
+        $this->add_element($eventgroup) ;
+
+        //$eventlist = new FECheckBoxList('Events', true, '100%', '400px');
+        //$eventlist->set_list_data($this->_buildEventList()) ;
+        //$eventlist->enable_checkall(true) ;
+        //$this->add_element($eventlist) ;
 
  		//  Event Number field
 
@@ -932,7 +1025,7 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
         $this->set_hidden_element_value('_action', WPST_ACTION_EVENTS_LOAD) ;
 
         //if (is_null($this->getMeetId())) wp_die(basename(__FILE__) . '::' . __LINE__) ;
-        $this->set_hidden_element_value('_meetid', $this->getMeetId()) ;
+        $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
         //$this->set_element_value('First Event Number', '1') ;
     }
 
@@ -948,10 +1041,16 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
         $table = html_table($this->_width,0,4) ;
         $table->set_style('border: 1px solid') ;
 
+        //$table->add_row(html_td(null, null,
+        //    $this->element_label('Events')), html_td(null, null,
+        //    $this->element_form('Events'), html_br(),
+        //    div_font8bold('Note:  Only checked events will be added to the Swim Meet.'))) ;
+
+        $table->add_row(html_br()) ;
+
         $table->add_row(html_td(null, null,
-            $this->element_label('Events')), html_td(null, null,
-            $this->element_form('Events'), html_br(),
-            div_font8bold('Note:  Only checked events will be added to the Swim Meet.'))) ;
+            $this->element_label('Event Group')), html_td(null, null,
+            $this->element_form('Event Group'))) ;
 
         $table->add_row(html_br()) ;
 
@@ -997,8 +1096,91 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
         //  Assume success ...
 
         $success = true ;
+        $actionmsgcount = array('good' => 0, 'bad' => '0') ;
 
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
+
+        $meetid = $this->get_hidden_element_value('_swimmeetid') ;
+        $desc = SwimTeamTextMap::__mapMeetIdToText($meetid) ;
+        $desc = sprintf('%s swim meet vs %s on %s', ucwords($desc['location']), $desc['opponent'], $desc['date']) ;
+        $eventgroupid = $this->get_element_value('Event Group') ;
+
+        $eventIds = $event->getAllEventIdsByEventGroupIdAndMeetId($eventgroupid, WPST_NULL_ID) ;
+        //printf('<h3>%s::%s</h3>', basename(__FILE__), __LINE__) ;
+        //var_dump(count($eventIds)) ;
+
+        //  Loop through submitted event ids, copying the standard
+        //  event as a new event for the selected meet.
+
+        foreach ($eventIds as $eventId)
+        {
+            //  Load the base event, change
+            //  the meet id and add it as a new event
+
+            $event->loadSwimTeamEventByEventId($eventId['eventid']) ;
+            $event->setMeetId($meetid) ;
+            $success = ($event->addSwimTeamEvent() != null) ;
+
+            if ($success)
+            {
+                $actionmsgcount['good']++ ;
+                $actionmsgs[] = sprintf('Event %d added to %s.', $event->getEventNumber(), $desc) ;
+            }
+            else
+            {
+                $actionmsgcount['bad']++ ;
+                $actionmsgs[] = sprintf('Event %d was not added to %s.', $event->getEventNumber(), $desc) ;
+            }
+        }
+
+        //  Construct action message
+
+        if (!empty($actionmsgs))
+        {
+            $c = container() ;
+
+            //  What sort of message(s) do we want to show ...
+            if (get_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES) == WPST_YES)
+            {
+                foreach($actionmsgs as $actionmsg)
+                {
+                    $c->add($actionmsg, html_br()) ;
+                }
+            }
+            else
+            {
+                $c->add(sprintf('%d events loaded into %s.', $actionmsgcount['good'], $desc), html_br()) ;
+                $c->add(sprintf('%d events were not loaded into %s.', $actionmsgcount['bad'], $desc), html_br()) ;
+            }
+
+            $actionmsg = $c->render() ;
+        }
+        else
+        {
+            $this->setErrorActionMessageDivClass() ;
+            $actionmsg = 'No events loaded.' ;
+        }
+
+        $this->set_action_message($actionmsg) ;
+
+        return true ;
+    }
+
+    /**
+     * This method is called ONLY after ALL validation has
+     * passed.  This is the method that allows you to 
+     * do something with the data, say insert/update records
+     * in the DB.
+     */
+    function form_action2()
+    {
+        $actionmsgs = array() ;
+
+        //  Assume success ...
+
+        $success = true ;
+
+        $event = new SwimTeamEvent() ;
 
         $eventIds = $this->get_element_value('Events') ;
 
@@ -1022,7 +1204,7 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
                 !array_search($eventId['eventid'], $eventIds, true)))
             {
                 $event->setEventId($eventId['eventid']) ;
-                $event->deleteSwimMeetEvent() ;
+                $event->deleteSwimTeamEvent() ;
             }
         }
          */
@@ -1031,16 +1213,16 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
         //  Loop through submitted event ids, copying the standard
         //  event as a new event for the selected meet.
 
-        $meetid = $this->get_hidden_element_value('_meetid') ;
+        $meetid = $this->get_hidden_element_value('_swimmeetid') ;
 
         foreach ($eventIds as $eventId)
         {
             //  Load the standard event, change
             //  the meet id and add it as a new event
 
-            $event->loadSwimMeetEventByEventId($eventId) ;
+            $event->loadSwimTeamEventByEventId($eventId) ;
             $event->setMeetId($meetid) ;
-            $success = ($event->addSwimMeetEvent() != null) ;
+            $success = ($event->addSwimTeamEvent() != null) ;
 
             if ($success)
                 $actionmsgs[] = sprintf('Event added to swim meet:  %s',
@@ -1116,6 +1298,7 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
      *
      * @return mixed - DIV container containing buttons.
      */
+    /*
     function form_content_buttons()
     {
         // Need a work-around?
@@ -1132,9 +1315,9 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
                 'padding-top:5px;padding-bottom:5px', 'align' => 'center',
                 'nowrap')) ;
 
-            /********************************
-             * add js onsubmit action if any
-             */
+            //********************************
+            //* add js onsubmit action if any
+            //
 
             foreach($this->_elements as $k => $v)
             {
@@ -1156,6 +1339,17 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
             return parent::form_content_buttons() ;
         }
     }
+             */
+
+    /**
+     * Overload form_content_buttons() method to have the
+     * button display 'Delete' instead of the default 'Save'.
+     *
+     */
+    function form_content_buttons()
+    {
+        return $this->form_content_buttons_Action_Cancel(WPST_ACTION_EVENTS_LOAD) ;
+    }
 }
 
 /**
@@ -1165,7 +1359,7 @@ class WpSwimMeetEventLoadForm extends WpSwimTeamForm
  * @access public
  * @see WpSwimTeamForm
  */
-class WpSwimMeetEventsImportForm extends WpSwimTeamFileUploadForm
+class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
 {
     /**
      * Age Group - used to connect event to an age group
@@ -1565,10 +1759,13 @@ class WpSwimMeetEventsImportForm extends WpSwimTeamFileUploadForm
         //  events can be defined at one time, need to loop
         //  through combination of age groups and strokes.
 
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
         $event->setMeetId(WPST_NULL_ID) ;
+        $this->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
         $event->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
         
+        //var_dump($this->getEventGroupId()) ;
+
         //  Hy-tek Meet Event (.hyv) File Format
         //
         //  More details at:
@@ -1640,11 +1837,11 @@ class WpSwimMeetEventsImportForm extends WpSwimTeamFileUploadForm
            
                 //  Check to see if the event already exists
 
-                if ($event->getSwimMeetEventExistsByEventNumberAndGroupId(null, null, true))
+                if ($event->getSwimTeamEventExistsByEventNumberAndGroupId(null, null, true))
                 {
                     if ($this->get_element_value('Duplicate Event Numbers') == WPST_ACTION_REPLACE)
                     {
-                        if ($event->updateSwimMeetEvent())
+                        if ($event->updateSwimTeamEvent())
                             $actionmsgs[] = sprintf('Event %s on line %d updated.',
                                 SwimTeamTextMap::__mapEventIdToText($event->getEventId()), $line_number) ;
                         else
@@ -1659,7 +1856,7 @@ class WpSwimMeetEventsImportForm extends WpSwimTeamFileUploadForm
                 }
                 else
                 {
-                    if ($event->addSwimMeetEvent() != null)
+                    if ($event->addSwimTeamEvent() != null)
                         $actionmsgs[] = sprintf('Event %s on line %d added.',
                             SwimTeamTextMap::__mapEventIdToText($event->getEventId()), $line_number) ;
                     else
@@ -1717,7 +1914,7 @@ class WpSwimMeetEventsImportForm extends WpSwimTeamFileUploadForm
  * @access public
  * @see WpSwimTeamForm
  */
-class WpSwimMeetEventGroupAddForm extends WpSwimTeamForm
+class WpSwimTeamEventGroupAddForm extends WpSwimTeamForm
 {
     /**
      * id property - used to track the eventgroup record
@@ -1839,7 +2036,7 @@ class WpSwimMeetEventGroupAddForm extends WpSwimTeamForm
 
         //  Make sure position is unique
 
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroup->setEventGroupDescription($this->get_element_value('Description')) ;
 
         if ($eventgroup->eventgroupExistByDescription())
@@ -1859,7 +2056,7 @@ class WpSwimMeetEventGroupAddForm extends WpSwimTeamForm
      */
     function form_action()
     {
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroup->setEventGroupDescription($this->get_element_value('Description')) ;
         $eventgroup->setEventGroupStatus($this->get_element_value('Status')) ;
         $success = $eventgroup->addEventGroup() ;
@@ -1906,9 +2103,9 @@ class WpSwimMeetEventGroupAddForm extends WpSwimTeamForm
  *
  * @author Mike Walsh <mike@walshcrew.com>
  * @access public
- * @see WpSwimMeetEventGroupAddForm
+ * @see WpSwimTeamEventGroupAddForm
  */
-class WpSwimMeetEventGroupUpdateForm extends WpSwimMeetEventGroupAddForm
+class WpSwimTeamEventGroupUpdateForm extends WpSwimTeamEventGroupAddForm
 {
     /**
      * This method is called only the first time the form
@@ -1921,7 +2118,7 @@ class WpSwimMeetEventGroupUpdateForm extends WpSwimMeetEventGroupAddForm
         $this->set_hidden_element_value('_eventgroupid', $this->getEventGroupId()) ;
         $this->set_hidden_element_value('_action', WPST_ACTION_UPDATE) ;
 
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroup->loadEventGroupById($this->getEventGroupId()) ;
 
         //  Initialize the form fields
@@ -1944,7 +2141,7 @@ class WpSwimMeetEventGroupUpdateForm extends WpSwimMeetEventGroupAddForm
 
         //  Make sure description is unique
 
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroup->setEventGroupDescription($this->get_element_value('Description')) ;
 
         if (($eventgroup->eventgroupExistByDescription())
@@ -1965,7 +2162,7 @@ class WpSwimMeetEventGroupUpdateForm extends WpSwimMeetEventGroupAddForm
      */
     function form_action()
     {
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroup->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
         $eventgroup->setEventGroupDescription($this->get_element_value('Description')) ;
         $eventgroup->setEventGroupStatus($this->get_element_value('Status')) ;
@@ -1996,7 +2193,7 @@ class WpSwimMeetEventGroupUpdateForm extends WpSwimMeetEventGroupAddForm
  * @access public
  * @see WpSwimTeamForm
  */
-class WpSwimMeetEventGroupDeleteForm extends WpSwimMeetEventGroupUpdateForm
+class WpSwimTeamEventGroupDeleteForm extends WpSwimTeamEventGroupUpdateForm
 {
     /**
      * Return form help
@@ -2049,7 +2246,7 @@ class WpSwimMeetEventGroupDeleteForm extends WpSwimMeetEventGroupUpdateForm
     {
         //  Make sure position exists
 
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroup->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
 
         return ($eventgroup->eventgroupExistById()) ;
@@ -2064,7 +2261,7 @@ class WpSwimMeetEventGroupDeleteForm extends WpSwimMeetEventGroupUpdateForm
      */
     function form_action()
     {
-        $eventgroup = new SwimMeetEventGroup() ;
+        $eventgroup = new SwimTeamEventGroup() ;
         $eventgroup->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
 
         $success = $eventgroup->deleteEventGroup() ;
@@ -2103,7 +2300,7 @@ class WpSwimMeetEventGroupDeleteForm extends WpSwimMeetEventGroupUpdateForm
  * @access public
  * @see DIVtag
  */
-class WpSwimMeetEventReorderAjaxForm extends TABLEtag
+class WpSwimTeamEventReorderAjaxForm extends TABLEtag
 {
     /**
      * Property to store the event
@@ -2125,8 +2322,8 @@ class WpSwimMeetEventReorderAjaxForm extends TABLEtag
      *
      * @param meetid - int - meet id to connect events to
      */
-    //function WpSwimMeetEventReorderAjaxForm($meetid = WPST_NULL_ID, $eventgroupid = WPST_NULL_ID)
-    function WpSwimMeetEventReorderAjaxForm()
+    //function WpSwimTeamEventReorderAjaxForm($meetid = WPST_NULL_ID, $eventgroupid = WPST_NULL_ID)
+    function WpSwimTeamEventReorderAjaxForm()
     {
         $this->__agegroup = new SwimTeamAgeGroup() ;
 
@@ -2157,7 +2354,7 @@ class WpSwimMeetEventReorderAjaxForm extends TABLEtag
 
         foreach ($this->__eventIds as $eventId)
         {
-            $this->__event->loadSwimMeetEventByEventId($eventId['eventid']) ;
+            $this->__event->loadSwimTeamEventByEventId($eventId['eventid']) ;
 
             $this->__agegroup->loadAgeGroupById($this->__event->getAgeGroupId()) ;
 
@@ -2232,23 +2429,23 @@ class WpSwimMeetEventReorderAjaxForm extends TABLEtag
  *
  * @author Mike Walsh <mike@walshcrew.com>
  * @access public
- * @see WpSwimMeetEventReorderAjaxForm
+ * @see WpSwimTeamEventReorderAjaxForm
  */
-class WpSwimMeetEventReorderBySwimMeetAjaxForm extends WpSwimMeetEventReorderAjaxForm
+class WpSwimTeamEventReorderBySwimMeetAjaxForm extends WpSwimTeamEventReorderAjaxForm
 {
     /**
      * Constructor - Build the Ajax form content
      *
      * @param meetid - int - meet id to connect events to
      */
-    function WpSwimMeetEventReorderBySwimMeetAjaxForm($meetid = WPST_NULL_ID)
+    function WpSwimTeamEventReorderBySwimMeetAjaxForm($meetid = WPST_NULL_ID)
     {
-        $this->__event = new SwimMeetEvent() ;
+        $this->__event = new SwimTeamEvent() ;
 
         $this->__eventIds = $this->__event->getAllEventIdsByMeetId($meetid) ;
         //var_dump($eventIds) ;
 
-        parent::WpSwimMeetEventReorderAjaxForm() ;
+        parent::WpSwimTeamEventReorderAjaxForm() ;
     }
 }
 
@@ -2257,23 +2454,23 @@ class WpSwimMeetEventReorderBySwimMeetAjaxForm extends WpSwimMeetEventReorderAja
  *
  * @author Mike Walsh <mike@walshcrew.com>
  * @access public
- * @see WpSwimMeetEventReorderAjaxForm
+ * @see WpSwimTeamEventReorderAjaxForm
  */
-class WpSwimMeetEventReorderByEventGroupAjaxForm extends WpSwimMeetEventReorderAjaxForm
+class WpSwimTeamEventReorderByEventGroupAjaxForm extends WpSwimTeamEventReorderAjaxForm
 {
     /**
      * Constructor - Build the Ajax form content
      *
      * @param meetid - int - meet id to connect events to
      */
-    function WpSwimMeetEventReorderByEventGroupAjaxForm($eventgroupid = WPST_NULL_ID)
+    function WpSwimTeamEventReorderByEventGroupAjaxForm($eventgroupid = WPST_NULL_ID)
     {
-        $this->__event = new SwimMeetEvent() ;
+        $this->__event = new SwimTeamEvent() ;
 
-        $this->__eventIds = $this->__event->getAllEventIdsByEventGroupId($eventgroupid) ;
+        $this->__eventIds = $this->__event->getAllEventIdsByEventGroupIdAndMeetId($eventgroupid, WPST_NULL_ID) ;
         //var_dump($this->__eventIds) ;
 
-        parent::WpSwimMeetEventReorderAjaxForm() ;
+        parent::WpSwimTeamEventReorderAjaxForm() ;
     }
 }
 ?>

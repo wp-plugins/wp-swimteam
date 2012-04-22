@@ -766,7 +766,8 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
 
         //  The unique item is the second column.
 
-	    $this->add_action_column('radio', 'FIRST', "meetid") ;
+	    $this->add_action_column('radio', 'FIRST', 'meetid') ;
+        $this->set_radio_var_name('_swimmeetid', false) ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -913,13 +914,13 @@ class SwimMeetsAdminGUIDataList extends SwimMeetsGUIDataList
      */
     var $__normal_actions = array(
          WPST_ACTION_DETAILS => WPST_ACTION_DETAILS
-        ,WPST_ACTION_RESULTS => WPST_ACTION_RESULTS
+        //,WPST_ACTION_RESULTS => WPST_ACTION_RESULTS
         //,WPST_ACTION_SCRATCH_REPORT => WPST_ACTION_SCRATCH_REPORT
         ,WPST_ACTION_ADD => WPST_ACTION_ADD
         ,WPST_ACTION_UPDATE => WPST_ACTION_UPDATE
         ,WPST_ACTION_DELETE => WPST_ACTION_DELETE
-        //,WPST_ACTION_EVENTS => WPST_ACTION_EVENTS
-        ,WPST_ACTION_EXPORT_SDIF => WPST_ACTION_EXPORT_SDIF
+        ,WPST_ACTION_EVENTS_MANAGE => WPST_ACTION_EVENTS_MANAGE
+        //,WPST_ACTION_EXPORT_SDIF => WPST_ACTION_EXPORT_SDIF
         ,WPST_ACTION_JOBS => WPST_ACTION_JOBS
         ,WPST_ACTION_JOB_REMINDERS => WPST_ACTION_JOB_REMINDERS
         //,WPST_ACTION_IMPORT_EVENTS => WPST_ACTION_IMPORT_EVENTS

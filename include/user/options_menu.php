@@ -97,7 +97,7 @@ class OptionsTabContainer extends Container
 
         $tabs = new TabControlWidget() ;
 
-        $url = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ;
+        $url = SwimTeamUtils::GetPageURI() ;
 
         //  Clean up the URL or the tab=N argument
         //  will continue to be appended indefinitely.

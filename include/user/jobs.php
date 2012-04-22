@@ -17,9 +17,10 @@
  */
 
 
-require_once("jobs.class.php") ;
-require_once("jobs.forms.class.php") ;
-require_once("container.class.php") ;
+require_once('jobs.class.php') ;
+require_once('jobs.forms.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the swim clubs
@@ -40,9 +41,9 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_USERS_PROFILE_USER)),
-            __("Display detailed information about a particular job.")) ;
+            __('Display detailed information about a particular job.')) ;
         $table->add_row(html_b(__(WPST_ACTION_SIGN_UP)),
-            __("Assign a user to a specific job assigment.")) ;
+            __('Assign a user to a specific job assigment.')) ;
 
         return $table ;
     }
@@ -54,11 +55,11 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
      */
     function __buildGDL()
     {
-        $where_clause = sprintf("jobtype=\"%s\" AND jobstatus=\"%s\"",
+        $where_clause = sprintf('jobtype="%s" AND jobstatus="%s"',
             WPST_JOB_TYPE_VOLUNTEER, WPST_ACTIVE) ;
 
-        $gdl = new SwimTeamJobsGUIDataList("Swim Team Jobs",
-            "100%", "jobstatus, jobposition", true, WPST_JOBS_DEFAULT_COLUMNS,
+        $gdl = new SwimTeamJobsGUIDataList('Swim Team Jobs',
+            '100%', 'jobstatus, jobposition', true, WPST_JOBS_DEFAULT_COLUMNS,
             WPST_JOBS_DEFAULT_TABLES, $where_clause) ;
 
         $gdl->set_alternating_row_colors(true) ;
@@ -79,8 +80,8 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
-        $div->add(html_h3("Swim Team Jobs")) ;
+        $div->set_style('clear: both;') ;
+        $div->add(html_h3('Swim Team Jobs')) ;
 
         //  This allows passing arguments eithers as a GET or a POST
 
@@ -89,12 +90,12 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
         //  The jobid is the argument which must be
         //  dealt with differently for GET and POST operations
 
-        if (array_key_exists(WPST_DB_PREFIX . "radio", $scriptargs))
-            $jobid = $scriptargs[WPST_DB_PREFIX . "radio"][0] ;
-        else if (array_key_exists("_jobid", $scriptargs))
-            $jobid = $scriptargs["_jobid"] ;
-        else if (array_key_exists("jobid", $scriptargs))
-            $jobid = $scriptargs["jobid"] ;
+        if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
+            $jobid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
+        else if (array_key_exists('_jobid', $scriptargs))
+            $jobid = $scriptargs['_jobid'] ;
+        else if (array_key_exists('jobid', $scriptargs))
+            $jobid = $scriptargs['jobid'] ;
         else
             $jobid = null ;
 
@@ -105,9 +106,9 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
         //  If there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
-        if (array_key_exists("_action", $scriptargs))
+        if (array_key_exists('_action', $scriptargs))
             $action = $scriptargs['_action'] ;
-        else if (array_key_exists("_form_action", $scriptargs))
+        else if (array_key_exists('_form_action', $scriptargs))
             $action = $scriptargs['_form_action'] ;
         else
             $action = null ;
@@ -133,7 +134,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
             {
                 case WPST_ACTION_PROFILE:
                     $c = container() ;
-                    $profile = new SwimTeamJobProfileInfoTable("Swim Team Job Profile", "500px") ;
+                    $profile = new SwimTeamJobProfileInfoTable('Swim Team Job Profile', '500px') ;
                     $profile->setJobId($jobid) ;
                     $profile->constructSwimTeamJobProfile() ;
                     $c->add($profile) ;
@@ -141,7 +142,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_ADD:
-                    $form = new WpSwimTeamJobAddForm("Add Swim Team Job",
+                    $form = new WpSwimTeamJobAddForm('Add Swim Team Job',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Job Instructions') ;
@@ -149,7 +150,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_UPDATE:
-                    $form = new WpSwimTeamJobUpdateForm("Update Swim Team Job",
+                    $form = new WpSwimTeamJobUpdateForm('Update Swim Team Job',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setJobId($jobid) ;
                     $this->setShowFormInstructions() ;
@@ -158,7 +159,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_DELETE:
-                    $form = new WpSwimTeamJobDeleteForm("Delete Swim Team Job",
+                    $form = new WpSwimTeamJobDeleteForm('Delete Swim Team Job',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setJobId($jobid) ;
                     $this->setShowFormInstructions() ;
@@ -167,7 +168,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_ALLOCATE:
-                    $form = new WpSwimTeamJobsAllocateForm("Allocate Swim Team Jobs",
+                    $form = new WpSwimTeamJobsAllocateForm('Allocate Swim Team Jobs',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setJobId($jobid) ;
                     $this->setShowFormInstructions() ;
@@ -176,7 +177,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_REALLOCATE:
-                    $form = new WpSwimTeamJobsReallocateForm("Reallocate Swim Team Jobs",
+                    $form = new WpSwimTeamJobsReallocateForm('Reallocate Swim Team Jobs',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setJobId($jobid) ;
                     $this->setShowFormInstructions() ;
@@ -185,7 +186,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_DEALLOCATE:
-                    $form = new WpSwimTeamJobsDeallocateForm("Deallocate Swim Team Jobs",
+                    $form = new WpSwimTeamJobsDeallocateForm('Deallocate Swim Team Jobs',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setJobId($jobid) ;
                     $this->setShowFormInstructions() ;
@@ -194,7 +195,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_DELETE:
-                    $form = new WpSwimTeamJobDeleteForm("Delete Swim Team Job",
+                    $form = new WpSwimTeamJobDeleteForm('Delete Swim Team Job',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setJobId($jobid) ;
                     $this->setShowFormInstructions() ;
@@ -203,7 +204,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_SIGN_UP:
-                    $form = new WpSwimTeamJobAssignForm("Job Sign Up",
+                    $form = new WpSwimTeamJobAssignForm('Job Sign Up',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setJobId($jobid) ;
                     $this->setShowFormInstructions() ;
@@ -212,7 +213,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 default:
-                    $div->add(html_h4(sprintf("Unsupported action \"%s\" requested.", $action))) ;
+                    $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
                     break ;
             }
 
@@ -223,8 +224,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
                 //  Create the form processor
 
                 $fp = new FormProcessor($form) ;
-                $fp->set_form_action($_SERVER['PHP_SELF'] .
-                    "?" . $_SERVER['QUERY_STRING']) ;
+                $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
                 //  Display the form again even if processing was successful.
 
@@ -255,11 +255,11 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add(html_br(2), $c) ;
-                $div->add(SwimTeamGUIBackHomeButtons::getButtons()) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Jobs')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4("No content to display.")) ;
+                $div->add(html_br(2), html_h4('No content to display.')) ;
             }
         }
 
@@ -289,32 +289,32 @@ class SwimTeamAdminJobsTabContainer extends SwimTeamJobsTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_ACTION_ADD)),
-            __("Add a job or volunteer position.  Use this action to define
-            a new job or position so it can be used to help run a swim team.")) ;
+            __('Add a job or volunteer position.  Use this action to define
+            a new job or position so it can be used to help run a swim team.')) ;
         $table->add_row(html_b(__(WPST_ACTION_UPDATE)),
-            __("Update a job or volunteer position.  Use this
+            __('Update a job or volunteer position.  Use this
             action to update the information for a job or position.  Set
-            a position to <b>Inactive</b> if it is no longer needed.")) ;
+            a position to <b>Inactive</b> if it is no longer needed.')) ;
         $table->add_row(html_b(__(WPST_ACTION_DELETE)),
-            __("Delete a job or volunteer position.  Use this
+            __('Delete a job or volunteer position.  Use this
             action to delete a position from the system.  Deleting a
             job will also delete any job allocations or job assignments
             effectively erasing it from the system.  Set a position to
-            Inactive if it is no longer needed.")) ;
+            Inactive if it is no longer needed.')) ;
         $table->add_row(html_b(__(WPST_ACTION_ALLOCATE)),
-            __("Allocate a job to a season or one or more swim meets.  Jobs
+            __('Allocate a job to a season or one or more swim meets.  Jobs
             must be allocated before users can be assigned to them.  The
             process of allocating a job determines how many of a specific
-            job is required for a season or a meet.")) ;
+            job is required for a season or a meet.')) ;
         $table->add_row(html_b(__(WPST_ACTION_REALLOCATE)),
-            __("Change how a job is allocated against a season or meet.  If
+            __('Change how a job is allocated against a season or meet.  If
             reallocating a job decreases the quantity, existing assigments
             may be deleted depending on whether or not they have been filled
             or not.  When increasing the quantity, new job assigments are
-            added to the existing assignments.")) ;
+            added to the existing assignments.')) ;
         $table->add_row(html_b(__(WPST_ACTION_DEALLOCATE)),
-            __("Remove all allocations of a job from a season or meet.  When
-            deallocating a job, any existing job assignments are also removed.")) ;
+            __('Remove all allocations of a job from a season or meet.  When
+            deallocating a job, any existing job assignments are also removed.')) ;
 
         return $table ;
     }
@@ -357,8 +357,8 @@ class SwimTeamAdminJobsTabContainer extends SwimTeamJobsTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimTeamJobsAdminGUIDataList("Swim Team Jobs",
-            "100%", "jobstatus, jobposition", false) ;
+        $gdl = new SwimTeamJobsAdminGUIDataList('Swim Team Jobs',
+            '100%', 'jobstatus, jobposition', false) ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;

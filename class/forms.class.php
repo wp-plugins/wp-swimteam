@@ -517,6 +517,21 @@ class WpSwimTeamForm extends StandardFormContent
     }
 
     /**
+     * Provide a mechanism to overload form_content_buttons() method
+     * to have the button display "Load" instead of "Save".
+     *
+     * @return HTMLTag object
+     */
+    function form_content_buttons_Action_Cancel($action = 'Unknown')
+    {
+        $div = new DIVtag(array('style' => 'background-color: #eeeeee;'.
+            'padding-top:5px;padding-bottom:5px', 'align'=>'center', 'nowrap'),
+            $this->add_action($action), _HTML_SPACE, $this->add_cancel()) ;
+
+        return $div;
+    }
+
+    /**
      * Constructor
      *
      * @param string - title

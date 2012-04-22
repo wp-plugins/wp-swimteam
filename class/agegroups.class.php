@@ -784,42 +784,6 @@ class SwimTeamAgeGroupsAdminGUIDataList extends SwimTeamAgeGroupsGUIDataList
         
         $this->save_checked_items(true) ;
     }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function actionbar_cell($actions = null)
-    {
-        //  Add an ActionBar button based on the action the page
-        //  was called with.
-
-        $c = container() ;
-
-        if (is_null($actions)) $actions = $this->__normal_actions ;
-
-        foreach($actions as $key => $action)
-            $actions[$action] = $action ;
-
-        $lb = $this->action_select('_action', $actions,
-            '', false, array('style' => 'width: 150px; margin-right: 10px;'),
-            $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']) ;
-
-        $c->add($lb) ;
-
-        return $c ;
-    }
-
-    /**
-     * Action Bar - build a set of Action Bar buttons
-     *
-     * @return container - container holding action bar content
-     */
-    function empty_datalist_actionbar_cell()
-    {
-        return $this->actionbar_cell($this->__empty_actions) ;
-    }
 }
 
 /**

@@ -18,10 +18,10 @@
  *
  */
 
-include_once(PHPHTMLLIB_ABSPATH . "/widgets/data_list/includes.inc") ;
-include_once(PHPHTMLLIB_ABSPATH . "/widgets/data_list/WordPressSQLDataListSource.inc") ;
+include_once(PHPHTMLLIB_ABSPATH . '/widgets/data_list/includes.inc') ;
+include_once(PHPHTMLLIB_ABSPATH . '/widgets/data_list/WordPressSQLDataListSource.inc') ;
 
-include_once("db.include.php") ;
+include_once('db.include.php') ;
 
 /**
  * Class definition for the tab content
@@ -153,86 +153,69 @@ class TabWidgetContent
  * @access public
  * @see SPANtag
  */
-class SwimTeamGUIBackHomeButtons extends SPANtag
+class SwimTeamGUIButtons extends SPANtag
 {
-    /**
-     * Get Full URL Path
-     *
-     * @return string - full URL path for the current page
-     */
-    function getFullURLPath()
-    {
-        $full_url = 'http' ;
-        $script_name = '' ;
-
-        if(isset($_SERVER['REQUEST_URI']))
-        {
-            $script_name = $_SERVER['REQUEST_URI'] ;
-        }
-        else
-        {
-            $script_name = $_SERVER['PHP_SELF'] ;
-
-            if($_SERVER['QUERY_STRING'] > ' ')
-            {
-                $script_name .=  '?'.$_SERVER['QUERY_STRING'] ;
-            }
-        }
-
-        if(isset($_SERVER['HTTPS']) && $_SERVER['HTTPS']=='on')
-        {
-            $full_url .=  's' ;
-        }
-
-        $full_url .=  '://' ;
-
-        if($_SERVER['SERVER_PORT'] != '80')
-        {
-            $full_url .= $_SERVER['HTTP_HOST'] . ':' .
-                $_SERVER['SERVER_PORT'] . $script_name ;
-        }
-        else
-        {
-            $full_url .=  $_SERVER['HTTP_HOST'] . $script_name ;
-        }
-
-       return $full_url ;
-    }
-
     /**
      * Get Back and Home buttons
      *
+     * @param string - optional URI to embed in the javascript.
      * @return object - HTML span containing Back and Home buttons.
      */
-    function getButtons()
+    function getBackHomeButtons($uri = null)
     {
-        /*
-        if (!array_key_exists('QUERY_STRING', $_SERVER))
-            $uri = $_SERVER['PHP_SELF'] ;
-        else
-            $uri = $_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING'] ;
-        
-        $back = html_button("button", "Back") ;
-        $back->set_tag_attribute("onclick",
-            "javascript:document.location='" .
-            get_option('url') . $uri . "' ;") ;
-        $back->set_tag_attribute("style", "margin: 10px;") ;
-         */
+        if (is_null($uri))
+            $uri = SwimTeamUtils::GetPageURI() ;
 
-        $uri = SwimTeamGUIBackHomeButtons::getFullURLPath() ;
+        $back = html_button('button', 'Back') ;
+        $back->set_tag_attribute('onclick',
+            'javascript:window.history.back() ;') ;
+        $back->set_tag_attribute('style', 'margin: 10px;') ;
 
-        $back = html_button("button", "Back") ;
-        $back->set_tag_attribute("onclick",
-            "javascript:document.location='" .
-             $uri . "' ;") ;
-        $back->set_tag_attribute("style", "margin: 10px;") ;
-
-        $home = html_button("button", "Home") ;
-        $home->set_tag_attribute("onclick",
-            "javascript:document.location='" .  get_option('url') . "' ;") ;
-        $home->set_tag_attribute("style", "margin: 10px;") ;
+        $home = html_button('button', 'Home') ;
+        $home->set_tag_attribute('onclick',
+            'javascript:document.location=\'' . $uri . '\' ;') ;
+        $home->set_tag_attribute('style', 'margin: 10px;') ;
 
         return html_span(null, $back, $home) ;
+    }
+
+    /**
+     * Get Done button
+     *
+     * @param string - optional URI to embed in the javascript.
+     * @return object - HTML span containing Back and Home buttons.
+     */
+    function getDoneButton($uri = null)
+    {
+        if (is_null($uri))
+            $uri = SwimTeamUtils::GetPageURI() ;
+
+        $done = html_button('button', 'Done') ;
+        $done->set_tag_attribute('onclick',
+            'javascript:document.location=\'' . $uri . '\' ;') ;
+        $done->set_tag_attribute('style', 'margin: 10px;') ;
+
+        return html_span(null, $done) ;
+    }
+
+    /**
+     * Get 'Custom' button
+     *
+     * @param string - text to display on the button
+     * @param string - optional URI to embed in the javascript.
+     * @return object - HTML span containing Back and Home buttons.
+     */
+    function getButton($text, $uri = null)
+    {
+        if (is_null($uri))
+            $uri = SwimTeamUtils::GetPageURI() ;
+
+        $button = html_button('button', $text) ;
+        $button->set_tag_attribute('onclick',
+            'javascript:document.location=\'' . $uri . '\' ;') ;
+        $button->set_tag_attribute('style', 'margin: 10px;') ;
+
+        return html_span(null, $button) ;
     }
 }
 
@@ -283,6 +266,17 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
     }
 
     /**
+     * Set radio var
+     *
+     * @param string - action to take
+     */
+    function set_radio_var_name($radioVarName, $useglobalprefix = true)
+    {
+        $this->_vars['radioVar'] = ($useglobalprefix) ?
+            $this->get_global_prefix() . $radioVarName : $radioVarName ;
+    }
+
+    /**
      * Set admin action
      *
      * @param string - action to take
@@ -303,8 +297,8 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimTeamGUIDataList($title, $width = "100%",
-        $default_orderby = '', $default_reverseorder = FALSE,
+    function SwimTeamGUIDataList($title, $width = '100%',
+        $default_orderby = '', $default_reverseorder = false,
         $columns, $tables, $where_clause)
     {
         //  Set the properties for this child class
@@ -434,8 +428,8 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
      */
     function user_setup()
     {
-        user_error("SwimTeamGUIDataList::user_setup() - child class " .
-            "must override this to set the the database table.") ;
+        user_error('SwimTeamGUIDataList::user_setup() - child class ' .
+            'must override this to set the the database table.') ;
 	}
 
     /**
@@ -456,8 +450,8 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
 		switch ($col_name)
         {
                 /*
-            case "Updated" :
-                $obj = strftime("%Y-%m-%d @ %T", (int)$row_data["updated"]) ;
+            case 'Updated' :
+                $obj = strftime('%Y-%m-%d @ %T', (int)$row_data['updated']) ;
                 break ;
                 */
 
@@ -478,16 +472,17 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
         //  Add an ActionBar button based on the action the page
         //  was called with.
 
+        $sa = array() ;
         $c = container() ;
 
         if (is_null($actions)) $actions = $this->__normal_actions ;
 
         foreach($actions as $key => $action)
-            $actions[$action] = $action ;
+            $sa[$action] = $key ;
 
-        $lb = $this->action_select('_action', $actions,
-            '', false, array('style' => 'width: 150px; margin-right: 10px;'),
-            $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING']) ;
+        $lb = $this->action_select('_action', $sa, '', false,
+            array('style' => 'width: 150px; margin-right: 10px;'),
+            SwimTeamUtils::GetPageURI()) ;
 
         $c->add($lb) ;
 
@@ -522,14 +517,15 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
      */
     function build_base_url()
     {
-
-        //$url = $_SERVER["PHP_SELF"]."?";
-        $url = $_SERVER["PHP_SELF"]."?";
-        $uri = $_SERVER["PHP_SELF"] . "?" . $_SERVER["QUERY_STRING"] ;
+        //$url = $_SERVER['PHP_SELF'].'?';
+        //$uri = $_SERVER['PHP_SELF'] . '?' . $_SERVER['QUERY_STRING'] ;
+        //$uri = SwimTeamUtils::GetPageQuery() ;
+        $uri = SwimTeamUtils::GetPageURI() ;
+        $url = SwimTeamUtils::GetPageURL() . '?' ;
 
         //  On a POST, return the URI instead of
         //  constructing a page url.
-        if ( $this->get_form_method() == "POST" ) {
+        if ( $this->get_form_method() == 'POST' ) {
             return $uri;
         }
 
@@ -541,21 +537,87 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
             //and add them to the url to save them.
             foreach($vars as $name => $value) {
 
-                if ( $name != $this->_vars["offsetVar"] &&
-                     $name != $this->_vars["orderbyVar"] &&
-                     $name != $this->_vars["reverseorderVar"] &&
-                     $name != $this->_vars["search_valueVar"]
+                if ( $name != $this->_vars['offsetVar'] &&
+                     $name != $this->_vars['orderbyVar'] &&
+                     $name != $this->_vars['reverseorderVar'] &&
+                     $name != $this->_vars['search_valueVar']
                    ) {
                     if ( is_array($value) ) {
-                        $url .= $name."[]=".implode("&".$name."[]=",$value)."&";
+                        $url .= $name.'[]='.implode('&'.$name.'[]=',$value).'&';
                     } else {
-                        $url .= $name."=".urlencode(stripslashes($value))."&";
+                        $url .= $name.'='.urlencode(stripslashes($value)).'&';
                     }
                 }
             }
         }
 
         return $url;
+    }
+}
+
+/**
+ * Class definition for useful static methods
+ *
+ * @author Mike Walsh <mike@walshcrew.com>
+ * @access private
+ */
+class SwimTeamUtils
+{
+    /**
+     * Get Page URL
+     *
+     * @return string
+     */
+    function GetPageURL()
+    {
+        $pageURL = 'http' ;
+
+        if ($_SERVER['HTTPS'] == 'on') $pageURL .= 's' ;
+
+        $pageURL .= '://' ;
+
+        if ($_SERVER['SERVER_PORT'] != '80')
+            $pageURL .= $_SERVER['SERVER_NAME'] .
+                ':' . $_SERVER['SERVER_PORT'] ;
+        else
+            $pageURL .= $_SERVER['SERVER_NAME'] ;
+
+        return $pageURL ;
+    }
+
+    /**
+     * Get Page URI
+     *
+     * @return string
+     */
+    function GetPageURI()
+    {
+        $pageURI = 'http' ;
+
+        if ($_SERVER['HTTPS'] == 'on') $pageURI .= 's' ;
+
+        $pageURI .= '://' ;
+
+        if ($_SERVER['SERVER_PORT'] != '80')
+            $pageURI .= $_SERVER['SERVER_NAME'] .
+                ':' . $_SERVER['SERVER_PORT'] . $_SERVER['REQUEST_URI'] ;
+        else
+            $pageURI .= $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] ;
+
+        return $pageURI ;
+    }
+
+    /**
+     * Get Page Query
+     *
+     * @return string
+     */
+    function GetPageQuery()
+    {
+        $pageQuery = SwimTeamUtils::GetPageURL() . '?'. $_SERVER['QUERY_STRING'] ;
+
+        var_dump($pageQuery) ;
+        return $pageQuery ;
     }
 }
 ?>

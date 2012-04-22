@@ -10,7 +10,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Swimmers
  * @version $Revision$
@@ -19,10 +19,10 @@
  *
  */
 
-require_once("forms.class.php") ;
-require_once("swimmers.class.php") ;
-require_once("seasons.class.php") ;
-require_once("roster.class.php") ;
+require_once('forms.class.php') ;
+require_once('swimmers.class.php') ;
+require_once('seasons.class.php') ;
+require_once('roster.class.php') ;
 
 /**
  * Construct the Register Swimmer form
@@ -63,25 +63,25 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $this->add_hidden_element("swimmerid") ;
+        $this->add_hidden_element('swimmerid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
         //  First Name Field
-        $firstName = new FEText("First Name", true, "150px") ;
+        $firstName = new FEText('First Name', true, '150px') ;
         $firstName->set_readonly(true) ;
         $this->add_element($firstName) ;
 
         //  Last Name Field
-        $lastName = new FEText("Last Name", true, "150px") ;
+        $lastName = new FEText('Last Name', true, '150px') ;
         $lastName->set_readonly(true) ;
         $this->add_element($lastName) ;
 
         //  Season Field
-        $season = new FEText("Active Season", true, "150px") ;
+        $season = new FEText('Active Season', true, '150px') ;
         $season->set_readonly(true) ;
         $this->add_element($season) ;
 
@@ -91,8 +91,8 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
 
         if (!empty($option))
         {
-            $tou = new FECheckBox("Terms of Use",
-                "I have read and agree to the Swim Team Terms of Use") ;
+            $tou = new FECheckBox('Terms of Use',
+                'I have read and agree to the Swim Team Terms of Use') ;
             $this->add_element($tou) ;
         }
 
@@ -102,8 +102,8 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
 
         if (!empty($option))
         {
-            $billing = new FECheckBox("Billing Policy",
-                "I have read and agree to the Swim Team Billing Policy") ;
+            $billing = new FECheckBox('Billing Policy',
+                'I have read and agree to the Swim Team Billing Policy') ;
             $this->add_element($billing) ;
         }
 
@@ -111,8 +111,8 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
 
         if (current_user_can('edit_others_posts'))
         {
-            $override = new FECheckBox("Override Age Checks",
-                "Override Age Checks") ;
+            $override = new FECheckBox('Override Age Checks',
+                'Override Age Checks') ;
             $this->add_element($override) ;
         }
     }
@@ -132,11 +132,11 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
         $season->loadActiveSeason() ;
 
         //  Initialize the form fields
-        $this->set_hidden_element_value("swimmerid", $this->getId()) ;
-        $this->set_hidden_element_value("_action", WPST_SWIMMERS_REGISTER_SWIMMER) ;
-        $this->set_element_value("First Name", $swimmer->getFirstName()) ;
-        $this->set_element_value("Last Name", $swimmer->getLastName()) ;
-        $this->set_element_value("Active Season", $season->getSeasonLabel()) ;
+        $this->set_hidden_element_value('swimmerid', $this->getId()) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_REGISTER) ;
+        $this->set_element_value('First Name', $swimmer->getFirstName()) ;
+        $this->set_element_value('Last Name', $swimmer->getLastName()) ;
+        $this->set_element_value('Active Season', $season->getSeasonLabel()) ;
     }
 
 
@@ -150,16 +150,16 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
     {
 
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("First Name"),
-            $this->element_form("First Name")) ;
+        $table->add_row($this->element_label('First Name'),
+            $this->element_form('First Name')) ;
 
-        $table->add_row($this->element_label("Last Name"),
-            $this->element_form("Last Name")) ;
+        $table->add_row($this->element_label('Last Name'),
+            $this->element_form('Last Name')) ;
 
-        $table->add_row($this->element_label("Active Season"),
-            $this->element_form("Active Season")) ;
+        $table->add_row($this->element_label('Active Season'),
+            $this->element_form('Active Season')) ;
 
         $option = get_option(WPST_OPTION_REG_TOU_URL) ;
 
@@ -168,11 +168,11 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
             $tr = html_tr() ;
             $td = html_td() ;
 
-            $td->add($this->element_form("Terms of Use"), 
+            $td->add($this->element_form('Terms of Use'), 
             html_a($option, html_img(WPST_PLUGIN_URL .
-                "/images/icons/paper.png", null, null, null,
-                "Swim Team Terms of Use"), null, "_new",
-                "Swim Team Terms of Use")) ;
+                '/images/icons/paper.png', null, null, null,
+                'Swim Team Terms of Use'), null, '_new',
+                'Swim Team Terms of Use')) ;
             $td->set_colspan(2) ;
             $tr->add($td) ;
             $table->add_row($tr) ;
@@ -185,11 +185,11 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
             $tr = html_tr() ;
             $td = html_td() ;
 
-            $td->add($this->element_form("Billing Policy"), 
+            $td->add($this->element_form('Billing Policy'), 
             html_a($option, html_img(WPST_PLUGIN_URL .
-                "/images/icons/paper.png", null, null, null,
-                "Swim Team Billing Policy"), null, "_new",
-                "Swim Team Billing Policy")) ;
+                '/images/icons/paper.png', null, null, null,
+                'Swim Team Billing Policy'), null, '_new',
+                'Swim Team Billing Policy')) ;
             $td->set_colspan(2) ;
             $tr->add($td) ;
             $table->add_row($tr) ;
@@ -202,7 +202,7 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
             $tr = html_tr() ;
             $td = html_td() ;
 
-            $td->add($this->element_form("Override Age Checks")) ;
+            $td->add($this->element_form('Override Age Checks')) ;
             $td->set_colspan(2) ;
             $tr->add($td) ;
             $table->add_row($tr) ;
@@ -230,16 +230,16 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
         $roster = new SwimTeamRoster() ;
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $roster->setSwimmerId($this->get_hidden_element_value("swimmerid")) ;
+        $roster->setSwimmerId($this->get_hidden_element_value('swimmerid')) ;
 
         $swimmer = new SwimTeamSwimmer() ;
-        $swimmer->loadSwimmerById($this->get_hidden_element_value("swimmerid")) ;
+        $swimmer->loadSwimmerById($this->get_hidden_element_value('swimmerid')) ;
 
         //  Override Age Checks?  Only certain users can do this.
 
         if (current_user_can('edit_others_posts'))
         {
-            $override = ($this->get_element_value("Override Age Checks") === WPST_NULL_STRING) ;
+            $override = ($this->get_element_value('Override Age Checks') === WPST_NULL_STRING) ;
         }
  
         //  Three cases to deal with:
@@ -263,7 +263,7 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
             if ($roster->getRosterStatus() == WPST_ACTIVE)
             {
                 $valid = false ;
-                $this->add_error("Active Season", "Swimmer is already registered.") ;
+                $this->add_error('Active Season', 'Swimmer is already registered.') ;
             }
         }
 
@@ -272,14 +272,14 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
         //  Too young?
         if (($swimmer->getAgeGroupAge() < get_option(WPST_OPTION_MIN_AGE)) && !$override)
         {
-            $this->add_error("Active Season", "Swimmer is too young, check date of birth.");
+            $this->add_error('Active Season', 'Swimmer is too young, check date of birth.');
             $valid = false ;
         }
 
         //  Too old?
         if (($swimmer->getAgeGroupAge() > get_option(WPST_OPTION_MAX_AGE)) && !$override)
         {
-            $this->add_error("Active Season", "Swimmer is too old, check date of birth.");
+            $this->add_error('Active Season', 'Swimmer is too old, check date of birth.');
             $valid = false ;
         }
 
@@ -290,10 +290,10 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
         if (!empty($option))
         {
 
-            if (is_null($this->get_element_value("Terms of Use")))
+            if (is_null($this->get_element_value('Terms of Use')))
             {
                 $valid = false ;
-                $this->add_error("Terms of Use", "You must agree to the Swim Team Terms of Use.") ;
+                $this->add_error('Terms of Use', 'You must agree to the Swim Team Terms of Use.') ;
             }
         }
 
@@ -304,10 +304,10 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
         if (!empty($option))
         {
 
-            if (is_null($this->get_element_value("Billing Policy")))
+            if (is_null($this->get_element_value('Billing Policy')))
             {
                 $valid = false ;
-                $this->add_error("Billing Policy", "You must agree to the Swim Team Billing Policy.") ;
+                $this->add_error('Billing Policy', 'You must agree to the Swim Team Billing Policy.') ;
             }
         }
 
@@ -336,7 +336,7 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
         $roster = new SwimTeamRoster() ;
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $roster->setSwimmerId($this->get_hidden_element_value("swimmerid")) ;
+        $roster->setSwimmerId($this->get_hidden_element_value('swimmerid')) ;
         $roster->setContactId($userdata->ID) ;
         $roster->setRosterStatus(WPST_ROSTER_SWIMMER_ACTIVE) ;
 
@@ -346,11 +346,11 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
         if ($success) 
         {
             $roster->setId($success) ;
-            $this->set_action_message("Swimmer successfully registered.") ;
+            $this->set_action_message('Swimmer successfully registered.') ;
         }
         else
         {
-            $this->set_action_message("Swimmer was not successfully registered.") ;
+            $this->set_action_message('Swimmer was not successfully registered.') ;
         }
 
         return $success ;
@@ -366,7 +366,7 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Register" instead of the default "Save".
+     * button display 'Register' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -394,7 +394,7 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
     function form_init_data()
     {
         parent::form_init_data() ;
-        $this->set_hidden_element_value("_action", WPST_SWIMMERS_UNREGISTER_SWIMMER) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_UNREGISTER) ;
     }
 
     /**
@@ -414,7 +414,7 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
         $roster = new SwimTeamRoster() ;
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $roster->setSwimmerId($this->get_hidden_element_value("swimmerid")) ;
+        $roster->setSwimmerId($this->get_hidden_element_value('swimmerid')) ;
 
         //  Three cases to deal with:
         //
@@ -438,12 +438,12 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
             }
             else
             {
-                $this->add_error("Active Season", "Swimmer is not registered.") ;
+                $this->add_error('Active Season', 'Swimmer is not registered.') ;
             }
         }
         else
         {
-            $this->add_error("Active Season", "Swimmer is not registered.") ;
+            $this->add_error('Active Season', 'Swimmer is not registered.') ;
         }
 
         return $valid ;
@@ -471,7 +471,7 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
         $roster = new SwimTeamRoster() ;
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $roster->setSwimmerId($this->get_hidden_element_value("swimmerid")) ;
+        $roster->setSwimmerId($this->get_hidden_element_value('swimmerid')) ;
         $roster->loadRosterBySeasonIdAndSwimmerId() ;
         $roster->setRosterStatus(WPST_INACTIVE) ;
 
@@ -483,16 +483,16 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
         if ($success) 
         {
             $roster->setId($success) ;
-            $this->set_action_message("Swimmer successfully unregistered.") ;
+            $this->set_action_message('Swimmer successfully unregistered.') ;
         }
         else
         {
-            $this->set_action_message("Swimmer was not successfully unregistered.") ;
+            $this->set_action_message('Swimmer was not successfully unregistered.') ;
         }
  
         //  Now that the swimmer has been removed from the roster,
         //  need to update their global status which is presented
-        //  as part of the "My Swimmers" functionality.
+        //  as part of the 'My Swimmers' functionality.
 
         //$swimmer = new SwimTeamSwimmer() ;
         //$swimmer->loadSwimmerById($roster->getSwimmerId()) ;
@@ -512,7 +512,7 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Register" instead of the default "Save".
+     * button display 'Register' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -536,7 +536,7 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
 
         //  Season Field
 
-        $swimmerlabel = new FEText("Swimmer Label", true, "150px") ;
+        $swimmerlabel = new FEText('Swimmer Label', true, '150px') ;
 
         $season = new SwimTeamSeason() ;
         $season->loadActiveSeason() ;
@@ -556,7 +556,7 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
     function form_init_data()
     {
         parent::form_init_data() ;
-        $this->set_hidden_element_value("_action", WPST_ROSTER_LABEL_SWIMMER) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_ASSIGN_LABEL) ;
 
         $season = new SwimTeamSeason() ;
         $season->loadActiveSeason() ;
@@ -566,7 +566,7 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
         $roster->setSwimmerId($this->getId()) ;
 
         $roster->loadRosterBySeasonIdAndSwimmerId() ;
-        $this->set_element_value("Swimmer Label", $roster->getSwimmerLabel()) ;
+        $this->set_element_value('Swimmer Label', $roster->getSwimmerLabel()) ;
     }
 
     /**
@@ -579,19 +579,19 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
     {
 
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("First Name"),
-            $this->element_form("First Name")) ;
+        $table->add_row($this->element_label('First Name'),
+            $this->element_form('First Name')) ;
 
-        $table->add_row($this->element_label("Last Name"),
-            $this->element_form("Last Name")) ;
+        $table->add_row($this->element_label('Last Name'),
+            $this->element_form('Last Name')) ;
 
-        $table->add_row($this->element_label("Active Season"),
-            $this->element_form("Active Season")) ;
+        $table->add_row($this->element_label('Active Season'),
+            $this->element_form('Active Season')) ;
 
-        $table->add_row($this->element_label("Swimmer Label"),
-            $this->element_form("Swimmer Label")) ;
+        $table->add_row($this->element_label('Swimmer Label'),
+            $this->element_form('Swimmer Label')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -613,7 +613,7 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
         $roster = new SwimTeamRoster() ;
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $roster->setSwimmerId($this->get_hidden_element_value("swimmerid")) ;
+        $roster->setSwimmerId($this->get_hidden_element_value('swimmerid')) ;
 
         //  Three cases to deal with:
         //
@@ -633,13 +633,13 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
             //  Already active?  Invalid
             if ($roster->getRosterStatus() == WPST_ACTIVE)
             {
-                $roster->setSwimmerLabel($this->get_element_value("Swimmer Label")) ;
+                $roster->setSwimmerLabel($this->get_element_value('Swimmer Label')) ;
 
                 //  Make sure Swimmer Label isn't being used
 
                 if ($roster->isSwimmerLabelAssigned())
                 {
-                    $this->add_error("Swimmer Label", "Swimmer Label is already assigned.") ;
+                    $this->add_error('Swimmer Label', 'Swimmer Label is already assigned.') ;
                 }
                 else
                 {
@@ -648,12 +648,12 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
             }
             else
             {
-                $this->add_error("Active Season", "Swimmer is not registered.") ;
+                $this->add_error('Active Season', 'Swimmer is not registered.') ;
             }
         }
         else
         {
-            $this->add_error("Active Season", "Swimmer is not registered.") ;
+            $this->add_error('Active Season', 'Swimmer is not registered.') ;
         }
 
         return $valid ;
@@ -673,9 +673,9 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
         $roster = new SwimTeamRoster() ;
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $roster->setSwimmerId($this->get_hidden_element_value("swimmerid")) ;
+        $roster->setSwimmerId($this->get_hidden_element_value('swimmerid')) ;
         $roster->loadRosterBySeasonIdAndSwimmerId() ;
-        $roster->setSwimmerLabel($this->get_element_value("Swimmer Label")) ;
+        $roster->setSwimmerLabel($this->get_element_value('Swimmer Label')) ;
 
         $success = $roster->updateRoster() ;
 
@@ -684,11 +684,11 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
         if ($success) 
         {
             $roster->setId($success) ;
-            $this->set_action_message("Swimmer Label successfully assigned.") ;
+            $this->set_action_message('Swimmer Label successfully assigned.') ;
         }
         else
         {
-            $this->set_action_message("Swimmer Label was not successfully assigned.") ;
+            $this->set_action_message('Swimmer Label was not successfully assigned.') ;
         }
  
         return $success ;
@@ -709,7 +709,7 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Register" instead of the default "Save".
+     * button display 'Register' instead of the default 'Save'.
      *
      */
     function form_content_buttons()

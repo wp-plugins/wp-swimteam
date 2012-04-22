@@ -26,6 +26,11 @@
 class SwimTeamTabContainer extends Container
 {
     /**
+     * Recorded Action property
+     */
+    var $__recorded_action = null ;
+
+    /**
      * Show Action Summary property
      */
     var $__show_action_summary = false ;
@@ -59,6 +64,27 @@ class SwimTeamTabContainer extends Container
      * Show Form Instructions Content property
      */
     var $__form_instructions_content = null ;
+
+    /**
+     * Set Recorded Action property
+     *
+     * @param string set recorded action
+     */
+    function setAction($action = null)
+    {
+        $this->__recorded_action = $action ;
+    }
+
+    /**
+     * Get Recorded Action property
+     *
+     *
+     * @return string recorded action
+     */
+    function getAction()
+    {
+        return $this->__recorded_action ;
+    }
 
     /**
      * Set Show Action Summary property

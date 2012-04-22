@@ -946,8 +946,8 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
             foreach ($swimmerIds as $swimmerId)
             {
                 $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
-                $s[$swimmer->getFirstName() . " " .
-                    $swimmer->getLastName()] = $swimmer->getId() ;
+                $s[$swimmer->getFirstName() . " " .  $swimmer->getLastName() .
+                    ' (' .  $swimmer->getAgeGroupAge() . ')'] = $swimmer->getId() ;
             }
         }
 

@@ -16,8 +16,9 @@
  *
  */
 
-require_once("swimmeets.report.class.php") ;
-require_once("container.class.php") ;
+require_once('swimmeets.report.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the ReportGeneratorTab
@@ -58,19 +59,17 @@ class ReportSwimMeetsTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
+        $div->set_style('clear: both;') ;
 
         //  Start building the form
 
-        $form = new WpSwimTeamSwimMeetsReportForm("Swim Team Swim Meet Report",
+        $form = new WpSwimTeamSwimMeetsReportForm('Swim Team Swim Meet Report',
             $_SERVER['HTTP_REFERER'], 600) ;
 
         //  Create the form processor
 
         $fp = new FormProcessor($form) ;
-        //$fp->set_form_action($_SERVER['REQUEST_URI']) ;
-        $fp->set_form_action($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
-        //
+        $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
         //  Display the form again even if processing was successful.
 
@@ -80,7 +79,7 @@ class ReportSwimMeetsTabContainer extends SwimTeamTabContainer
 
         if ($fp->is_action_successful())
         {
-            $mode = $fp->_form_content->get_element_value("Report Format") ;
+            $mode = $fp->_form_content->get_element_value('Report Format') ;
 
             $c = container() ;
 
@@ -92,8 +91,8 @@ class ReportSwimMeetsTabContainer extends SwimTeamTabContainer
 
                 $arg = urlencode($rpt->getPDFFile()) ;
 
-                $if = html_iframe(sprintf("%s/include/user/reportgenPDF.php?file=%s", WPST_PLUGIN_URL, $arg)) ;
-                $if->set_tag_attributes(array("width" => 0, "height" => 0)) ;
+                $if = html_iframe(sprintf('%s/include/user/reportgenPDF.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
+                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                 $c->add($if) ;
 
 
@@ -108,9 +107,7 @@ class ReportSwimMeetsTabContainer extends SwimTeamTabContainer
                 $fp->set_render_form_after_success(false) ;
 
                 $div->add($fp, html_br(), $c) ;
-                $buttons = SwimTeamGUIBackHomeButtons::getButtons() ;
-                $buttons->set_id("BackHomeButtons") ;
-                $div->add($buttons) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Report Generator')) ;
             }
         }
         else

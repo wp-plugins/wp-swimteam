@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.18.747
- * Last Modified:  2012/04/15 17:05:24
+ * Version: 1.19.783
+ * Last Modified:  2012/04/22 14:19:58
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 726 2012-03-29 14:44:36Z mpwalsh8 $
+ * $Id: swimteam.php 755 2012-04-20 11:54:50Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,7 +20,7 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 726 $
+ * @version $Rev: 755 $
  * @lastmodified $Date$
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
@@ -751,7 +751,7 @@ function swimteam_reorder_events()
 
     $success = true ;
 
-    $event = new SwimMeetEvent() ;
+    $event = new SwimTeamEvent() ;
 
     //  Loop through Ajax submitted event ids
 
@@ -762,12 +762,12 @@ function swimteam_reorder_events()
         //  set to 0 and should not exist - skip any events
         //  which don't exist by Id.
 
-        if ($event->getSwimMeetEventExistsByEventId($eventId))
+        if ($event->getSwimTeamEventExistsByEventId($eventId))
         {
-            $event->loadSwimMeetEventByEventId($eventId) ;
+            $event->loadSwimTeamEventByEventId($eventId) ;
             $event->setEventNumber($eventnumber++) ;
 
-            $success &= ($event->updateSwimMeetEvent() != null) ;
+            $success &= ($event->updateSwimTeamEvent() != null) ;
         }
     }
 

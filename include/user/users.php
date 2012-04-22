@@ -16,11 +16,12 @@
  *
  */
 
-require_once("users.class.php") ;
-require_once("users.forms.class.php") ;
-//require_once("users.csv.class.php") ;
-require_once("reportgen.class.php") ;
-require_once("container.class.php") ;
+require_once('users.class.php') ;
+require_once('users.forms.class.php') ;
+//require_once('users.csv.class.php') ;
+require_once('reportgen.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the user
@@ -41,8 +42,8 @@ class UsersTabContainer extends SwimTeamTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_USERS_PROFILE_USER)),
-            __("Display a user\'s profile.  Show the user\'s
-            detailed information as it will be displayed on the user.")) ;
+            __('Display a user\'s profile.  Show the user\'s
+            detailed information as it will be displayed on the user.')) ;
 
         return $table ;
     }
@@ -54,8 +55,8 @@ class UsersTabContainer extends SwimTeamTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimTeamUsersGUIDataList("Swim Team Web Site Users",
-            "100%", "lastname, firstname", false, WPST_USERS_COLUMNS,
+        $gdl = new SwimTeamUsersGUIDataList('Swim Team Web Site Users',
+            '100%', 'lastname, firstname', false, WPST_USERS_COLUMNS,
             WPST_USERS_TABLES, WPST_USERS_WHERE_CLAUSE) ;
 
         $gdl->set_alternating_row_colors(true) ;
@@ -99,8 +100,8 @@ class UsersTabContainer extends SwimTeamTabContainer
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -191,8 +192,8 @@ class UsersTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
-        $div->add(html_h3("Parents, Guardians, Coaches, Swimmers, etc.")) ;
+        $div->set_style('clear: both;') ;
+        $div->add(html_h3('Parents, Guardians, Coaches, Swimmers, etc.')) ;
 
         //  This allows passing arguments eithers as a GET or a POST
 
@@ -201,10 +202,10 @@ class UsersTabContainer extends SwimTeamTabContainer
         //  The userid is the argument which must be
         //  dealt with differently for GET and POST operations
 
-        if (array_key_exists(WPST_DB_PREFIX . "radio", $scriptargs))
-            $userid = $scriptargs[WPST_DB_PREFIX . "radio"][0] ;
-        else if (array_key_exists("userid", $scriptargs))
-            $userid = $scriptargs["userid"] ;
+        if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
+            $userid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
+        else if (array_key_exists('userid', $scriptargs))
+            $userid = $scriptargs['userid'] ;
         else
             $userid = null ;
 
@@ -212,9 +213,9 @@ class UsersTabContainer extends SwimTeamTabContainer
         //  there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
-       if (array_key_exists("_action", $scriptargs))
+       if (array_key_exists('_action', $scriptargs))
             $action = $scriptargs['_action'] ;
-        else if (array_key_exists("_form_action", $scriptargs))
+        else if (array_key_exists('_form_action', $scriptargs))
             $action = $scriptargs['_form_action'] ;
         else
             $action = null ;
@@ -225,13 +226,13 @@ class UsersTabContainer extends SwimTeamTabContainer
 
         if ($action == WPST_ACTION_SELECT_ACTION) $action = null ;
 
-        //  Is requested action "Execute"?  If so, need
+        //  Is requested action 'Execute'?  If so, need
         //  to get the select action from the drop down
         //  list.
 
         if ($action == WPST_ACTION_EXECUTE)
         {
-            if (array_key_exists("_select_action", $scriptargs))
+            if (array_key_exists('_select_action', $scriptargs))
                 $action = $scriptargs['_select_action'] ;
             else
                 $action = null ;
@@ -256,7 +257,7 @@ class UsersTabContainer extends SwimTeamTabContainer
             {
                 case WPST_ACTION_PROFILE:
                     $c = container() ;
-                    $profile = new SwimTeamUserProfileInfoTable("Web Site User Profile", "500px") ;
+                    $profile = new SwimTeamUserProfileInfoTable('Web Site User Profile', '500px') ;
                     $profile->set_alt_color_flag(true) ;
                     $profile->set_show_cellborders(true) ;
                     $profile->setId($userid) ;
@@ -265,7 +266,7 @@ class UsersTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_UPDATE:
-                    $form = new WpSwimTeamUserProfileForm("Update User",
+                    $form = new WpSwimTeamUserProfileForm('Update User',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($userid) ;
                     $this->setShowFormInstructions() ;
@@ -290,23 +291,23 @@ class UsersTabContainer extends SwimTeamTabContainer
                     $csv->generateCSVFile() ;
                     $arg = urlencode($csv->getCSVFile()) ;
 
-                    $if = html_iframe(sprintf("%s/include/user/reportgenCSV.php?file=%s", WPST_PLUGIN_URL, $arg)) ;
-                    $if->set_tag_attributes(array("width" => 0, "height" => 0)) ;
+                    $if = html_iframe(sprintf('%s/include/user/reportgenCSV.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
+                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                     $c->add($if) ;
                     $c->add($csv->getReport(true)) ;
                     
-                    $div->add(html_div("updated fade",
-                        html_h4(sprintf("Swim Team Users Report
-                        Generated, %s record%s returned.",
+                    $div->add(html_div('updated fade',
+                        html_h4(sprintf('Swim Team Users Report
+                        Generated, %s record%s returned.',
                         $csv->getRecordCount(),
-                        $csv->getRecordCount() == 1 ? "" : "s")))) ;
+                        $csv->getRecordCount() == 1 ? '' : 's')))) ;
                     
                     $this->setShowInstructions() ;
                     $this->setInstructionsHeader('Export Users CSV Instructions Summary') ;
                     break ;
 
                 default:
-                    $div->add(html_h4(sprintf("Unsupported action \"%s\" requested.", $action))) ;
+                    $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
                     break ;
             }
 
@@ -317,9 +318,7 @@ class UsersTabContainer extends SwimTeamTabContainer
                 //  Create the form processor
 
                 $fp = new FormProcessor($form) ;
-                //$fp->set_form_action($_SERVER['REQUEST_URI']) ;
-                $fp->set_form_action($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
-                //
+                $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
                 //  Display the form again even if processing was successful.
 
@@ -346,11 +345,11 @@ class UsersTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add($c) ;
-                $div->add(SwimTeamGUIBackHomeButtons::getButtons()) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Users')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4("No content to display.")) ;
+                $div->add(html_br(2), html_h4('No content to display.')) ;
             }
         }
 
@@ -378,15 +377,15 @@ class AdminUsersTabContainer extends UsersTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_ACTION_UPDATE)),
-            __("Update a user\'s information.  Use this action to correct
-            any of the information about one or more of user.")) ;
+            __('Update a user\'s information.  Use this action to correct
+            any of the information about one or more of user.')) ;
         $table->add_row(html_b(__(WPST_ACTION_JOBS)),
-            __("Report the user\'s Job Assignments.")) ;
+            __('Report the user\'s Job Assignments.')) ;
         $table->add_row(html_b(__(WPST_ACTION_EXPORT_CSV)),
-            __("Export the list of users as a CSV file.  A CSV file can
+            __('Export the list of users as a CSV file.  A CSV file can
             be loaded into tools such as Microsoft Excel.  All of the user
             information appears in the file, each field separated by the
-            comma \",\" character.")) ;
+            comma "," character.')) ;
 
         return $table ;
     }
@@ -398,8 +397,8 @@ class AdminUsersTabContainer extends UsersTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimTeamUsersAdminGUIDataList("Swim Team Web Site Users",
-            "100%", "lastname, firstname", false, WPST_USERS_COLUMNS,
+        $gdl = new SwimTeamUsersAdminGUIDataList('Swim Team Web Site Users',
+            '100%', 'lastname, firstname', false, WPST_USERS_COLUMNS,
             WPST_USERS_TABLES, WPST_USERS_WHERE_CLAUSE) ;
 
         $gdl->set_alternating_row_colors(true) ;

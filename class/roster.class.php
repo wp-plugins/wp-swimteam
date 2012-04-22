@@ -1199,13 +1199,18 @@ class SwimTeamRosterAdminGUIDataList extends SwimTeamRosterGUIDataList
             $columns, $tables, $where_clause) ;
 
         //  These actions can't be part of the property
-        //  declaration.
+        //  declaration.  Opt-In and Opt-Out are only enabled
+        //  for the Roster GDL when Opt-In/Opt-Out is in
+        //  stroke mode!
 
-        $optin = get_option(WPST_OPTION_OPT_IN_LABEL) ;
-        $this->__normal_actions[WPST_ACTION_OPT_IN] = $optin ;
+        if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
+        {
+            $optin = get_option(WPST_OPTION_OPT_IN_LABEL) ;
+            $this->__normal_actions[WPST_ACTION_OPT_IN] = $optin ;
 
-        $optout = get_option(WPST_OPTION_OPT_OUT_LABEL) ;
-        $this->__normal_actions[WPST_ACTION_OPT_OUT] = $optout ;
+            $optout = get_option(WPST_OPTION_OPT_OUT_LABEL) ;
+            $this->__normal_actions[WPST_ACTION_OPT_OUT] = $optout ;
+        }
     }
 
     /**

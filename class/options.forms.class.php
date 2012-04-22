@@ -19,8 +19,8 @@
  *
  */
 
-require_once("forms.class.php") ;
-require_once("options.class.php") ;
+require_once('forms.class.php') ;
+require_once('options.class.php') ;
 
 /**
  * Construct the Options Settings form
@@ -83,7 +83,7 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $gender = new FEListBox("Gender", true, "150px");
+        $gender = new FEListBox('Gender', true, '150px');
         $gender->set_list_data(array(
              ucfirst(WPST_GENDER_MALE) => WPST_GENDER_MALE
             ,ucfirst(WPST_GENDER_FEMALE) => WPST_GENDER_FEMALE
@@ -96,33 +96,33 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
             $agelist[] = $i ;
 
         //  Minimum Age Field
-        $minage = new FEListBox("Minimum Age", true, "100ox") ;
+        $minage = new FEListBox('Minimum Age', true, '100ox') ;
         $minage->set_list_data($agelist) ;
         $this->add_element($minage);
 		
         //  Maximum Age Field
-        $maxage = new FEListBox("Maximum Age", true, "100px") ;
+        $maxage = new FEListBox('Maximum Age', true, '100px') ;
         $maxage->set_list_data($agelist) ;
         $this->add_element($maxage);
 		
-        $cutoffmonth = new FEMonths("Age Cutoff Month", true, "150px") ;
+        $cutoffmonth = new FEMonths('Age Cutoff Month', true, '150px') ;
         $this->add_element($cutoffmonth);
 
-        $cutoffday = new FEDays("Age Cutoff Day", true, "100px") ;
+        $cutoffday = new FEDays('Age Cutoff Day', true, '100px') ;
         $this->add_element($cutoffday);
 
-        $optinlabel = new FERegEx("Opt-In Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $optinlabel = new FERegEx('Opt-In Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($optinlabel) ;
 
-        $optoutlabel = new FERegEx("Opt-Out Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $optoutlabel = new FERegEx('Opt-Out Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($optoutlabel) ;
 
-        $optinoptoutemail = new FEEmailMany("Opt-In Opt-Out E-mail Address", true, "300px");
+        $optinoptoutemail = new FEEmailMany('Opt-In Opt-Out E-mail Address', true, '300px');
         $this->add_element($optinoptoutemail) ;
 
-        $optinoptoutemailformat = new FEListBox("Opt-In Opt-Out E-mail Format", true, "100px");
+        $optinoptoutemailformat = new FEListBox('Opt-In Opt-Out E-mail Format', true, '100px');
         $optinoptoutemailformat->set_list_data(array(
              ucwords(WPST_HTML) => WPST_HTML
             ,ucwords(WPST_TEXT) => WPST_TEXT
@@ -187,20 +187,20 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
 
         //  Initialize the form fields
-        $this->set_element_value("Gender", $options->getGender()) ;
-        $this->set_element_value("Minimum Age", $options->getMinAge()) ;
-        $this->set_element_value("Maximum Age", $options->getMaxAge()) ;
-        $this->set_element_value("Age Cutoff Month", $options->getAgeCutoffMonth()) ;
-        $this->set_element_value("Age Cutoff Day", $options->getAgeCutoffDay()) ;
-        $this->set_element_value("Opt-In Label", $options->getOptInLabel()) ;
-        $this->set_element_value("Opt-Out Label", $options->getOptOutLabel()) ;
-        $this->set_element_value("Opt-In Opt-Out E-mail Address", $options->getOptInOptOutEmailAddress()) ;
-        $this->set_element_value("Opt-In Opt-Out E-mail Format", $options->getOptInOptOutEmailFormat()) ;
-        $this->set_element_value("Opt-In Opt-Out Usage Model", $options->getOptInOptOutUsageModel()) ;
-        $this->set_element_value("Opt-In Opt-Out Stroke Mode", $options->getOptInOptOutMode()) ;
-        $this->set_element_value("Opt-In Opt-Out Strokes", $options->getOptInOptOutStrokes()) ;
+        $this->set_element_value('Gender', $options->getGender()) ;
+        $this->set_element_value('Minimum Age', $options->getMinAge()) ;
+        $this->set_element_value('Maximum Age', $options->getMaxAge()) ;
+        $this->set_element_value('Age Cutoff Month', $options->getAgeCutoffMonth()) ;
+        $this->set_element_value('Age Cutoff Day', $options->getAgeCutoffDay()) ;
+        $this->set_element_value('Opt-In Label', $options->getOptInLabel()) ;
+        $this->set_element_value('Opt-Out Label', $options->getOptOutLabel()) ;
+        $this->set_element_value('Opt-In Opt-Out E-mail Address', $options->getOptInOptOutEmailAddress()) ;
+        $this->set_element_value('Opt-In Opt-Out E-mail Format', $options->getOptInOptOutEmailFormat()) ;
+        $this->set_element_value('Opt-In Opt-Out Usage Model', $options->getOptInOptOutUsageModel()) ;
+        $this->set_element_value('Opt-In Opt-Out Stroke Mode', $options->getOptInOptOutMode()) ;
+        $this->set_element_value('Opt-In Opt-Out Strokes', $options->getOptInOptOutStrokes()) ;
         /*
-        $this->set_element_value("Opt-In Opt-Out Strokes", array(
+        $this->set_element_value('Opt-In Opt-Out Strokes', array(
             WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE,
             WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_VALUE,
             WPST_SDIF_EVENT_STROKE_CODE_BREASTSTROKE_VALUE,
@@ -209,9 +209,9 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
             WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE,
             WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE)) ;
          */
-        $this->set_element_value("Geography", $options->getGeography()) ;
-        $this->set_element_value("State or Province Label", $options->getStateOrProvinceLabel()) ;
-        $this->set_element_value("Postal Code Label", $options->getPostalCodeLabel()) ;
+        $this->set_element_value('Geography', $options->getGeography()) ;
+        $this->set_element_value('State or Province Label', $options->getStateOrProvinceLabel()) ;
+        $this->set_element_value('Postal Code Label', $options->getPostalCodeLabel()) ;
     }
 
 
@@ -227,34 +227,34 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
 
         $stable = html_table('100%', 0, 0) ;
  
-        //$stable->set_style("border: 1px solid") ;
+        //$stable->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("Gender"),
-            $this->element_form("Gender")) ;
+        $table->add_row($this->element_label('Gender'),
+            $this->element_form('Gender')) ;
 
-        $table->add_row($this->element_label("Minimum Age"),
-            $this->element_form("Minimum Age")) ;
+        $table->add_row($this->element_label('Minimum Age'),
+            $this->element_form('Minimum Age')) ;
 
-        $table->add_row($this->element_label("Maximum Age"),
-            $this->element_form("Maximum Age")) ;
+        $table->add_row($this->element_label('Maximum Age'),
+            $this->element_form('Maximum Age')) ;
 
-        $table->add_row($this->element_label("Age Cutoff Month"),
-            $this->element_form("Age Cutoff Month")) ;
+        $table->add_row($this->element_label('Age Cutoff Month'),
+            $this->element_form('Age Cutoff Month')) ;
 
-        $table->add_row($this->element_label("Age Cutoff Day"),
-            $this->element_form("Age Cutoff Day")) ;
+        $table->add_row($this->element_label('Age Cutoff Day'),
+            $this->element_form('Age Cutoff Day')) ;
 
-        $table->add_row($this->element_label("Opt-In Label"),
-            $this->element_form("Opt-In Label")) ;
+        $table->add_row($this->element_label('Opt-In Label'),
+            $this->element_form('Opt-In Label')) ;
 
-        $table->add_row($this->element_label("Opt-Out Label"),
-            $this->element_form("Opt-Out Label")) ;
+        $table->add_row($this->element_label('Opt-Out Label'),
+            $this->element_form('Opt-Out Label')) ;
 
-        $table->add_row($this->element_label("Opt-In Opt-Out E-mail Address"),
-            $this->element_form("Opt-In Opt-Out E-mail Address")) ;
+        $table->add_row($this->element_label('Opt-In Opt-Out E-mail Address'),
+            $this->element_form('Opt-In Opt-Out E-mail Address')) ;
 
-        $table->add_row($this->element_label("Opt-In Opt-Out E-mail Format"),
-            $this->element_form("Opt-In Opt-Out E-mail Format")) ;
+        $table->add_row($this->element_label('Opt-In Opt-Out E-mail Format'),
+            $this->element_form('Opt-In Opt-Out E-mail Format')) ;
 
         $table->add_row($this->element_label('Opt-In Opt-Out Usage Model'),
             $this->element_form('Opt-In Opt-Out Usage Model')) ;
@@ -389,49 +389,49 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $autoregister = new FEYesNoListBox("Auto-Register New Swimmers", true, "75px") ;
+        $autoregister = new FEYesNoListBox('Auto-Register New Swimmers', true, '75px') ;
         $this->add_element($autoregister) ;
 
-        $regsystem = new FEListBox("Registration System", true, "100px");
+        $regsystem = new FEListBox('Registration System', true, '100px');
         $regsystem->set_list_data(array(
              ucwords(WPST_OPEN) => WPST_OPEN
             ,ucwords(WPST_CLOSED) => WPST_CLOSED
         )) ;
         $this->add_element($regsystem) ;
 
-        $regprefixlabel = new FEText("Registration Prefix Label", false, "75px");
+        $regprefixlabel = new FEText('Registration Prefix Label', false, '75px');
         $this->add_element($regprefixlabel) ;
 
-        $regfeelabel = new FERegEx("Registration Fee Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $regfeelabel = new FERegEx('Registration Fee Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($regfeelabel) ;
 
-        $currencylabel = new FEText("Currency Label", true, "75px");
+        $currencylabel = new FEText('Currency Label', true, '75px');
         $this->add_element($currencylabel) ;
 
-        $defaultregfee = new FENumberPrice("Registration Fee", true, "100px");
+        $defaultregfee = new FENumberPrice('Registration Fee', true, '100px');
         $this->add_element($defaultregfee) ;
 
-        $regemail = new FEEmailMany("Registration E-mail Address", true, "300px");
+        $regemail = new FEEmailMany('Registration E-mail Address', true, '300px');
         $this->add_element($regemail) ;
 
-        $regemailformat = new FEListBox("Registration E-mail Format", true, "100px");
+        $regemailformat = new FEListBox('Registration E-mail Format', true, '100px');
         $regemailformat->set_list_data(array(
              ucwords(WPST_HTML) => WPST_HTML
             ,ucwords(WPST_TEXT) => WPST_TEXT
         )) ;
         $this->add_element($regemailformat) ;
 
-        $regtouurl = new FEUrl("Registration Terms of Use URL", false, "300px");
+        $regtouurl = new FEUrl('Registration Terms of Use URL', false, '300px');
         $this->add_element($regtouurl) ;
 
-        $regfeeurl = new FEUrl("Registration Fee Policy URL", false, "300px");
+        $regfeeurl = new FEUrl('Registration Fee Policy URL', false, '300px');
         $this->add_element($regfeeurl) ;
 
-        $useroptionalfields = new FENumberInRange("User Optional Fields", true, "100px");
+        $useroptionalfields = new FENumberInRange('User Optional Fields', true, '100px');
         $this->add_element($useroptionalfields) ;
 
-        $swimmeroptionalfields = new FENumberInRange("Swimmer Optional Fields", true, "100px");
+        $swimmeroptionalfields = new FENumberInRange('Swimmer Optional Fields', true, '100px');
         $this->add_element($swimmeroptionalfields) ;
     }
 
@@ -447,18 +447,18 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
 
         //  Initialize the form fields
-        $this->set_element_value("Auto-Register New Swimmers", $options->getAutoRegister()) ;
-        $this->set_element_value("Registration System", $options->getRegistrationSystem()) ;
-        $this->set_element_value("Registration Prefix Label", $options->getRegistrationPrefixLabel()) ;
-        $this->set_element_value("Registration Fee Label", $options->getRegistrationFeeLabel()) ;
-        $this->set_element_value("Currency Label", $options->getRegistrationFeeCurrencyLabel()) ;
-        $this->set_element_value("Registration Fee", $options->getRegistrationFee()) ;
-        $this->set_element_value("Registration E-mail Address", $options->getRegistrationEmail()) ;
-        $this->set_element_value("Registration E-mail Format", $options->getRegistrationEmailFormat()) ;
-        $this->set_element_value("Registration Terms of Use URL", $options->getRegistrationTermsOfUseURL()) ;
-        $this->set_element_value("Registration Fee Policy URL", $options->getRegistrationFeePolicyURL()) ;
-        $this->set_element_value("User Optional Fields", $options->getUserOptionalFields()) ;
-        $this->set_element_value("Swimmer Optional Fields", $options->getSwimmerOptionalFields()) ;
+        $this->set_element_value('Auto-Register New Swimmers', $options->getAutoRegister()) ;
+        $this->set_element_value('Registration System', $options->getRegistrationSystem()) ;
+        $this->set_element_value('Registration Prefix Label', $options->getRegistrationPrefixLabel()) ;
+        $this->set_element_value('Registration Fee Label', $options->getRegistrationFeeLabel()) ;
+        $this->set_element_value('Currency Label', $options->getRegistrationFeeCurrencyLabel()) ;
+        $this->set_element_value('Registration Fee', $options->getRegistrationFee()) ;
+        $this->set_element_value('Registration E-mail Address', $options->getRegistrationEmail()) ;
+        $this->set_element_value('Registration E-mail Format', $options->getRegistrationEmailFormat()) ;
+        $this->set_element_value('Registration Terms of Use URL', $options->getRegistrationTermsOfUseURL()) ;
+        $this->set_element_value('Registration Fee Policy URL', $options->getRegistrationFeePolicyURL()) ;
+        $this->set_element_value('User Optional Fields', $options->getUserOptionalFields()) ;
+        $this->set_element_value('Swimmer Optional Fields', $options->getSwimmerOptionalFields()) ;
     }
 
 
@@ -471,43 +471,43 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
     function form_content()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("Auto-Register New Swimmers"),
-            $this->element_form("Auto-Register New Swimmers")) ;
+        $table->add_row($this->element_label('Auto-Register New Swimmers'),
+            $this->element_form('Auto-Register New Swimmers')) ;
 
-        $table->add_row($this->element_label("Registration System"),
-            $this->element_form("Registration System")) ;
+        $table->add_row($this->element_label('Registration System'),
+            $this->element_form('Registration System')) ;
 
-        $table->add_row($this->element_label("Registration Prefix Label"),
-            $this->element_form("Registration Prefix Label")) ;
+        $table->add_row($this->element_label('Registration Prefix Label'),
+            $this->element_form('Registration Prefix Label')) ;
 
-        $table->add_row($this->element_label("Registration Fee Label"),
-            $this->element_form("Registration Fee Label")) ;
+        $table->add_row($this->element_label('Registration Fee Label'),
+            $this->element_form('Registration Fee Label')) ;
 
-        $table->add_row($this->element_label("Currency Label"),
-            $this->element_form("Currency Label")) ;
+        $table->add_row($this->element_label('Currency Label'),
+            $this->element_form('Currency Label')) ;
 
-        $table->add_row($this->element_label("Registration Fee"),
-            $this->element_form("Registration Fee")) ;
+        $table->add_row($this->element_label('Registration Fee'),
+            $this->element_form('Registration Fee')) ;
 
-        $table->add_row($this->element_label("Registration E-mail Address"),
-            $this->element_form("Registration E-mail Address")) ;
+        $table->add_row($this->element_label('Registration E-mail Address'),
+            $this->element_form('Registration E-mail Address')) ;
 
-        $table->add_row($this->element_label("Registration E-mail Format"),
-            $this->element_form("Registration E-mail Format")) ;
+        $table->add_row($this->element_label('Registration E-mail Format'),
+            $this->element_form('Registration E-mail Format')) ;
 
-        $table->add_row($this->element_label("Registration Terms of Use URL"),
-            $this->element_form("Registration Terms of Use URL")) ;
+        $table->add_row($this->element_label('Registration Terms of Use URL'),
+            $this->element_form('Registration Terms of Use URL')) ;
 
-        $table->add_row($this->element_label("Registration Fee Policy URL"),
-            $this->element_form("Registration Fee Policy URL")) ;
+        $table->add_row($this->element_label('Registration Fee Policy URL'),
+            $this->element_form('Registration Fee Policy URL')) ;
 
-        $table->add_row($this->element_label("User Optional Fields"),
-            $this->element_form("User Optional Fields")) ;
+        $table->add_row($this->element_label('User Optional Fields'),
+            $this->element_form('User Optional Fields')) ;
 
-        $table->add_row($this->element_label("Swimmer Optional Fields"),
-            $this->element_form("Swimmer Optional Fields")) ;
+        $table->add_row($this->element_label('Swimmer Optional Fields'),
+            $this->element_form('Swimmer Optional Fields')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -535,18 +535,18 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
     {
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
-        $options->setAutoRegister($this->get_element_value("Auto-Register New Swimmers")) ;
-        $options->setRegistrationSystem($this->get_element_value("Registration System")) ;
-        $options->setRegistrationPrefixLabel($this->get_element_value("Registration Prefix Label")) ;
-        $options->setRegistrationFeeLabel($this->get_element_value("Registration Fee Label")) ;
-        $options->setRegistrationFeeCurrencyLabel($this->get_element_value("Currency Label")) ;
-        $options->setRegistrationFee($this->get_element_value("Registration Fee")) ;
-        $options->setRegistrationEmail($this->get_element_value("Registration E-mail Address")) ;
-        $options->setRegistrationEmailFormat($this->get_element_value("Registration E-mail Format")) ;
-        $options->setRegistrationTermsOfUseURL($this->get_element_value("Registration Terms of Use URL")) ;
-        $options->setRegistrationFeePolicyURL($this->get_element_value("Registration Fee Policy URL")) ;
-        $options->setUserOptionalFields($this->get_element_value("User Optional Fields")) ;
-        $options->setSwimmerOptionalFields($this->get_element_value("Swimmer Optional Fields")) ;
+        $options->setAutoRegister($this->get_element_value('Auto-Register New Swimmers')) ;
+        $options->setRegistrationSystem($this->get_element_value('Registration System')) ;
+        $options->setRegistrationPrefixLabel($this->get_element_value('Registration Prefix Label')) ;
+        $options->setRegistrationFeeLabel($this->get_element_value('Registration Fee Label')) ;
+        $options->setRegistrationFeeCurrencyLabel($this->get_element_value('Currency Label')) ;
+        $options->setRegistrationFee($this->get_element_value('Registration Fee')) ;
+        $options->setRegistrationEmail($this->get_element_value('Registration E-mail Address')) ;
+        $options->setRegistrationEmailFormat($this->get_element_value('Registration E-mail Format')) ;
+        $options->setRegistrationTermsOfUseURL($this->get_element_value('Registration Terms of Use URL')) ;
+        $options->setRegistrationFeePolicyURL($this->get_element_value('Registration Fee Policy URL')) ;
+        $options->setUserOptionalFields($this->get_element_value('User Optional Fields')) ;
+        $options->setSwimmerOptionalFields($this->get_element_value('Swimmer Optional Fields')) ;
         $options->updateOptions() ;
 
         $this->set_action_message('Swim Team options updated.') ; 
@@ -580,12 +580,12 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $primaryphonelabel = new FERegEx("Primary Phone Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $primaryphonelabel = new FERegEx('Primary Phone Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($primaryphonelabel) ;
 
-        $secondaryphonelabel = new FERegEx("Secondary Phone Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $secondaryphonelabel = new FERegEx('Secondary Phone Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($secondaryphonelabel) ;
 
 
@@ -601,8 +601,8 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options_count ; $oc++)
         {
-            $user_option{$oc} = new FEListBox("User Option #" .
-                $oc, true, "200px");
+            $user_option{$oc} = new FEListBox('User Option #' .
+                $oc, true, '200px');
             $user_option{$oc}->set_list_data(array(
                  ucfirst(WPST_REQUIRED) => WPST_REQUIRED
                 ,ucfirst(WPST_OPTIONAL) => WPST_OPTIONAL
@@ -617,13 +617,13 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
             )) ;
             $this->add_element($user_option{$oc}) ;
 
-            $user_option_label{$oc} = new FERegEx("User Option #" .
-                $oc . " Label", true, "200px",
+            $user_option_label{$oc} = new FERegEx('User Option #' .
+                $oc . ' Label', true, '200px',
                 null, '/[a-zA-Z]+/', 'Label must start with a letter.');
             $this->add_element($user_option_label{$oc}) ;
 
-            $user_option_mode{$oc} = new FEListBox("User Option #" .
-                $oc . " Mode", true, "100px") ;
+            $user_option_mode{$oc} = new FEListBox('User Option #' .
+                $oc . ' Mode', true, '100px') ;
             $user_option_mode{$oc}->set_list_data(array(
                  ucfirst(WPST_USER) => WPST_USER
                 ,ucfirst(WPST_ADMIN) => WPST_ADMIN
@@ -643,8 +643,8 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
 
-        $this->set_element_value("Primary Phone Label", $options->getPrimaryPhoneLabel()) ;
-        $this->set_element_value("Secondary Phone Label", $options->getSecondaryPhoneLabel()) ;
+        $this->set_element_value('Primary Phone Label', $options->getPrimaryPhoneLabel()) ;
+        $this->set_element_value('Secondary Phone Label', $options->getSecondaryPhoneLabel()) ;
 
         //  Initialize the form fields
         //  How many user options does this configuration support?
@@ -658,12 +658,12 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options_count ; $oc++)
         {
-            $this->set_element_value("User Option #" . $oc,
-                $options->getSwimTeamOption(constant("WPST_OPTION_USER_OPTION" . $oc))) ;
-            $this->set_element_value("User Option #" . $oc . " Label",
-                $options->getSwimTeamOption(constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL"))) ;
-            $this->set_element_value("User Option #" . $oc . " Mode",
-                $options->getSwimTeamOption(constant("WPST_OPTION_USER_OPTION" . $oc . "_MODE"))) ;
+            $this->set_element_value('User Option #' . $oc,
+                $options->getSwimTeamOption(constant('WPST_OPTION_USER_OPTION' . $oc))) ;
+            $this->set_element_value('User Option #' . $oc . ' Label',
+                $options->getSwimTeamOption(constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL'))) ;
+            $this->set_element_value('User Option #' . $oc . ' Mode',
+                $options->getSwimTeamOption(constant('WPST_OPTION_USER_OPTION' . $oc . '_MODE'))) ;
         }
     }
 
@@ -678,13 +678,13 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_label("Primary Phone Label"),
-            $this->element_form("Primary Phone Label"), "&nbsp;") ;
+        $table->add_row($this->element_label('Primary Phone Label'),
+            $this->element_form('Primary Phone Label'), '&nbsp;') ;
 
-        $table->add_row($this->element_label("Secondary Phone Label"),
-            $this->element_form("Secondary Phone Label"), "&nbsp;") ;
+        $table->add_row($this->element_label('Secondary Phone Label'),
+            $this->element_form('Secondary Phone Label'), '&nbsp;') ;
 
-        $table->add_row("&nbsp;", "&nbsp;", "&nbsp;") ;
+        $table->add_row('&nbsp;', '&nbsp;', '&nbsp;') ;
 
         //  How many user options does this configuration support?
 
@@ -695,22 +695,22 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
 
         if ($options_count > 0)
         {
-            $table->add_row(html_b("Option Label"),
-                html_b("Option Type"), html_b("Option Mode")) ;
+            $table->add_row(html_b('Option Label'),
+                html_b('Option Type'), html_b('Option Mode')) ;
 
             //  Load the user options
 
             for ($oc = 1 ; $oc <= $options_count ; $oc++)
             {
                 $table->add_row(
-                    $this->element_form("User Option #" . $oc . " Label"),
-                    $this->element_form("User Option #" . $oc),
-                    $this->element_form("User Option #" . $oc . " Mode")
+                    $this->element_form('User Option #' . $oc . ' Label'),
+                    $this->element_form('User Option #' . $oc),
+                    $this->element_form('User Option #' . $oc . ' Mode')
                 ) ;
             }
 
-            $td = html_td(null, null, div_font8bold("Admin Mode:  Field is only visible to Adminstrative users.")) ;
-            $td->set_tag_attributes(array("colspan" => 3, "align" => "center")) ;
+            $td = html_td(null, null, div_font8bold('Admin Mode:  Field is only visible to Adminstrative users.')) ;
+            $td->set_tag_attributes(array('colspan' => 3, 'align' => 'center')) ;
             $table->add(html_tr(null, $td)) ;
         }
 
@@ -739,8 +739,8 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
 
-        $options->setPrimaryPhoneLabel($this->get_element_value("Primary Phone Label")) ;
-        $options->setSecondaryPhoneLabel($this->get_element_value("Secondary Phone Label")) ;
+        $options->setPrimaryPhoneLabel($this->get_element_value('Primary Phone Label')) ;
+        $options->setSecondaryPhoneLabel($this->get_element_value('Secondary Phone Label')) ;
         //  How many user options does this configuration support?
 
         $options_count = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
@@ -752,14 +752,14 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options_count ; $oc++)
         {
-            $options->setSwimTeamOption(constant("WPST_OPTION_USER_OPTION" .
-                $oc), $this->get_element_value("User Option #" . $oc)) ;
-            $options->setSwimTeamOption(constant("WPST_OPTION_USER_OPTION" .
-                $oc . "_LABEL"), $this->get_element_value("User Option #" .
-                $oc . " Label")) ;
-            $options->setSwimTeamOption(constant("WPST_OPTION_USER_OPTION" .
-                $oc . "_MODE"), $this->get_element_value("User Option #" .
-                $oc . " Mode")) ;
+            $options->setSwimTeamOption(constant('WPST_OPTION_USER_OPTION' .
+                $oc), $this->get_element_value('User Option #' . $oc)) ;
+            $options->setSwimTeamOption(constant('WPST_OPTION_USER_OPTION' .
+                $oc . '_LABEL'), $this->get_element_value('User Option #' .
+                $oc . ' Label')) ;
+            $options->setSwimTeamOption(constant('WPST_OPTION_USER_OPTION' .
+                $oc . '_MODE'), $this->get_element_value('User Option #' .
+                $oc . ' Mode')) ;
         }
 
         $options->updateOptions() ;
@@ -795,15 +795,15 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $genderlabelmale = new FERegEx("Male Gender Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $genderlabelmale = new FERegEx('Male Gender Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($genderlabelmale) ;
 
-        $genderlabelfemale = new FERegEx("Female Gender Label", true,
-            "200px", null, '/[a-zA-Z]+/', 'Label must start with a letter.');
+        $genderlabelfemale = new FERegEx('Female Gender Label', true,
+            '200px', null, '/[a-zA-Z]+/', 'Label must start with a letter.');
         $this->add_element($genderlabelfemale) ;
 
-        $swimmerlabelformat = new FEListBox("Swimmer Labels", true, "250px");
+        $swimmerlabelformat = new FEListBox('Swimmer Labels', true, '250px');
         $swimmerlabelformat->set_list_data(array(
              WPST_USA_SWIMMING => WPST_USA_SWIMMING
             ,WPST_SIMPLE_NUMERIC => WPST_SIMPLE_NUMERIC
@@ -814,7 +814,7 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         )) ;
         $this->add_element($swimmerlabelformat) ;
 
-        $swimmerlabelformatcode = new FEText("Swimmer Label Format", true, "100px");
+        $swimmerlabelformatcode = new FEText('Swimmer Label Format', true, '100px');
         $this->add_element($swimmerlabelformatcode) ;
 
         //  Swimmer optional fields
@@ -829,8 +829,8 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options_count ; $oc++)
         {
-            $swimmer_option{$oc} = new FEListBox("Swimmer Option #" .
-                $oc, true, "200px");
+            $swimmer_option{$oc} = new FEListBox('Swimmer Option #' .
+                $oc, true, '200px');
             $swimmer_option{$oc}->set_list_data(array(
                  ucfirst(WPST_REQUIRED) => WPST_REQUIRED
                 ,ucfirst(WPST_OPTIONAL) => WPST_OPTIONAL
@@ -845,14 +845,14 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
             )) ;
             $this->add_element($swimmer_option{$oc}) ;
 
-            $swimmer_option_label{$oc} = new FERegEx("Swimmer Option #" .
-                $oc . " Label", true, "200px",
+            $swimmer_option_label{$oc} = new FERegEx('Swimmer Option #' .
+                $oc . ' Label', true, '200px',
                 null, '/[a-zA-Z]+/', 'Label must start with a letter.');
             
             $this->add_element($swimmer_option_label{$oc}) ;
 
-            $swimmer_option_mode{$oc} = new FEListBox("Swimmer Option #" .
-                $oc . " Mode", true, "100px") ;
+            $swimmer_option_mode{$oc} = new FEListBox('Swimmer Option #' .
+                $oc . ' Mode', true, '100px') ;
             $swimmer_option_mode{$oc}->set_list_data(array(
                  ucfirst(WPST_USER) => WPST_USER
                 ,ucfirst(WPST_ADMIN) => WPST_ADMIN
@@ -872,10 +872,10 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
 
-        $this->set_element_value("Male Gender Label", $options->getGenderLabelMale()) ;
-        $this->set_element_value("Female Gender Label", $options->getGenderLabelFemale()) ;
-        $this->set_element_value("Swimmer Labels", $options->getSwimmerLabelFormat()) ;
-        $this->set_element_value("Swimmer Label Format", $options->getSwimmerLabelFormatCode()) ;
+        $this->set_element_value('Male Gender Label', $options->getGenderLabelMale()) ;
+        $this->set_element_value('Female Gender Label', $options->getGenderLabelFemale()) ;
+        $this->set_element_value('Swimmer Labels', $options->getSwimmerLabelFormat()) ;
+        $this->set_element_value('Swimmer Label Format', $options->getSwimmerLabelFormatCode()) ;
 
         //  Initialize the form fields
         //  How many swimmer options does this configuration support?
@@ -889,12 +889,12 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options_count ; $oc++)
         {
-            $this->set_element_value("Swimmer Option #" . $oc,
-                $options->getSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" . $oc))) ;
-            $this->set_element_value("Swimmer Option #" . $oc . " Label",
-                $options->getSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL"))) ;
-            $this->set_element_value("Swimmer Option #" . $oc . " Mode",
-                $options->getSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE"))) ;
+            $this->set_element_value('Swimmer Option #' . $oc,
+                $options->getSwimTeamOption(constant('WPST_OPTION_SWIMMER_OPTION' . $oc))) ;
+            $this->set_element_value('Swimmer Option #' . $oc . ' Label',
+                $options->getSwimTeamOption(constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL'))) ;
+            $this->set_element_value('Swimmer Option #' . $oc . ' Mode',
+                $options->getSwimTeamOption(constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE'))) ;
         }
     }
 
@@ -909,19 +909,19 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_label("Male Gender Label"),
-            $this->element_form("Male Gender Label")) ;
+        $table->add_row($this->element_label('Male Gender Label'),
+            $this->element_form('Male Gender Label')) ;
 
-        $table->add_row($this->element_label("Female Gender Label"),
-            $this->element_form("Female Gender Label")) ;
+        $table->add_row($this->element_label('Female Gender Label'),
+            $this->element_form('Female Gender Label')) ;
 
-        $table->add_row($this->element_label("Swimmer Labels"),
-            $this->element_form("Swimmer Labels")) ;
+        $table->add_row($this->element_label('Swimmer Labels'),
+            $this->element_form('Swimmer Labels')) ;
 
-        $table->add_row($this->element_label("Swimmer Label Format"),
-            $this->element_form("Swimmer Label Format")) ;
+        $table->add_row($this->element_label('Swimmer Label Format'),
+            $this->element_form('Swimmer Label Format')) ;
 
-        $table->add_row("&nbsp;", "&nbsp;", "&nbsp;") ;
+        $table->add_row('&nbsp;', '&nbsp;', '&nbsp;') ;
 
         //  How many swimmer options does this configuration support?
 
@@ -932,22 +932,22 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
 
         if ($options_count > 0)
         {
-            $table->add(html_tr(null, html_th("Option Label"),
-                html_th("Option Type"), html_th("Option Mode"))) ;
+            $table->add(html_tr(null, html_th('Option Label'),
+                html_th('Option Type'), html_th('Option Mode'))) ;
 
             //  Load the swimmer options
     
             for ($oc = 1 ; $oc <= $options_count ; $oc++)
             {
                 $table->add_row(
-                    $this->element_form("Swimmer Option #" . $oc . " Label"),
-                    $this->element_form("Swimmer Option #" . $oc),
-                    $this->element_form("Swimmer Option #" . $oc . " Mode")
+                    $this->element_form('Swimmer Option #' . $oc . ' Label'),
+                    $this->element_form('Swimmer Option #' . $oc),
+                    $this->element_form('Swimmer Option #' . $oc . ' Mode')
                 ) ;
             }
 
-            $td = html_td(null, null, div_font8bold("Admin Mode:  Field is only visible to Adminstrative users.")) ;
-            $td->set_tag_attributes(array("colspan" => 3, "align" => "center")) ;
+            $td = html_td(null, null, div_font8bold('Admin Mode:  Field is only visible to Adminstrative users.')) ;
+            $td->set_tag_attributes(array('colspan' => 3, 'align' => 'center')) ;
             $table->add(html_tr(null, $td)) ;
         }
 
@@ -976,10 +976,10 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
 
-        $options->setGenderLabelMale($this->get_element_value("Male Gender Label")) ;
-        $options->setGenderLabelFemale($this->get_element_value("Female Gender Label")) ;
-        $options->setSwimmerLabelFormat($this->get_element_value("Swimmer Labels")) ;
-        $options->setSwimmerLabelFormatCode($this->get_element_value("Swimmer Label Format")) ;
+        $options->setGenderLabelMale($this->get_element_value('Male Gender Label')) ;
+        $options->setGenderLabelFemale($this->get_element_value('Female Gender Label')) ;
+        $options->setSwimmerLabelFormat($this->get_element_value('Swimmer Labels')) ;
+        $options->setSwimmerLabelFormatCode($this->get_element_value('Swimmer Label Format')) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -992,12 +992,12 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options_count ; $oc++)
         {
-            $options->setSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" . $oc), 
-                $this->get_element_value("Swimmer Option #" . $oc)) ;
-            $options->setSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL"),
-                $this->get_element_value("Swimmer Option #" . $oc . " Label")) ;
-            $options->setSwimTeamOption(constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_MODE"),
-                $this->get_element_value("Swimmer Option #" . $oc . " Mode")) ;
+            $options->setSwimTeamOption(constant('WPST_OPTION_SWIMMER_OPTION' . $oc), 
+                $this->get_element_value('Swimmer Option #' . $oc)) ;
+            $options->setSwimTeamOption(constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL'),
+                $this->get_element_value('Swimmer Option #' . $oc . ' Label')) ;
+            $options->setSwimTeamOption(constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_MODE'),
+                $this->get_element_value('Swimmer Option #' . $oc . ' Mode')) ;
         }
         $options->updateOptions() ;
 
@@ -1032,7 +1032,7 @@ class WpSwimTeamGoogleMapsOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $googlemapsapikey = new FETextArea("Google API Key", false, 3, 60, "300px") ;
+        $googlemapsapikey = new FETextArea('Google API Key', false, 3, 60, '300px') ;
         $this->add_element($googlemapsapikey) ;
     }
 
@@ -1048,7 +1048,7 @@ class WpSwimTeamGoogleMapsOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
 
         //  Initialize the form fields
-        $this->set_element_value("Google API Key", $options->getGoogleAPIKey()) ;
+        $this->set_element_value('Google API Key', $options->getGoogleAPIKey()) ;
     }
 
 
@@ -1062,13 +1062,13 @@ class WpSwimTeamGoogleMapsOptionsForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_label("Google API Key"),
-            $this->element_form("Google API Key")) ;
+        $table->add_row($this->element_label('Google API Key'),
+            $this->element_form('Google API Key')) ;
 
         $table->add_row(null, html_span(null,
-            "Don't have a Google Maps API Key?", html_br(), 
-            html_a("http://code.google.com/apis/maps/signup.html",
-            "Sign up"), "for a free API key with Google Maps.")) ;
+            'Don\'t have a Google Maps API Key?', html_br(), 
+            html_a('http://code.google.com/apis/maps/signup.html',
+            'Sign up'), 'for a free API key with Google Maps.')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -1094,7 +1094,7 @@ class WpSwimTeamGoogleMapsOptionsForm extends WpSwimTeamForm
     {
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
-        $options->setGoogleAPIKey($this->get_element_value("Google API Key")) ;
+        $options->setGoogleAPIKey($this->get_element_value('Google API Key')) ;
         $options->updateOptions() ;
 
         $this->set_action_message('Swim Team Google Maps options updated.') ;
@@ -1128,7 +1128,7 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $jobsignup = new FEListBox("Job Sign Up Mode", true, "100px");
+        $jobsignup = new FEListBox('Job Sign Up Mode', true, '100px');
         $jobsignup->set_list_data(array(
              ucwords(WPST_USER) => WPST_USER
             ,ucwords(WPST_ADMIN) => WPST_ADMIN
@@ -1141,17 +1141,17 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
         $jobcreditsrequired = new FENumberInRange('Job Credits Required', true, '100px', null, 0, 500) ;
         $this->add_element($jobcreditsrequired) ;
 
-        $regemail = new FEEmailMany("Job E-mail Address", true, "300px");
+        $regemail = new FEEmailMany('Job E-mail Address', true, '300px');
         $this->add_element($regemail) ;
 
-        $regemailformat = new FEListBox("Job E-mail Format", true, "100px");
+        $regemailformat = new FEListBox('Job E-mail Format', true, '100px');
         $regemailformat->set_list_data(array(
              ucwords(WPST_HTML) => WPST_HTML
             ,ucwords(WPST_TEXT) => WPST_TEXT
         )) ;
         $this->add_element($regemailformat) ;
 
-        $regtouurl = new FEUrl("Job Expectations URL", false, "300px");
+        $regtouurl = new FEUrl('Job Expectations URL', false, '300px');
         $this->add_element($regtouurl) ;
     }
 
@@ -1167,12 +1167,12 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
 
         //  Initialize the form fields
-        $this->set_element_value("Job Sign Up Mode", $options->getJobSignUp()) ;
-        $this->set_element_value("Job Credits", $options->getJobCredits()) ;
-        $this->set_element_value("Job Credits Required", $options->getJobCreditsRequired()) ;
-        $this->set_element_value("Job E-mail Address", $options->getJobEmailAddress()) ;
-        $this->set_element_value("Job E-mail Format", $options->getJobEmailFormat()) ;
-        $this->set_element_value("Job Expectations URL", $options->getJobExpectationsURL()) ;
+        $this->set_element_value('Job Sign Up Mode', $options->getJobSignUp()) ;
+        $this->set_element_value('Job Credits', $options->getJobCredits()) ;
+        $this->set_element_value('Job Credits Required', $options->getJobCreditsRequired()) ;
+        $this->set_element_value('Job E-mail Address', $options->getJobEmailAddress()) ;
+        $this->set_element_value('Job E-mail Format', $options->getJobEmailFormat()) ;
+        $this->set_element_value('Job Expectations URL', $options->getJobExpectationsURL()) ;
     }
 
 
@@ -1185,25 +1185,25 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
     function form_content()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("Job Sign Up Mode"),
-            $this->element_form("Job Sign Up Mode")) ;
+        $table->add_row($this->element_label('Job Sign Up Mode'),
+            $this->element_form('Job Sign Up Mode')) ;
 
-        $table->add_row($this->element_label("Job Credits"),
-            $this->element_form("Job Credits")) ;
+        $table->add_row($this->element_label('Job Credits'),
+            $this->element_form('Job Credits')) ;
 
-        $table->add_row($this->element_label("Job Credits Required"),
-            $this->element_form("Job Credits Required")) ;
+        $table->add_row($this->element_label('Job Credits Required'),
+            $this->element_form('Job Credits Required')) ;
 
-        $table->add_row($this->element_label("Job E-mail Address"),
-            $this->element_form("Job E-mail Address")) ;
+        $table->add_row($this->element_label('Job E-mail Address'),
+            $this->element_form('Job E-mail Address')) ;
 
-        $table->add_row($this->element_label("Job E-mail Format"),
-            $this->element_form("Job E-mail Format")) ;
+        $table->add_row($this->element_label('Job E-mail Format'),
+            $this->element_form('Job E-mail Format')) ;
 
-        $table->add_row($this->element_label("Job Expectations URL"),
-            $this->element_form("Job Expectations URL")) ;
+        $table->add_row($this->element_label('Job Expectations URL'),
+            $this->element_form('Job Expectations URL')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -1231,12 +1231,12 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
     {
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
-        $options->setJobSignUp($this->get_element_value("Job Sign Up Mode")) ;
-        $options->setJobCredits($this->get_element_value("Job Credits")) ;
-        $options->setJobCreditsRequired($this->get_element_value("Job Credits Required")) ;
-        $options->setJobEmailAddress($this->get_element_value("Job E-mail Address")) ;
-        $options->setJobEmailFormat($this->get_element_value("Job E-mail Format")) ;
-        $options->setJobExpectationsURL($this->get_element_value("Job Expectations URL")) ;
+        $options->setJobSignUp($this->get_element_value('Job Sign Up Mode')) ;
+        $options->setJobCredits($this->get_element_value('Job Credits')) ;
+        $options->setJobCreditsRequired($this->get_element_value('Job Credits Required')) ;
+        $options->setJobEmailAddress($this->get_element_value('Job E-mail Address')) ;
+        $options->setJobEmailFormat($this->get_element_value('Job E-mail Format')) ;
+        $options->setJobExpectationsURL($this->get_element_value('Job Expectations URL')) ;
         $options->updateOptions() ;
 
         $this->set_action_message('Swim Team options updated.') ;
@@ -1269,22 +1269,25 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
+        $enableverbosemessges = new FEYesNoListBox('Enable Verbose Messages', true, '75px') ;
+        $this->add_element($enableverbosemessges) ;
+
         $gdlrows = new FENumberInRange('Rows to Display', true, '100px', null, 5, 200) ;
         $this->add_element($gdlrows) ;
 
-        $enablegooglemaps = new FEYesNoListBox("Enable Google Maps", true, "75px") ;
+        $enablegooglemaps = new FEYesNoListBox('Enable Google Maps', true, '75px') ;
         $this->add_element($enablegooglemaps) ;
 
-        $googlemapsapikey = new FETextArea("Google API Key", false, 3, 60, "300px") ;
+        $googlemapsapikey = new FETextArea('Google API Key', false, 3, 60, '300px') ;
         $this->add_element($googlemapsapikey) ;
 
-        $redirect = new FERadioGroup("Login Redirect", array(
+        $redirect = new FERadioGroup('Login Redirect', array(
             ucwords(WPST_NONE) => WPST_NONE,
             ucwords(WPST_DASHBOARD_PAGE) => WPST_DASHBOARD_PAGE,
             ucwords(WPST_SWIMTEAM_OVERVIEW_PAGE) => WPST_SWIMTEAM_OVERVIEW_PAGE,
             ucwords(WPST_HOME_PAGE) => WPST_HOME_PAGE,
             //ucwords(WPST_PREVIOUS_PAGE) => WPST_PREVIOUS_PAGE
-            ), true, "200px");
+            ), true, '200px');
         $redirect->set_br_flag(true) ;
         $this->add_element($redirect) ;
 
@@ -1302,10 +1305,11 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
 
         //  Initialize the form fields
-        $this->set_element_value("Rows to Display", $options->getGDLRowsToDisplay()) ;
-        $this->set_element_value("Enable Google Maps", $options->getEnableGoogleMaps()) ;
-        $this->set_element_value("Google API Key", $options->getGoogleAPIKey()) ;
-        $this->set_element_value("Login Redirect", WPST_NONE) ;
+        $this->set_element_value('Enable Verbose Messages', $options->getEnableVerboseMessages()) ;
+        $this->set_element_value('Rows to Display', $options->getGDLRowsToDisplay()) ;
+        $this->set_element_value('Enable Google Maps', $options->getEnableGoogleMaps()) ;
+        $this->set_element_value('Google API Key', $options->getGoogleAPIKey()) ;
+        $this->set_element_value('Login Redirect', WPST_NONE) ;
     }
 
 
@@ -1319,8 +1323,11 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_label("Rows to Display"),
-            $this->element_form("Rows to Display")) ;
+        $table->add_row($this->element_label('Enable Verbose Messages'),
+            $this->element_form('Enable Verbose Messages')) ;
+
+        $table->add_row($this->element_label('Rows to Display'),
+            $this->element_form('Rows to Display')) ;
 
         $table->add_row(null, html_span(null,
             'Frequently wp-SwimTeam presents information in', html_br(),
@@ -1330,22 +1337,22 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
 
         $table->add_row($this->element_label('Enable Google Maps'),
-            $this->element_form("Enable Google Maps")) ;
+            $this->element_form('Enable Google Maps')) ;
 
-        $table->add_row( $this->element_label("Google API Key"),
-            $this->element_form("Google API Key")) ;
+        $table->add_row( $this->element_label('Google API Key'),
+            $this->element_form('Google API Key')) ;
 
         //$table->add_row(_HTML_SPACE, _HTML_SPACE) ;
 
         $table->add_row(null, html_span(null,
-            "Don't have a Google Maps API Key?", html_br(), 
-            html_a("http://code.google.com/apis/maps/signup.html",
-            "Sign up"), "for a free API key with Google.")) ;
+            'Don\'t have a Google Maps API Key?', html_br(), 
+            html_a('http://code.google.com/apis/maps/signup.html',
+            'Sign up'), 'for a free API key with Google.')) ;
 
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
 
-        $table->add_row($this->element_label("Login Redirect"),
-            $this->element_form("Login Redirect")) ;
+        $table->add_row($this->element_label('Login Redirect'),
+            $this->element_form('Login Redirect')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -1371,10 +1378,11 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
     {
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
-        $options->setGDLRowsToDisplay($this->get_element_value("Rows to Display")) ;
-        $options->setEnableGoogleMaps($this->get_element_value("Enable Google Maps")) ;
-        $options->setGoogleAPIKey($this->get_element_value("Google API Key")) ;
-        $options->setLoginRedirectAction($this->get_element_value("Login Redirect")) ;
+        $options->setEnableVerboseMessages($this->get_element_value('Enable Verbose Messages')) ;
+        $options->setGDLRowsToDisplay($this->get_element_value('Rows to Display')) ;
+        $options->setEnableGoogleMaps($this->get_element_value('Enable Google Maps')) ;
+        $options->setGoogleAPIKey($this->get_element_value('Google API Key')) ;
+        $options->setLoginRedirectAction($this->get_element_value('Login Redirect')) ;
         $options->updateOptions() ;
 
         $this->set_action_message('Swim Team Miscellaneous options updated.') ;

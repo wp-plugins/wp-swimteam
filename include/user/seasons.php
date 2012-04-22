@@ -16,10 +16,11 @@
  *
  */
 
-require_once("seasons.class.php") ;
-require_once("seasons.forms.class.php") ;
-require_once("jobs.forms.class.php") ;
-require_once("container.class.php") ;
+require_once('seasons.class.php') ;
+require_once('seasons.forms.class.php') ;
+require_once('jobs.forms.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the jobs
@@ -40,13 +41,13 @@ class SeasonsTabContainer extends SwimTeamTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_ACTION_ADD)),
-            __("Add a swim season.")) ;
+            __('Add a swim season.')) ;
         $table->add_row(html_b(__(WPST_ACTION_UPDATE)),
-            __("Update a swim season.")) ;
+            __('Update a swim season.')) ;
         $table->add_row(html_b(__(WPST_ACTION_DELETE)),
-            __("Delete a swim season.")) ;
+            __('Delete a swim season.')) ;
         $table->add_row(html_b(__(WPST_ACTION_JOBS)),
-            __("Assign a user to a specific job assigment.")) ;
+            __('Assign a user to a specific job assigment.')) ;
 
         return $table ;
     }
@@ -58,8 +59,8 @@ class SeasonsTabContainer extends SwimTeamTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimTeamSeasonsAdminGUIDataList("Swim Team Seasons",
-            "100%", "season_start", true) ;
+        $gdl = new SwimTeamSeasonsAdminGUIDataList('Swim Team Seasons',
+            '100%', 'season_start', true) ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;
@@ -79,7 +80,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->add(html_br(), html_h3("Swim Team Seasons")) ;
+        $div->add(html_br(), html_h3('Swim Team Seasons')) ;
 
         //  This allows passing arguments eithers as a GET or a POST
 
@@ -88,12 +89,12 @@ class SeasonsTabContainer extends SwimTeamTabContainer
         //  The seasonid is the argument which must be
         //  dealt with differently for GET and POST operations
 
-        if (array_key_exists("seasonid", $scriptargs))
-            $seasonid = $scriptargs["seasonid"] ;
-        else if (array_key_exists("_seasonid", $scriptargs))
-            $seasonid = $scriptargs["_seasonid"] ;
-        else if (array_key_exists(WPST_DB_PREFIX . "radio", $scriptargs))
-            $seasonid = $scriptargs[WPST_DB_PREFIX . "radio"][0] ;
+        if (array_key_exists('seasonid', $scriptargs))
+            $seasonid = $scriptargs['seasonid'] ;
+        else if (array_key_exists('_seasonid', $scriptargs))
+            $seasonid = $scriptargs['_seasonid'] ;
+        else if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
+            $seasonid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
         else
             $seasonid = null ;
 
@@ -104,9 +105,9 @@ class SeasonsTabContainer extends SwimTeamTabContainer
         //  If there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
-        if (array_key_exists("_action", $scriptargs))
+        if (array_key_exists('_action', $scriptargs))
             $action = $scriptargs['_action'] ;
-        else if (array_key_exists("_form_action", $scriptargs))
+        else if (array_key_exists('_form_action', $scriptargs))
             $action = $scriptargs['_form_action'] ;
         else
             $action = null ;
@@ -124,14 +125,14 @@ class SeasonsTabContainer extends SwimTeamTabContainer
             switch ($action)
             {
                 case WPST_ACTION_ADD:
-                    $form = new WpSwimTeamSeasonAddForm("Add Swim Team Season",
+                    $form = new WpSwimTeamSeasonAddForm('Add Swim Team Season',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Season') ;
                     break ;
 
                 case WPST_ACTION_UPDATE:
-                    $form = new WpSwimTeamSeasonUpdateForm("Update Swim Team Season",
+                    $form = new WpSwimTeamSeasonUpdateForm('Update Swim Team Season',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($seasonid) ;
                     $this->setShowFormInstructions() ;
@@ -139,7 +140,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_DELETE:
-                    $form = new WpSwimTeamSeasonDeleteForm("Delete Swim Team Season",
+                    $form = new WpSwimTeamSeasonDeleteForm('Delete Swim Team Season',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($seasonid) ;
                     $this->setShowFormInstructions() ;
@@ -147,7 +148,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_OPEN_SEASON:
-                    $form = new WpSwimTeamSeasonOpenForm("Open Swim Team Season",
+                    $form = new WpSwimTeamSeasonOpenForm('Open Swim Team Season',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId(seasonid) ;
                     $this->setShowFormInstructions() ;
@@ -155,7 +156,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_CLOSE_SEASON:
-                    $form = new WpSwimTeamSeasonCloseForm("Close Swim Team Season",
+                    $form = new WpSwimTeamSeasonCloseForm('Close Swim Team Season',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($seasonid) ;
                     $this->setShowFormInstructions() ;
@@ -163,7 +164,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_LOCK_IDS:
-                    $form = new WpSwimTeamLockSwimmerIdsForm("Lock Swimmer Ids",
+                    $form = new WpSwimTeamLockSwimmerIdsForm('Lock Swimmer Ids',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($seasonid) ;
                     $this->setShowFormInstructions() ;
@@ -171,7 +172,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_UNLOCK_IDS:
-                    $form = new WpSwimTeamUnlockSwimmerIdsForm("Unlock Swimmer Ids",
+                    $form = new WpSwimTeamUnlockSwimmerIdsForm('Unlock Swimmer Ids',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setId($seasonid) ;
                     $this->setShowFormInstructions() ;
@@ -179,7 +180,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_JOBS:
-                    $form = new WpSwimTeamSeasonJobAssignForm("Assign Swim Season Jobs",
+                    $form = new WpSwimTeamSeasonJobAssignForm('Assign Swim Season Jobs',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setMode(WPST_SEASON) ;
                     $form->setSeasonId($seasonid) ;
@@ -188,7 +189,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 default:
-                    $div->add(html_h4(sprintf("Unsupported action \"%s\" requested.", $action))) ;
+                    $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
                     break ;
             }
 
@@ -199,9 +200,7 @@ class SeasonsTabContainer extends SwimTeamTabContainer
                 //  Create the form processor
 
                 $fp = new FormProcessor($form) ;
-                $fp->set_form_action($_SERVER['PHP_SELF'] .
-                    "?" . $_SERVER['QUERY_STRING']) ;
-                
+                $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
                 //  Display the form again even if processing was successful.
 
@@ -231,11 +230,11 @@ class SeasonsTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add(html_br(2), $c) ;
-                $div->add(SwimTeamGUIBackHomeButtons::getButtons()) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Seasons')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4("No content to display.")) ;
+                $div->add(html_br(2), html_h4('No content to display.')) ;
             }
         }
 

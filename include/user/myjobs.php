@@ -16,10 +16,11 @@
  *
  */
 
-require_once("jobs.class.php") ;
-require_once("seasons.class.php") ;
-require_once("textmap.class.php") ;
-require_once("container.class.php") ;
+require_once('jobs.class.php') ;
+require_once('seasons.class.php') ;
+require_once('textmap.class.php') ;
+require_once('container.class.php') ;
+require_once('container.class.php') ;
 
 /**
  * Class definition of the overview tab

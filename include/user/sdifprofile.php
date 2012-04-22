@@ -16,9 +16,10 @@
  *
  */
 
-require_once("sdif.class.php") ;
-require_once("sdif.forms.class.php") ;
-require_once("container.class.php") ;
+require_once('sdif.class.php') ;
+require_once('sdif.forms.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the SDIFProfileTab
@@ -63,19 +64,17 @@ class SDIFProfileTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->add(html_h2("Swim Team SDIF Profile")) ;
+        $div->add(html_h2('Swim Team SDIF Profile')) ;
 
         //  Start building the form
 
-        $form = new WpSwimTeamSDIFProfileForm("Swim SDIF Team Profile",
+        $form = new WpSwimTeamSDIFProfileForm('Swim SDIF Team Profile',
             $_SERVER['HTTP_REFERER'], 600) ;
 
         //  Create the form processor
 
         $fp = new FormProcessor($form) ;
-        //$fp->set_form_action($_SERVER['REQUEST_URI']) ;
-        $fp->set_form_action($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
-        
+        $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
         //  Display the form again even if processing was successful.
 

@@ -16,9 +16,10 @@
  *
  */
 
-require_once("team.class.php") ;
-require_once("team.forms.class.php") ;
-require_once("container.class.php") ;
+require_once('team.class.php') ;
+require_once('team.forms.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the TeamProfileTab
@@ -56,21 +57,19 @@ class TeamProfileOptionsTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
-        //$div->add(html_h2("Swim Team Profile")) ;
+        $div->set_style('clear: both;') ;
+        //$div->add(html_h2('Swim Team Profile')) ;
         //$div->add(html_br()) ;
 
         //  Start building the form
 
-        $form = new WpSwimTeamTeamProfileForm("Swim Team Profile",
+        $form = new WpSwimTeamTeamProfileForm('Swim Team Profile',
             $_SERVER['HTTP_REFERER'], 600) ;
 
         //  Create the form processor
 
         $fp = new FormProcessor($form) ;
-        //$fp->set_form_action($_SERVER['REQUEST_URI']) ;
-        $fp->set_form_action($_SERVER['PHP_SELF'] . "?" . $_SERVER['QUERY_STRING']) ;
-        //
+        $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
         //  Display the form again even if processing was successful.
 

@@ -130,8 +130,8 @@ class SwimTeamTextMap
 
         if ($eventid == WPST_NULL_ID) return ucfirst(WPST_NONE) ;
 
-        $event = new SwimMeetEvent() ;
-        $event->loadSwimMeetEventByEventId($eventid) ;
+        $event = new SwimTeamEvent() ;
+        $event->loadSwimTeamEventByEventId($eventid) ;
 
         $text = sprintf('%04s  %s  %s  %s  %s',
             $event->getEventNumber(),
@@ -247,7 +247,7 @@ class SwimTeamTextMap
         {
             require_once('events.class.php') ;
 
-            $eventgroup = new SwimMeetEventGroup() ;
+            $eventgroup = new SwimTeamEventGroup() ;
             
             if ($eventgroup->eventgroupExistById($eventgroupid))
             {

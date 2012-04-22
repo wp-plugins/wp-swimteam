@@ -92,9 +92,14 @@ class SwimMeetReport extends SwimMeet
     var $__show_map_links = false ;
 
     /**
-     * Use Initials flag
+     * Use first initial flag
      */
-    var $__use_first_intial = false ;
+    var $__use_first_initial = false ;
+
+    /**
+     * Use last initial flag
+     */
+    var $__use_last_initial = false ;
 
     /**
      * Use Nickname flag
@@ -378,7 +383,7 @@ class SwimMeetReport extends SwimMeet
      */
     function setUseFirstInitial($flag = true)
     {
-        $this->__use_first_intial = $flag ;
+        $this->__use_first_initial = $flag ;
     }
 
     /**
@@ -388,7 +393,7 @@ class SwimMeetReport extends SwimMeet
      */
     function getUseFirstInitial()
     {
-        return $this->__use_first_intial ;
+        return $this->__use_first_initial ;
     }
 
     /**
@@ -398,7 +403,7 @@ class SwimMeetReport extends SwimMeet
      */
     function setUseLastInitial($flag = true)
     {
-        $this->__use_last_intial = $flag ;
+        $this->__use_last_initial = $flag ;
     }
 
     /**
@@ -408,7 +413,7 @@ class SwimMeetReport extends SwimMeet
      */
     function getUseLastInitial()
     {
-        return $this->__use_last_intial ;
+        return $this->__use_last_initial ;
     }
 
     /**
@@ -624,14 +629,14 @@ class SwimMeetReport extends SwimMeet
                         else
                             $name = $fn ;
     
-                        //  Use first intial?
+                        //  Use first initial?
     
                         if ($this->getUseFirstInitial())
                             $name = substr($name, 0, 1) . '. ' ;
                         else
                             $name .= ' ' ;
     
-                        //  Use last intial?
+                        //  Use last initial?
     
                         if ($this->getUseLastInitial())
                             $name .= substr($ln, 0, 1) . '.' ;

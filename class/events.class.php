@@ -30,7 +30,7 @@ require_once('textmap.class.php') ;
  * @access public
  * @see SwimTeamDBI
  */
-class SwimMeetEvent extends SwimTeamDBI
+class SwimTeamEvent extends SwimTeamDBI
 {
     /**
      * event id property - used for unique database identifier
@@ -248,7 +248,7 @@ class SwimMeetEvent extends SwimTeamDBI
      *
      * @return - boolean - existance of event
      */
-    function getSwimMeetEventExists($eventnumber = false, $seteventid = false)
+    function getSwimTeamEventExists($eventnumber = false, $seteventid = false)
     {
 	    //  Is a similar event already in the database?
 
@@ -316,7 +316,7 @@ class SwimMeetEvent extends SwimTeamDBI
      * @param - string - optional id
      * @return - boolean - existance of event
      */
-    function getSwimMeetEventExistsByEventId($eventid = null, $seteventid = false)
+    function getSwimTeamEventExistsByEventId($eventid = null, $seteventid = false)
     {
         if (is_null($eventid)) $eventid = $this->getEventId() ;
 
@@ -351,7 +351,7 @@ class SwimMeetEvent extends SwimTeamDBI
      * @param - boolean - optional flag to set the event id
      * @return - boolean - existance of event
      */
-    function getSwimMeetEventExistsByEventNumberAndGroupId($eventnumber = null,
+    function getSwimTeamEventExistsByEventNumberAndGroupId($eventnumber = null,
         $eventgroupid = null, $seteventid = false)
     {
         if (is_null($eventnumber)) $eventnumber = $this->getEventNumber() ;
@@ -382,13 +382,13 @@ class SwimMeetEvent extends SwimTeamDBI
     /**
      * Add a new swim event
      */
-    function addSwimMeetEvent()
+    function addSwimTeamEvent()
     {
         $success = null ;
 
         //  Make sure the event doesn't exist yet
 
-        if (!$this->getSwimMeetEventExists())
+        if (!$this->getSwimTeamEventExists())
         {
             //  Construct the insert query
  
@@ -422,13 +422,13 @@ class SwimMeetEvent extends SwimTeamDBI
      * Update a swim event
      *
      */
-    function updateSwimMeetEvent()
+    function updateSwimTeamEvent()
     {
         $success = null ;
 
         //  Make sure the event exists, can't update something that doesn't!
 
-        if ($this->getSwimMeetEventExistsByEventId())
+        if ($this->getSwimTeamEventExistsByEventId())
         {
             //  Construct the update query
  
@@ -471,13 +471,13 @@ class SwimMeetEvent extends SwimTeamDBI
      * event has results, disallow deleting the event.
      *
      */
-    function deleteSwimMeetEvent()
+    function deleteSwimTeamEvent()
     {
         $success = null ;
 
         //  Make sure the event exists yet
 
-        if ($this->getSwimMeetEventExistsByEventId())
+        if ($this->getSwimTeamEventExistsByEventId())
         {
             //  Before deleting the event, need to make sure any registrations
             //  associated with it are deleted as well to prevent orphan registrations.
@@ -487,17 +487,14 @@ class SwimMeetEvent extends SwimTeamDBI
 
             //  Construct the delete query
  
-            $query = sprintf('DELETE FROM %s
-                WHERE eventid="%s"',
-                WPST_EVENTS_TABLE,
-                $this->getEventId()
-            ) ;
+            $query = sprintf('DELETE FROM %s WHERE eventid="%s"',
+                WPST_EVENTS_TABLE, $this->getEventId()) ;
 
             $this->setQuery($query) ;
             $this->runDeleteQuery() ;
         }
 
-        $success = !$this->getSwimMeetEventExistsByEventId() ;
+        $success = !$this->getSwimTeamEventExistsByEventId() ;
 
         return $success ;
     }
@@ -508,7 +505,7 @@ class SwimMeetEvent extends SwimTeamDBI
      *
      * @param - string - optional event id
      */
-    function loadSwimMeetEventByEventId($eventid = null)
+    function loadSwimTeamEventByEventId($eventid = null)
     {
         if (is_null($eventid)) $eventid = $this->getEventId() ;
 
@@ -518,7 +515,7 @@ class SwimMeetEvent extends SwimTeamDBI
         $this->setEventId($eventid) ;
 
         //  Make sure it is a legal event id
-        if ($this->getSwimMeetEventExistsByEventId($eventid))
+        if ($this->getSwimTeamEventExistsByEventId($eventid))
         {
             $query = sprintf('SELECT * FROM %s WHERE eventid="%s"',
                 WPST_EVENTS_TABLE, $eventid) ;
@@ -563,6 +560,8 @@ class SwimMeetEvent extends SwimTeamDBI
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 
+        //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+        //var_dump($query) ;
         return $this->getQueryResults() ;
     }
 
@@ -598,10 +597,22 @@ class SwimMeetEvent extends SwimTeamDBI
      * @param - optional - event group id, default to no group id
      * @return - array - array of swimmers ids
      */
+    function getAllEventIdsByEventGroupIdAndMeetId($eventgroupid = WPST_NULL_ID, $meetid = WPST_NULL_ID, $orderby = 'eventnumber')
+    {
+        $filter = sprintf('eventgroupid="%s" AND meetid="%s"', $eventgroupid, $meetid) ;
+
+        return $this->getAllEventIds($filter, $orderby) ;
+    }
+
+    /**
+     * Retrieve all the Event Ids for an event group
+     *
+     * @param - optional - event group id, default to no group id
+     * @return - array - array of swimmers ids
+     */
     function getAllEventIdsByEventGroupIdAndEventNumber($eventgroupid = WPST_NULL_ID, $eventnumber = WPST_NULL_ID, $orderby = 'eventnumber')
     {
-        $filter = sprintf('eventgroupid="%s" AND eventnumber="%s"',
-            $eventgroupid, $eventnumber) ;
+        $filter = sprintf('eventgroupid="%s" AND eventnumber="%s"', $eventgroupid, $eventnumber) ;
 
         return $this->getAllEventIds($filter, $orderby) ;
     }
@@ -626,13 +637,35 @@ class SwimMeetEvent extends SwimTeamDBI
 }
 
 /**
+ * Class definition of the events
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see SwimTeamDBI
+ */
+class SwimMeetEvent extends SwimTeamEvent
+{
+    /**
+     *
+     * Load event record by Id
+     *
+     * @param - string - optional event id
+     */
+    function loadSwimMeetEventByEventId($eventid = null)
+    {
+        return parent::loadSwimTeamEventByEventId($eventid) ;
+    }
+}
+
+
+/**
  * Class definition of the event groups
  *
  * @author Mike Walsh <mike@walshcrew.com>
  * @access public
  * @see SwimTeamDBI
  */
-class SwimMeetEventGroup extends SwimTeamDBI
+class SwimTeamEventGroup extends SwimTeamDBI
 {
     /**
      * eventgroup id property - used for unique database identifier
@@ -845,7 +878,7 @@ class SwimMeetEventGroup extends SwimTeamDBI
             //  to delete all of the event records which are
             //  connected to it.
 
-            $event = new SwimMeetEvent() ;
+            $event = new SwimTeamEvent() ;
 
             $eventids = $event->getAllEventIdsByEventGroupId($this->getEventGroupId()) ;
 
@@ -962,6 +995,28 @@ class SwimMeetEventGroup extends SwimTeamDBI
 
         return $this->getQueryResults() ;
     }
+
+    /**
+     * Get the count of Events for the Event Group
+     *
+     * @param - int - optional filter to restrict query
+     * @return - array - array of swimmers ids
+     */
+    function getEventGroupCount($eventgroupid = null)
+    {
+        if (is_null($eventgroupid)) $eventgroupid = $this->getEventGroupId() ;
+
+        //  Select the count of records for the Event Group in
+        //  the Events ignoring the ones assigned to a real meet.
+
+        $query = sprintf('SELECT COUNT(eventid) AS eventcount FROM
+            %s WHERE eventgroupid="%s" AND meetid="%s"', WPST_EVENTS_TABLE,
+            $eventgroupid, WPST_NULL_ID) ;
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResult() ;
+    }
 }
 
 /**
@@ -972,7 +1027,7 @@ class SwimMeetEventGroup extends SwimTeamDBI
  * @access public
  * @see SwimTeamGUIDataList
  */
-class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
+class SwimTeamEventsGUIDataList extends SwimTeamGUIDataList
 {
     /**
      * The constructor
@@ -985,7 +1040,7 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimMeetEventsGUIDataList($title, $width = '100%',
+    function SwimTeamEventsGUIDataList($title, $width = '100%',
         $default_orderby = '', $default_reverseorder = false,
         $columns = WPST_EVENTS_DEFAULT_COLUMNS,
         $tables = WPST_EVENTS_DEFAULT_TABLES,
@@ -1017,8 +1072,6 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
 		//add the columns in the display that you want to view.
 		//The API is :
 		//Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-	  	$this->add_header_item('Group',
-	         	'175', 'eventgroupid', SORTABLE, SEARCHABLE, 'left') ;
 
 		$this->add_header_item('Event',
 	       	    '50', 'eventnumber', SORTABLE, SEARCHABLE, 'left') ;
@@ -1034,6 +1087,9 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
 
 	  	$this->add_header_item('Stroke',
 	         	'150', 'stroke', SORTABLE, SEARCHABLE, 'left') ;
+
+	  	$this->add_header_item('Group',
+	         	'175', 'eventgroupid', SORTABLE, SEARCHABLE, 'left') ;
 
 		$this->add_header_item('ID',
 	       	    '30', 'eventid', SORTABLE, SEARCHABLE, 'left') ;
@@ -1100,9 +1156,9 @@ class SwimMeetEventsGUIDataList extends SwimTeamGUIDataList
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @access public
- * @see SwimMeetEventsGUIDataList
+ * @see SwimTeamEventsGUIDataList
  */
-class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
+class SwimTeamEventsAdminGUIDataList extends SwimTeamEventsGUIDataList
 {
     /**
      * Property to store the requested action
@@ -1184,6 +1240,7 @@ class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
         //  The unique item is the second column.
 
 	    $this->add_action_column('radio', 'FIRST', 'eventid') ;
+        $this->set_radio_var_name('_eventid', false) ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -1206,7 +1263,7 @@ class SwimMeetEventsAdminGUIDataList extends SwimMeetEventsGUIDataList
  * @access public
  * @see SwimTeamGUIDataList
  */
-class SwimMeetEventGroupsGUIDataList extends SwimTeamGUIDataList
+class SwimTeamEventGroupsGUIDataList extends SwimTeamGUIDataList
 {
     /**
      * The constructor
@@ -1219,7 +1276,7 @@ class SwimMeetEventGroupsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimMeetEventGroupsGUIDataList($title, $width = '100%',
+    function SwimTeamEventGroupsGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_EVENT_GROUPS_WITH_EVENT_COUNT_COLUMNS,
         $tables = WPST_EVENT_GROUPS_DEFAULT_TABLES,
@@ -1316,9 +1373,9 @@ class SwimMeetEventGroupsGUIDataList extends SwimTeamGUIDataList
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @access public
- * @see SwimMeetEventGroupsGUIDataList
+ * @see SwimTeamEventGroupsGUIDataList
  */
-class SwimMeetEventGroupsAdminGUIDataList extends SwimMeetEventGroupsGUIDataList
+class SwimTeamEventGroupsAdminGUIDataList extends SwimTeamEventGroupsGUIDataList
 {
     /**
      * Property to store the requested action
@@ -1399,6 +1456,7 @@ class SwimMeetEventGroupsAdminGUIDataList extends SwimMeetEventGroupsGUIDataList
         //  The unique item is the second column.
 
 	    $this->add_action_column('radio', 'FIRST', 'eventgroupid') ;
+        $this->set_radio_var_name('_eventgroupid', false) ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -1414,19 +1472,66 @@ class SwimMeetEventGroupsAdminGUIDataList extends SwimMeetEventGroupsGUIDataList
 }
 
 /**
+ * GUIDataList class for performaing administration tasks
+ * on the various events.
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see SwimTeamEventsAdminGUIDataList
+ * @since v1.19
+ */
+class SwimMeetEventsGUIDataList extends SwimTeamEventsGUIDataList
+{
+}
+
+/**
+ * GUIDataList class for performaing administration tasks
+ * on the various events.
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see SwimTeamEventsAdminGUIDataList
+ * @since v1.19
+ */
+class SwimMeetEventsAdminGUIDataList extends SwimTeamEventsAdminGUIDataList
+{
+    /**
+     * Property to store the possible actions - used to build action buttons
+     */
+    var $__normal_actions = array(
+        //WPST_ACTION_EVENTS_ADD => WPST_ACTION_EVENTS_ADD
+        //,WPST_ACTION_EVENTS_UPDATE => WPST_ACTION_EVENTS_UPDATE
+        //,WPST_ACTION_EVENTS_IMPORT => WPST_ACTION_EVENTS_IMPORT
+         WPST_ACTION_EVENTS_LOAD => WPST_ACTION_EVENTS_LOAD
+        ,WPST_ACTION_EVENTS_REORDER => WPST_ACTION_EVENTS_REORDER
+        ,WPST_ACTION_EVENTS_DELETE => WPST_ACTION_EVENTS_DELETE
+        ,WPST_ACTION_EVENTS_DELETE_ALL => WPST_ACTION_EVENTS_DELETE_ALL
+    ) ;
+
+    /**
+     * Property to store the possible actions - used to build action buttons
+     */
+    var $__empty_actions = array(
+        // WPST_ACTION_EVENTS_ADD => WPST_ACTION_EVENTS_ADD
+        //,WPST_ACTION_EVENTS_IMPORT => WPST_ACTION_EVENTS_IMPORT
+        WPST_ACTION_EVENTS_LOAD => WPST_ACTION_EVENTS_LOAD
+    ) ;
+}
+
+/**
  * Class definition of the events
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @access public
  * @see SwimTeamInfoTable
  */
-class SwimMeetEventGroupInfoTable extends SwimTeamInfoTable
+class SwimTeamEventGroupInfoTable extends SwimTeamInfoTable
 {
     /**
      * Construct a summary of the active season.
      *
      */
-    function constructSwimMeetEventGroupeInfoTable($eventgroupid)
+    function constructSwimTeamEventGroupeInfoTable($eventgroupid)
     {
         $hdr = 0 ;
 
@@ -1438,7 +1543,7 @@ class SwimMeetEventGroupInfoTable extends SwimTeamInfoTable
 
         //  Find all of the events in the season
 
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
         $agegroup = new SwimTeamAgeGroup() ;
         
         $eventIds = $event->getAllEventIdsByEventGroupId($eventgroupid) ;
@@ -1446,7 +1551,7 @@ class SwimMeetEventGroupInfoTable extends SwimTeamInfoTable
         //  Looop through events ids
         foreach ($eventIds as $eventId)
         {
-            $event->loadSwimMeetEventByEventId($eventId['eventid']) ;
+            $event->loadSwimTeamEventByEventId($eventId['eventid']) ;
 
             $agegroup->loadAgeGroupById($event->getAgeGroupId()) ;
 
@@ -1468,13 +1573,13 @@ class SwimMeetEventGroupInfoTable extends SwimTeamInfoTable
  * @access public
  * @see SwimTeamInfoTable
  */
-class SwimMeetEventScheduleInfoTable extends SwimTeamInfoTable
+class SwimTeamEventScheduleInfoTable extends SwimTeamInfoTable
 {
     /**
      * Construct a summary of the active season.
      *
      */
-    function constructSwimMeetEventScheduleInfoTable($seasonid = null)
+    function constructSwimTeamEventScheduleInfoTable($seasonid = null)
     {
         $hdr = 0 ;
 
@@ -1494,12 +1599,12 @@ class SwimMeetEventScheduleInfoTable extends SwimTeamInfoTable
 
         //  Find all of the events in the season
 
-        $event = new SwimMeetEvent() ;
+        $event = new SwimTeamEvent() ;
         $eventIds = $event->getAllEventIds(sprintf('seasonid="%s"', $seasonid)) ;
 
         foreach ($eventIds as $eventId)
         {
-            $event->loadSwimMeetEventByEventId($eventId['eventid']) ;
+            $event->loadSwimTeamEventByEventId($eventId['eventid']) ;
 
             if ($event->getEventType() == WPST_DUAL_MEET)
                 $opponent = SwimTeamTextMap::__mapOpponentSwimClubIdToText(

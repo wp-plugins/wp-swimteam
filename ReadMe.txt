@@ -64,6 +64,18 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.19 =
+* Fixed wp-SwimTeam so it will work in sub-directory installations and WordPress multi-site.
+* Added new option to toggle message verbosity.  Some actions generate numerous messages, this option will reduce and summarize messages.
+* Fixed Event Opt-In/Opt-Out which was broken with Event Model changes in v1.18.
+* Added ability to load Meet Events from an Event Group into a swim meet.
+* Fixed broken GUI controls for Events (expand, collapse, page forward and back).
+* Tightened up flow control between Event Groups and Events and Swim Meets and Events.
+* Changed buttons on for some actions (events, swim meets) to return to a logical place.  "Back" and "Home" didn't really mean anything in most cases.  In particular, "Back" has been a reliability challenge so in most cases it has been eliminated.
+* Fixed several bugs in report generator which manifested themselves when User or Swimmer optional field count was set to zero.
+* Fixed bug which resulted in broken Opt-In and Opt-Out actions on the drop down lists.
+* Fixed bug which incorrectly entered Opt-In/Opt-Out information in Stroke format even when set for Event Mode.
+
 = 1.18 =
 * Fixed bug which prevented users from signing up for jobs.
 * Phase 1 of overhauled Event Model is complete.  The new Event Model introduces the concept of Event Groups.  Events are now defined in the context of an Event Group.  Swim meets currently do not have any connection to Events but that will chance in a release fairly shortly in Phase 2.

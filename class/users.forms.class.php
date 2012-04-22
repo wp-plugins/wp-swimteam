@@ -108,6 +108,8 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         //  Check the options!
         
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
+        if (empty($label))
+            $label = WPST_DEFAULT_STATE_OR_PROVINCE_LABEL ;
 
         $geography = get_option(WPST_OPTION_GEOGRAPHY) ;
 
@@ -119,6 +121,8 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $this->add_element($state) ;
 
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
+        if (empty($label))
+            $label = WPST_DEFAULT_POSTAL_CODE_LABEL ;
 
         if ($geography == WPST_US_ONLY)
             $postalcode = new FEZipcode($label, true, '75px') ;
@@ -272,9 +276,13 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
             $this->set_element_value('City', $u->getCity()) ;
 
             $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
+            if (empty($label))
+                $label = WPST_DEFAULT_STATE_OR_PROVINCE_LABEL ;
             $this->set_element_value($label, $u->getStateOrProvince()) ;
 
             $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
+            if (empty($label))
+                $label = WPST_DEFAULT_POSTAL_CODE_LABEL ;
             $this->set_element_value($label, $u->getPostalCode()) ;
 
             $this->set_element_value('Country', $u->getCountry()) ;
@@ -363,11 +371,15 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
             $this->element_form('City')) ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
+        if (empty($label))
+            $label = WPST_DEFAULT_STATE_OR_PROVINCE_LABEL ;
 
         $table->add_row($this->element_label($label),
             $this->element_form($label)) ;
 
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
+        if (empty($label))
+            $label = WPST_DEFAULT_POSTAL_CODE_LABEL ;
 
         $table->add_row($this->element_label($label),
             $this->element_form($label)) ;
@@ -467,9 +479,13 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         $u->setCity($this->get_element_value('City')) ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
+        if (empty($label))
+            $label = WPST_DEFAULT_STATE_OR_PROVINCE_LABEL ;
         $u->setStateOrProvince($this->get_element_value($label)) ;
 
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
+        if (empty($label))
+            $label = WPST_DEFAULT_POSTAL_CODE_LABEL ;
         $u->setPostalCode($this->get_element_value($label)) ;
 
         $geography = get_option(WPST_OPTION_GEOGRAPHY) ;

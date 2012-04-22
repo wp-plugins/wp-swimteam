@@ -20,6 +20,7 @@ require_once('events.class.php') ;
 require_once('events.forms.class.php') ;
 require_once('container.class.php') ;
 require_once('textmap.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the jobs
@@ -61,7 +62,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimMeetEventGroupsAdminGUIDataList('Swim Team Event Groups',
+        $gdl = new SwimTeamEventGroupsAdminGUIDataList('Swim Team Event Groups',
             '100%', 'eventgroupdescription') ;
 
         $gdl->set_alternating_row_colors(true) ;
@@ -89,10 +90,25 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
 
         $scriptargs = array_merge($_GET, $_POST) ;
 
+        //print '<pre>' ;
+        //print_r($scriptargs) ;
+        //print '</pre>' ;
         //  So, how did we get here?  If $_POST is empty
         //  then it wasn't via a form submission.
 
-        //  Show the list of event groups or process an action.
+        //  The eventgroupid is the argument which must be
+        //  dealt with differently for GET and POST operations
+
+        //  Event Group Id passed?
+        if (array_key_exists('eventgroupid', $scriptargs))
+            $eventgroupid = $scriptargs['eventgroupid'] ;
+        else if (array_key_exists('_eventgroupid', $scriptargs))
+            $eventgroupid = is_array($scriptargs['_eventgroupid']) ?
+                $scriptargs['_eventgroupid'][0] :  $scriptargs['_eventgroupid'] ;
+        else
+            $eventgroupid = null ;
+
+        //  Show the list of swim meets or process an action.
         //  If there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
@@ -103,19 +119,19 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
         else
             $action = null ;
 
-        //  The eventgroupid is the argument which must be
-        //  dealt with differently for GET and POST operations
+        //  If one of the GDL controls was selected, then
+        //  the action maybe confusing the processor.  Flush
+        //  any action that doesn't make sense.  Look for the
+        //  recorded action when this happens.
 
-        if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
-            $eventgroupid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
-        else if (array_key_exists('eventgroupid', $scriptargs))
-            $eventgroupid = $scriptargs['eventgroupid'] ;
-        else if (array_key_exists("_eventgroupid", $scriptargs))
-            $eventgroupid = $scriptargs["_eventgroupid"] ;
-        else if ($action == WPST_ACTION_EVENTS_REORDER)
-            $eventgroupid = WPST_NULL_ID ;
-        else
-            $eventgroupid = null ;
+        if ($action == WPST_ACTION_SELECT_ACTION)
+        {
+            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+            if (array_key_exists('_recorded_action', $scriptargs))
+                $action = $scriptargs['_recorded_action'] ;
+            else
+                $action = null ;
+        }
 
         if (empty($scriptargs) || is_null($action))
         {
@@ -133,14 +149,14 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
             switch ($action)
             {
                 case WPST_ACTION_ADD:
-                    $form = new WpSwimMeetEventGroupAddForm('Add Swim Team Event Group',
+                    $form = new WpSwimTeamEventGroupAddForm('Add Swim Team Event Group',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Event Group') ;
                     break ;
 
                 case WPST_ACTION_UPDATE:
-                    $form = new WpSwimMeetEventGroupUpdateForm('Update Swim Team Event Group',
+                    $form = new WpSwimTeamEventGroupUpdateForm('Update Swim Team Event Group',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setEventGroupId($eventgroupid) ;
                     $this->setShowFormInstructions() ;
@@ -148,7 +164,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_DELETE:
-                    $form = new WpSwimMeetEventGroupDeleteForm('Delete Swim Team Event Group',
+                    $form = new WpSwimTeamEventGroupDeleteForm('Delete Swim Team Event Group',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setEventGroupId($eventgroupid) ;
                     $this->setShowFormInstructions() ;
@@ -158,9 +174,9 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
                 case WPST_ACTION_EVENTS_REPORT:
                 //case WPST_ACTION_PROFILE:
                     $c = container() ;
-                    $profile = new SwimMeetEventGroupInfoTable(
+                    $profile = new SwimTeamEventGroupInfoTable(
                         SwimTeamTextMap::__mapEventGroupIdToText($eventgroupid), '700px') ;
-                    $profile->constructSwimMeetEventGroupeInfoTable($eventgroupid) ;
+                    $profile->constructSwimTeamEventGroupeInfoTable($eventgroupid) ;
                     $c->add($profile) ;
 
                     break ;
@@ -204,9 +220,10 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
 
                     //  Leverage the Events tab management code
 
+                    //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
                     //var_dump($eventgroupid) ;
                     require_once('events.php') ;
-                    $c = new AdminEventsTabContainer($eventgroupid,
+                    $c = new AdminSwimTeamEventsTabContainer($eventgroupid,
                        SwimTeamTextMap::__mapEventGroupIdToText($eventgroupid)) ;
 
                     break ;
@@ -214,7 +231,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
                     /*
                 case WPST_ACTION_EVENTS_REORDER:
                     $c = container() ;
-                    $ajax = new WpSwimMeetEventReorderByEventGroupAjaxForm($eventgroupid) ;
+                    $ajax = new WpSwimTeamEventReorderByEventGroupAjaxForm($eventgroupid) ;
                     $c->add($ajax) ;
                     break ;
                      */
@@ -233,9 +250,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
                 //  Create the form processor
 
                 $fp = new FormProcessor($form) ;
-                $fp->set_form_action($_SERVER['PHP_SELF'] .
-                    '?' . $_SERVER['QUERY_STRING']) ;
-                
+                $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
                 //  Display the form again even if processing was successful.
 
@@ -265,7 +280,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add(html_br(2), $c) ;
-                $div->add(SwimTeamGUIBackHomeButtons::getButtons()) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Event Groups')) ;
             }
             else
             {

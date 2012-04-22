@@ -13,7 +13,7 @@
  *
  * (c) 2007 by Mike Walsh for Wp-SwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage SDIF
  * @version $Revision$
@@ -28,7 +28,7 @@ define('WPST_SDIF_VERSION', '3.0') ;
 define('WPST_SDIF_FUTURE_USE', '') ;
 define('WPST_SDIF_NO_VALUE', '') ;
 define('WPST_SDIF_SOFTWARE_NAME', 'wp-swimteam') ;
-define('WPST_SDIF_SOFTWARE_VERSION', 'v0.1') ;
+define('WPST_SDIF_SOFTWARE_VERSION', WPST_VERSION) ;
 
 /**
  *  Organization Code
@@ -507,6 +507,7 @@ define('WPST_SDIF_COUNTRY_CODE_POLAND_LABEL', 'Poland') ;
 define('WPST_SDIF_COUNTRY_CODE_PORTUGAL_LABEL', 'Portugal') ;
 define('WPST_SDIF_COUNTRY_CODE_PUERTO_RICO_LABEL', 'Puerto Rico') ;
 define('WPST_SDIF_COUNTRY_CODE_QATAR_LABEL', 'Qatar') ;
+define('WPST_SDIF_COUNTRY_CODE_REPUBLIC_LABEL', 'Republic') ;
 define('WPST_SDIF_COUNTRY_CODE_ROMANIA_LABEL', 'Romania') ;
 define('WPST_SDIF_COUNTRY_CODE_RUSSIA_LABEL', 'Russia') ;
 define('WPST_SDIF_COUNTRY_CODE_RWANDA_LABEL', 'Rwanda') ;
@@ -738,7 +739,6 @@ define('WPST_SDIF_COUNTRY_CODE_ZAIRE_VALUE', 'ZAI') ;
 define('WPST_SDIF_COUNTRY_CODE_ZAMBIA_VALUE', 'ZAM') ;
 define('WPST_SDIF_COUNTRY_CODE_ZIMBABWE_VALUE', 'ZIM') ;
 
-
 /**
  *  Meet Type Code
  *
@@ -954,6 +954,9 @@ define('WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE', 7) ;
 define('WPST_SDIF_COURSE_STATUS_CODE_SCM_LABEL', 'Short Course Meters') ;
 define('WPST_SDIF_COURSE_STATUS_CODE_SCY_LABEL', 'Short Course Yards') ;
 define('WPST_SDIF_COURSE_STATUS_CODE_LCM_LABEL', 'Long Course Meters') ;
+define('WPST_SDIF_COURSE_STATUS_CODE_SCM_ALT_LABEL', 'SC Meters') ;
+define('WPST_SDIF_COURSE_STATUS_CODE_SCY_ALT_LABEL', 'SC Yards') ;
+define('WPST_SDIF_COURSE_STATUS_CODE_LCM_ALT_LABEL', 'LC Meters') ;
 define('WPST_SDIF_COURSE_STATUS_CODE_DQ_LABEL', 'Disqualified') ;
 
 //  Define the values used in the records
@@ -1286,6 +1289,9 @@ define('WPST_SDIF_RECORD_TERMINATOR', chr(13) . chr(10)) ;
 
 //  Define A0 record
 define('WPST_SDIF_A0_RECORD', 'A0%1.1s%-8.8s%-2.2s%-30.30s%-20.20s%-10.10s%-20.20s%-12.12s%-8.8s%-42.42s%-2.2s%-3.3s%2.2s') ;
+
+//  Define B1 record
+define('WPST_SDIF_B1_RECORD', 'B1%1s%8s%30s%22s%22s%20s%2s%10s%3s%1s%8s%8s%4s%8s%1s%10s') ;
 
 //  Define C1 record
 define('WPST_SDIF_C1_RECORD', 'C1%1.1s%-8.8s%-6.6s%-30.30s%-16.16s%-22.22s%-22.22s%-20.20s%-2.2s%-10.10s%-3.3s%1.1s%-6.6s%1.1s%-10.10s%2.2s') ;

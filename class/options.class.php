@@ -136,6 +136,11 @@ class SwimTeamOptions extends SwimTeamDBI
     var $__enable_google_maps ;
 
     /**
+     * enable verbose messages property
+     */
+    var $__enable_verbose_msgs ;
+
+    /**
      * google maps api key property
      */
     var $__google_api_key ;
@@ -748,6 +753,26 @@ class SwimTeamOptions extends SwimTeamDBI
     function setEnableGoogleMaps($status)
     {
         $this->__enable_google_maps = $status ;
+    }
+
+    /**
+     * Get the verbose message status
+     *
+     * @return - string - status google maps
+     */
+    function getEnableVerboseMessages()
+    {
+        return ($this->__enable_verbose_msgs) ;
+    }
+
+    /**
+     * Set the verbose message status
+     *
+     * @param - string - status google maps
+     */
+    function setEnableVerboseMessages($status)
+    {
+        $this->__enable_verbose_msgs = $status ;
     }
 
     /**
@@ -1447,6 +1472,20 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, WPST_DEFAULT_GDL_ROWS_TO_DISPLAY) ;
         }
 
+        //  Enable Verbose Messages
+        $option = get_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setEnableVerboseMessages($option) ;
+        }
+        else
+        {
+            $this->setEnableVerboseMessages(WPST_DEFAULT_ENABLE_VERBOSE_MESSAGES) ;
+            update_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES, WPST_DEFAULT_ENABLE_VERBOSE_MESSAGES) ;
+        }
+
         //  Enable Google Maps
         $option = get_option(WPST_OPTION_ENABLE_GOOGLE_MAPS) ;
 
@@ -1964,6 +2003,7 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE, $this->getSwimmerLabelFormatCode()) ;
         update_option(WPST_OPTION_AUTO_REGISTER, $this->getAutoRegister()) ;
         update_option(WPST_OPTION_REGISTRATION_SYSTEM, $this->getRegistrationSystem()) ;
+        update_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES, $this->getEnableVerboseMessages()) ;
         update_option(WPST_OPTION_ENABLE_GOOGLE_MAPS, $this->getEnableGoogleMaps()) ;
         update_option(WPST_OPTION_GOOGLE_API_KEY, $this->getGoogleAPIKey()) ;
         update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, $this->getGDLRowsToDisplay()) ;

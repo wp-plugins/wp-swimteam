@@ -10,10 +10,10 @@
  *
  * (c) 2007 by Mike Walsh for Wp-SwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 738 $
+ * @version $Revision: 765 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -203,6 +203,7 @@ define('WPST_DEFAULT_OPT_OUT_LABEL', 'Scratch') ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_EMAIL_FORMAT', WPST_HTML) ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_MODE', WPST_BOTH) ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_USAGE_MODEL', WPST_STROKE) ;
+define('WPST_DEFAULT_ENABLE_VERBOSE_MESSAGES', WPST_NO) ;
 define('WPST_DEFAULT_ENABLE_GOOGLE_MAPS', WPST_NO) ;
 define('WPST_DEFAULT_GOOGLE_API_KEY', 'Google API Key') ;
 define('WPST_DEFAULT_GDL_ROWS_TO_DISPLAY', 20) ;
@@ -241,6 +242,7 @@ define('WPST_OPTION_REGISTRATION_SYSTEM', WPST_OPTION_PREFIX . 'registration_sys
 define('WPST_OPTION_GEOGRAPHY', WPST_OPTION_PREFIX . 'geography') ;
 define('WPST_OPTION_SWIMMER_LABEL_FORMAT', WPST_OPTION_PREFIX . 'swimmer_label_format') ;
 define('WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE', WPST_OPTION_PREFIX . 'swimmer_label_format_code') ;
+define('WPST_OPTION_ENABLE_VERBOSE_MESSAGES', WPST_OPTION_PREFIX . 'enable_verbose_messages') ;
 define('WPST_OPTION_ENABLE_GOOGLE_MAPS', WPST_OPTION_PREFIX . 'enable_google_maps') ;
 define('WPST_OPTION_GOOGLE_API_KEY', WPST_OPTION_PREFIX . 'google_api_key') ;
 define('WPST_OPTION_GDL_ROWS_TO_DISPLAY', WPST_OPTION_PREFIX . 'gdl_rows_to_display') ;

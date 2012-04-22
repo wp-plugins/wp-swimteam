@@ -19,6 +19,7 @@
 require_once('events.class.php') ;
 require_once('events.forms.class.php') ;
 require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the events
@@ -27,7 +28,7 @@ require_once('container.class.php') ;
  * @access public
  * @see SwimTeamTabContainer
  */
-class EventsTabContainer extends SwimTeamTabContainer
+class SwimTeamEventsTabContainer extends SwimTeamTabContainer
 {
     /**
      * Event Description
@@ -38,6 +39,11 @@ class EventsTabContainer extends SwimTeamTabContainer
      * Event Group Id
      */
     var $__eventgroupid = WPST_NULL_ID ;
+
+    /**
+     * Swim Meet Id
+     */
+    var $__swimmeetid = WPST_NULL_ID ;
 
     /**
      * Set the event description
@@ -60,9 +66,9 @@ class EventsTabContainer extends SwimTeamTabContainer
     }
 
     /**
-     * Set the eventgroup id
+     * Set the event group id
      *
-     * @param - int - eventgroup id
+     * @param - int - event group id
      */
     function setEventGroupId($id)
     {
@@ -70,13 +76,33 @@ class EventsTabContainer extends SwimTeamTabContainer
     }
 
     /**
-     * Get the eventgroup id
+     * Get the event group id
      *
-     * @return - int - eventgroup id
+     * @return - int - event group id
      */
     function getEventGroupId()
     {
         return ($this->__eventgroupid) ;
+    }
+
+    /**
+     * Set the swim meet id
+     *
+     * @param - int - swim meet id
+     */
+    function setSwimMeetId($id)
+    {
+        $this->__swimmeetid = $id ;
+    }
+
+    /**
+     * Get the swim meet id
+     *
+     * @return - int - swim meet id
+     */
+    function getSwimMeetId()
+    {
+        return ($this->__swimmeetid) ;
     }
 
     /**
@@ -121,15 +147,14 @@ class EventsTabContainer extends SwimTeamTabContainer
      *
      * @return GUIDataList
      */
-    function __buildGDL($eventgroupid = WPST_NULL_ID)
+    function __buildGDL()
     {
 
-        $gdl = new SwimMeetEventsGUIDataList($this->getEventDescription(),
+        $gdl = new SwimTeamEventsGUIDataList($this->getEventDescription(),
             '100%', 'eventgroup, eventnumber', false) ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;
-        $gdl->set_save_vars(array('eventgroupid' => $eventgroupid)) ;
 
         return $gdl ;
     }
@@ -139,7 +164,7 @@ class EventsTabContainer extends SwimTeamTabContainer
      *
      * @param eventgroup id - int - optional eventgroup id to load the events from
      */
-    function EventsTabContainer($eventgroupid = WPST_NULL_ID, $desc = 'Standard Meet Events')
+    function SwimTeamEventsTabContainer($eventgroupid = WPST_NULL_ID, $desc = 'Standard Meet Events')
     {
         $this->setEventGroupId($eventgroupid) ;
         $this->setEventDescription($desc) ;
@@ -162,15 +187,46 @@ class EventsTabContainer extends SwimTeamTabContainer
 
         $scriptargs = array_merge($_GET, $_POST) ;
 
+        //print '<pre>' ;
+        //print_r($scriptargs) ;
+        //print '</pre>' ;
         //  The eventid is the argument which must be
         //  dealt with differently for GET and POST operations
 
-        if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
-            $eventid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
-        else if (array_key_exists('eventid', $scriptargs))
+        //  Event Id passed?
+        if (array_key_exists('eventid', $scriptargs))
             $eventid = $scriptargs['eventid'] ;
+        else if (array_key_exists('_eventid', $scriptargs))
+            $eventid = $scriptargs['_eventid'] ;
+        else if (array_key_exists('_eventid', $scriptargs))
+            $eventid = is_array($scriptargs['_eventid']) ?
+                $scriptargs['_eventid'][0] :  $scriptargs['_eventid'] ;
+        //else if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
+        //    $eventid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
         else
             $eventid = null ;
+
+        //  Event Group Id passed?
+        if (array_key_exists('eventgroupid', $scriptargs))
+            $eventgroupid = $scriptargs['eventgroupid'] ;
+        else if (array_key_exists('_eventgroupid', $scriptargs))
+            $eventgroupid = is_array($scriptargs['_eventgroupid']) ?
+                $scriptargs['_eventgroupid'][0] :  $scriptargs['_eventgroupid'] ;
+        else
+            $eventgroupid = null ;
+        $this->setEventGroupId($eventgroupid) ;
+
+        //  Swim Meet Id passed?
+        if (array_key_exists('swimmeetid', $scriptargs))
+            $swimmeetid = $scriptargs['swimmeetid'] ;
+        else if (array_key_exists('_swimmeetid', $scriptargs))
+            $swimmeetid = is_array($scriptargs['_swimmeetid']) ?
+                $scriptargs['_swimmeetid'][0] :  $scriptargs['_swimmeetid'] ;
+        //else if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
+        //    $swimmeetid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
+        else
+            $swimmeetid = null ;
+        $this->setSwimMeetId($swimmeetid) ;
 
         //  So, how did we get here?  If $scriptargs is empty
         //  then it wasn't via a form submission.
@@ -186,24 +242,34 @@ class EventsTabContainer extends SwimTeamTabContainer
         else
             $action = null ;
 
+        $this->setAction($action) ;
+        //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+        //var_dump($action) ;
+
         //  If one of the GDL controls was selected, then
         //  the action maybe confusing the processor.  Flush
-        //  any action that doesn't make sense.
+        //  any action that doesn't make sense.  Look for the
+        //  recorded action when this happens.
 
-        if ($action == WPST_ACTION_SELECT_ACTION) $action = null ;
+        if ($action == WPST_ACTION_SELECT_ACTION)
+        {
+            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+            if (array_key_exists('_recorded_action', $scriptargs))
+                $action = $scriptargs['_recorded_action'] ;
+            else
+                $action = null ;
+        }
 
         //  Did action originate from the Event Groups Tab?  If so
         //  null it out so the event action is handled properly.
 
-        if ($action == WPST_ACTION_EVENTS_MANAGE) $action = null ;
+        //if ($action == WPST_ACTION_EVENTS_MANAGE) $action = null ;
 
         //  Start processing the action
 
-        if (empty($scriptargs) || is_null($action))
+        if (empty($scriptargs) || is_null($action) || $action == WPST_ACTION_EVENTS_MANAGE)
         {
-            $this->setEventGroupId($eventgroupid) ;
-            $gdl = $this->__buildGDL($this->getEventGroupId()) ;
-                    //var_dump($gdl) ;
+            $gdl = $this->__buildGDL() ;
             $div->add($gdl) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Events Action Summary') ;
@@ -230,7 +296,10 @@ class EventsTabContainer extends SwimTeamTabContainer
                     $fa = preg_replace('/&?eventgroupid=[1-9][0-9]*/i', '', $fa) ;
                     
                     $fa .= sprintf('&eventgroupid=%s', $eventgroupid) ;
-                    $form = new WpSwimMeetEventLoadForm('Load Events', $fa, '600px') ;
+                    $form = new WpSwimTeamEventLoadForm('Load Events', $fa, '600px') ;
+                    //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+                    //var_dump($this->getSwimMeetId()) ;                    
+                    $form->setMeetId($this->getSwiMmeetId()) ;
                     $form->setEventGroupId($eventgroupid) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Load Events') ;
@@ -245,7 +314,7 @@ class EventsTabContainer extends SwimTeamTabContainer
                     $fa = preg_replace('/&?eventgroupid=[1-9][0-9]*/i', '', $fa) ;
                     
                     $fa .= sprintf('&eventgroupid=%s', $eventgroupid) ;
-                    $form = new WpSwimMeetEventAddForm('Add Event', $fa, 700) ;
+                    $form = new WpSwimTeamEventAddForm('Add Event', $fa, 700) ;
                         //$_SERVER['HTTP_REFERER'], 700) ;
                     $form->setMeetId(WPST_NULL_ID) ;
                     $form->setEventGroupId($eventgroupid) ;
@@ -255,20 +324,25 @@ class EventsTabContainer extends SwimTeamTabContainer
 
                 case WPST_ACTION_EVENTS_REORDER:
                     $c = container() ;
-                    $ajax = new WpSwimMeetEventReorderByEventGroupAjaxForm($eventgroupid) ;
+                    if ($swimmeetid != WPST_NULL_ID)
+                        $ajax = new WpSwimTeamEventReorderBySwimMeetAjaxForm($swimmeetid) ;
+                    else
+                        $ajax = new WpSwimTeamEventReorderByEventGroupAjaxForm($eventgroupid) ;
                     $c->add($ajax) ;
                     break ;
 
                 case WPST_ACTION_EVENTS_IMPORT:
-                    $form = new WpSwimMeetEventsImportForm('Import Events',
+                    $form = new WpSwimTeamEventsImportForm('Import Events',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setEventGroupId($eventgroupid) ;
+                    //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+                    //var_dump($eventgroupid) ;                    
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Import Events') ;
                     break ;
 
                 case WPST_ACTION_EVENTS_UPDATE:
-                    $form = new WpSwimMeetEventUpdateForm('Update Event',
+                    $form = new WpSwimTeamEventUpdateForm('Update Event',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setEventGroupId($eventgroupid) ;
                     $form->setEventId($eventid) ;
@@ -277,7 +351,7 @@ class EventsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_EVENTS_DELETE:
-                    $form = new WpSwimMeetEventDeleteForm('Delete Event',
+                    $form = new WpSwimTeamEventDeleteForm('Delete Event',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setEventGroupId($eventgroupid) ;
                     $form->setEventId($eventid) ;
@@ -286,8 +360,9 @@ class EventsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_EVENTS_DELETE_ALL:
-                    $form = new WpSwimMeetEventDeleteAllForm('Delete All Events',
+                    $form = new WpSwimTeamEventDeleteAllForm('Delete All Events',
                         $_SERVER['HTTP_REFERER'], 400) ;
+                    $form->setMeetId($swimmeetid) ;
                     $form->setEventGroupId($eventgroupid) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Delete All Events') ;
@@ -307,8 +382,7 @@ class EventsTabContainer extends SwimTeamTabContainer
                 //  Create the form processor
 
                 $fp = new FormProcessor($form) ;
-                $fp->set_form_action($_SERVER['PHP_SELF'] .
-                    '?' . $_SERVER['QUERY_STRING']) ;
+                $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
                 //  Display the form again even if processing was successful.
 
@@ -324,7 +398,7 @@ class EventsTabContainer extends SwimTeamTabContainer
 
                     get_currentuserinfo() ;
 
-                    $gdl = $this->__buildGDL($this->getEventGroupId()) ;
+                    $gdl = $this->__buildGDL() ;
 
                     $div->add($gdl) ;
 
@@ -345,8 +419,8 @@ class EventsTabContainer extends SwimTeamTabContainer
                 //  events, for eventgroup events, the buttons will be handled
                 //  by the Swim Meet code.
 
-                if ($eventgroupid == WPST_NULL_ID)
-                    $div->add(SwimTeamGUIBackHomeButtons::getButtons()) ;
+                //if ($eventgroupid == WPST_NULL_ID)
+                //    $div->add(SwimTeamGUIButtons::getBackHomeButtons()) ;
             }
             else
             {
@@ -366,7 +440,7 @@ class EventsTabContainer extends SwimTeamTabContainer
  * @access public
  * @see Container
  */
-class AdminEventsTabContainer extends EventsTabContainer
+class AdminSwimTeamEventsTabContainer extends SwimTeamEventsTabContainer
 {
     /**
      * Build verbage to explain what can be done
@@ -404,18 +478,95 @@ class AdminEventsTabContainer extends EventsTabContainer
      *
      * @return GUIDataList
      */
-    function __buildGDL($eventgroupid = WPST_NULL_ID)
+    function __buildGDL()
     {
-        $gdl = new SwimMeetEventsAdminGUIDataList('Swim Meet Events',
+        $gdl = new SwimTeamEventsAdminGUIDataList('Swim Team Events',
             '100%', 'eventgroupid,eventnumber', false, WPST_EVENTS_DEFAULT_COLUMNS,
-            WPST_EVENTS_DEFAULT_TABLES, sprintf('eventgroupid="%s"',
-            $this->getEventGroupId())) ;
+            WPST_EVENTS_DEFAULT_TABLES, sprintf('eventgroupid="%s" AND meetid="%s"',
+            $this->getEventGroupId(), WPST_NULL_ID)) ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;
-        $gdl->set_save_vars(array('eventgroupid' => $eventgroupid)) ;
+        $gdl->set_save_vars(array('_recorded_action' => $this->getAction(), 'eventgroupid' => $this->getEventGroupId())) ;
 
         return $gdl ;
     }
 }
+
+/**
+ * Class definition of the events
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see SwimMeetTabContainer
+ */
+class SwimMeetEventsTabContainer extends SwimTeamEventsTabContainer
+{
+}
+
+/**
+ * Class definition of the events
+ *
+ * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @access public
+ * @see AdminSwimTeamEventsTabContainer
+ */
+class AdminSwimMeetEventsTabContainer extends AdminSwimTeamEventsTabContainer
+{
+    /**
+     * Build verbage to explain what can be done
+     *
+     * @return DIVTag
+     */
+    function __buildActionSummary()
+    {
+        $table = parent::__buildActionSummary() ;
+
+        //  Can't load events without a specific swim meet id
+
+        if ($this->getSwimMeetId() != WPST_NULL_ID)
+        {
+            $table->add_row(html_b(__(WPST_ACTION_EVENTS_LOAD)),
+                __('Load events into the swim swim meet.')) ;
+        }
+
+        $table->add_row(html_b(__(WPST_ACTION_EVENTS_ADD)),
+            __('Add one or more events.')) ;
+        $table->add_row(html_b(__(WPST_ACTION_EVENTS_UPDATE)),
+            __('Update a single event.  Use this action to correct
+            any of the information about an indivual event.')) ;
+        $table->add_row(html_b(__(WPST_ACTION_EVENTS_REORDER)),
+            __('Reorder the event list by moving events up or down
+            the list.  The events will be renumbered starting at 1.')) ;
+        $table->add_row(html_b(__(WPST_ACTION_EVENTS_DELETE)),
+            __('Delete a single event.')) ;
+
+        return $table ;
+    }
+
+    /**
+     * Build the GUI DataList used to display the roster
+     *
+     * @return GUIDataList
+     */
+    function __buildGDL()
+    {
+        //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+        //var_dump($this->getSwimMeetId()) ;
+        $gdl = new SwimMeetEventsAdminGUIDataList('Swim Meet Events',
+            '100%', 'eventnumber', false, WPST_EVENTS_DEFAULT_COLUMNS,
+            WPST_EVENTS_DEFAULT_TABLES, sprintf('meetid="%s"',
+            $this->getSwimMeetId())) ;
+
+        $gdl->set_alternating_row_colors(true) ;
+        $gdl->set_show_empty_datalist_actionbar(true) ;
+        $gdl->set_save_vars(array('_recorded_action' => $this->getAction(), 'swimmeetid' => $this->getSwimMeetId())) ;
+
+        //print '<pre>' ;
+        //print_r($gdl) ;
+        //print '</pre>' ;
+        return $gdl ;
+    }
+}
+
 ?>

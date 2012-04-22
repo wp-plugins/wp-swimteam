@@ -131,7 +131,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
 
         //  Load the user options
 
@@ -202,7 +202,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
             $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
-            if (empty($options)) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
+            if ($options === false) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
 
             //  Load the user options
 
@@ -287,7 +287,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
 
         //$ometa = new SwimTeamOptionMeta() ;
         //$ometa->setUserId($this->getId()) ;
@@ -339,7 +339,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
 
         //  Load the user options
 
@@ -435,7 +435,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_USER_OPTION_COUNT ;
             
         //  Handle the optional fields
 
@@ -1336,7 +1336,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -1456,7 +1456,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -1510,7 +1510,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -1630,7 +1630,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
             
         //  Handle the optional fields
 

@@ -16,9 +16,10 @@
  *
  */
 
-require_once("swimclubs.class.php") ;
-require_once("swimclubs.forms.class.php") ;
-require_once("container.class.php") ;
+require_once('swimclubs.class.php') ;
+require_once('swimclubs.forms.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the swim clubs
@@ -39,8 +40,8 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_ACTION_PROFILE)),
-            __("Display a swim club\'s profile - address, phone number,
-            web site, notes, etc.")) ;
+            __('Display a swim club\'s profile - address, phone number,
+            web site, notes, etc.')) ;
 
         return $table ;
     }
@@ -52,8 +53,8 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimTeamSwimClubsGUIDataList("Swim Clubs",
-            "100%", "cluborpoolname, teamname", true) ;
+        $gdl = new SwimTeamSwimClubsGUIDataList('Swim Clubs',
+            '100%', 'cluborpoolname, teamname', true) ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(false) ;
@@ -73,8 +74,8 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
-        $div->add(html_h3("Swim Clubs")) ;
+        $div->set_style('clear: both;') ;
+        $div->add(html_h3('Swim Clubs')) ;
 
         //  This allows passing arguments eithers as a GET or a POST
 
@@ -83,10 +84,10 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
         //  The swimclubid is the argument which must be
         //  dealt with differently for GET and POST operations
 
-        if (array_key_exists(WPST_DB_PREFIX . "radio", $scriptargs))
-            $swimclubid = $scriptargs[WPST_DB_PREFIX . "radio"][0] ;
-        else if (array_key_exists("swimclubid", $scriptargs))
-            $swimclubid = $scriptargs["swimclubid"] ;
+        if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
+            $swimclubid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
+        else if (array_key_exists('swimclubid', $scriptargs))
+            $swimclubid = $scriptargs['swimclubid'] ;
         else
             $swimclubid = null ;
 
@@ -97,9 +98,9 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
         //  If there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
-       if (array_key_exists("_action", $scriptargs))
+       if (array_key_exists('_action', $scriptargs))
             $action = $scriptargs['_action'] ;
-        else if (array_key_exists("_form_action", $scriptargs))
+        else if (array_key_exists('_form_action', $scriptargs))
             $action = $scriptargs['_form_action'] ;
         else
             $action = null ;
@@ -118,7 +119,7 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
             {
                 case WPST_ACTION_PROFILE:
                     $c = container() ;
-                    $profile = new SwimClubProfileInfoTable("Swim Club Profile", "700px") ;
+                    $profile = new SwimClubProfileInfoTable('Swim Club Profile', '700px') ;
                     $profile->setSwimClubId($swimclubid) ;
                     $profile->constructSwimClubProfile() ;
                     $c->add($profile) ;
@@ -126,14 +127,14 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_ADD:
-                    $form = new WpSwimTeamSwimClubAddForm("Add Swim Club",
+                    $form = new WpSwimTeamSwimClubAddForm('Add Swim Club',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Swim Club') ;
                     break ;
 
                 case WPST_ACTION_UPDATE:
-                    $form = new WpSwimTeamSwimClubUpdateForm("Update Swim Club",
+                    $form = new WpSwimTeamSwimClubUpdateForm('Update Swim Club',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setSwimClubId($swimclubid) ;
                     $this->setShowFormInstructions() ;
@@ -141,7 +142,7 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 case WPST_ACTION_DELETE:
-                    $form = new WpSwimTeamSwimClubDeleteForm("Delete Swim Club",
+                    $form = new WpSwimTeamSwimClubDeleteForm('Delete Swim Club',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setSwimClubId($swimclubid) ;
                     $this->setShowFormInstructions() ;
@@ -149,7 +150,7 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
                     break ;
 
                 default:
-                    $div->add(html_h4(sprintf("Unsupported action \"%s\" requested.", $action))) ;
+                    $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
                     break ;
             }
 
@@ -160,8 +161,7 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
                 //  Create the form processor
 
                 $fp = new FormProcessor($form) ;
-                $fp->set_form_action($_SERVER['PHP_SELF'] .
-                    "?" . $_SERVER['QUERY_STRING']) ;
+                $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
                 //  Display the form again even if processing was successful.
 
@@ -191,11 +191,11 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add(html_br(2), $c) ;
-                $div->add(SwimTeamGUIBackHomeButtons::getButtons()) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Swim Clubs')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4("No content to display.")) ;
+                $div->add(html_br(2), html_h4('No content to display.')) ;
             }
         }
 
@@ -223,15 +223,15 @@ class AdminSwimClubsTabContainer extends SwimClubsTabContainer
         $table = parent::__buildActionSummary() ;
 
         $table->add_row(html_b(__(WPST_ACTION_PROFILE)),
-            __("Display a swim club\'s profile - address, phone number,
-            web site, notes, etc.")) ;
+            __('Display a swim club\'s profile - address, phone number,
+            web site, notes, etc.')) ;
         $table->add_row(html_b(__(WPST_ACTION_ADD)),
-            __("Add a swim club\'s information.  Use this action to
+            __('Add a swim club\'s information.  Use this action to
             add swim club to the system.  Swim clubs must be in the syetm
-            before they can be used as a meet opponent.")) ;
+            before they can be used as a meet opponent.')) ;
         $table->add_row(html_b(__(WPST_ACTION_UPDATE)),
-            __("Update a swim club\'s information.  Use this action to
-            correct any of the information about a swim club.")) ;
+            __('Update a swim club\'s information.  Use this action to
+            correct any of the information about a swim club.')) ;
 
         return $table ;
     }
@@ -243,8 +243,8 @@ class AdminSwimClubsTabContainer extends SwimClubsTabContainer
      */
     function __buildGDL()
     {
-        $gdl = new SwimTeamSwimClubsAdminGUIDataList("Swim Clubs",
-            "100%", "cluborpoolname, teamname", true) ;
+        $gdl = new SwimTeamSwimClubsAdminGUIDataList('Swim Clubs',
+            '100%', 'cluborpoolname, teamname', true) ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;

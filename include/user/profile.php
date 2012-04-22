@@ -16,9 +16,10 @@
  *
  */
 
-require_once("users.class.php") ;
-require_once("users.forms.class.php") ;
-require_once("container.class.php") ;
+require_once('users.class.php') ;
+require_once('users.forms.class.php') ;
+require_once('container.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the UserProfileTab
@@ -56,22 +57,21 @@ class UserProfileTabContainer extends SwimTeamTabContainer
         //  the page was reached.
  
         $div = html_div() ;
-        $div->set_style("clear: both;") ;
-        $div->add(html_h3("Swim Team User Profile")) ;
+        $div->set_style('clear: both;') ;
+        $div->add(html_h3('Swim Team User Profile')) ;
 
         //  Start building the form
 
         $u = wp_get_current_user() ;
 
-        $form = new WpSwimTeamUserProfileForm("Swim Team User Profile",
+        $form = new WpSwimTeamUserProfileForm('Swim Team User Profile',
             $_SERVER['HTTP_REFERER'], 600) ;
 
         $form->setId($u->ID) ;
         //  Create the form processor
 
         $fp = new FormProcessor($form) ;
-        $fp->set_form_action($_SERVER['PHP_SELF'] .
-            "?" . $_SERVER['QUERY_STRING']) ;
+        $fp->set_form_action(SwimTeamUtils::GetPageURI()) ;
 
         //  Display the form again even if processing was successful.
 
@@ -83,7 +83,7 @@ class UserProfileTabContainer extends SwimTeamTabContainer
         {
             if (!is_null($form->getId()))
             {
-                $profile = new SwimTeamUserProfileInfoTable("Your Profile", "500px") ;
+                $profile = new SwimTeamUserProfileInfoTable('Your Profile', '500px') ;
                 $profile->setId($form->getId()) ;
                 $profile->buildProfile() ;
 
@@ -91,7 +91,7 @@ class UserProfileTabContainer extends SwimTeamTabContainer
             }
             else
             {
-                $div->add("No profile selected.") ;
+                $div->add('No profile selected.') ;
             }
         }
         else
