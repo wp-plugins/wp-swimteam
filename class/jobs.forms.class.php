@@ -1332,7 +1332,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
     /**
      * meet id property - used to track the meet id
      */
-    var $__meetid ;
+    var $__swimmeetid ;
 
     /**
      * Return form help
@@ -1435,7 +1435,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
      */
     function setMeetId($id)
     {
-        $this->__meetid = $id ;
+        $this->__swimmeetid = $id ;
     }
 
     /**
@@ -1445,7 +1445,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
      */
     function getMeetId()
     {
-        return $this->__meetid ;
+        return $this->__swimmeetid ;
     }
 
     /**
@@ -1462,7 +1462,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
         $this->add_hidden_element("_jobid") ;
         $this->add_hidden_element("_joballocationid") ;
         $this->add_hidden_element("_seasonid") ;
-        $this->add_hidden_element("_meetid") ;
+        $this->add_hidden_element("_swimmeetid") ;
         $this->add_hidden_element("_action") ;
 
         $season = new SwimTeamSeason() ;
@@ -1793,7 +1793,7 @@ class WpSwimTeamSwimMeetJobAssignForm extends WpSwimTeamJobAssignForm
         $this->add_hidden_element("_jobid") ;
         $this->add_hidden_element("_joballocationid") ;
         $this->add_hidden_element("_seasonid") ;
-        $this->add_hidden_element("_meetid") ;
+        $this->add_hidden_element("_swimmeetid") ;
         $this->add_hidden_element("_action") ;
 
         //  Need to create a field for each job for the swim meet
@@ -1852,7 +1852,7 @@ class WpSwimTeamSwimMeetJobAssignForm extends WpSwimTeamJobAssignForm
     {
         //  Initialize the form fields
         $this->set_hidden_element_value("_action", WPST_ACTION_JOBS) ;
-        $this->set_hidden_element_value("_meetid", $this->getMeetId()) ;
+        $this->set_hidden_element_value("_swimmeetid", $this->getMeetId()) ;
         $this->set_hidden_element_value("_seasonid", $this->getSeasonId()) ;
 
         $job = new SwimTeamJob() ;
@@ -1978,20 +1978,30 @@ class WpSwimTeamSwimMeetJobAssignForm extends WpSwimTeamJobAssignForm
                 $ja->setUserId($this->get_element_value("Job #$label")) ;
                 $u = get_userdata($ja->getUserId()) ;
 
+                //  Need to account for the use case when a job
+                //  us is unassigned by setting the User to None.
+
+                if ($ja->getUserId() == WPST_NULL_ID)
+                {
+                    $msg = "unsassigned" ;
+                }
+                else
+                {
+                    $u = get_userdata($ja->getUserId()) ;
+                    $msg = sprintf("assigned to %s %s (%s)", $u->first_name, $u->last_name, $u->user_login) ;
+                }
+
                 if ($ja->reassignJob() != null)
                 {
-                    $actionmsgs[] = sprintf("Job \"%s\" assigned to %s
-                        %s (%s) for swim meet <i>(%s - %s - %s)</i>.",
-                        $job->getJobPosition(), $u->first_name, $u->last_name,
-                        $u->user_login, $meetdetails["opponent"],
+                    $actionmsgs[] = sprintf("Job \"%s\" %s for swim meet <i>(%s - %s - %s)</i>.",
+                        $job->getJobPosition(), $msg, $meetdetails["opponent"],
                         $meetdetails["date"], $meetdetails["location"]) ;
                 }
                 else
                 {
                     $actionmsgs[] = sprintf("Job \"%s\" WAS NOT assigned to %s
                         %s (%s) for swim meet <i>(%s - %s - %s)</i>.",
-                        $job->getJobPosition(), $u->first_name, $u->last_name,
-                        $u->user_login, $meetdetails["opponent"],
+                        $job->getJobPosition(), msg, $meetdetails["opponent"],
                         $meetdetails["date"], $meetdetails["location"]) ;
                 }
             }
@@ -2044,7 +2054,7 @@ class WpSwimTeamSeasonJobAssignForm extends WpSwimTeamJobAssignForm
         $this->add_hidden_element("_jobid") ;
         $this->add_hidden_element("_joballocationid") ;
         $this->add_hidden_element("_seasonid") ;
-        $this->add_hidden_element("_meetid") ;
+        $this->add_hidden_element("_swimmeetid") ;
         $this->add_hidden_element("_action") ;
 
         //  Need to create a field for each job for the season
@@ -2101,7 +2111,7 @@ class WpSwimTeamSeasonJobAssignForm extends WpSwimTeamJobAssignForm
     {
         //  Initialize the form fields
         $this->set_hidden_element_value("_action", WPST_ACTION_JOBS) ;
-        $this->set_hidden_element_value("_meetid", $this->getMeetId()) ;
+        $this->set_hidden_element_value("_swimmeetid", $this->getMeetId()) ;
         $this->set_hidden_element_value("_seasonid", $this->getSeasonId()) ;
 
         $job = new SwimTeamJob() ;

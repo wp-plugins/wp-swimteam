@@ -191,14 +191,14 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                 case WPST_ACTION_ADD:
                     $form = new WpSwimTeamSwimMeetAddForm('Add Swim Meet',
-                        $_SERVER['HTTP_REFERER'], 600) ;
+                        SwimTeamUtils::GetPageURI(), 600) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Add Swim Meeets') ;
                     break ;
 
                 case WPST_ACTION_UPDATE:
                     $form = new WpSwimTeamSwimMeetUpdateForm('Update Swim Meet',
-                        $_SERVER['HTTP_REFERER'], 600) ;
+                        SwimTeamUtils::GetPageURI(), 600) ;
                     $form->setMeetId($swimmeetid) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Update Swim Meeets') ;
@@ -206,7 +206,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                 case WPST_ACTION_JOBS:
                     $form = new WpSwimTeamSwimMeetJobAssignForm('Assign Swim Meet Jobs',
-                        $_SERVER['HTTP_REFERER'], 600) ;
+                        SwimTeamUtils::GetPageURI(), 600) ;
                     $form->setMode(WPST_SWIMMEET) ;
                     $form->setMeetId($swimmeetid) ;
                     $this->setShowFormInstructions() ;
@@ -215,7 +215,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                 case WPST_ACTION_JOB_REMINDERS:
                     $form = new WpSwimTeamSwimMeetJobRemindersForm('Send Job Reminders for Swim Meet',
-                        $_SERVER['HTTP_REFERER'], 600) ;
+                        SwimTeamUtils::GetPageURI(), 600) ;
                     $form->setMeetId($swimmeetid) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Send Job Reminder Emails') ;
@@ -233,7 +233,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     if (empty($eventIds))
                     {
                         $form = new WpSwimTeamSwimMeetImportEventsForm('Import Swim Meet Events',
-                            $_SERVER['HTTP_REFERER'], 600) ;
+                            SwimTeamUtils::GetPageURI(), 600) ;
                         $form->setMeetId($swimmeetid) ;
                     }
                     else
@@ -259,7 +259,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     if (!empty($eventIds))
                     {
                         $form = new WpSwimTeamSwimMeetImportResultsForm('Import Swim Meet Results',
-                            $_SERVER['HTTP_REFERER'], 600) ;
+                            SwimTeamUtils::GetPageURI(), 600) ;
                         $form->setMeetId($swimmeetid) ;
                     }
                     else
@@ -273,9 +273,9 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                 case WPST_ACTION_OPT_IN:
                     $optin = ucwords(get_option(WPST_OPTION_OPT_IN_LABEL)) ;
                     //$form = new WpSwimTeamSwimMeetOptInOutForm('Swim Meet:  ' .
-                    //    $optin, $_SERVER['HTTP_REFERER'], 600) ;
+                    //    $optin, SwimTeamUtils::GetPageURI(), 600) ;
                     $form = $this->__getForm('Swim Meet:  ' .
-                        $optin, $_SERVER['HTTP_REFERER'], 700) ;
+                        $optin, SwimTeamUtils::GetPageURI(), 700) ;
                     $form->setAction(WPST_ACTION_OPT_IN) ;
                     $form->setMeetId($swimmeetid) ;
                     break ;
@@ -283,9 +283,9 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                 case WPST_ACTION_OPT_OUT:
                     $optout = ucwords(get_option(WPST_OPTION_OPT_OUT_LABEL)) ;
                     //$form = new WpSwimTeamSwimMeetOptInOutForm('Swim Meet:  ' .
-                        //$optout, $_SERVER['HTTP_REFERER'], 600) ;
+                        //$optout, SwimTeamUtils::GetPageURI(), 600) ;
                     $form = $this->__getForm('Swim Meet:  ' .
-                        $optout, $_SERVER['HTTP_REFERER'], 700) ;
+                        $optout, SwimTeamUtils::GetPageURI(), 700) ;
                     $form->setAction(WPST_ACTION_OPT_OUT) ;
                     $form->setMeetId($swimmeetid) ;
                     break ;
@@ -293,7 +293,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                 case WPST_ACTION_DELETE:
                     /*
                     $form = new WpSwimTeamSwimMeetDeleteForm('Delete Swim Meet',
-                        $_SERVER['HTTP_REFERER'], 600) ;
+                        SwimTeamUtils::GetPageURI(), 600) ;
                     $form->setSwimMeetId($swimmeetid) ;
                     break ;
                      */
