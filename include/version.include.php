@@ -24,9 +24,9 @@
  */
 define('WPST_MAJOR_VERSION', '1') ;
 define('WPST_MINOR_VERSION', '20') ;
-define('WPST_BUILD_NUMBER', '786') ;
+define('WPST_BUILD_NUMBER', '787') ;
 define('WPST_VERSION', WPST_MAJOR_VERSION .
     '.' . WPST_MINOR_VERSION . '.' . WPST_BUILD_NUMBER) ;
-define('WPST_BUILD_TIME', '2012/04/23 02:19:20') ;
+define('WPST_BUILD_TIME', '2012/04/23 02:34:40') ;
 define('WPST_SOFTWARE_NAME', 'wp-SwimTeam') ;
 ?>

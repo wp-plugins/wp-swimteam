@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.20 =
+* Serious bug fix for Jobs module that could cause jobs to unintentionally be assigned, even for prior seasons.  Could result in a significant amount of e-mail.
+
 = 1.19 =
 * Fixed wp-SwimTeam so it will work in sub-directory installations and WordPress multi-site.
 * Added new option to toggle message verbosity.  Some actions generate numerous messages, this option will reduce and summarize messages.
