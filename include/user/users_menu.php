@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
  * @version $Revision$
@@ -21,7 +21,7 @@ require_once('widgets.class.php') ;
 /**
  * Class definition of the Users Page
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */
@@ -32,6 +32,8 @@ class UsersMenuTabContainer extends Container
      */
     function UsersMenuTabContainer()
     {
+        global $pagenow ;
+
         //  The container content is either a GUIDataList of 
         //  the jobs which have been defined OR form processor
         //  content to add, delete, or update jobs.  Wbich type
@@ -89,20 +91,18 @@ class UsersMenuTabContainer extends Container
 
         $tabs = new TabControlWidget() ;
 
-        $url = SwimTeamUtils::GetPageURI() ;
-
         //  Clean up the URL or the tab=N argument
-        //  will continue to be appended indefinitely.
+        //  may be appended to the URI mutliple times.
 
-        $url = preg_replace('/&?tab=[1-9][0-9]*/i', '', $url) ;
+        $url = add_query_arg(array('tab' => false),
+            admin_url($pagenow .'?'.$_SERVER['QUERY_STRING'])) ;
 
-        //  Add the tabs to the widget
+        //  Construct the tabs
 
         foreach ($tab_content as $tc)
         {
-            $tabs->add_tab(html_a(sprintf('%s&tab=%d',
-                $url, $tc->getIndex()), $tc->getLabel()),
-                ($activetab == $tc->getIndex()));
+            $tabs->add_tab(html_a(add_query_arg('tab', $tc->getIndex(),
+                $url), $tc->getLabel()), ($activetab == $tc->getIndex()));
         }
 
         $div->add($tabs);
@@ -113,8 +113,7 @@ class UsersMenuTabContainer extends Container
         {
             if ($tc->getIndex() == $activetab)
             {
-                require_once(WPST_PATH .
-                    '/include/user/' . $tc->getIncludeFile()) ;
+                require_once(plugin_dir_path(__FILE__) .  $tc->getIncludeFile()) ;
                 $class = $tc->getClassName() ;
                 $div->add(new $class()) ;
                 break ;

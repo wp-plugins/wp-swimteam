@@ -570,19 +570,9 @@ class SwimTeamUtils
      */
     function GetPageURL()
     {
-        $pageURL = 'http' ;
+        global $pagenow ;
 
-        if ($_SERVER['HTTPS'] == 'on') $pageURL .= 's' ;
-
-        $pageURL .= '://' ;
-
-        if ($_SERVER['SERVER_PORT'] != '80')
-            $pageURL .= $_SERVER['SERVER_NAME'] .
-                ':' . $_SERVER['SERVER_PORT'] ;
-        else
-            $pageURL .= $_SERVER['SERVER_NAME'] ;
-
-        return $pageURL ;
+        return get_admin_url() . $pagenow  ;
     }
 
     /**
@@ -592,32 +582,9 @@ class SwimTeamUtils
      */
     function GetPageURI()
     {
-        $pageURI = 'http' ;
+        global $pagenow ;
 
-        if ($_SERVER['HTTPS'] == 'on') $pageURI .= 's' ;
-
-        $pageURI .= '://' ;
-
-        if ($_SERVER['SERVER_PORT'] != '80')
-            $pageURI .= $_SERVER['SERVER_NAME'] .
-                ':' . $_SERVER['SERVER_PORT'] . $_SERVER['REQUEST_URI'] ;
-        else
-            $pageURI .= $_SERVER['SERVER_NAME'] . $_SERVER['REQUEST_URI'] ;
-
-        return $pageURI ;
-    }
-
-    /**
-     * Get Page Query
-     *
-     * @return string
-     */
-    function GetPageQuery()
-    {
-        $pageQuery = SwimTeamUtils::GetPageURL() . '?'. $_SERVER['QUERY_STRING'] ;
-
-        var_dump($pageQuery) ;
-        return $pageQuery ;
+        return admin_url($pagenow .'?'. $_SERVER['QUERY_STRING']) ;
     }
 }
 ?>

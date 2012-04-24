@@ -64,6 +64,10 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.21 =
+* Fixed bug with URL construction for Tabs which in some hosting environments would end up with a bad URL landing the User on the WordPress login page.
+* Improved URL construction for Tabs, leveraging the WordPress API instead of parsing server variables.
+
 = 1.20 =
 * Serious bug fix for Jobs module that could cause jobs to unintentionally be assigned, even for prior seasons.  Could result in a significant amount of e-mail.
 
