@@ -259,7 +259,7 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         //  Need to set the action so the next step knows
         //  what to do when called from a GUIDataList.
         //
-        $this->set_hidden_element_value('_action', WPST_USERS_UPDATE_USER) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_UPDATE) ;
 
         $u = new SwimTeamUserProfile() ;
 

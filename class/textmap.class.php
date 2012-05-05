@@ -65,7 +65,7 @@ class SwimTeamTextMap
         else
             $opponent = $meet->getMeetDescription() ;
     
-        $meetdate = date('m/d/Y', strtotime($meet->getMeetDate())) ;
+        $meetdate = date('m/d/Y', strtotime($meet->getMeetDateAsDate())) ;
     
         return array('date' => $meetdate, 'opponent' => $opponent,
             'location' => ucfirst($meet->getLocation())) ;

@@ -187,7 +187,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -320,7 +320,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -429,7 +429,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -506,7 +506,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -595,7 +595,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         get_currentuserinfo() ;
 
@@ -729,7 +729,7 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         get_currentuserinfo() ;
 
@@ -806,7 +806,7 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
 
             $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-            if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+            if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
             //  Load the swimmer options
 
@@ -905,7 +905,7 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         get_currentuserinfo() ;
         //  Load the swimmer options
@@ -1630,7 +1630,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -1722,7 +1722,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -1795,7 +1795,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -1841,7 +1841,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 
@@ -1906,7 +1906,7 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         //  Load the swimmer options
 

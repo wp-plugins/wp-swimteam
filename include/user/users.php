@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
  * @version $Revision$
@@ -26,7 +26,7 @@ require_once('widgets.class.php') ;
 /**
  * Class definition of the user
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */
@@ -41,7 +41,7 @@ class UsersTabContainer extends SwimTeamTabContainer
     {
         $table = parent::__buildActionSummary() ;
 
-        $table->add_row(html_b(__(WPST_USERS_PROFILE_USER)),
+        $table->add_row(html_b(__(WPST_ACTION_PROFILE)),
             __('Display a user\'s profile.  Show the user\'s
             detailed information as it will be displayed on the user.')) ;
 
@@ -198,6 +198,9 @@ class UsersTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_userid = array(
+            WPST_ACTION_EXPORT_CSV
+        ) ;
 
         //  The userid is the argument which must be
         //  dealt with differently for GET and POST operations
@@ -251,6 +254,14 @@ class UsersTabContainer extends SwimTeamTabContainer
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Users Action Summary') ;
         }
+        else if (is_null($userid) && !in_array($action, $actions_allowed_without_userid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select a user in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Users Action Summary') ;
+        }
         else  //  Crank up the form processing process
         {
             switch ($action)
@@ -275,10 +286,6 @@ class UsersTabContainer extends SwimTeamTabContainer
 
                 case WPST_ACTION_JOBS:
                     $c = container() ;
-                    //$userjobs = new SwimTeamUserJobsInfoTable('User Jobs', '100%') ;
-                    //$userjobs->setUserId($userid) ;
-                    //$userjobs->constructSwimTeamUserJobsInfoTable() ;
-                    //$c->add($userjobs) ;
                     $c->add($this->UserJobReport($userid)) ;
                     break ;
 
@@ -361,7 +368,7 @@ class UsersTabContainer extends SwimTeamTabContainer
 /**
  * Class definition of the user
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */

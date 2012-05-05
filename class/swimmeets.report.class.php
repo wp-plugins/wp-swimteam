@@ -1071,7 +1071,7 @@ class WpSwimTeamSwimMeetsReportForm extends WpSwimTeamForm
                 else
                     $opponent = $meet->getMeetDescription() ;
     
-                $meetdate = date('D M j, Y', strtotime($meet->getMeetDate())) ;
+                $meetdate = date('D M j, Y', strtotime($meet->getMeetDateAsDate())) ;
 
                 $m[sprintf('%s %s (%s)', $meetdate, $opponent,
                     ucfirst($meet->getLocation()))] = $meetId['meetid'] ;

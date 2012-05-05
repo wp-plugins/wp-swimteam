@@ -27,8 +27,28 @@ include_once('swimteam.include.php') ;
 define('WPST_SDIF_VERSION', '3.0') ;
 define('WPST_SDIF_FUTURE_USE', '') ;
 define('WPST_SDIF_NO_VALUE', '') ;
-define('WPST_SDIF_SOFTWARE_NAME', 'wp-swimteam') ;
+define('WPST_SDIF_SOFTWARE_NAME', WPST_SOFTWARE_NAME) ;
 define('WPST_SDIF_SOFTWARE_VERSION', WPST_VERSION) ;
+
+/**
+ * Swim applications handle zero times (0.00) differently
+ * and the SDIF specification is loose in how it is defined.
+ * An application doesn't have to support all interpretations
+ * of zero, just one of them!  To support as many as possible,
+ * a mode is defined in the SDIF options page to control how
+ * zero times are handled during SDIF generation.
+ *
+ */
+define('WPST_SDIF_USE_BLANKS_LABEL', 'Use Blanks') ;
+define('WPST_SDIF_USE_ZEROS_LABEL', 'Use Zeros') ;
+define('WPST_SDIF_USE_NT_LABEL', 'Use "NT" Notation') ;
+define('WPST_SDIF_USE_BLANKS_VALUE', 1) ;
+define('WPST_SDIF_USE_ZEROS_VALUE', 2) ;
+define('WPST_SDIF_USE_NT_VALUE', 3) ;
+define('WPST_SDIF_FILE_FORMAT_SDIF_LABEL', 'SDIF') ;
+define('WPST_SDIF_FILE_FORMAT_CL2_LABEL', 'Hy-tek CL2') ;
+define('WPST_SDIF_FILE_FORMAT_SDIF_VALUE', 'sd3') ;
+define('WPST_SDIF_FILE_FORMAT_CL2_VALUE', 'cl2') ;
 
 /**
  *  Organization Code
@@ -1288,13 +1308,22 @@ define('WPST_SDIF_COLUMN_DEBUG2', '123456789012345678901234567890123456789012345
 define('WPST_SDIF_RECORD_TERMINATOR', chr(13) . chr(10)) ;
 
 //  Define A0 record
-define('WPST_SDIF_A0_RECORD', 'A0%1.1s%-8.8s%-2.2s%-30.30s%-20.20s%-10.10s%-20.20s%-12.12s%-8.8s%-42.42s%-2.2s%-3.3s%2.2s') ;
+//define('WPST_SDIF_A0_RECORD', 'A0%1.1s%-8.8s%-2.2s%-30.30s%-20.20s%-10.10s%-20.20s%-12.12s%-8.8s%-42.42s%-2.2s%-3.3s%2.2s') ;
+define('WPST_SDIF_A0_RECORD', 'A0%1.1s%-8.8s%-2.2s%-30.30s%-20.20s%-10.10s%-20.20s%-12.12s%-8.8s%-42.42s%-2.2s%-3.3s') ;
 
 //  Define B1 record
 define('WPST_SDIF_B1_RECORD', 'B1%1s%8s%30s%22s%22s%20s%2s%10s%3s%1s%8s%8s%4s%8s%1s%10s') ;
 
 //  Define C1 record
-define('WPST_SDIF_C1_RECORD', 'C1%1.1s%-8.8s%-6.6s%-30.30s%-16.16s%-22.22s%-22.22s%-20.20s%-2.2s%-10.10s%-3.3s%1.1s%-6.6s%1.1s%-10.10s%2.2s') ;
+//define('WPST_SDIF_C1_RECORD', 'C1%1.1s%-8.8s%-6.6s%-30.30s%-16.16s%-22.22s%-22.22s%-20.20s%-2.2s%-10.10s%-3.3s%1.1s%-6.6s%1.1s%-10.10s%2.2s') ;
+define('WPST_SDIF_C1_RECORD', 'C1%1.1s%-8.8s%-6.6s%-30.30s%-16.16s%-22.22s%-22.22s%-20.20s%-2.2s%-10.10s%-3.3s%1.1s%-6.6s%1.1s%-10.10s') ;
+
+//  Define C2 record
+define('WPST_SDIF_C2_RECORD', 'C2%1.1s%-8.8s%-6.6s%-30.30s%-12.12s%-6.6s%-6.6s%-5.5s%-6.6s%-6.6s%16.16s%-45.45s%1.1s%-10.10s') ;
+
+//  Define D0 record
+define('WPST_SDIF_D0_PARSE_RECORD', 'D0%1.1s%-8.8s%-28.28s%12.12s%-1.1s%3.3s%-8.8s%2.2s%-1.1s%-1.1s%04.4s%1.1s%04.4s%04.4s%8.8s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%2.2s%2.2s%2.2s%2.2s%3.3s%3.3s%4.4s%2.2s') ;
+define('WPST_SDIF_D0_GENERATE_RECORD', 'D0%1.1s%-8.8s%-28.28s%12.12s%-1.1s%3.3s%-8.8s%2.2s%-1.1s%-1.1s%04.4s%1.1s%04.4s%04.4s%8.8s%9.9s%9.9s%9.9s%9.9s%4.4s%4.4s%3.3s%3.3s%4.4s%2.2s') ;
 
 //  Define D1 record
 define('WPST_SDIF_D1_RECORD', 'D1%1.1s%-8.8s%-6.6s%1.1s%-28.28s%1.1s%-12.12s%1.1s%-3.3s%-8.8s%02.2s%1.1s%-30.30s%-20.20s%-12.12s%-12.12s%-8.8s%1.1s%-3.3s%2.2s') ;
@@ -1302,6 +1331,17 @@ define('WPST_SDIF_D1_RECORD', 'D1%1.1s%-8.8s%-6.6s%1.1s%-28.28s%1.1s%-12.12s%1.1
 //  Define D2 record
 define('WPST_SDIF_D2_RECORD', 'D2%1.1s%-8.8s%-6.6s%1.1s%-28.28s%-30.30s%-30.30s%-20.20s%-2.2s%-12.12s%-10.10s%-3.3s%1.1s%1.1s%1.1s%-4.4s%2.2s') ;
 
+//  Define D3 record
+define('WPST_SDIF_D3_RECORD', 'D3%14.14s%-15.15s%2.2s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%118.118s') ;
+
+//  Define E0 record
+define('WPST_SDIF_E0_PARSE_RECORD', 'E0%1.1s%-8.8s%1.1s%-6.6s%2.2s%1.1s%4.4s%1.1s%4.4s%4.4s%3.3s%8.8s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%2.2s%2.2s%2.2s%2.2s%3.3s%3.3s%4.4s%59.59s') ;
+define('WPST_SDIF_E0_GENERATE_RECORD', 'E0%1.1s%-8.8s%1.1s%-6.6s%2.2s%1.1s%4.4s%1.1s%4.4s%4.4s%3.3s%8.8s%9.9s%9.9s%9.9s%9.9s%2.2s%2.2s%2.2s%2.2s%3.3s%3.3s%4.4s%59.59s') ;
+
+//  Define F0 record
+define('WPST_SDIF_F0_RECORD', 'F0%1.1s%12.12s%6.6s%1.1s%-28.28s%12.12s%3.3s%8.8s%2.2s%1.1s%1.1s%1.1s%1.1s%8.8s%1.1s%4.4s%14.14s%-15.15s%39.39s') ;
+
 //  Define Z0 record
-define('WPST_SDIF_Z0_RECORD', 'Z0%1.1s%-8.8s%-2.2s%-30.30s%3.3s%3.3s%4.4s%4.4s%6.6s%6.6s%5.5s%6.6s%6.6s%5.5s%3.3s%3.3s%3.3s%3.3s%-57s%-2.2s') ;
+//define('WPST_SDIF_Z0_RECORD', 'Z0%1.1s%-8.8s%-2.2s%-30.30s%3.3s%3.3s%4.4s%4.4s%6.6s%6.6s%5.5s%6.6s%6.6s%5.5s%3.3s%3.3s%3.3s%3.3s%-57s%-2.2s') ;
+define('WPST_SDIF_Z0_RECORD', 'Z0%1.1s%-8.8s%-2.2s%-30.30s%3.3s%3.3s%4.4s%4.4s%6.6s%6.6s%5.5s%6.6s%6.6s%5.5s%3.3s%3.3s%3.3s%3.3s%-57s') ;
 ?>

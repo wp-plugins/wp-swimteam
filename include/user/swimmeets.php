@@ -22,6 +22,7 @@ require_once('swimmeets.forms.class.php') ;
 require_once('events.class.php') ;
 require_once('jobs.forms.class.php') ;
 require_once('container.class.php') ;
+require_once('textmap.class.php') ;
 require_once('widgets.class.php') ;
 
 /**
@@ -110,6 +111,9 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_POST, $_GET) ;
+        $actions_allowed_without_swimmeetid = array(
+            WPST_ACTION_ADD
+        ) ;
 
         //printf('<h3>%s::%s</h3>', basename(__FILE__), __LINE__) ;
         //print '<pre>' ;
@@ -137,7 +141,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
         //  If there is no $_POST or if there isn't an action
         //  specififed, then simply display the GDL.
 
-       if (array_key_exists('_action', $scriptargs))
+        if (array_key_exists('_action', $scriptargs))
             $action = $scriptargs['_action'] ;
         else if (array_key_exists('_form_action', $scriptargs))
             $action = $scriptargs['_form_action'] ;
@@ -170,9 +174,15 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
         if (empty($scriptargs) || is_null($action))
         {
-            $gdl = $this->__buildGDL($swimmeetid) ;
-
-            $div->add($gdl) ;
+            $div->add($gdl = $this->__buildGDL($swimmeetid)) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
+        }
+        else if (is_null($swimmeetid) && !in_array($action, $actions_allowed_without_swimmeetid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select a swim meet in order to perform this action.'))) ;
+            $div->add($this->__buildGDL($swimmeetid)) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
         }
@@ -221,32 +231,34 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     $this->setFormInstructionsHeader('Send Job Reminder Emails') ;
                     break ;
 
-                    /*
-                case WPST_ACTION_IMPORT_EVENTS:
-
+                case WPST_ACTION_EXPORT_ENTRIES:
+                    $swimmeet = SwimTeamTextMap::__mapMeetIdToText($swimmeetid) ;
                     //  Does the meet have events to load results against?
                    
                     $event = new SwimMeetEvent() ;
                     $event->setMeetId($swimmeetid) ;
                     $eventIds = $event->getAllEventIdsByMeetId($swimmeetid) ;
 
-                    if (empty($eventIds))
+                    if (!empty($eventIds))
                     {
-                        $form = new WpSwimTeamSwimMeetImportEventsForm('Import Swim Meet Events',
-                            SwimTeamUtils::GetPageURI(), 600) ;
+                        $form = new WpSwimTeamSwimMeetExportEntriesForm('Export Meet Entries:  ' .
+                            sprintf('%s vs %s on %s', $swimmeet['location'], $swimmeet['opponent'],
+                            $swimmeet['date']), SwimTeamUtils::GetPageURI(), 600) ;
                         $form->setMeetId($swimmeetid) ;
                     }
                     else
                     {
-                        //$c = container() ;
-                        $msg = html_div('updated fade', html_h4('Swim meet already has events defined.')) ;
-                        $div->add($msg) ;
-                    }
-                    break ;        print '<pre>' ;
-        print_r($scriptargs) ;
-        print '</pre>' ;
+                        $div->add(html_div('error fade', html_h4('Swim meet (' .
+                            sprintf('%s vs %s on %s', $swimmeet['location'], $swimmeet['opponent'],
+                            $swimmeet['date']) .  ') does not have any events to export entries for.
+                            Set up meet events before exporting entries.'))) ;
 
-                     */
+                        $c = Container() ;
+                        $c->add($this->__buildGDL($swimmeetid)) ;
+                        $this->setShowActionSummary() ;
+                        $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
+                    }
+                    break ;
 
                 case WPST_ACTION_IMPORT_RESULTS:
 
@@ -267,6 +279,10 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                         //$c = container() ;
                         $msg = html_div('updated fade', html_h4('Swim meet does not have any events to import results against.  Set up meet events before importing results.')) ;
                         $div->add($msg) ;
+
+                        $div->add($this->__buildGDL($swimmeetid)) ;
+                        $this->setShowActionSummary() ;
+                        $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
                     }
                     break ;
 
@@ -317,7 +333,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                         $opponent = new SwimClubProfile() ;
                         $opponent->loadSwimClubBySwimClubId($swimmeet->getOpponentSwimClubId()) ;
                     
-                        $desc = sprintf('%s vs %s %s', $swimmeet->getMeetDate(),
+                        $desc = sprintf('%s vs %s %s', $swimmeet->getMeetDateAsDate(),
                             $opponent->getClubOrPoolName(), $opponent->getTeamName()) ;
                     }
                     else
@@ -339,20 +355,54 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                     break ;
 
-                case WPST_ACTION_EXPORT_SDIF:
+                case WPST_ACTION_EXPORT_ENTRIES:
+                    //  Does the meet have events to load results against?
+                   
                     $c = container() ;
 
-                    $sdif = new SDIFMeetPyramid() ;
-                    $sdif->generateSDIF($swimmeetid) ;
-                    $sdif->generateSDIFFile() ;
+                    $event = new SwimMeetEvent() ;
+                    $event->setMeetId($swimmeetid) ;
+                    $eventIds = $event->getAllEventIdsByMeetId($swimmeetid) ;
 
-                    $arg = urlencode($sdif->getSDIFFile()) ;
+                    if (!empty($eventIds))
+                    {
+                        require_once('sdif.class.php') ;
+                        //$form = new WpSwimTeamSwimMeetExportEntriesForm('Export Entries Swim Meet',
+                        //    SwimTeamUtils::GetPageURI(), 600) ;
+                        //$form->setMeetId($swimmeetid) ;
 
-                    $if = html_iframe(sprintf('%s/include/user/swimmeet_entries_SDIF.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
-                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
-                    $c->add($if) ;
+                        $sdif = new SDIFMeetEntriesPyramid() ;
+                        $sdif->setSwimMeetId($swimmeetid) ;
+                        $sdif->setSDIFDebugFlag(false) ;
+                        $sdif->setZeroTimeMode(WPST_SDIF_USE_BLANKS) ;
+                        $sdif->generateSDIF($swimmeetid) ;
+                        $sdif->generateSDIFFile() ;
 
-                    $c->add(html_h4(sprintf('%s meet entries exported in SDIF format.', $sdif->getSDIFCount()))) ;
+                        $arg = urlencode($sdif->getSDIFFile()) ;
+
+                        $if = html_iframe(sprintf('%s/include/user/swimmeet_entries_SDIF.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
+                        $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                        $c->add($if) ;
+
+                        $msg = html_div('updated fade',
+                            html_h4(sprintf('%s meet entries exported in SDIF format.', $sdif->getSDIFCount()))) ;
+                        $c->add($msg) ;
+                    }
+                    else
+                    {
+                        $swimmeet = SwimTeamTextMap::__mapMeetIdToText($swimmeetid) ;
+                        $msg = html_div('error fade', html_h4('Swim meet (' .
+                            sprintf('%s vs %s on %s', $swimmeet['location'], $swimmeet['opponent'],
+                            $swimmeet['date']) .  ') does not have any events to export entries for.
+                            Set up meet events before exporting entries.')) ;
+                        $c->add($msg) ;
+                    }
+
+                    $gdl = $this->__buildGDL($swimmeetid) ;
+
+                    $div->add($gdl) ;
+                    $this->setShowActionSummary() ;
+                    $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
 
                     break ;
 
@@ -396,14 +446,25 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                         //$div->add($c, html_br(),
                         //    SwimTeamGUIButtons::getBackHomeButtons()) ;
                     }
+                    else if ($action == WPST_ACTION_EXPORT_ENTRIES)
+                    {
+                        $div->add($this->__buildGDL($swimmeetid)) ;
+                        $this->setShowActionSummary() ;
+                        $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
+
+                        $c = container() ;
+                        $if = html_iframe(sprintf('%s/include/user/swimmeet_entries_SDIF.php?file=%s',
+                            WPST_PLUGIN_URL, $form->getSDIFFile())) ;
+                        $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                        $c->add($if) ;
+                        $div->add($c) ;
+                    }
                     else
                     {
                         //  Need to show a different GDL based on whether or
                         //  not the end user has a level of Admin ability.
 
-                        $gdl = $this->__buildGDL($swimmeetid) ;
-
-                        $div->add($gdl) ;
+                        $div->add($this->__buildGDL($swimmeetid)) ;
                         $this->setShowActionSummary() ;
                         $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
                     }
@@ -417,14 +478,12 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
             }
             else if (isset($c))
             {
-                //$div->add(html_br(2), $c) ;
-                $div->add($c, html_br(),
-                    //SwimTeamGUIButtons::getBackHomeButtons()) ;
-                    SwimTeamGUIButtons::getButton('Return to Swim Meets')) ;
+                $div->add($c) ;
+                //$div->add($c, html_br(), SwimTeamGUIButtons::getButton('Return to Swim Meets')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4('No content to display.')) ;
+                $div->add(html_div('error fade', html_h4('No content to display.'))) ;
             }
         }
 

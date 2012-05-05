@@ -7,7 +7,7 @@
  *
  * (c) 2008 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
  * @version $Revision$
@@ -24,7 +24,7 @@ require_once('widgets.class.php') ;
 /**
  * Class definition of the swim clubs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -80,6 +80,9 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_swimclubid = array(
+            WPST_ACTION_ADD
+        ) ;
 
         //  The swimclubid is the argument which must be
         //  dealt with differently for GET and POST operations
@@ -112,6 +115,14 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
             $div->add($gdl) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Swim Clubs Action Summary') ;
+        }
+        else if (is_null($swimclubid) && !in_array($action, $actions_allowed_without_swimclubid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select a swim club in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
         }
         else  //  Crank up the form processing process
         {
@@ -207,7 +218,7 @@ class SwimClubsTabContainer extends SwimTeamTabContainer
 /**
  * Class definition of the swim clubs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */

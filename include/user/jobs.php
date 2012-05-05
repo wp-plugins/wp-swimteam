@@ -40,7 +40,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
     {
         $table = parent::__buildActionSummary() ;
 
-        $table->add_row(html_b(__(WPST_USERS_PROFILE_USER)),
+        $table->add_row(html_b(__(WPST_ACTION_PROFILE)),
             __('Display detailed information about a particular job.')) ;
         $table->add_row(html_b(__(WPST_ACTION_SIGN_UP)),
             __('Assign a user to a specific job assigment.')) ;
@@ -118,13 +118,21 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
         //  any action that doesn't make sense.
 
         if ($action == WPST_ACTION_SELECT_ACTION) $action = null ;
+        $actions_allowed_without_jobid = array(
+            WPST_ACTION_ADD
+        ) ;
 
         if (empty($scriptargs) || is_null($action))
         {
-            $gdl = $this->__buildGDL() ;
-
-            $div->add($gdl, html_br(2)) ;
-
+            $div->add($this->__buildGDL()) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Jobs Action Summary') ;
+        }
+        else if (is_null($jobid) && !in_array($action, $actions_allowed_without_jobid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select a job in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Jobs Action Summary') ;
         }

@@ -10,7 +10,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
  * @version $Revision$
@@ -25,12 +25,12 @@ require_once('swimmeets.class.php') ;
 require_once('swimclubs.class.php') ;
 require_once('swimmers.class.php') ;
 require_once('events.class.php') ;
-require_once('sdif.include.php') ;
+require_once('sdif.class.php') ;
 
 /**
  * Construct the base SwimMeet form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -39,8 +39,12 @@ class WpSwimTeamSwimMeetForm extends WpSwimTeamForm
     /**
      * meet id property - used to track the age group record
      */
-
     var $__meetid ;
+
+    /**
+     * events ids property - used to store the event ids
+     */
+    var $__eventids ;
 
     /**
      * Set the meet id property
@@ -48,6 +52,33 @@ class WpSwimTeamSwimMeetForm extends WpSwimTeamForm
     function setMeetId($id)
     {
         $this->__meetid = $id ;
+    }
+
+    /**
+     * Get the event ids property
+     */
+    function getEventIds()
+    {
+        return $this->__eventids ;
+    }
+
+    /**
+     * Set the event ids property
+     */
+    function setEventIds($ids)
+    {
+        $this->__eventids = $ids ;
+    }
+
+    /**
+     * Set the event ids property
+     */
+    function saveEventId($id)
+    {
+        if (is_null($this->__eventids))
+            $this->__eventids = array() ;
+
+        $this->__eventids[] = $id ;
     }
 
     /**
@@ -59,6 +90,40 @@ class WpSwimTeamSwimMeetForm extends WpSwimTeamForm
     }
 
     /**
+     * Get the array of event key and value pairs
+     *
+     * @return mixed - array of event key value pairs
+     */
+    function _eventSelections($admin = false)
+    {
+        //  AgeGroup options and labels 
+
+        $e = array() ;
+        $event = new SwimMeetEvent() ;
+
+        $meetid = $this->getMeetId() ;
+        if (is_null($meetid)) $meetid = $this->get_hidden_element_value('_swimmeetid') ;
+
+        //  Seems to make more sense to order these by Age Group than event number
+        //  but we'll see.  As a parent I'd rather see all of the events I want to
+        //  click on grouped together.
+
+        $eventIds = $event->getAllEventIdsByMeetId($meetid, 'agegroupid') ;
+
+        if (!empty($eventIds))
+        {
+            foreach ($eventIds as $eventId)
+            {
+                $this->saveEventId($eventId['eventid']) ;
+                $event->loadSwimMeetEventByEventId($eventId['eventid']) ;
+                $e[SwimTeamTextMap::__mapEventIdToText($eventId['eventid'])] = $event->getEventId() ;
+            }
+        }
+
+        return $e ;
+    }
+
+    /**
      * This method gets called EVERY time the object is
      * created.  It is used to build all of the 
      * FormElement objects used in this Form.
@@ -66,19 +131,205 @@ class WpSwimTeamSwimMeetForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $this->add_hidden_element("meetid") ;
+        $this->add_hidden_element('_swimmeetid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
     }
 }
 
 /**
  * Construct the Swim Meet Import Results form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see WpSwimTeamSwimMeetForm
+ */
+class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
+{
+    /**
+     * SDIF file property
+     */
+    var $__sdif_file ;
+
+    /**
+     * Set the SDIF file property
+     */
+    function setSDIFFile($txt)
+    {
+        $this->__sdif_file = $txt ;
+    }
+
+    /**
+     * Get the SDIF file property
+     */
+    function getSDIFFile()
+    {
+        return $this->__sdif_file ;
+    }
+
+    /**
+     * This method gets called EVERY time the object is
+     * created.  It is used to build all of the 
+     * FormElement objects used in this Form.
+     *
+     */
+    function form_init_elements()
+    {
+        //$this->add_hidden_element('userid') ;
+        $this->add_hidden_element('_swimmeetid') ;
+
+        //  This is used to remember the action
+        //  which originated from the GUIDataList.
+ 
+        $this->add_hidden_element('_action') ;
+
+        //$zerotimemode = new FEListBox('Zero Time Format', true, '200px');
+        //$zerotimemode->set_list_data(SDIFCodeTableMappings::GetZeroTimeMode()) ;
+        //$this->add_element($zerotimemode) ;
+
+        $fileformat = new FERadioGroup('File Format',
+            SDIFCodeTableMappings::GetFileFormat(), true, '200px');
+        $fileformat->set_br_flag(true) ;
+        $fileformat->set_disabled(true) ;
+        $this->add_element($fileformat) ;
+
+        $zerotimemode = new FERadioGroup('Zero Time Format',
+            SDIFCodeTableMappings::GetZeroTimeMode(), true, '200px');
+        $zerotimemode->set_br_flag(true) ;
+        $this->add_element($zerotimemode) ;
+
+        $events = new FECheckBoxList('Events', true, '95%', '250px');
+        $events->set_list_data($this->_eventSelections()) ;
+        $events->enable_checkall(true) ;
+        $this->add_element($events) ;
+    }
+
+    /**
+     * This method is called only the first time the form
+     * page is hit.  This enables u to query a DB and 
+     * pre populate the FormElement objects with data.
+     *
+     */
+    function form_init_data()
+    {
+        //  Initialize the form fields
+
+        if (!is_null($this->getMeetId()))
+            $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
+
+        $this->set_hidden_element_value('_action', WPST_ACTION_EXPORT_ENTRIES) ;
+        $this->set_element_value('File Format', WPST_SDIF_FILE_FORMAT_SDIF_VALUE) ;
+        $this->set_element_value('Zero Time Format', WPST_SDIF_USE_BLANKS_VALUE) ;
+        $this->set_element_value('Events', $this->getEventIds()) ;
+    }
+
+    /**
+     * This is the method that builds the layout of where the
+     * FormElements will live.  You can lay it out any way
+     * you like.
+     *
+     */
+    function form_content()
+    {
+        $table = html_table($this->_width,0,4) ;
+        $table->set_style('border: 1px solid') ;
+
+        $table->add_row(_HTML_SPACE, _HTML_SPACE, _HTML_SPACE, _HTML_SPACE) ;
+
+        $table->add_row($this->element_label('File Format'),
+            $this->element_form('File Format'),
+            $this->element_label('Zero Time Format'),
+            $this->element_form('Zero Time Format')) ;
+ 
+        $table->add_row(_HTML_SPACE, _HTML_SPACE, _HTML_SPACE, _HTML_SPACE) ;
+
+        $td = html_td(null, null, $this->element_form('Events')) ;
+        $td->set_tag_attribute('colspan', 3) ;
+        $table->add_row($this->element_label('Events'), $td) ;
+
+        $table->add_row(_HTML_SPACE, _HTML_SPACE, _HTML_SPACE, _HTML_SPACE) ;
+
+        $this->add_form_block(null, $table) ;
+    }
+
+    /**
+     * This method gets called after the FormElement data has
+     * passed the validation.  This enables you to validate the
+     * data against some backend mechanism, say a DB.
+     *
+     */
+    function form_backend_validation()
+    {
+        $eventIds = $this->get_element_value('Events') ;
+
+        if (empty($eventIds))
+        {
+            $this->add_error('Events', 'At least one event must be selected.') ;
+            return false ;
+        }
+
+        return true ;
+    }
+
+    /**
+     * This method is called ONLY after ALL validation has
+     * passed.  This is the method that allows you to 
+     * do something with the data, say insert/update records
+     * in the DB.
+     */
+    function form_action()
+    {
+        $sdif = new SDIFMeetEntriesPyramid() ;
+        $sdif->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
+        $sdif->setZeroTimeMode($this->get_element_value('Zero Time Format')) ;
+        $sdif->generateSDIF($this->get_element_value('Events')) ;
+        $sdif->generateSDIFFile() ;
+
+        $this->setSDIFFile(urlencode($sdif->getSDIFFile())) ;
+
+        $this->set_action_message(sprintf('%s meet entries exported in SDIF format.', $sdif->getSDIFCount())) ;
+
+        return true ;
+    }
+
+    /**
+     * Overload form_content_buttons() method to have the
+     * button display 'Export' instead of the default 'Save'.
+     *
+     */
+    function form_content_buttons()
+    {
+        return $this->form_content_buttons_Action_Cancel(WPST_ACTION_EXPORT_ENTRIES) ;
+    }
+}
+
+/**
+ * Construct the Admin SwimMeet OptInOut form
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see WpSwimTeamSwimMeetExportEntriesForm
+ */
+class WpSwimTeamSwimMeetExportEntriesAdminForm extends WpSwimTeamSwimMeetExportEntriesForm
+{
+    /**
+     * Get the array of swimmer key and value pairs
+     *
+     * @return mixed - array of swimmer key value pairs
+     */
+    function _swimmerSelections()
+    {
+        return parent::_swimmerSelections(true) ;
+    }
+}
+
+/**
+ * Construct the Swim Meet Import Results form
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetForm
  */
@@ -92,7 +343,7 @@ class WpSwimTeamSwimMeetFileUploadForm extends WpSwimTeamSwimMeetForm
     /**
      * Upload File Label property
      */
-    var $__uploadFileLabel = "Filename" ;
+    var $__uploadFileLabel = 'Filename' ;
 
     /** 
      * This method returns the InfoTable widget. 
@@ -109,14 +360,14 @@ class WpSwimTeamSwimMeetFileUploadForm extends WpSwimTeamSwimMeetForm
      */ 
     function set_file_info_table($fileInfo)
     { 
-        $it = new InfoTable("File Upload Summary", 400) ; 
+        $it = new InfoTable('File Upload Summary', 400) ; 
 
         $lines = file($fileInfo['tmp_name']) ; 
 
-        $it->add_row("Filename", $fileInfo['name']) ; 
-        $it->add_row("Temporary Filename", $fileInfo['tmp_name']) ; 
-        $it->add_row("File Size", filesize($fileInfo['tmp_name'])) ; 
-        $it->add_row("Lines", count($lines)) ; 
+        $it->add_row('Filename', $fileInfo['name']) ; 
+        $it->add_row('Temporary Filename', $fileInfo['tmp_name']) ; 
+        $it->add_row('File Size', filesize($fileInfo['tmp_name'])) ; 
+        $it->add_row('Lines', count($lines)) ; 
 
         unset($lines) ; 
 
@@ -131,7 +382,7 @@ class WpSwimTeamSwimMeetFileUploadForm extends WpSwimTeamSwimMeetForm
      */
     function form_init_elements()
     {
-        $uploadedfile = new FEFile($this->__uploadFileLabel, true, "100%") ; 
+        $uploadedfile = new FEFile($this->__uploadFileLabel, true, '100%') ; 
         $uploadedfile->set_max_size(10240000000) ; 
         $uploadedfile->set_temp_dir(ini_get('upload_tmp_dir')) ; 
 
@@ -157,8 +408,8 @@ class WpSwimTeamSwimMeetFileUploadForm extends WpSwimTeamSwimMeetForm
     function form_content()
     {
         //$table = html_table($this->_width,0,4) ;
-        $table = html_table("100%", 2,4) ;
-        $table->set_style("border: 3px solid") ;
+        $table = html_table('100%', 2,4) ;
+        $table->set_style('border: 3px solid') ;
 
         $table->add_row($this->element_label($this->__uploadFileLabel),
             $this->element_form($this->__uploadFileLabel)) ;
@@ -187,9 +438,9 @@ class WpSwimTeamSwimMeetFileUploadForm extends WpSwimTeamSwimMeetForm
     {
         $success = true ;
 
-        $this->set_action_message("File \"" . 
+        $this->set_action_message('File "' . 
             $this->get_element_value($this->__uploadFileLabel) .
-            "\" successfully uploaded.") ; 
+            '" successfully uploaded.') ; 
         $file = $this->get_element($this->__uploadFileLabel) ; 
         $fileInfo = $file->get_file_info() ; 
 
@@ -198,16 +449,16 @@ class WpSwimTeamSwimMeetFileUploadForm extends WpSwimTeamSwimMeetForm
         //  Delete the file so we don't keep a lot of stuff around. 
 
         if (!unlink($fileInfo['tmp_name'])) 
-            $this->add_error($this->__uploadFileLabel, "Unable to remove uploaded file."); 
+            $this->add_error($this->__uploadFileLabel, 'Unable to remove uploaded file.'); 
 
-        $this->set_action_message("File uploaded.") ;
+        $this->set_action_message('File uploaded.') ;
 
         return $success ;
     }
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Upload" instead of the default "Save".
+     * button display 'Upload' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -220,7 +471,7 @@ class WpSwimTeamSwimMeetFileUploadForm extends WpSwimTeamSwimMeetForm
 /**
  * Construct the Add SwimMeet form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -329,7 +580,7 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
      */
     function _opponentSelections()
     {
-        //  Swim Club options and labels, seed "None" as an
+        //  Swim Club options and labels, seed 'None' as an
         //  option as some meet types don't have an opponent.
 
         $s = array(ucfirst(WPST_NONE) => WPST_NULL_ID) ;
@@ -342,10 +593,10 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
         {
             foreach ($swimclubIds as $swimclubId)
             {
-                $swimclub->loadSwimClubBySwimClubId($swimclubId["swimclubid"]) ;
+                $swimclub->loadSwimClubBySwimClubId($swimclubId['swimclubid']) ;
 
                 $opponent = $swimclub->getClubOrPoolName() .
-                    " " . $swimclub->getTeamName() ;
+                    ' ' . $swimclub->getTeamName() ;
                 $s[$opponent] = $swimclub->getSwimClubId() ;
             }
         }
@@ -361,72 +612,72 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
      */
     function form_init_elements()
     {
-        $this->add_hidden_element("meetid") ;
+        $this->add_hidden_element('_swimmeetid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
 		//  Season field
 
-        $season = new FEListBox("Season", true, "200px");
+        $season = new FEListBox('Season', true, '200px');
         $season->set_list_data($this->_seasonSelections()) ;
         $this->add_element($season) ;
 
 		//  Opponent field
 
-        $opponent = new FEListBox("Opponent", true, "300px");
+        $opponent = new FEListBox('Opponent', true, '300px');
         $opponent->set_list_data($this->_opponentSelections()) ;
         $this->add_element($opponent) ;
 
 		//  Description field
 
-        $description = new FEText("Description", false, "300px");
+        $description = new FEText('Description', false, '300px');
         $this->add_element($description) ;
 
 		//  Meet Type field
 
-        $meettype = new FEListBox("Meet Type", true, "150px");
+        $meettype = new FEListBox('Meet Type', true, '150px');
         $meettype->set_list_data($this->_meettypeSelections()) ;
         $this->add_element($meettype) ;
 
 		//  Participation field
 
-        $participation = new FEListBox("Participation", true, "150px");
+        $participation = new FEListBox('Participation', true, '150px');
         $participation->set_list_data($this->_participationSelections()) ;
         $this->add_element($participation) ;
 
    		//  Meet Status field
 
-        $meetstatus = new FEListBox("Meet Status", true, "150px");
+        $meetstatus = new FEListBox('Meet Status', true, '150px');
         $meetstatus->set_list_data($this->_meetStatusSelections()) ;
         $this->add_element($meetstatus) ;
 
         //  Date Field
 
-        $meetdate = new FEDate("Date", true, null, null,
-                "Fdy", date("Y") - 3, date("Y") + 7) ;
+        $meetdate = new FEDate('Date', true, null, null,
+                'Fdy', date('Y') - 3, date('Y') + 7) ;
         $this->add_element($meetdate);
 
-        $hours = new FEHoursListBox("Time", true) ;
+        $hours = new FEHoursListBox('Time', true) ;
         $this->add_element($hours) ;
 		
-        $minutes = new FEMinutesListBox("Minutes", true) ;
+        $minutes = new FEMinutesListBox('Minutes', true) ;
         $this->add_element($minutes) ;
 		
-        $location = new FEListBox("Location", true, "100px");
+        $location = new FEListBox('Location', true, '100px');
         $location->set_list_data($this->_locationSelections()) ;
         $this->add_element($location) ;
 
 		//  Team Score field
 
-        $teamscore = new FENumberFloat("Team Score", true, "50px");
+        $teamscore = new FENumberFloat('Team Score', true, '50px');
         $this->add_element($teamscore) ;
 
 		//  Opponent Score field
 
-        $opponentscore = new FENumberFloat("Opponent Score", true, "50px");
+        $opponentscore = new FENumberFloat('Opponent Score', true, '50px');
         $this->add_element($opponentscore) ;
     }
 
@@ -440,24 +691,24 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
     {
         //  Initialize the form fields
 
-        $this->set_hidden_element_value("_action", WPST_ACTION_ADD) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_ADD) ;
 
         $season = new SwimTeamSeason() ;
 
-        $this->set_element_value("Season", $season->getActiveSeasonId()) ;
-        $this->set_element_value("Opponent", WPST_NULL_ID) ;
-        $this->set_element_value("Meet Type", WPST_DUAL_MEET) ;
-        $this->set_element_value("Participation", WPST_OPT_OUT) ;
-        $this->set_element_value("Meet Status", WPST_OPEN) ;
-        $this->set_element_value("Location", WPST_HOME) ;
-        $this->set_element_value("Date", array("year" => date("Y"),
-            "month" => date("m"), "day" => date("d"))) ;
-        //$this->set_element_value("Time", date("H")) ;
-        //$this->set_element_value("Minutes", date("i")) ;
-        $this->set_element_value("Time", "17") ;
-        $this->set_element_value("Minutes", "0") ;
-        $this->set_element_value("Team Score", "0") ;
-        $this->set_element_value("Opponent Score", "0") ;
+        $this->set_element_value('Season', $season->getActiveSeasonId()) ;
+        $this->set_element_value('Opponent', WPST_NULL_ID) ;
+        $this->set_element_value('Meet Type', WPST_DUAL_MEET) ;
+        $this->set_element_value('Participation', WPST_OPT_OUT) ;
+        $this->set_element_value('Meet Status', WPST_OPEN) ;
+        $this->set_element_value('Location', WPST_HOME) ;
+        $this->set_element_value('Date', array('year' => date('Y'),
+            'month' => date('m'), 'day' => date('d'))) ;
+        //$this->set_element_value('Time', date('H')) ;
+        //$this->set_element_value('Minutes', date('i')) ;
+        $this->set_element_value('Time', '17') ;
+        $this->set_element_value('Minutes', '0') ;
+        $this->set_element_value('Team Score', '0') ;
+        $this->set_element_value('Opponent Score', '0') ;
     }
 
 
@@ -470,43 +721,43 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
     function form_content()
     {
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("Season"),
-            $this->element_form("Season")) ;
+        $table->add_row($this->element_label('Season'),
+            $this->element_form('Season')) ;
 
-        $table->add_row($this->element_label("Opponent"),
-            $this->element_form("Opponent")) ;
+        $table->add_row($this->element_label('Opponent'),
+            $this->element_form('Opponent')) ;
 
-        $table->add_row($this->element_label("Meet Type"),
-            $this->element_form("Meet Type")) ;
+        $table->add_row($this->element_label('Meet Type'),
+            $this->element_form('Meet Type')) ;
 
         $td = html_td() ;
-        //$td->set_tag_attributes(array("colspan" => "2", "align" => "left")) ;
-        $td->add($this->element_form("Participation"), $this->element_form("Meet Status")) ;
-        $table->add_row($this->element_label("Participation"), $td) ;
+        //$td->set_tag_attributes(array('colspan' => '2', 'align' => 'left')) ;
+        $td->add($this->element_form('Participation'), $this->element_form('Meet Status')) ;
+        $table->add_row($this->element_label('Participation'), $td) ;
 
         $table->add_row(html_td(null, null,
-            $this->element_label("Description")), html_td(null, null,
-            $this->element_form("Description"),
-            div_font8bold("Optional description for non-dual meets."))) ;
+            $this->element_label('Description')), html_td(null, null,
+            $this->element_form('Description'),
+            div_font8bold('Optional description for non-dual meets.'))) ;
 
-        $table->add_row($this->element_label("Location"),
-            $this->element_form("Location")) ;
+        $table->add_row($this->element_label('Location'),
+            $this->element_form('Location')) ;
 
-        $table->add_row($this->element_label("Date"),
-            $this->element_form("Date")) ;
+        $table->add_row($this->element_label('Date'),
+            $this->element_form('Date')) ;
 
         $table->add_row(html_td(null, null,
-            $this->element_label("Time")), html_td(null, null,
-            $this->element_form("Time"), ":", $this->element_form("Minutes"),
-            div_font8bold("Time is in 24 hour HH:MM format"))) ;
+            $this->element_label('Time')), html_td(null, null,
+            $this->element_form('Time'), ':', $this->element_form('Minutes'),
+            div_font8bold('Time is in 24 hour HH:MM format'))) ;
 
-        $table->add_row($this->element_label("Team Score"),
-            $this->element_form("Team Score")) ;
+        $table->add_row($this->element_label('Team Score'),
+            $this->element_form('Team Score')) ;
 
-        $table->add_row($this->element_label("Opponent Score"),
-            $this->element_form("Opponent Score")) ;
+        $table->add_row($this->element_label('Opponent Score'),
+            $this->element_form('Opponent Score')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -525,21 +776,21 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
 
         $meet = new SwimMeet() ;
 
-        $meet->setSeasonId($this->get_element_value("Season")) ;
-        $meet->setOpponentSwimClubId($this->get_element_value("Opponent")) ;
-        $meet->setMeetType($this->get_element_value("Meet Type")) ;
-        $meet->setParticipation($this->get_element_value("Participation")) ;
-        $meet->setMeetStatus($this->get_element_value("Meet Status")) ;
-        $meet->setMeetDescription($this->get_element_value("Description")) ;
-        $meet->setLocation($this->get_element_value("Location")) ;
-        $meet->setMeetDate($this->get_element_value("Date")) ;
+        $meet->setSeasonId($this->get_element_value('Season')) ;
+        $meet->setOpponentSwimClubId($this->get_element_value('Opponent')) ;
+        $meet->setMeetType($this->get_element_value('Meet Type')) ;
+        $meet->setParticipation($this->get_element_value('Participation')) ;
+        $meet->setMeetStatus($this->get_element_value('Meet Status')) ;
+        $meet->setMeetDescription($this->get_element_value('Description')) ;
+        $meet->setLocation($this->get_element_value('Location')) ;
+        $meet->setMeetDate($this->get_element_value('Date')) ;
 
-        $time = $this->get_element_value("Time") . ":" .
-            $this->get_element_value("Minutes") . ":00" ;
+        $time = $this->get_element_value('Time') . ':' .
+            $this->get_element_value('Minutes') . ':00' ;
         $meet->setMeetTime($time) ;
 
-        $meet->setTeamScore($this->get_element_value("Team Score")) ;
-        $meet->setOpponentScore($this->get_element_value("Opponent Score")) ;
+        $meet->setTeamScore($this->get_element_value('Team Score')) ;
+        $meet->setOpponentScore($this->get_element_value('Opponent Score')) ;
 
         //  Check existance?
  
@@ -547,9 +798,9 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
         {
             if ($meet->getSwimMeetExists())
             {
-                $this->add_error("Season", "Similar swim meet already exists.");
-                $this->add_error("Opponent", "Similar swim meet already exists.");
-                $this->add_error("Date", "Similar swim meet already exists.");
+                $this->add_error('Season', 'Similar swim meet already exists.');
+                $this->add_error('Opponent', 'Similar swim meet already exists.');
+                $this->add_error('Date', 'Similar swim meet already exists.');
                 $valid = false ;
             }
         }
@@ -560,19 +811,19 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
         $season->loadSeasonById($meet->getSeasonId()) ;
 
         $s = $season->getSeasonStartAsArray() ;
-        $st = strtotime(sprintf("%04s-%02s-%02s", $s["year"], $s["month"], $s["day"])) ;
+        $st = strtotime(sprintf('%04s-%02s-%02s', $s['year'], $s['month'], $s['day'])) ;
 
         $e = $season->getSeasonEndAsArray() ;
-        $et = strtotime(sprintf("%04s-%02s-%02s", $e["year"], $e["month"], $e["day"])) ;
+        $et = strtotime(sprintf('%04s-%02s-%02s', $e['year'], $e['month'], $e['day'])) ;
 
         $d = $meet->getMeetDate() ;
-        $dt = strtotime(sprintf("%04s-%02s-%02s", $d["year"], $d["month"], $d["day"])) ;
+        $dt = strtotime(sprintf('%04s-%02s-%02s', $d['year'], $d['month'], $d['day'])) ;
  
         //  Date before season start or after season end?
 
         if (($dt < $st) || ($dt > $et))
         {
-            $this->add_error("Date", "Date occurs outside of season.") ;
+            $this->add_error('Date', 'Date occurs outside of season.') ;
             $valid = false ;
         }
 
@@ -581,7 +832,7 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
         if (($meet->getMeetType() == WPST_DUAL_MEET) &&
             ($meet->getOpponentSwimClubId() == WPST_NONE))
         {
-            $this->add_error("Opponent", "No opponent selected for dual meet.") ;
+            $this->add_error('Opponent', 'No opponent selected for dual meet.') ;
             $valid = false ;
         }
 
@@ -590,7 +841,7 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
         if (($meet->getMeetType() != WPST_DUAL_MEET) &&
             ($meet->getMeetDescription() == WPST_NULL_STRING))
         {
-            $this->add_error("Description", sprintf("Description required for %s.", ucwords($meet->getMeetType()))) ;
+            $this->add_error('Description', sprintf('Description required for %s.', ucwords($meet->getMeetType()))) ;
             $valid = false ;
         }
 
@@ -607,21 +858,21 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
     {
         $meet = new SwimMeet() ;
 
-        $meet->setSeasonId($this->get_element_value("Season")) ;
-        $meet->setOpponentSwimClubId($this->get_element_value("Opponent")) ;
-        $meet->setMeetType($this->get_element_value("Meet Type")) ;
-        $meet->setParticipation($this->get_element_value("Participation")) ;
-        $meet->setMeetStatus($this->get_element_value("Meet Status")) ;
-        $meet->setMeetDescription($this->get_element_value("Description")) ;
-        $meet->setLocation($this->get_element_value("Location")) ;
-        $meet->setMeetDate($this->get_element_value("Date")) ;
+        $meet->setSeasonId($this->get_element_value('Season')) ;
+        $meet->setOpponentSwimClubId($this->get_element_value('Opponent')) ;
+        $meet->setMeetType($this->get_element_value('Meet Type')) ;
+        $meet->setParticipation($this->get_element_value('Participation')) ;
+        $meet->setMeetStatus($this->get_element_value('Meet Status')) ;
+        $meet->setMeetDescription($this->get_element_value('Description')) ;
+        $meet->setLocation($this->get_element_value('Location')) ;
+        $meet->setMeetDate($this->get_element_value('Date')) ;
 
-        $time = $this->get_element_value("Time") . ":" .
-            sprintf("%02s", $this->get_element_value("Minutes")) . ":00" ;
+        $time = $this->get_element_value('Time') . ':' .
+            sprintf('%02s', $this->get_element_value('Minutes')) . ':00' ;
         $meet->setMeetTime($time) ;
 
-        $meet->setTeamScore($this->get_element_value("Team Score")) ;
-        $meet->setOpponentScore($this->get_element_value("Opponent Score")) ;
+        $meet->setTeamScore($this->get_element_value('Team Score')) ;
+        $meet->setOpponentScore($this->get_element_value('Opponent Score')) ;
 
         $success = $meet->addSwimMeet() ;
 
@@ -630,11 +881,11 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
         if ($success) 
         {
             $meet->setMeetId($success) ;
-            $this->set_action_message("Swim Meet successfully added.") ;
+            $this->set_action_message('Swim Meet successfully added.') ;
         }
         else
         {
-            $this->set_action_message("Swim Meet was not successfully added.") ;
+            $this->set_action_message('Swim Meet was not successfully added.') ;
         }
 
         return $success ;
@@ -659,7 +910,7 @@ class WpSwimTeamSwimMeetAddForm extends WpSwimTeamSwimMeetForm
 /**
  * Construct the Update SwimMeet form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetAddForm
  */
@@ -673,27 +924,27 @@ class WpSwimTeamSwimMeetUpdateForm extends WpSwimTeamSwimMeetAddForm
      */
     function form_init_data()
     {
-        $this->set_hidden_element_value("_action", WPST_ACTION_UPDATE) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_UPDATE) ;
 
         $meet = new SwimMeet() ;
         $meet->loadSwimMeetByMeetId($this->getMeetId()) ;
 
-        $this->set_hidden_element_value("meetid", $meet->getMeetId()) ;
-        $this->set_element_value("Season", $meet->getSeasonId()) ;
-        $this->set_element_value("Opponent", $meet->getOpponentSwimClubId()) ;
-        $this->set_element_value("Meet Type", $meet->getMeetType()) ;
-        $this->set_element_value("Participation", $meet->getParticipation()) ;
-        $this->set_element_value("Meet Status", $meet->getMeetStatus()) ;
-        $this->set_element_value("Description", $meet->getMeetDescription()) ;
-        $this->set_element_value("Location", $meet->getLocation()) ;
-        $this->set_element_value("Date", $meet->getMeetDate())  ;
+        $this->set_hidden_element_value('_swimmeetid', $meet->getMeetId()) ;
+        $this->set_element_value('Season', $meet->getSeasonId()) ;
+        $this->set_element_value('Opponent', $meet->getOpponentSwimClubId()) ;
+        $this->set_element_value('Meet Type', $meet->getMeetType()) ;
+        $this->set_element_value('Participation', $meet->getParticipation()) ;
+        $this->set_element_value('Meet Status', $meet->getMeetStatus()) ;
+        $this->set_element_value('Description', $meet->getMeetDescription()) ;
+        $this->set_element_value('Location', $meet->getLocation()) ;
+        $this->set_element_value('Date', $meet->getMeetDate())  ;
 
         $time = $meet->getMeetTimeAsArray() ;
-        $this->set_element_value("Time", $time["hours"]) ;
-        $this->set_element_value("Minutes", $time["minutes"]) ;
+        $this->set_element_value('Time', $time['hours']) ;
+        $this->set_element_value('Minutes', $time['minutes']) ;
 
-        $this->set_element_value("Team Score", $meet->getTeamScore()) ;
-        $this->set_element_value("Opponent Score", $meet->getOpponentScore()) ;
+        $this->set_element_value('Team Score', $meet->getTeamScore()) ;
+        $this->set_element_value('Opponent Score', $meet->getOpponentScore()) ;
     }
 
     /**
@@ -719,22 +970,22 @@ class WpSwimTeamSwimMeetUpdateForm extends WpSwimTeamSwimMeetAddForm
     {
         $meet = new SwimMeet() ;
 
-        $meet->setMeetId($this->get_hidden_element_value("meetid")) ;
-        $meet->setSeasonId($this->get_element_value("Season")) ;
-        $meet->setOpponentSwimClubId($this->get_element_value("Opponent")) ;
-        $meet->setMeetType($this->get_element_value("Meet Type")) ;
-        $meet->setParticipation($this->get_element_value("Participation")) ;
-        $meet->setMeetStatus($this->get_element_value("Meet Status")) ;
-        $meet->setMeetDescription($this->get_element_value("Description")) ;
-        $meet->setLocation($this->get_element_value("Location")) ;
-        $meet->setMeetDate($this->get_element_value("Date")) ;
+        $meet->setMeetId($this->get_hidden_element_value('_swimmeetid')) ;
+        $meet->setSeasonId($this->get_element_value('Season')) ;
+        $meet->setOpponentSwimClubId($this->get_element_value('Opponent')) ;
+        $meet->setMeetType($this->get_element_value('Meet Type')) ;
+        $meet->setParticipation($this->get_element_value('Participation')) ;
+        $meet->setMeetStatus($this->get_element_value('Meet Status')) ;
+        $meet->setMeetDescription($this->get_element_value('Description')) ;
+        $meet->setLocation($this->get_element_value('Location')) ;
+        $meet->setMeetDate($this->get_element_value('Date')) ;
 
-        $time = $this->get_element_value("Time") . ":" .
-            sprintf("%02s", $this->get_element_value("Minutes")) . ":00" ;
+        $time = $this->get_element_value('Time') . ':' .
+            sprintf('%02s', $this->get_element_value('Minutes')) . ':00' ;
         $meet->setMeetTime($time) ;
 
-        $meet->setTeamScore($this->get_element_value("Team Score")) ;
-        $meet->setOpponentScore($this->get_element_value("Opponent Score")) ;
+        $meet->setTeamScore($this->get_element_value('Team Score')) ;
+        $meet->setOpponentScore($this->get_element_value('Opponent Score')) ;
 
         $success = $meet->updateSwimMeet() ;
 
@@ -743,11 +994,11 @@ class WpSwimTeamSwimMeetUpdateForm extends WpSwimTeamSwimMeetAddForm
         if ($success) 
         {
             $meet->setMeetId($success) ;
-            $this->set_action_message("Swim Meet successfully updated.") ;
+            $this->set_action_message('Swim Meet successfully updated.') ;
         }
         else
         {
-            $this->set_action_message("Swim Meet was not successfully updated.") ;
+            $this->set_action_message('Swim Meet was not successfully updated.') ;
         }
 
         return $success ;
@@ -757,7 +1008,7 @@ class WpSwimTeamSwimMeetUpdateForm extends WpSwimTeamSwimMeetAddForm
 /**
  * Construct the Delete SwimMeet form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetUpdateForm
  */
@@ -796,20 +1047,20 @@ class WpSwimTeamSwimMeetDeleteForm extends WpSwimTeamSwimMeetUpdateForm
     function form_action()
     {
         $meet = new SwimTeamSwimMeet() ;
-        $meet->setId($this->get_hidden_element_value("meetid")) ;
+        $meet->setId($this->get_hidden_element_value('_swimmeetid')) ;
         $success = $meet->deleteSwimMeet() ;
 
         if ($success) 
-            $this->set_action_message("SwimMeet successfully deleted.") ;
+            $this->set_action_message('SwimMeet successfully deleted.') ;
         else
-            $this->set_action_message("SwimMeet was not successfully deleted.") ;
+            $this->set_action_message('SwimMeet was not successfully deleted.') ;
 
         return $success ;
     }
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Delete" instead of the default "Save".
+     * button display 'Delete' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -821,7 +1072,7 @@ class WpSwimTeamSwimMeetDeleteForm extends WpSwimTeamSwimMeetUpdateForm
 /**
  * Construct the SwimMeet OptInOut form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -927,12 +1178,13 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
         $swimmer = new SwimTeamSwimmer() ;
 
         if ($admin)
-            $filter = sprintf("%s.seasonid='%s' AND %s.swimmerid=%s.id AND %s.status='%s'",
+            $filter = sprintf('%s.seasonid="%s" AND %s.swimmerid=%s.id AND %s.status="%s"',
                 WPST_ROSTER_TABLE, $season->getActiveSeasonId(),
                 WPST_ROSTER_TABLE, WPST_SWIMMERS_TABLE,
                 WPST_ROSTER_TABLE, WPST_ACTIVE) ;
         else
-            $filter = sprintf("(%s.contact1id = '%s' OR %s.contact2id = '%s') AND %s.seasonid='%s' AND %s.swimmerid=%s.id AND %s.status='%s'",
+            $filter = sprintf('(%s.contact1id = "%s" OR %s.contact2id = "%s") AND
+                %s.seasonid="%s" AND %s.swimmerid=%s.id AND %s.status="%s"',
                 WPST_SWIMMERS_TABLE, $userdata->ID,
                 WPST_SWIMMERS_TABLE, $userdata->ID,
                 WPST_ROSTER_TABLE, $season->getActiveSeasonId(),
@@ -945,8 +1197,8 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
         {
             foreach ($swimmerIds as $swimmerId)
             {
-                $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
-                $s[$swimmer->getFirstName() . " " .  $swimmer->getLastName() .
+                $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+                $s[$swimmer->getFirstName() . ' ' .  $swimmer->getLastName() .
                     ' (' .  $swimmer->getAgeGroupAge() . ')'] = $swimmer->getId() ;
             }
         }
@@ -1003,36 +1255,36 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        //$this->add_hidden_element("userid") ;
-        $this->add_hidden_element("meetid") ;
+        //$this->add_hidden_element('userid') ;
+        $this->add_hidden_element('_swimmeetid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
-        $swimmers = new FECheckBoxList("Swimmers", true, "200px", "120px");
+        $swimmers = new FECheckBoxList('Swimmers', true, '200px', '120px');
         $swimmers->set_list_data($this->_swimmerSelections()) ;
         $swimmers->enable_checkall(true) ;
         $this->add_element($swimmers) ;
 
         $this->__strokes = new FEActiveDIVRadioButtonGroup(
-            $this->getActionLabel() . " Type", array(
+            $this->getActionLabel() . ' Type', array(
                 ucwords(WPST_FULL) => WPST_FULL
                ,ucwords(WPST_PARTIAL) => WPST_PARTIAL
             ), true) ;
         $this->__strokes->set_readonly(get_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE) != WPST_BOTH) ;
         $this->add_element($this->__strokes) ;
 
-        $fullstrokes = new FECheckBoxList("Full Strokes",
-            false, "200px", "120px");
+        $fullstrokes = new FECheckBoxList('Full Strokes',
+            false, '200px', '120px');
         $fullstrokes->set_list_data($this->_strokeSelections()) ;
         $fullstrokes->set_disabled(true) ;
         $fullstrokes->enable_checkall(false) ;
         $this->add_element($fullstrokes) ;
 
-        $partialstrokes = new FECheckBoxList("Partial Strokes",
-            false, "200px", "120px");
+        $partialstrokes = new FECheckBoxList('Partial Strokes',
+            false, '200px', '120px');
         $partialstrokes->set_list_data($this->_strokeSelections()) ;
         $partialstrokes->enable_checkall(true) ;
         $this->add_element($partialstrokes) ;
@@ -1048,13 +1300,13 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
     {
         //  Initialize the form fields
 
-        $this->set_hidden_element_value("meetid", $this->getMeetId()) ;
-        $this->set_hidden_element_value("_action", $this->getAction()) ;
+        $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
+        $this->set_hidden_element_value('_action', $this->getAction()) ;
 
         if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_MODE) == WPST_PARTIAL)
-            $this->set_element_value($this->getActionLabel() . " Type", WPST_PARTIAL) ;
+            $this->set_element_value($this->getActionLabel() . ' Type', WPST_PARTIAL) ;
         else
-            $this->set_element_value($this->getActionLabel() . " Type", WPST_FULL) ;
+            $this->set_element_value($this->getActionLabel() . ' Type', WPST_FULL) ;
     }
 
 
@@ -1066,24 +1318,24 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
      */
     function form_content()
     {
-        $it = new SwimMeetInfoTable("Swim Meet Details") ;
-        $it->setSwimMeetId($this->get_hidden_element_value("meetid")) ;
+        $it = new SwimMeetInfoTable('Swim Meet Details') ;
+        $it->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
         $it->constructSwimMeetInfoTable() ;
 
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
         $td = html_td() ;
-        $td->set_tag_attributes(array("rowspan" => "2",
-            "valign" => "middle", "style" => "padding-right: 10px;")) ;
+        $td->set_tag_attributes(array('rowspan' => '2',
+            'valign' => 'middle', 'style' => 'padding-right: 10px;')) ;
         $td->add($it) ;
 
-        $table->add_row($this->element_label("Swimmers"),
-            $this->element_form("Swimmers"), $td) ;
+        $table->add_row($this->element_label('Swimmers'),
+            $this->element_form('Swimmers'), $td) ;
  
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
-        $table->add_row($this->element_label($this->getActionLabel() . " Type"),
-            $this->element_form($this->getActionLabel() . " Type")) ;
+        $table->add_row($this->element_label($this->getActionLabel() . ' Type'),
+            $this->element_form($this->getActionLabel() . ' Type')) ;
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
 
         //  Initialize the Full Strokes here instead of in 
@@ -1092,7 +1344,7 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
         //  form has to be displayed again due to a validation
         //  problem.
 
-        $this->set_element_value("Full Strokes", $this->_strokeSelections()) ;
+        $this->set_element_value('Full Strokes', $this->_strokeSelections()) ;
 
         //  Build the Magic Divs
 
@@ -1105,8 +1357,8 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
         $table->add_row('Strokes', $strokes) ;
 
         $td = html_td() ;
-        $td->set_tag_attributes(array("colspan" => "3", "align" => "center")) ;
-        $td->add(div_font8bold("This information replaces any existing information on a per swimmer basis.")) ;
+        $td->set_tag_attributes(array('colspan' => '3', 'align' => 'center')) ;
+        $td->add(div_font8bold('This information replaces any existing information on a per swimmer basis.')) ;
 
         $table->add_row($td) ;
 
@@ -1123,12 +1375,12 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
     {
         $valid = true ;
 
-        $optinoptouttype = $this->get_element_value($this->getActionLabel() . " Type") ;
-        $partialstrokes = $this->get_element_value("Partial Strokes") ;
+        $optinoptouttype = $this->get_element_value($this->getActionLabel() . ' Type') ;
+        $partialstrokes = $this->get_element_value('Partial Strokes') ;
 
         if (($optinoptouttype == WPST_PARTIAL) && empty($partialstrokes))
         {
-            $this->add_error($this->element_label($this->getActionLabel() . " Type"), "You must select at least one (1) stroke.");
+            $this->add_error($this->element_label($this->getActionLabel() . ' Type'), 'You must select at least one (1) stroke.');
             $valid = false ;
         }
 
@@ -1156,21 +1408,21 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
 
         $strokelabels = $this->_strokeSelections() ;
 
-        $optinoptouttype = $this->get_element_value($this->getActionLabel() . " Type") ;
+        $optinoptouttype = $this->get_element_value($this->getActionLabel() . ' Type') ;
 
         //  Use the available Stroke Selections for a Full Opt-In
         //  Opt-Out since the element is disabled and won't be passed
         //  through the form processor.
 
         if ($optinoptouttype == WPST_PARTIAL)
-            $strokes = $this->get_element_value("Partial Strokes") ;
+            $strokes = $this->get_element_value('Partial Strokes') ;
         else
             $strokes = $this->_strokeSelections() ;
 
-        $swimmerIds = $this->get_element_value("Swimmers") ;
+        $swimmerIds = $this->get_element_value('Swimmers') ;
 
-        $meetid = $this->get_hidden_element_value("meetid") ;
-        $action = $this->get_hidden_element_value("_action") ;
+        $meetid = $this->get_hidden_element_value('_swimmeetid') ;
+        $action = $this->get_hidden_element_value('_action') ;
 
         if (strtolower($action) == strtolower(WPST_OPT_IN))
             $actionlabel = get_option(WPST_OPTION_OPT_IN_LABEL) ;
@@ -1201,11 +1453,11 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
 
             if ($prior)
             {
-                $actionmsgs[] = sprintf("Previous record%s (%s) removed for swimmer %s %s <i>(%s - %s - %s)</i>.",
-                    ($prior == 1 ? "" : "s"), $prior, 
+                $actionmsgs[] = sprintf('Previous record%s (%s) removed for swimmer %s %s <i>(%s - %s - %s)</i>.',
+                    ($prior == 1 ? '' : 's'), $prior, 
                     $swimmer->getFirstName(), $swimmer->getLastName(),
-                    $meetdetails["opponent"], $meetdetails["date"],
-                    $meetdetails["location"]) ;
+                    $meetdetails['opponent'], $meetdetails['date'],
+                    $meetdetails['location']) ;
             }
 
             //  Add or Update meta data for each stroke
@@ -1214,11 +1466,11 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
             {
                 $sm->setStrokeCode($stroke) ;
                 $success &= $sm->saveSwimmerSwimMeetMeta() ;
-                $actionmsgs[] = sprintf("%s (%s) recorded for swimmer %s %s <i>(%s - %s - %s)</i>.",
+                $actionmsgs[] = sprintf('%s (%s) recorded for swimmer %s %s <i>(%s - %s - %s)</i>.',
                     $actionlabel, array_search($stroke, $strokelabels),
                     $swimmer->getFirstName(), $swimmer->getLastName(),
-                    $meetdetails["opponent"], $meetdetails["date"],
-                    $meetdetails["location"]) ;
+                    $meetdetails['opponent'], $meetdetails['date'],
+                    $meetdetails['location']) ;
             }
 
             //  Send e-mail confirmation ...
@@ -1243,7 +1495,7 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
         }
         else
         {
-            $actionmsg = sprintf("No %s actions recorded.", $actionlabel) ;
+            $actionmsg = sprintf('No %s actions recorded.', $actionlabel) ;
         }
 
         $this->set_action_message($actionmsg) ;
@@ -1270,7 +1522,7 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
 /**
  * Construct the Admin SwimMeet OptInOut form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1290,45 +1542,12 @@ class WpSwimTeamSwimMeetOptInOutAdminForm extends WpSwimTeamSwimMeetOptInOutForm
 /**
  * Construct the SwimMeet OptInOut form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetOptInOutForm
  */
 class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
 {
-    /**
-     * Get the array of event key and value pairs
-     *
-     * @return mixed - array of event key value pairs
-     */
-    function _eventSelections($admin = false)
-    {
-        //  AgeGroup options and labels 
-
-        $e = array() ;
-        $event = new SwimMeetEvent() ;
-
-        $meetid = $this->getMeetId() ;
-        if (is_null($meetid)) $meetid = $this->get_hidden_element_value('meetid') ;
-
-        //  Seems to make more sense to order these by Age Group than event number
-        //  but we'll see.  As a parent I'd rather see all of the events I want to
-        //  click on grouped together.
-
-        $eventIds = $event->getAllEventIdsByMeetId($meetid, 'agegroupid') ;
-
-        if (!empty($eventIds))
-        {
-            foreach ($eventIds as $eventId)
-            {
-                $event->loadSwimMeetEventByEventId($eventId['eventid']) ;
-                $e[SwimTeamTextMap::__mapEventIdToText($eventId['eventid'])] = $event->getEventId() ;
-            }
-        }
-
-        return $e ;
-    }
-
     /**
      * This method gets called EVERY time the object is
      * created.  It is used to build all of the 
@@ -1338,7 +1557,7 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
     function form_init_elements()
     {
         //$this->add_hidden_element('userid') ;
-        $this->add_hidden_element('meetid') ;
+        $this->add_hidden_element('_swimmeetid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
@@ -1382,7 +1601,7 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
         //  Initialize the form fields
 
         if (!is_null($this->getMeetId()))
-            $this->set_hidden_element_value('meetid', $this->getMeetId()) ;
+            $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
         $this->set_hidden_element_value('_action', $this->getAction()) ;
 
         //  Override age checks?  Only available to admin
@@ -1402,7 +1621,7 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
     function form_content()
     {
         $it = new SwimMeetInfoTable('Swim Meet Details') ;
-        $it->setSwimMeetId($this->get_hidden_element_value('meetid')) ;
+        $it->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
         $it->constructSwimMeetInfoTable() ;
 
         $table = html_table($this->_width,0,4) ;
@@ -1547,7 +1766,7 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
         $eventIds = $this->get_element_value('Events') ;
         $swimmerId = $this->get_element_value('Swimmers') ;
 
-        $meetid = $this->get_hidden_element_value('meetid') ;
+        $meetid = $this->get_hidden_element_value('_swimmeetid') ;
         $action = $this->get_hidden_element_value('_action') ;
 
         if (strtolower($action) == strtolower(WPST_OPT_IN))
@@ -1581,11 +1800,11 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
 
             if ($prior)
             {
-                $actionmsgs[] = sprintf("Previous record%s (%s) removed for swimmer %s %s <i>(%s - %s - %s)</i>.",
-                    ($prior == 1 ? "" : "s"), $prior, 
+                $actionmsgs[] = sprintf('Previous record%s (%s) removed for swimmer %s %s <i>(%s - %s - %s)</i>.',
+                    ($prior == 1 ? '' : 's'), $prior, 
                     $swimmer->getFirstName(), $swimmer->getLastName(),
-                    $meetdetails["opponent"], $meetdetails["date"],
-                    $meetdetails["location"]) ;
+                    $meetdetails['opponent'], $meetdetails['date'],
+                    $meetdetails['location']) ;
             }
 
             //  Add or Update meta data for each event
@@ -1598,10 +1817,10 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
 
                 $success &= $sm->saveSwimmerSwimMeetMeta() ;
 
-                $actionmsgs[] = sprintf("%s recorded for swimmer %s %s:  Event %s <i>(%s - %s - %s)</i>.",
+                $actionmsgs[] = sprintf('%s recorded for swimmer %s %s:  Event %s <i>(%s - %s - %s)</i>.',
                     $actionlabel, $swimmer->getFirstName(), $swimmer->getLastName(),
-                    SwimTeamTextMap::__mapEventIdToText($eventId), $meetdetails["opponent"],
-                    $meetdetails["date"], $meetdetails["location"]) ;
+                    SwimTeamTextMap::__mapEventIdToText($eventId), $meetdetails['opponent'],
+                    $meetdetails['date'], $meetdetails['location']) ;
             }
 
             //  Send e-mail confirmation ...
@@ -1626,7 +1845,7 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
         }
         else
         {
-            $actionmsg = sprintf("No %s actions recorded.", $actionlabel) ;
+            $actionmsg = sprintf('No %s actions recorded.', $actionlabel) ;
         }
 
         $this->set_action_message($actionmsg) ;
@@ -1638,7 +1857,7 @@ class WpSwimTeamSwimMeetEventOptInOutForm extends WpSwimTeamSwimMeetOptInOutForm
 /**
  * Construct the Admin SwimMeet OptInOut form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetEventOptInOutForm
  */
@@ -1658,7 +1877,7 @@ class WpSwimTeamSwimMeetEventOptInOutAdminForm extends WpSwimTeamSwimMeetEventOp
 /**
  * Construct the Swim Meet Import Results form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetForm
  */
@@ -1681,14 +1900,14 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
      */ 
     function set_file_info_table($fileInfo)
     { 
-        $it = new InfoTable("File Upload Summary", 400) ; 
+        $it = new InfoTable('File Upload Summary', 400) ; 
 
         $lines = file($fileInfo['tmp_name']) ; 
 
-        $it->add_row("Filename", $fileInfo['name']) ; 
-        $it->add_row("Temporary Filename", $fileInfo['tmp_name']) ; 
-        $it->add_row("File Size", filesize($fileInfo['tmp_name'])) ; 
-        $it->add_row("Lines", count($lines)) ; 
+        $it->add_row('Filename', $fileInfo['name']) ; 
+        $it->add_row('Temporary Filename', $fileInfo['tmp_name']) ; 
+        $it->add_row('File Size', filesize($fileInfo['tmp_name'])) ; 
+        $it->add_row('Lines', count($lines)) ; 
 
         unset($lines) ; 
 
@@ -1703,14 +1922,14 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
      */
     function form_init_elements()
     {
-        $this->add_hidden_element("meetid") ;
+        $this->add_hidden_element('_swimmeetid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
-        $resultsfile = new FEFile("SDIF Filename", true, "400px") ; 
+        $resultsfile = new FEFile('SDIF Filename', true, '400px') ; 
         $resultsfile->set_max_size(10240000000) ; 
         $resultsfile->set_temp_dir(ini_get('upload_tmp_dir')) ; 
 
@@ -1718,13 +1937,13 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
 
         //  Options on how to load results
 
-        $match = new FERadioGroup("Match Swimmers", array(
+        $match = new FERadioGroup('Match Swimmers', array(
             //ucwords(WPST_NONE) => WPST_NONE,
             ucwords(WPST_MATCH_SWIMMER_ID) => WPST_MATCH_SWIMMER_ID,
             ucwords(WPST_MATCH_SWIMMER_NAME) => WPST_MATCH_SWIMMER_NAME,
             ucwords(WPST_MATCH_SWIMMER_NAME_AND_ID) => WPST_MATCH_SWIMMER_NAME_AND_ID,
             //ucwords(WPST_PREVIOUS_PAGE) => WPST_PREVIOUS_PAGE
-            ), true, "200px");
+            ), true, '200px');
         $match->set_br_flag(true) ;
         $this->add_element($match) ;
     }
@@ -1737,9 +1956,9 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
      */
     function form_init_data()
     {
-        $this->set_hidden_element_value("meetid", $this->getMeetId()) ;
-        $this->set_hidden_element_value("_action", WPST_ACTION_IMPORT_RESULTS) ;
-        $this->set_element_value("Match Swimmers", WPST_MATCH_SWIMMER_ID) ;
+        $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_IMPORT_RESULTS) ;
+        $this->set_element_value('Match Swimmers', WPST_MATCH_SWIMMER_ID) ;
     }
 
     /**
@@ -1751,15 +1970,15 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
     function form_content()
     {
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 0px solid") ;
+        $table->set_style('border: 0px solid') ;
 
-        $table->add_row($this->element_label("SDIF Filename"),
-            $this->element_form("SDIF Filename")) ;
+        $table->add_row($this->element_label('SDIF Filename'),
+            $this->element_form('SDIF Filename')) ;
 
         $table->add_row(_HTML_SPACE, _HTML_SPACE) ;
         
-        $table->add_row($this->element_label("Match Swimmers"),
-            $this->element_form("Match Swimmers")) ;
+        $table->add_row($this->element_label('Match Swimmers'),
+            $this->element_form('Match Swimmers')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -1792,15 +2011,15 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
         //  A results file can contain results for more than
         //  one team - so what to do if that happens?
 
-        $legal_records = array("A0" => 1, "B1" => 1, "B2" => 0,
-            "C1" => 1, "C2" => 0, "D0" => 0, "D3" => 0, "G0" => 0,
-            "E0" => 0, "F0" => 0, "Z0" => 1) ;
+        $legal_records = array('A0' => 1, 'B1' => 1, 'B2' => 0,
+            'C1' => 1, 'C2' => 0, 'D0' => 0, 'D3' => 0, 'G0' => 0,
+            'E0' => 0, 'F0' => 0, 'Z0' => 1) ;
  
-        $record_counts = array("A0" => 0, "B1" => 0, "B2" => 0,
-            "C1" => 0, "C2" => 0, "D0" => 0, "D3" => 0, "G0" => 0,
-            "E0" => 0, "F0" => 0, "Z0" => 0) ;
+        $record_counts = array('A0' => 0, 'B1' => 0, 'B2' => 0,
+            'C1' => 0, 'C2' => 0, 'D0' => 0, 'D3' => 0, 'G0' => 0,
+            'E0' => 0, 'F0' => 0, 'Z0' => 0) ;
  
-        $file = $this->get_element("SDIF Filename") ; 
+        $file = $this->get_element('SDIF Filename') ; 
         $fileInfo = $file->get_file_info() ; 
 
         $lines = file($fileInfo['tmp_name']) ; 
@@ -1817,7 +2036,7 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
 
             if (!array_key_exists($record_type, $legal_records))
             {
-                $this->add_error("SDIF File", sprintf("Invalid record \"%s\" encountered in SDIF file on line %s.", $record_type, $line_number)) ;
+                $this->add_error('SDIF File', sprintf('Invalid record "%s" encountered in SDIF file on line %s.', $record_type, $line_number)) ;
                 return false ;
             }
             else
@@ -1835,7 +2054,7 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
         {
             if ($record_count < $legal_records[$record_type])
             {
-                $this->add_error("SDIF File", sprintf("Missing required \"%s\" record(s) in SDIF file.", $record_type)) ;
+                $this->add_error('SDIF File', sprintf('Missing required "%s" record(s) in SDIF file.', $record_type)) ;
                 return false ;
             }
         }
@@ -1855,12 +2074,12 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
     {
         $meet = new SwimMeet() ;
 
-        $meet->setMeetId($this->get_hidden_element_value("meetid")) ;
+        $meet->setMeetId($this->get_hidden_element_value('_swimmeetid')) ;
 
-        $this->set_action_message("Results File \"" . 
-            $this->get_element_value("SDIF Filename") .
-            "\" successfully uploaded.") ; 
-        $file = $this->get_element("SDIF Filename") ; 
+        $this->set_action_message('Results File "' . 
+            $this->get_element_value('SDIF Filename') .
+            '" successfully uploaded.') ; 
+        $file = $this->get_element('SDIF Filename') ; 
         $fileInfo = $file->get_file_info() ; 
 
         $this->set_file_info_table($fileInfo) ; 
@@ -1871,7 +2090,7 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
         //  Delete the file so we don't keep a lot of stuff around. 
 
         if (!unlink($fileInfo['tmp_name'])) 
-            $this->add_error("CSV Filename", "Unable to remove uploaded results file."); 
+            $this->add_error('CSV Filename', 'Unable to remove uploaded results file.'); 
 
         //$success = $meet->importSwimMeetResults() ;
         $success = true ;
@@ -1881,11 +2100,11 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
         if ($success) 
         {
             $meet->setMeetId($success) ;
-            $this->set_action_message("Swim Meet results successfully imported.") ;
+            $this->set_action_message('Swim Meet results successfully imported.') ;
         }
         else
         {
-            $this->set_action_message("Swim Meet results were not imported.") ;
+            $this->set_action_message('Swim Meet results were not imported.') ;
         }
 
         return $success ;
@@ -1893,7 +2112,7 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Upload" instead of the default "Save".
+     * button display 'Upload' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -1905,7 +2124,7 @@ class WpSwimTeamSwimMeetImportResultsForm extends WpSwimTeamSwimMeetForm
 /**
  * Construct the Swim Meet Import Results form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamFileUploadForm
  */
@@ -1916,7 +2135,7 @@ class WpSwimTeamSwimMeetImportStrokesForm extends WpSwimTeamSwimMeetFileUploadFo
 /**
  * Construct the Swim Meet Job Reminders form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetForm
  */
@@ -1957,9 +2176,9 @@ class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
         //  Initialize the form fields
 
         if (!is_null($this->getMeetId()))
-            $this->set_hidden_element_value('meetid', $this->getMeetId()) ;
+            $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
 
-        $this->set_hidden_element_value("_action", WPST_ACTION_JOB_REMINDERS) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_JOB_REMINDERS) ;
         $jobs = $this->get_element('Jobs') ;
         $jobs->set_value(array(
              WPST_JOB_DURATION_FULL_MEET
@@ -1976,7 +2195,7 @@ class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
     function form_content()
     {
         $it = new SwimMeetInfoTable('Swim Meet Details') ;
-        $it->setSwimMeetId($this->get_hidden_element_value('meetid')) ;
+        $it->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
         $it->constructSwimMeetInfoTable() ;
 
         $table = html_table($this->_width,0,4) ;
@@ -2014,7 +2233,7 @@ class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
         $actionmsgs = array() ;
 
         $jobs = $this->get_element_value('Jobs') ;
-        $this->setMeetId($this->get_hidden_element_value('meetid')) ;
+        $this->setMeetId($this->get_hidden_element_value('_swimmeetid')) ;
 
         $ja = new SwimTeamJobAssignment() ;
         $jaids = $ja->getJobAssignmentIdsByMeetId($this->getMeetId()) ;
@@ -2059,7 +2278,7 @@ class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
 
             $meetdetails = SwimTeamTextMap::__MapMeetIdToText($this->getMeetId()) ;
             $actionmsgs[] = sprintf('%d Job Assignment Reminders sent for Swim Meet:  %s - %s - %s',
-                count($actionmsgs), $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
+                count($actionmsgs), $meetdetails['opponent'], $meetdetails['date'], $meetdetails['location']) ;
 
             foreach($actionmsgs as $actionmsg)
             {
@@ -2072,7 +2291,7 @@ class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
         {
             $meetdetails = SwimTeamTextMap::__MapMeetIdToText($this->getMeetId()) ;
             $actionmsg = sprintf('No Job Assignment Reminders sent for Swim Meet:  %s - %s - %s',
-                $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
+                $meetdetails['opponent'], $meetdetails['date'], $meetdetails['location']) ;
         }
 
         $this->set_action_message($actionmsg) ;
@@ -2082,7 +2301,7 @@ class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Upload" instead of the default "Save".
+     * button display 'Upload' instead of the default 'Save'.
      *
      */
     function form_content_buttons()

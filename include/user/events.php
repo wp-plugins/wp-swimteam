@@ -186,6 +186,11 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_eventid = array(
+            WPST_ACTION_EVENTS_LOAD
+           ,WPST_ACTION_EVENTS_REORDER
+           ,WPST_ACTION_EVENTS_DELETE_ALL
+        ) ;
 
         //print '<pre>' ;
         //print_r($scriptargs) ;
@@ -197,12 +202,8 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
         if (array_key_exists('eventid', $scriptargs))
             $eventid = $scriptargs['eventid'] ;
         else if (array_key_exists('_eventid', $scriptargs))
-            $eventid = $scriptargs['_eventid'] ;
-        else if (array_key_exists('_eventid', $scriptargs))
             $eventid = is_array($scriptargs['_eventid']) ?
                 $scriptargs['_eventid'][0] :  $scriptargs['_eventid'] ;
-        //else if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
-        //    $eventid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
         else
             $eventid = null ;
 
@@ -269,8 +270,15 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
 
         if (empty($scriptargs) || is_null($action) || $action == WPST_ACTION_EVENTS_MANAGE)
         {
-            $gdl = $this->__buildGDL() ;
-            $div->add($gdl) ;
+            $div->add($this->__buildGDL()) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Events Action Summary') ;
+        }
+        else if (is_null($eventid) && !in_array($action, $actions_allowed_without_eventid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select an event in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Events Action Summary') ;
         }

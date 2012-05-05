@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
  * @version $Revision$
@@ -25,7 +25,7 @@ require_once('widgets.class.php') ;
 /**
  * Class definition of the jobs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -85,6 +85,9 @@ class SeasonsTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_seasonid = array(
+            WPST_ACTION_ADD
+        ) ;
 
         //  The seasonid is the argument which must be
         //  dealt with differently for GET and POST operations
@@ -119,6 +122,14 @@ class SeasonsTabContainer extends SwimTeamTabContainer
             $div->add($gdl) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Seasons Action Summary') ;
+        }
+        else if (is_null($seasonid) && !in_array($action, $actions_allowed_without_seasonid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select a season in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
         }
         else  //  Crank up the form processing process
         {

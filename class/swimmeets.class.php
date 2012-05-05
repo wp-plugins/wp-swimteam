@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Meets
  * @version $Revision$
@@ -17,16 +17,16 @@
  */
 
 
-require_once("db.class.php") ;
-require_once("swimteam.include.php") ;
-require_once("swimmeets.include.php") ;
-require_once("swimclubs.class.php") ;
-require_once("widgets.class.php") ;
+require_once('db.class.php') ;
+require_once('swimteam.include.php') ;
+require_once('swimmeets.include.php') ;
+require_once('swimclubs.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the meets
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -259,7 +259,14 @@ class SwimMeet extends SwimTeamDBI
      */
     function setMeetDate($date)
     {
-        $this->__meetdate = $date ;
+        if (is_array($date))
+            $this->__meetdate = $date ;
+        else
+            $this->__meetdate = array(
+                'year' => substr($date, 0, 4)
+               ,'month' => substr($date, 5, 2)
+               ,'day' => substr($date, 8, 2)
+            ) ;
     }
 
     /**
@@ -282,7 +289,19 @@ class SwimMeet extends SwimTeamDBI
         //$d = $this->getMeetDateAsArray() ;
         $d = $this->getMeetDate() ;
 
-        return sprintf("%04s-%02s-%02s", $d["year"], $d["month"], $d["day"]) ;
+        return sprintf('%04s-%02s-%02s', $d['year'], $d['month'], $d['day']) ;
+    }
+
+    /**
+     * Get the date of the meet as a string in SDIF format
+     *
+     * @return - string - start of meet date as a string
+     */
+    function getMeetDateAsMMDDYYYY()
+    {
+        $d = $this->getMeetDate() ;
+
+        return sprintf('%02s%02s%04s', $d['month'], $d['day'], $d['year']) ;
     }
 
     /**
@@ -294,7 +313,7 @@ class SwimMeet extends SwimTeamDBI
     {
         list($year, $month, $day) = explode('-', $this->getMeetDate()) ;
         
-        return array("month" => $month, "day" => $day, "year" => $year) ;
+        return array('month' => $month, 'day' => $day, 'year' => $year) ;
     }
 
     /**
@@ -326,7 +345,7 @@ class SwimMeet extends SwimTeamDBI
     {
         list($hours, $minutes, $seconds) = explode(':', $this->getMeetTime()) ;
         
-        return array("hours" => $hours, "minutes" => $minutes, "seconds" => $seconds) ;
+        return array('hours' => $hours, 'minutes' => $minutes, 'seconds' => $seconds) ;
     }
 
     /**
@@ -380,10 +399,10 @@ class SwimMeet extends SwimTeamDBI
     {
 	    //  Is a similar meet already in the database?
 
-        $query = sprintf("SELECT meetid FROM %s WHERE
-            seasonid = \"%s\" AND
-            opponentswimclubid = \"%s\" AND
-            meetdate=\"%s\"",
+        $query = sprintf('SELECT meetid FROM %s WHERE
+            seasonid = "%s" AND
+            opponentswimclubid = "%s" AND
+            meetdate="%s"',
             WPST_SWIMMEETS_TABLE,
             $this->getSeasonId(),
             $this->getOpponentSwimClubId(),
@@ -415,7 +434,7 @@ class SwimMeet extends SwimTeamDBI
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT meetid FROM %s WHERE meetid = \"%s\"",
+        $query = sprintf('SELECT meetid FROM %s WHERE meetid = "%s"',
             WPST_SWIMMEETS_TABLE, $meetid) ;
 
         $this->setQuery($query) ;
@@ -441,18 +460,18 @@ class SwimMeet extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET
-                seasonid=\"%s\",
-                opponentswimclubid=\"%s\",
-                meettype=\"%s\",
-                participation=\"%s\",
-                meetstatus=\"%s\",
-                meetdescription=\"%s\",
-                location=\"%s\",
-                meetdate=\"%s\",
-                meettime=\"%s\",
-                teamscore=\"%s\",
-                opponentscore=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET
+                seasonid="%s",
+                opponentswimclubid="%s",
+                meettype="%s",
+                participation="%s",
+                meetstatus="%s",
+                meetdescription="%s",
+                location="%s",
+                meetdate="%s",
+                meettime="%s",
+                teamscore="%s",
+                opponentscore="%s"',
                 WPST_SWIMMEETS_TABLE,
                 $this->getSeasonId(),
                 $this->getOpponentSwimClubId(),
@@ -488,19 +507,19 @@ class SwimMeet extends SwimTeamDBI
         {
             //  Construct the update query
  
-            $query = sprintf("UPDATE %s SET
-                seasonid=\"%s\",
-                opponentswimclubid=\"%s\",
-                meettype=\"%s\",
-                participation=\"%s\",
-                meetstatus=\"%s\",
-                meetdescription=\"%s\",
-                location=\"%s\",
-                meetdate=\"%s\",
-                meettime=\"%s\",
-                teamscore=\"%s\",
-                opponentscore=\"%s\"
-                WHERE meetid=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                seasonid="%s",
+                opponentswimclubid="%s",
+                meettype="%s",
+                participation="%s",
+                meetstatus="%s",
+                meetdescription="%s",
+                location="%s",
+                meetdate="%s",
+                meettime="%s",
+                teamscore="%s",
+                opponentscore="%s"
+                WHERE meetid="%s"',
                 WPST_SWIMMEETS_TABLE,
                 $this->getSeasonId(),
                 $this->getOpponentSwimClubId(),
@@ -521,7 +540,7 @@ class SwimMeet extends SwimTeamDBI
         }
         else
         {
-            wp_die("Unable to update meet record.") ;
+            wp_die('Unable to update meet record.') ;
         }
 
         return true ;
@@ -545,8 +564,8 @@ class SwimMeet extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("DELETE FROM %s
-                WHERE id=\"%s\"",
+            $query = sprintf('DELETE FROM %s
+                WHERE id="%s"',
                 WPST_SWIMMEETS_TABLE,
                 $this->getMeetId()
             ) ;
@@ -578,7 +597,7 @@ class SwimMeet extends SwimTeamDBI
         //  Make sure it is a legal meet id
         if ($this->getSwimMeetExistsByMeetId())
         {
-            $query = sprintf("SELECT * FROM %s WHERE meetid=\"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE meetid="%s"',
                 WPST_SWIMMEETS_TABLE, $meetid) ;
 
             $this->setQuery($query) ;
@@ -612,15 +631,15 @@ class SwimMeet extends SwimTeamDBI
      * @param - string - optional filter to restrict query
      * @return - array - array of swimmers ids
      */
-    function getAllMeetIds($filter = null, $orderby = "meetdate")
+    function getAllMeetIds($filter = null, $orderby = 'meetdate')
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT meetid FROM %s", WPST_SWIMMEETS_TABLE) ;
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        $query = sprintf('SELECT meetid FROM %s', WPST_SWIMMEETS_TABLE) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -642,7 +661,7 @@ class SwimMeet extends SwimTeamDBI
         $swimclub = new SwimClubProfile() ;
         $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
 
-        return $swimclub->getClubOrPoolName() . " " . $swimclub->getTeamName() ;
+        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
     }
 }
 
@@ -651,7 +670,7 @@ class SwimMeet extends SwimTeamDBI
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -679,7 +698,7 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimMeetsGUIDataList($title, $width = "100%",
+    function SwimMeetsGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_SWIMMEETS_DEFAULT_COLUMNS,
         $tables = WPST_SWIMMEETS_DEFAULT_TABLES,
@@ -729,26 +748,26 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
 		//add the columns in the display that you want to view.
 		//The API is :
 		//Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-		$this->add_header_item("Season",
-	       	    "200", "seasonid", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Season',
+	       	    '200', 'seasonid', SORTABLE, SEARCHABLE, 'left') ;
 
-		$this->add_header_item("Opponent",
-	       	    "300", "opponentswimclubid", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Opponent',
+	       	    '300', 'opponentswimclubid', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Date",
-	         	"150", "location", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Date',
+	         	'150', 'location', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Location",
-	         	"100", "location", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Location',
+	         	'100', 'location', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Participation",
-	         	"100", "participation", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Participation',
+	         	'100', 'participation', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Status",
-	         	"100", "meetstatus", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Status',
+	         	'100', 'meetstatus', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Score",
-	         	"125", "teamscore", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Score',
+	         	'125', 'teamscore', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
@@ -798,59 +817,59 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
     {
 		switch ($col_name)
         {
-            case "Season" :
-                $obj = $this->__mapSeasonIdToText($row_data["seasonid"]) ;
+            case 'Season' :
+                $obj = $this->__mapSeasonIdToText($row_data['seasonid']) ;
                 break ;
 
-            case "Opponent" :
-                if ($row_data["meettype"] == WPST_DUAL_MEET)
-                    $obj = $this->__mapOpponentSwimClubIdToText($row_data["opponentswimclubid"]) ;
+            case 'Opponent' :
+                if ($row_data['meettype'] == WPST_DUAL_MEET)
+                    $obj = $this->__mapOpponentSwimClubIdToText($row_data['opponentswimclubid']) ;
                 else
-                    $obj = $row_data["meetdescription"] ;
+                    $obj = $row_data['meetdescription'] ;
                 break ;
 
-            case "Date" :
-                $obj = date("F d, Y", strtotime($row_data["meetdate"])) ;
+            case 'Date' :
+                $obj = date('F d, Y', strtotime($row_data['meetdate'])) ;
                 break ;
 
-            case "Location" :
-                $obj = ucfirst($row_data["location"]) ;
+            case 'Location' :
+                $obj = ucfirst($row_data['location']) ;
                 break ;
 
-            case "Status" :
-                $obj = ucfirst($row_data["meetstatus"]) ;
+            case 'Status' :
+                $obj = ucfirst($row_data['meetstatus']) ;
                 break ;
 
-            case "Participation" :
-                if ($row_data["participation"] == WPST_OPT_IN)
+            case 'Participation' :
+                if ($row_data['participation'] == WPST_OPT_IN)
                     $obj = ucwords(get_option(WPST_OPTION_OPT_IN_LABEL)) ;
-                else if ($row_data["participation"] == WPST_OPT_OUT)
+                else if ($row_data['participation'] == WPST_OPT_OUT)
                     $obj = ucwords(get_option(WPST_OPTION_OPT_OUT_LABEL)) ;
                 else
-                    $obj = ucwords($row_data["participation"]) ;
+                    $obj = ucwords($row_data['participation']) ;
                 break ;
 
-            case "Score" :
-                if ($row_data["meettype"] == WPST_DUAL_MEET)
+            case 'Score' :
+                if ($row_data['meettype'] == WPST_DUAL_MEET)
                 {
-                    $ts = $row_data["teamscore"] ;
-                    $os = $row_data["opponentscore"] ;
+                    $ts = $row_data['teamscore'] ;
+                    $os = $row_data['opponentscore'] ;
 
                     if  ($ts > $os)
-                        $obj = sprintf("Win:  %s - %s", $ts, $os) ;
+                        $obj = sprintf('Win:  %s - %s', $ts, $os) ;
                     else if  ($ts < $os)
-                        $obj = sprintf("Loss:  %s - %s", $ts, $os) ;
-                    else if ((strtotime("now") > strtotime($row_data["meetdate"]))
+                        $obj = sprintf('Loss:  %s - %s', $ts, $os) ;
+                    else if ((strtotime('now') > strtotime($row_data['meetdate']))
                         && ($ts == 0) && ($os == 0))
-                        $obj = sprintf("Tie:  %s - %s", $ts, $os) ;
+                        $obj = sprintf('Tie:  %s - %s', $ts, $os) ;
                     else if (($ts == 0) && ($os == 0))
-                        $obj = "No Result" ;
+                        $obj = 'No Result' ;
                     else
-                        $obj = sprintf("Tie:  %s - %s", $ts, $os) ;
+                        $obj = sprintf('Tie:  %s - %s', $ts, $os) ;
                 }
                 else
                 {
-                    $obj = "N/A" ;
+                    $obj = 'N/A' ;
                 }
                 break ;
 
@@ -890,7 +909,7 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
         $swimclub = new SwimClubProfile() ;
         $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
 
-        return $swimclub->getClubOrPoolName() . " " . $swimclub->getTeamName() ;
+        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
     }
 }
 
@@ -898,7 +917,7 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various meets.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamMeetsGUIDataList
  */
@@ -920,7 +939,7 @@ class SwimMeetsAdminGUIDataList extends SwimMeetsGUIDataList
         ,WPST_ACTION_UPDATE => WPST_ACTION_UPDATE
         ,WPST_ACTION_DELETE => WPST_ACTION_DELETE
         ,WPST_ACTION_EVENTS_MANAGE => WPST_ACTION_EVENTS_MANAGE
-        //,WPST_ACTION_EXPORT_SDIF => WPST_ACTION_EXPORT_SDIF
+        ,WPST_ACTION_EXPORT_ENTRIES => WPST_ACTION_EXPORT_ENTRIES
         ,WPST_ACTION_JOBS => WPST_ACTION_JOBS
         ,WPST_ACTION_JOB_REMINDERS => WPST_ACTION_JOB_REMINDERS
         //,WPST_ACTION_IMPORT_EVENTS => WPST_ACTION_IMPORT_EVENTS
@@ -951,11 +970,11 @@ class SwimMeetsAdminGUIDataList extends SwimMeetsGUIDataList
 
         parent::user_setup() ;
 
-	  	$this->add_header_item("Participation",
-	         	"100", "participation", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Participation',
+	         	'100', 'participation', SORTABLE, SEARCHABLE, 'left') ;
 
-		$this->add_header_item("Id",
-	       	    "50", "meetid", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Id',
+	       	    '50', 'meetid', SORTABLE, SEARCHABLE, 'left') ;
 
     }
 
@@ -964,7 +983,7 @@ class SwimMeetsAdminGUIDataList extends SwimMeetsGUIDataList
 /**
  * Class definition of a meet info table
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -1009,7 +1028,7 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
         $swimclub = new SwimClubProfile() ;
         $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
 
-        return $swimclub->getClubOrPoolName() . " " . $swimclub->getTeamName() ;
+        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
     }
 
     /**
@@ -1020,10 +1039,10 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
     {
         //  Alternate the row colors
         //$this->set_alt_color_flag(true) ;
-        //$this->set_column_header($hdr++, "Date", null, "left") ;
-        //$this->set_column_header($hdr++, "Opponent", null, "left") ;
-        //$this->set_column_header($hdr++, "Location", null, "left") ;
-        //$this->set_column_header($hdr++, "Result", null, "left") ;
+        //$this->set_column_header($hdr++, 'Date', null, 'left') ;
+        //$this->set_column_header($hdr++, 'Opponent', null, 'left') ;
+        //$this->set_column_header($hdr++, 'Location', null, 'left') ;
+        //$this->set_column_header($hdr++, 'Result', null, 'left') ;
 
         $meet = new SwimMeet() ;
 
@@ -1039,25 +1058,25 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
             else
                 $opponent = $meet->getMeetDescription() ;
 
-            $meetdate = date("D M j, Y", strtotime($meet->getMeetDate())) ;
+            $meetdate = date('D M j, Y', strtotime($meet->getMeetDateAsDate())) ;
 
-            $this->add_row(html_b("Date"), $meetdate) ;
-            $this->add_row(html_b("Opponent"), $opponent) ;
-            $this->add_row(html_b("Location"), ucfirst($meet->getLocation())) ;
+            $this->add_row(html_b('Date'), $meetdate) ;
+            $this->add_row(html_b('Opponent'), $opponent) ;
+            $this->add_row(html_b('Location'), ucfirst($meet->getLocation())) ;
 
 
             if ($meet->getParticipation() == WPST_OPT_IN)
-                $this->add_row(html_b("Participation"), ucwords(get_option(WPST_OPTION_OPT_IN_LABEL))) ;
+                $this->add_row(html_b('Participation'), ucwords(get_option(WPST_OPTION_OPT_IN_LABEL))) ;
             else if ($meet->getParticipation() == WPST_OPT_OUT)
-                $this->add_row(html_b("Participation"), ucwords(get_option(WPST_OPTION_OPT_OUT_LABEL))) ;
+                $this->add_row(html_b('Participation'), ucwords(get_option(WPST_OPTION_OPT_OUT_LABEL))) ;
             else
-                $this->add_row(html_b("Participation"), ucwords(WPST_CLOSED)) ;
+                $this->add_row(html_b('Participation'), ucwords(WPST_CLOSED)) ;
 
-            $this->add_row(html_b("Status"), ucfirst($meet->getMeetStatus())) ;
+            $this->add_row(html_b('Status'), ucfirst($meet->getMeetStatus())) ;
         }
         else
         {
-            $this->add_row("No swim meet details available.") ;
+            $this->add_row('No swim meet details available.') ;
         }
     }
 }
@@ -1065,7 +1084,7 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
 /**
  * Class definition of the meet schedule info table
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -1086,7 +1105,7 @@ class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
         $swimclub = new SwimClubProfile() ;
         $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
 
-        return $swimclub->getClubOrPoolName() . " " . $swimclub->getTeamName() ;
+        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
     }
      */
 
@@ -1100,10 +1119,10 @@ class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
 
         //  Alternate the row colors
         $this->set_alt_color_flag(true) ;
-        $this->set_column_header($hdr++, "Date", null, "left") ;
-        $this->set_column_header($hdr++, "Opponent", null, "left") ;
-        $this->set_column_header($hdr++, "Location", null, "left") ;
-        $this->set_column_header($hdr++, "Result", null, "left") ;
+        $this->set_column_header($hdr++, 'Date', null, 'left') ;
+        $this->set_column_header($hdr++, 'Opponent', null, 'left') ;
+        $this->set_column_header($hdr++, 'Location', null, 'left') ;
+        $this->set_column_header($hdr++, 'Result', null, 'left') ;
 
         $season = new SwimTeamSeason() ;
 
@@ -1115,23 +1134,23 @@ class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
         //  Find all of the meets in the season
 
         $meet = new SwimMeet() ;
-        $meetIds = $meet->getAllMeetIds(sprintf("seasonid=\"%s\"", $seasonid)) ;
+        $meetIds = $meet->getAllMeetIds(sprintf('seasonid="%s"', $seasonid)) ;
 
         //  Handle case where no meets have been scheduled yet
 
         if (is_null($meetIds))
         {
             $td = html_td() ;
-            $td->set_tag_attribute("colspan", "4") ;
-            $td->set_style("border-top: 1px solid #979797;") ;
-            $td->add("No meets scheduled for active season.") ;
+            $td->set_tag_attribute('colspan', '4') ;
+            $td->set_style('border-top: 1px solid #979797;') ;
+            $td->add('No meets scheduled for active season.') ;
             $this->add_row($td) ;
         }
         else
         {
             foreach ($meetIds as $meetId)
             {
-                $meet->loadSwimMeetByMeetId($meetId["meetid"]) ;
+                $meet->loadSwimMeetByMeetId($meetId['meetid']) ;
     
                 if ($meet->getMeetType() == WPST_DUAL_MEET)
                     $opponent = $meet->__mapOpponentSwimClubIdToText(
@@ -1148,23 +1167,23 @@ class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
                     $os = $meet->getOpponentScore() ;
     
                     if  ($ts > $os)
-                        $winloss = sprintf("Win:  %s - %s", $ts, $os) ;
+                        $winloss = sprintf('Win:  %s - %s', $ts, $os) ;
                     else if  ($ts < $os)
-                        $winloss = sprintf("Loss:  %s - %s", $ts, $os) ;
-                    else if ((strtotime("now") > strtotime($meet->getMeetDate()))
+                        $winloss = sprintf('Loss:  %s - %s', $ts, $os) ;
+                    else if ((strtotime('now') > strtotime($meet->getMeetDateAsDate()))
                         && ($ts == 0) && ($os == 0))
-                        $winloss = sprintf("Tie:  %s - %s", $ts, $os) ;
+                        $winloss = sprintf('Tie:  %s - %s', $ts, $os) ;
                     else if (($ts == 0) && ($os == 0))
-                        $winloss = "TBD" ;
+                        $winloss = 'TBD' ;
                     else
-                        $winloss = sprintf("Tie:  %s - %s", $ts, $os) ;
+                        $winloss = sprintf('Tie:  %s - %s', $ts, $os) ;
                 }
                 else
                 {
-                    $winloss = "N/A" ;
+                    $winloss = 'N/A' ;
                 }
     
-                $meetdate = date("D M j, Y", strtotime($meet->getMeetDate())) ;
+                $meetdate = date('D M j, Y', strtotime($meet->getMeetDateAsDate())) ;
                 $this->add_row($meetdate, $opponent,
                     ucfirst($meet->getLocation()), $winloss) ;
             }
@@ -1175,7 +1194,7 @@ class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
 /**
  * Class definition of the swim meet meta data
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -1444,7 +1463,7 @@ class SwimMeetMeta extends SwimTeamDBI
     function loadSwimMeetMeta($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 
@@ -1497,8 +1516,8 @@ class SwimMeetMeta extends SwimTeamDBI
         if (is_null($smetaid)) $smetaid = $this->getSwimMeetMetaId() ;
 
         if (is_null($smetaid))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Id")) ;
-        $query = sprintf("SELECT * FROM %s WHERE smetaid='%s'",
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Id')) ;
+        $query = sprintf('SELECT * FROM %s WHERE smetaid="%s"',
             WPST_SWIMMEETS_META_TABLE, $smetaid) ;
 
         return $this->loadSwimMeetMeta($query) ;
@@ -1512,7 +1531,7 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function loadSwimMeetMetaByUserIdAndKey($userid, $key)
     {
-        $query = sprintf("SELECT * FROM %s WHERE userid='%s' AND smetakey='%s'",
+        $query = sprintf('SELECT * FROM %s WHERE userid="%s" AND smetakey="%s"',
             WPST_SWIMMEETS_META_TABLE, $userid, $key) ;
 
         return $this->loadSwimMeetMeta($query) ;
@@ -1526,7 +1545,7 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function loadSwimMeetMetaBySwimmerIdAndKey($swimmerid, $key)
     {
-        $query = sprintf("SELECT * FROM %s WHERE swimmerid='%s' AND smetakey='%s'",
+        $query = sprintf('SELECT * FROM %s WHERE swimmerid="%s" AND smetakey="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $key) ;
 
         return $this->loadSwimMeetMeta($query) ;
@@ -1542,10 +1561,10 @@ class SwimMeetMeta extends SwimTeamDBI
     {
         if ($orderby == WPST_SORT_BY_NAME)
         {
-            $query = sprintf("SELECT DISTINCT %s.swimmerid as
-                swimmerid FROM %s, %s WHERE %s.swimmeetid='%s' AND
-                %s.participation='%s' AND %s.swimmerid = %s.id
-                ORDER BY %s.lastname, %s.firstname",
+            $query = sprintf('SELECT DISTINCT %s.swimmerid as
+                swimmerid FROM %s, %s WHERE %s.swimmeetid="%s" AND
+                %s.participation="%s" AND %s.swimmerid = %s.id
+                ORDER BY %s.lastname, %s.firstname',
                 WPST_SWIMMEETS_META_TABLE,
                 WPST_SWIMMEETS_META_TABLE,
                 WPST_SWIMMERS_TABLE,
@@ -1563,10 +1582,10 @@ class SwimMeetMeta extends SwimTeamDBI
         {
             $season = new SwimTeamSeason() ;
 
-            $query = sprintf("SELECT DISTINCT %s.swimmerid as
-                swimmerid FROM %s, %s WHERE %s.swimmeetid='%s' AND
-                %s.participation='%s' AND %s.swimmerid = %s.swimmerid
-                AND %s.seasonid='%s' ORDER BY %s.swimmerlabel",
+            $query = sprintf('SELECT DISTINCT %s.swimmerid as
+                swimmerid FROM %s, %s WHERE %s.swimmeetid="%s" AND
+                %s.participation="%s" AND %s.swimmerid = %s.swimmerid
+                AND %s.seasonid="%s" ORDER BY %s.swimmerlabel',
                 WPST_SWIMMEETS_META_TABLE,
                 WPST_SWIMMEETS_META_TABLE,
                 WPST_ROSTER_TABLE,
@@ -1583,8 +1602,8 @@ class SwimMeetMeta extends SwimTeamDBI
         }
         else
         {
-            $query = sprintf("SELECT DISTINCT swimmerid FROM %s WHERE
-                swimmeetid='%s' AND participation='%s'",
+            $query = sprintf('SELECT DISTINCT swimmerid FROM %s WHERE
+                swimmeetid="%s" AND participation="%s"',
                 WPST_SWIMMEETS_META_TABLE, $meetid, $participation) ;
         }
 
@@ -1602,7 +1621,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
     {
-        $query = sprintf("SELECT strokecode FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
+        $query = sprintf('SELECT strokecode FROM %s WHERE
+            swimmerid="%s" AND swimmeetid="%s" AND participation="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $participation) ;
 
         $this->setQuery($query) ;
@@ -1619,7 +1639,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
     {
-        $query = sprintf("SELECT eventid FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
+        $query = sprintf('SELECT eventid FROM %s WHERE
+            swimmerid="%s" AND swimmeetid="%s" AND participation="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $participation) ;
 
         $this->setQuery($query) ;
@@ -1637,7 +1658,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function getMetaModifiedByMeetIdSwimmerIdAndStrokeCode($meetid, $swimmerid, $strokecode)
     {
-        $query = sprintf("SELECT modified FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND strokecode='%s'",
+        $query = sprintf('SELECT modified FROM %s WHERE
+            swimmerid="%s" AND swimmeetid="%s" AND strokecode="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $strokecode) ;
 
         $this->setQuery($query) ;
@@ -1655,7 +1677,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function getMetaEnteredByMeetIdSwimmerIdAndStrokeCode($meetid, $swimmerid, $strokecode)
     {
-        $query = sprintf("SELECT userid FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND strokecode='%s'",
+        $query = sprintf('SELECT userid FROM %s WHERE
+            swimmerid="%s" AND swimmeetid="%s" AND strokecode="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $strokecode) ;
 
         $this->setQuery($query) ;
@@ -1673,7 +1696,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function getMetaModifiedByMeetIdSwimmerIdAndEventId($meetid, $swimmerid, $eventid)
     {
-        $query = sprintf("SELECT modified FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND eventid='%s'",
+        $query = sprintf('SELECT modified FROM %s WHERE
+            swimmerid="%s" AND swimmeetid="%s" AND eventid="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $eventid) ;
 
         $this->setQuery($query) ;
@@ -1691,7 +1715,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function getMetaEnteredByMeetIdSwimmerIdAndEventId($meetid, $swimmerid, $eventid)
     {
-        $query = sprintf("SELECT userid FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND eventid='%s'",
+        $query = sprintf('SELECT userid FROM %s WHERE
+            swimmerid="%s" AND swimmeetid="%s" AND eventid="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $meetid, $eventid) ;
 
         $this->setQuery($query) ;
@@ -1710,7 +1735,7 @@ class SwimMeetMeta extends SwimTeamDBI
     function existSwimMeetMeta($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $this->runSelectQuery(false) ;
 
@@ -1728,7 +1753,7 @@ class SwimMeetMeta extends SwimTeamDBI
     function existSwimMeetMetaByUserIdAndKey($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $this->runSelectQuery(false) ;
 
@@ -1743,8 +1768,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function existSwimMeetMetaByUserIdAndKey2($userid, $key)
     {
-        $query = sprintf("SELECT smetaid FROM %s
-            WHERE userid='%s' AND smetakey='%s'",
+        $query = sprintf('SELECT smetaid FROM %s
+            WHERE userid="%s" AND smetakey="%s"',
             WPST_SWIMMEETS_META_TABLE, $userid, $key) ;
 
         return $this->existSwimMeetMeta($query) ;
@@ -1758,8 +1783,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function existSwimMeetMetaBySwimmerIdAndKey($swimmerid, $key)
     {
-        $query = sprintf("SELECT smetaid FROM %s
-            WHERE swimmerid='%s' AND smetakey='%s'",
+        $query = sprintf('SELECT smetaid FROM %s
+            WHERE swimmerid="%s" AND smetakey="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $key) ;
 
         return $this->existSwimMeetMeta($query) ;
@@ -1773,8 +1798,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function existSwimMeetMetaBySwimMeetIdAndSwimmerId($swimmeetid, $swimmerid)
     {
-        $query = sprintf("SELECT smetaid FROM %s
-            WHERE swimmeetid='%s' AND swimmerid='%s'",
+        $query = sprintf('SELECT smetaid FROM %s
+            WHERE swimmeetid="%s" AND swimmerid="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmeetid, $swimmerid) ;
 
         return $this->existSwimMeetMeta($query) ;
@@ -1790,8 +1815,8 @@ class SwimMeetMeta extends SwimTeamDBI
     function existSwimMeetMetaBySwimMeetIdAndSwimmerIdAndStrokeCode($swimmeetid,
         $swimmerid, $strokecode)
     {
-        $query = sprintf("SELECT smetaid FROM %s
-            WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+        $query = sprintf('SELECT smetaid FROM %s
+            WHERE swimmeetid="%s" AND swimmerid="%s" AND strokecode="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmeetid, $swimmerid, $strokecode) ;
 
         return $this->existSwimMeetMeta($query) ;
@@ -1807,27 +1832,27 @@ class SwimMeetMeta extends SwimTeamDBI
         $success = false ;
 
         if (is_null($this->getUserId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Id')) ;
         if (is_null($this->getSwimMeetMetaKey()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Key")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Key')) ;
         //  Update or new save?
  
         $update = $this->existSwimMeetMetaByUserIdAndKey($this->getUserId(), $this->getSwimMeetMetaKey()) ;
 
         if ($update)
-            $query = sprintf("UPDATE %s ", WPST_SWIMMEETS_META_TABLE) ;
+            $query = sprintf('UPDATE %s ', WPST_SWIMMEETS_META_TABLE) ;
         else
-            $query = sprintf("INSERT INTO %s ", WPST_SWIMMEETS_META_TABLE) ;
+            $query = sprintf('INSERT INTO %s ', WPST_SWIMMEETS_META_TABLE) ;
 
-        $query .= sprintf("SET 
-            userid=\"%s\",
-            swimmerid=\"%s\",
-            swimmeetid=\"%s\",
-            strokecode=\"%s\",
-            eventid=\"%s\",
-            participation=\"%s\",
-            smetakey=\"%s\",
-            smetavalue=\"%s\"",
+        $query .= sprintf('SET 
+            userid="%s",
+            swimmerid="%s",
+            swimmeetid="%s",
+            strokecode="%s",
+            eventid="%s",
+            participation="%s",
+            smetakey="%s",
+            smetavalue="%s"',
             $this->getUserId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
@@ -1841,7 +1866,7 @@ class SwimMeetMeta extends SwimTeamDBI
 
         if ($update)
         {
-            $query .= sprintf(" WHERE userid=\"%s\" AND smetakey=\"%s\"",
+            $query .= sprintf(' WHERE userid="%s" AND smetakey="%s"',
                 $this->getUserId(), $this->getSwimMeetMetaKey()) ;
 
             $this->setQuery($query) ;
@@ -1867,28 +1892,28 @@ class SwimMeetMeta extends SwimTeamDBI
         $success = false ;
 
         if (is_null($this->getSwimmerId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swimmer Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swimmer Id')) ;
         if (is_null($this->getSwimMeetId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swim Meet Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swim Meet Id')) ;
         //  Update or new save?
  
         $update = $this->existSwimMeetMetaBySwimMeetIdAndSwimmerIdAndStrokeCode(
             $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
         if ($update)
-            $query = sprintf("UPDATE %s ", WPST_SWIMMEETS_META_TABLE) ;
+            $query = sprintf('UPDATE %s ', WPST_SWIMMEETS_META_TABLE) ;
         else
-            $query = sprintf("INSERT INTO %s ", WPST_SWIMMEETS_META_TABLE) ;
+            $query = sprintf('INSERT INTO %s ', WPST_SWIMMEETS_META_TABLE) ;
 
-        $query .= sprintf("SET 
-            userid=\"%s\",
-            swimmerid=\"%s\",
-            swimmeetid=\"%s\",
-            strokecode=\"%s\",
-            eventid=\"%s\",
-            participation=\"%s\",
-            smetakey=\"%s\",
-            smetavalue=\"%s\"",
+        $query .= sprintf('SET 
+            userid="%s",
+            swimmerid="%s",
+            swimmeetid="%s",
+            strokecode="%s",
+            eventid="%s",
+            participation="%s",
+            smetakey="%s",
+            smetavalue="%s"',
             $this->getUserId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
@@ -1902,7 +1927,7 @@ class SwimMeetMeta extends SwimTeamDBI
 
         if ($update)
         {
-            $query .= sprintf(" WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+            $query .= sprintf(' WHERE swimmeetid="%s" AND swimmerid="%s" AND strokecode="%s"',
                 $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
             $this->setQuery($query) ;
@@ -1927,18 +1952,18 @@ class SwimMeetMeta extends SwimTeamDBI
     function deleteSwimmerSwimMeetMeta()
     {
         if (is_null($this->getSwimmerId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swimmer Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swimmer Id')) ;
         if (is_null($this->getSwimMeetId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swim Meet Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swim Meet Id')) ;
         //  Update or new save?
  
-        $query = sprintf("DELETE FROM %s ", WPST_SWIMMEETS_META_TABLE) ;
+        $query = sprintf('DELETE FROM %s ', WPST_SWIMMEETS_META_TABLE) ;
 
-        $query .= sprintf("WHERE 
-            swimmerid=\"%s\" AND 
-            swimmeetid=\"%s\" AND 
-            smetakey=\"%s\" AND 
-            smetavalue=\"%s\"",
+        $query .= sprintf('WHERE 
+            swimmerid="%s" AND 
+            swimmeetid="%s" AND 
+            smetakey="%s" AND 
+            smetavalue="%s"',
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
             $this->getSwimMeetMetaKey(),
@@ -1962,7 +1987,7 @@ class SwimMeetMeta extends SwimTeamDBI
     function deleteSwimMeetMeta($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $status = $this->runDeleteQuery() ;
 
@@ -1978,7 +2003,7 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function deleteSwimMeetMetaByUserId($userid)
     {
-        $query = sprintf("DELETE FROM %s WHERE userid='%s'",
+        $query = sprintf('DELETE FROM %s WHERE userid="%s"',
             WPST_SWIMMEETS_META_TABLE, $userid) ;
 
         return $this->deleteSwimMeetMeta($query) ;
@@ -1993,8 +2018,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function deleteSwimMeetMetaByUserIdAndKey($userid, $key)
     {
-        $query = sprintf("DELETE FROM %s
-            WHERE userid='%s' AND smetakey='%s'",
+        $query = sprintf('DELETE FROM %s
+            WHERE userid="%s" AND smetakey="%s"',
             WPST_SWIMMEETS_META_TABLE, $userid, $key) ;
 
         return $this->deleteSwimMeetMeta($query) ;
@@ -2009,7 +2034,7 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function deleteSwimMeetMetaBySwimmerId($swimmerid)
     {
-        $query = sprintf("DELETE FROM %s WHERE swimmerid='%s'",
+        $query = sprintf('DELETE FROM %s WHERE swimmerid="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid) ;
 
         return $this->deleteSwimMeetMeta($query) ;
@@ -2024,8 +2049,8 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function deleteSwimMeetMetaBySwimmerIdAndKey($swimmerid, $key)
     {
-        $query = sprintf("DELETE FROM %s
-            WHERE swimmerid='%s' AND smetakey='%s'",
+        $query = sprintf('DELETE FROM %s
+            WHERE swimmerid="%s" AND smetakey="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmerid, $key) ;
 
         return $this->deleteSwimMeetMeta($query) ;
@@ -2042,7 +2067,7 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function deleteSwimMeetMetaBySwimMeetIdAndSwimmerId($swimmeetid, $swimmerid)
     {
-        $query = sprintf("DELETE FROM %s WHERE swimmeetid='%s' AND swimmerid='%s'",
+        $query = sprintf('DELETE FROM %s WHERE swimmeetid="%s" AND swimmerid="%s"',
             WPST_SWIMMEETS_META_TABLE, $swimmeetid, $swimmerid) ;
 
         return $this->deleteSwimMeetMeta($query) ;
@@ -2057,7 +2082,7 @@ class SwimMeetMeta extends SwimTeamDBI
      */
     function deleteSwimMeetMetaByEventId($eventid)
     {
-        $query = sprintf("DELETE FROM %s WHERE eventid='%s'",
+        $query = sprintf('DELETE FROM %s WHERE eventid="%s"',
             WPST_SWIMMEETS_META_TABLE, $eventid) ;
 
         return $this->deleteSwimMeetMeta($query) ;
@@ -2109,20 +2134,20 @@ class SwimMeetMeta extends SwimTeamDBI
 
         // Additional headers
         //if (is_null($c2data))
-        //    $headers .= sprintf("To: %s %s <%s>", $c1data->user_firstname,
+        //    $headers .= sprintf('To: %s %s <%s>', $c1data->user_firstname,
         //        $c1data->user_lastname, $c1data->user_email) . "\r\n" ;
         //else
-        //    $headers .= sprintf("To: %s %s <%s>, %s %s<%s>",
+        //    $headers .= sprintf('To: %s %s <%s>, %s %s<%s>',
         //        $c1data->user_firstname, $c1data->user_lastname, $c1data->user_email,
         //        $c2data->user_firstname, $c2data->user_lastname, $c2data->user_email) . "\r\n" ;
 
-        $headers .= sprintf("From: %s <%s>",
+        $headers .= sprintf('From: %s <%s>',
             get_bloginfo('name'), get_bloginfo('admin_email')) . "\r\n" ;
 
-        $headers .= sprintf("Cc: %s", get_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS)) . "\r\n" ;
-        $headers .= sprintf("Bcc: %s", get_bloginfo('admin_email')) . "\r\n" ;
-        $headers .= sprintf("Reply-To: %s", get_bloginfo('admin_email')) . "\r\n" ;
-        $headers .= sprintf("X-Mailer: PHP/%s", phpversion()) ;
+        $headers .= sprintf('Cc: %s', get_option(WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS)) . "\r\n" ;
+        $headers .= sprintf('Bcc: %s', get_bloginfo('admin_email')) . "\r\n" ;
+        $headers .= sprintf('Reply-To: %s', get_bloginfo('admin_email')) . "\r\n" ;
+        $headers .= sprintf('X-Mailer: PHP/%s', phpversion()) ;
 
         if ($mode == WPST_HTML)
         {
@@ -2157,13 +2182,13 @@ class SwimMeetMeta extends SwimTeamDBI
             $htmlbody = '' ;
 
             foreach ($actionmsgs as $actionmsg)
-                $htmlbody .= sprintf("<li>%s</li>", $actionmsg) ;
+                $htmlbody .= sprintf('<li>%s</li>', $actionmsg) ;
 
             $message = sprintf($htmlhdr,
                 get_bloginfo('url'),
                 $c1data->user_firstname,
                 $action,
-                $swimmer->getFirstName() . " " . $swimmer->getLastName()) ;
+                $swimmer->getFirstName() . ' ' . $swimmer->getLastName()) ;
 
             $message .= $htmlbody ;
 
@@ -2190,25 +2215,25 @@ class SwimMeetMeta extends SwimTeamDBI
             $message = sprintf($plain,
                 $c1data->user_firstname,
                 $action,
-                $swimmer->getFirstName() . " " . $swimmer->getLastName(),
+                $swimmer->getFirstName() . ' ' . $swimmer->getLastName(),
                 //$action,
                 get_bloginfo('name'),
                 get_bloginfo('url'),
                 get_bloginfo('url')) ;
         }
 
-        //$to = sprintf("%s %s <%s>", $c1data->user_firstname,
+        //$to = sprintf('%s %s <%s>', $c1data->user_firstname,
         //    $c1data->user_lastname, $c1data->user_email) ;
         if (is_null($c2data))
-            $to = sprintf("%s %s <%s>", $c1data->user_firstname,
+            $to = sprintf('%s %s <%s>', $c1data->user_firstname,
                 $c1data->user_lastname, $c1data->user_email) ;
         else
-            $to = sprintf("%s %s <%s>, %s %s<%s>",
+            $to = sprintf('%s %s <%s>, %s %s<%s>',
                 $c1data->user_firstname, $c1data->user_lastname, $c1data->user_email,
                 $c2data->user_firstname, $c2data->user_lastname, $c2data->user_email) ;
 
-        $subject = sprintf("Swimmer %s for %s",
-            $action, $swimmer->getFirstName() . " " . $swimmer->getLastName()) ;
+        $subject = sprintf('Swimmer %s for %s',
+            $action, $swimmer->getFirstName() . ' ' . $swimmer->getLastName()) ;
 
         $status = wp_mail($to, $subject, $message, $headers) ;
 
@@ -2219,7 +2244,7 @@ class SwimMeetMeta extends SwimTeamDBI
 /**
  * Class definition of the swim meet results data
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -2338,7 +2363,7 @@ class SwimMeetResults extends SwimTeamDBI
     function loadSwimMeetResults($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 
@@ -2385,8 +2410,8 @@ class SwimMeetResults extends SwimTeamDBI
         if (is_null($resultsid)) $resultsid = $this->getSwimMeetResultsId() ;
 
         if (is_null($resultsid))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Id")) ;
-        $query = sprintf("SELECT * FROM %s WHERE resultsid='%s'",
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Id')) ;
+        $query = sprintf('SELECT * FROM %s WHERE resultsid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $resultsid) ;
 
         return $this->loadSwimMeetResults($query) ;
@@ -2400,7 +2425,7 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function loadSwimMeetResultsByEventIdAndSwimmerId($eventid, $swimmerid)
     {
-        $query = sprintf("SELECT * FROM %s WHERE eventid='%s' AND swimmerid='%s'",
+        $query = sprintf('SELECT * FROM %s WHERE eventid="%s" AND swimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $eventid, $swimmerid) ;
 
         return $this->loadSwimMeetResults($query) ;
@@ -2414,7 +2439,7 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function loadSwimMeetResultsBySwimmerIdAndSwimmerId($swimmerid, $swimmerid)
     {
-        $query = sprintf("SELECT * FROM %s WHERE swimmerid='%s' AND resultsswimmerid='%s'",
+        $query = sprintf('SELECT * FROM %s WHERE swimmerid="%s" AND resultsswimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmerid, $swimmerid) ;
 
         return $this->loadSwimMeetResults($query) ;
@@ -2430,10 +2455,10 @@ class SwimMeetResults extends SwimTeamDBI
     {
         if ($orderby == WPST_SORT_BY_NAME)
         {
-            $query = sprintf("SELECT DISTINCT %s.swimmerid as
-                swimmerid FROM %s, %s WHERE %s.swimmeetid='%s' AND
-                %s.participation='%s' AND %s.swimmerid = %s.id
-                ORDER BY %s.lastname, %s.firstname",
+            $query = sprintf('SELECT DISTINCT %s.swimmerid as
+                swimmerid FROM %s, %s WHERE %s.swimmeetid="%s" AND
+                %s.participation="%s" AND %s.swimmerid = %s.id
+                ORDER BY %s.lastname, %s.firstname',
                 WPST_SWIMMEETS_RESULTS_TABLE,
                 WPST_SWIMMEETS_RESULTS_TABLE,
                 WPST_SWIMMERS_TABLE,
@@ -2451,10 +2476,10 @@ class SwimMeetResults extends SwimTeamDBI
         {
             $season = new SwimTeamSeason() ;
 
-            $query = sprintf("SELECT DISTINCT %s.swimmerid as
-                swimmerid FROM %s, %s WHERE %s.swimmeetid='%s' AND
-                %s.participation='%s' AND %s.swimmerid = %s.swimmerid
-                AND %s.seasonid='%s' ORDER BY %s.swimmerlabel",
+            $query = sprintf('SELECT DISTINCT %s.swimmerid as
+                swimmerid FROM %s, %s WHERE %s.swimmeetid="%s" AND
+                %s.participation="%s" AND %s.swimmerid = %s.swimmerid
+                AND %s.seasonid="%s" ORDER BY %s.swimmerlabel',
                 WPST_SWIMMEETS_RESULTS_TABLE,
                 WPST_SWIMMEETS_RESULTS_TABLE,
                 WPST_ROSTER_TABLE,
@@ -2471,8 +2496,8 @@ class SwimMeetResults extends SwimTeamDBI
         }
         else
         {
-            $query = sprintf("SELECT DISTINCT swimmerid FROM %s WHERE
-                swimmeetid='%s' AND participation='%s'",
+            $query = sprintf('SELECT DISTINCT swimmerid FROM %s WHERE
+                swimmeetid="%s" AND participation="%s"',
                 WPST_SWIMMEETS_RESULTS_TABLE, $meetid, $participation) ;
         }
 
@@ -2490,7 +2515,8 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerid, $meetid, $participation)
     {
-        $query = sprintf("SELECT strokecode FROM %s WHERE swimmerid='%s' AND swimmeetid='%s' AND participation='%s'",
+        $query = sprintf('SELECT strokecode FROM %s WHERE
+            swimmerid="%s" AND swimmeetid="%s" AND participation="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmerid, $meetid, $participation) ;
 
         $this->setQuery($query) ;
@@ -2509,7 +2535,7 @@ class SwimMeetResults extends SwimTeamDBI
     function existSwimMeetResults($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $this->runSelectQuery(false) ;
 
@@ -2527,7 +2553,7 @@ class SwimMeetResults extends SwimTeamDBI
     function existSwimMeetResultsByEventIdAndSwimmerId($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $this->runSelectQuery(false) ;
 
@@ -2542,8 +2568,8 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function existSwimMeetResultsByEventIdAndSwimmerId2($eventid, $swimmerid)
     {
-        $query = sprintf("SELECT resultsid FROM %s
-            WHERE eventid='%s' AND resultsswimmerid='%s'",
+        $query = sprintf('SELECT resultsid FROM %s
+            WHERE eventid="%s" AND resultsswimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $eventid, $swimmerid) ;
 
         return $this->existSwimMeetResults($query) ;
@@ -2557,8 +2583,8 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function existSwimMeetResultsBySwimmerIdAndSwimmerId($swimmerid, $swimmerid)
     {
-        $query = sprintf("SELECT resultsid FROM %s
-            WHERE swimmerid='%s' AND resultsswimmerid='%s'",
+        $query = sprintf('SELECT resultsid FROM %s
+            WHERE swimmerid="%s" AND resultsswimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmerid, $swimmerid) ;
 
         return $this->existSwimMeetResults($query) ;
@@ -2572,8 +2598,8 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function existSwimMeetResultsBySwimMeetIdAndSwimmerId($swimmeetid, $swimmerid)
     {
-        $query = sprintf("SELECT resultsid FROM %s
-            WHERE swimmeetid='%s' AND swimmerid='%s'",
+        $query = sprintf('SELECT resultsid FROM %s
+            WHERE swimmeetid="%s" AND swimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmeetid, $swimmerid) ;
 
         return $this->existSwimMeetResults($query) ;
@@ -2589,8 +2615,8 @@ class SwimMeetResults extends SwimTeamDBI
     function existSwimMeetResultsBySwimMeetIdAndSwimmerIdAndStrokeCode($swimmeetid,
         $swimmerid, $strokecode)
     {
-        $query = sprintf("SELECT resultsid FROM %s
-            WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+        $query = sprintf('SELECT resultsid FROM %s
+            WHERE swimmeetid="%s" AND swimmerid="%s" AND strokecode="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmeetid, $swimmerid, $strokecode) ;
 
         return $this->existSwimMeetResults($query) ;
@@ -2606,27 +2632,27 @@ class SwimMeetResults extends SwimTeamDBI
         $success = false ;
 
         if (is_null($this->getEventId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Id')) ;
         if (is_null($this->getSwimMeetResultsSwimmerId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null SwimmerId")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null SwimmerId')) ;
         //  Update or new save?
  
         $update = $this->existSwimMeetResultsByEventIdAndSwimmerId($this->getEventId(), $this->getSwimMeetResultsSwimmerId()) ;
 
         if ($update)
-            $query = sprintf("UPDATE %s ", WPST_SWIMMEETS_RESULTS_TABLE) ;
+            $query = sprintf('UPDATE %s ', WPST_SWIMMEETS_RESULTS_TABLE) ;
         else
-            $query = sprintf("INSERT INTO %s ", WPST_SWIMMEETS_RESULTS_TABLE) ;
+            $query = sprintf('INSERT INTO %s ', WPST_SWIMMEETS_RESULTS_TABLE) ;
 
-        $query .= sprintf("SET 
-            eventid=\"%s\",
-            swimmerid=\"%s\",
-            swimmeetid=\"%s\",
-            strokecode=\"%s\",
-            eventid=\"%s\",
-            participation=\"%s\",
-            resultsswimmerid=\"%s\",
-            resultsvalue=\"%s\"",
+        $query .= sprintf('SET 
+            eventid="%s",
+            swimmerid="%s",
+            swimmeetid="%s",
+            strokecode="%s",
+            eventid="%s",
+            participation="%s",
+            resultsswimmerid="%s",
+            resultsvalue="%s"',
             $this->getEventId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
@@ -2640,7 +2666,7 @@ class SwimMeetResults extends SwimTeamDBI
 
         if ($update)
         {
-            $query .= sprintf(" WHERE eventid=\"%s\" AND resultsswimmerid=\"%s\"",
+            $query .= sprintf(' WHERE eventid="%s" AND resultsswimmerid="%s"',
                 $this->getEventId(), $this->getSwimMeetResultsSwimmerId()) ;
 
             $this->setQuery($query) ;
@@ -2666,28 +2692,28 @@ class SwimMeetResults extends SwimTeamDBI
         $success = false ;
 
         if (is_null($this->getSwimmerId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swimmer Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swimmer Id')) ;
         if (is_null($this->getSwimMeetId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swim Meet Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swim Meet Id')) ;
         //  Update or new save?
  
         $update = $this->existSwimMeetResultsBySwimMeetIdAndSwimmerIdAndStrokeCode(
             $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
         if ($update)
-            $query = sprintf("UPDATE %s ", WPST_SWIMMEETS_RESULTS_TABLE) ;
+            $query = sprintf('UPDATE %s ', WPST_SWIMMEETS_RESULTS_TABLE) ;
         else
-            $query = sprintf("INSERT INTO %s ", WPST_SWIMMEETS_RESULTS_TABLE) ;
+            $query = sprintf('INSERT INTO %s ', WPST_SWIMMEETS_RESULTS_TABLE) ;
 
-        $query .= sprintf("SET 
-            eventid=\"%s\",
-            swimmerid=\"%s\",
-            swimmeetid=\"%s\",
-            strokecode=\"%s\",
-            eventid=\"%s\",
-            participation=\"%s\",
-            resultsswimmerid=\"%s\",
-            resultsvalue=\"%s\"",
+        $query .= sprintf('SET 
+            eventid="%s",
+            swimmerid="%s",
+            swimmeetid="%s",
+            strokecode="%s",
+            eventid="%s",
+            participation="%s",
+            resultsswimmerid="%s",
+            resultsvalue="%s"',
             $this->getEventId(),
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
@@ -2701,7 +2727,7 @@ class SwimMeetResults extends SwimTeamDBI
 
         if ($update)
         {
-            $query .= sprintf(" WHERE swimmeetid='%s' AND swimmerid='%s' AND strokecode='%s'",
+            $query .= sprintf(' WHERE swimmeetid="%s" AND swimmerid="%s" AND strokecode="%s"',
                 $this->getSwimMeetId(), $this->getSwimmerId(), $this->getStrokeCode()) ;
 
             $this->setQuery($query) ;
@@ -2726,18 +2752,18 @@ class SwimMeetResults extends SwimTeamDBI
     function deleteSwimmerSwimMeetResults()
     {
         if (is_null($this->getSwimmerId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swimmer Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swimmer Id')) ;
         if (is_null($this->getSwimMeetId()))
-			wp_die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Swim Meet Id")) ;
+			wp_die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Swim Meet Id')) ;
         //  Update or new save?
  
-        $query = sprintf("DELETE FROM %s ", WPST_SWIMMEETS_RESULTS_TABLE) ;
+        $query = sprintf('DELETE FROM %s ', WPST_SWIMMEETS_RESULTS_TABLE) ;
 
-        $query .= sprintf("WHERE 
-            swimmerid=\"%s\" AND 
-            swimmeetid=\"%s\" AND 
-            resultsswimmerid=\"%s\" AND 
-            resultsvalue=\"%s\"",
+        $query .= sprintf('WHERE 
+            swimmerid="%s" AND 
+            swimmeetid="%s" AND 
+            resultsswimmerid="%s" AND 
+            resultsvalue="%s"',
             $this->getSwimmerId(),
             $this->getSwimMeetId(),
             $this->getSwimMeetResultsSwimmerId(),
@@ -2761,7 +2787,7 @@ class SwimMeetResults extends SwimTeamDBI
     function deleteSwimMeetResults($query = null)
     {
         if (is_null($query))
-			die(sprintf("%s(%s):  %s", basename(__FILE__), __LINE__, "Null Query")) ;
+			die(sprintf('%s(%s):  %s', basename(__FILE__), __LINE__, 'Null Query')) ;
         $this->setQuery($query) ;
         $status = $this->runDeleteQuery() ;
 
@@ -2777,7 +2803,7 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function deleteSwimMeetResultsByEventId($eventid)
     {
-        $query = sprintf("DELETE FROM %s WHERE eventid='%s'",
+        $query = sprintf('DELETE FROM %s WHERE eventid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $eventid) ;
 
         return $this->deleteSwimMeetResults($query) ;
@@ -2792,8 +2818,8 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function deleteSwimMeetResultsByEventIdAndSwimmerId($eventid, $swimmerid)
     {
-        $query = sprintf("DELETE FROM %s
-            WHERE eventid='%s' AND resultsswimmerid='%s'",
+        $query = sprintf('DELETE FROM %s
+            WHERE eventid="%s" AND resultsswimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $eventid, $swimmerid) ;
 
         return $this->deleteSwimMeetResults($query) ;
@@ -2808,7 +2834,7 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function deleteSwimMeetResultsBySwimmerId($swimmerid)
     {
-        $query = sprintf("DELETE FROM %s WHERE swimmerid='%s'",
+        $query = sprintf('DELETE FROM %s WHERE swimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmerid) ;
 
         return $this->deleteSwimMeetResults($query) ;
@@ -2823,8 +2849,8 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function deleteSwimMeetResultsBySwimmerIdAndSwimmerId($swimmerid, $swimmerid)
     {
-        $query = sprintf("DELETE FROM %s
-            WHERE swimmerid='%s' AND resultsswimmerid='%s'",
+        $query = sprintf('DELETE FROM %s
+            WHERE swimmerid="%s" AND resultsswimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmerid, $swimmerid) ;
 
         return $this->deleteSwimMeetResults($query) ;
@@ -2841,7 +2867,7 @@ class SwimMeetResults extends SwimTeamDBI
      */
     function deleteSwimMeetResultsBySwimMeetIdAndSwimmerId($swimmeetid, $swimmerid)
     {
-        $query = sprintf("DELETE FROM %s WHERE swimmeetid='%s' AND swimmerid='%s'",
+        $query = sprintf('DELETE FROM %s WHERE swimmeetid="%s" AND swimmerid="%s"',
             WPST_SWIMMEETS_RESULTS_TABLE, $swimmeetid, $swimmerid) ;
 
         return $this->deleteSwimMeetResults($query) ;
@@ -2851,7 +2877,7 @@ class SwimMeetResults extends SwimTeamDBI
 /**
  * Class definition of the swim meet results data
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamResults
  */

@@ -88,6 +88,9 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_agegroupid = array(
+            WPST_ACTION_ADD
+        ) ;
 
         //  The agegroupid is the argument which must be
         //  dealt with differently for GET and POST operations
@@ -118,6 +121,14 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
             $gdl = $this->__buildGDL() ;
 
             $div->add($gdl) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Age Groups Action Summary') ;
+        }
+        else if (is_null($agegroupid) && !in_array($action, $actions_allowed_without_agegroupid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select an age group in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Age Groups Action Summary') ;
         }

@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Swimmers
  * @version $Revision$
@@ -16,18 +16,18 @@
  *
  */
 
-require_once("db.class.php") ;
-require_once("swimmers.include.php") ;
-require_once("users.class.php") ;
-require_once("agegroups.class.php") ;
-require_once("table.class.php") ;
-require_once("widgets.class.php") ;
-require_once("options.class.php") ;
+require_once('db.class.php') ;
+require_once('swimmers.include.php') ;
+require_once('users.class.php') ;
+require_once('agegroups.class.php') ;
+require_once('table.class.php') ;
+require_once('widgets.class.php') ;
+require_once('options.class.php') ;
 
 /**
  * Class definition of the agegroups
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -451,7 +451,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
             $first = $this->getNickName() ;
         }
 
-        return ($first . " " . $this->getLastName()) ;
+        return ($first . ' ' . $this->getLastName()) ;
     }
 
     /**
@@ -467,7 +467,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
             ($this->getNickName() != WPST_NULL_STRING))
                 $first = $this->getNickName() ;
 
-        return ($this->getLastName() . ", " . $first) ;
+        return ($this->getLastName() . ', ' . $first) ;
     }
 
     /**
@@ -487,8 +487,8 @@ class SwimTeamSwimmer extends SwimTeamDBI
      */
     function setDateOfBirthAsDate($dob)
     {
-        $this->__dateOfBirth = array("year" => date("Y", strtotime($dob)),
-           "month" => date("m", strtotime($dob)), "day" => date("d", strtotime($dob))) ;
+        $this->__dateOfBirth = array('year' => date('Y', strtotime($dob)),
+           'month' => date('m', strtotime($dob)), 'day' => date('d', strtotime($dob))) ;
     }
 
     /**
@@ -510,7 +510,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
     {
         $d = &$this->__dateOfBirth ;
 
-        return sprintf("%04s-%02s-%02s", $d["year"], $d["month"], $d["day"]) ;
+        return sprintf('%04s-%02s-%02s', $d['year'], $d['month'], $d['day']) ;
     }
 
     /**
@@ -522,7 +522,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
     {
         $d = &$this->__dateOfBirth ;
 
-        return sprintf("%02s%02s%04s", $d["month"], $d["day"], $d["year"]) ;
+        return sprintf('%02s%02s%04s', $d['month'], $d['day'], $d['year']) ;
     }
 
     /**
@@ -530,12 +530,26 @@ class SwimTeamSwimmer extends SwimTeamDBI
      *
      * @return - string - date of birth as MMDDYY
      */
-    function getDateOfBirthAsMMDDYY($delimiter = "")
+    function getDateOfBirthAsMMDDYY($delimiter = '')
     {
         $d = &$this->__dateOfBirth ;
 
-        return sprintf("%02s%s%02s%s%02s", $d["month"],
-            $delimiter, $d["day"], $delimiter, substr($d["year"], 2, 2)) ;
+        return sprintf('%02s%s%02s%s%02s', $d['month'],
+            $delimiter, $d['day'], $delimiter, substr($d['year'], 2, 2)) ;
+    }
+
+    /**
+     * Get the date of birth as YYYYMMDD
+     *
+     * @parameter - string - optional delimiter
+     * @return - string - date of birth as YYYYMMDD
+     */
+    function getDateOfBirthAsYYYYMMDD($delimiter = '')
+    {
+        $d = &$this->__dateOfBirth ;
+
+        return sprintf('%04s%s%02s%s%02s', $d['year'],
+            $delimiter, $d['month'], $delimiter, $d['day']) ;
     }
 
     /**
@@ -623,9 +637,9 @@ class SwimTeamSwimmer extends SwimTeamDBI
         else
             list($year, $month, $day) = explode('-', $birthdate) ;
 
-        $year_diff = date("Y") - $year ;
+        $year_diff = date('Y') - $year ;
 
-        if (date("m") < $month || (date("m") == $month && date("d") < $day))
+        if (date('m') < $month || (date('m') == $month && date('d') < $day))
             $year_diff-- ;
 
         return $year_diff ;
@@ -645,13 +659,13 @@ class SwimTeamSwimmer extends SwimTeamDBI
             list($year, $month, $day) = explode('-', $birthdate) ;
 
         /*
-        $year_diff = date("Y") - $year ;
+        $year_diff = date('Y') - $year ;
 
-        if (date("m") < $month || (get_option(WPST_OPTION_AGE_CUTOFF_MONTH) == $month && get_option(WPST_OPTION_AGE_CUTOFF_DAY) < $day))
+        if (date('m') < $month || (get_option(WPST_OPTION_AGE_CUTOFF_MONTH) == $month && get_option(WPST_OPTION_AGE_CUTOFF_DAY) < $day))
             $year_diff-- ;
          */
 
-        $adjustedage = date("Y") - $year -
+        $adjustedage = date('Y') - $year -
             (get_option(WPST_OPTION_AGE_CUTOFF_MONTH) < $month) -
             ((get_option(WPST_OPTION_AGE_CUTOFF_MONTH) == $month) &
             (get_option(WPST_OPTION_AGE_CUTOFF_DAY) <= $day)) ;
@@ -668,15 +682,15 @@ class SwimTeamSwimmer extends SwimTeamDBI
     {
         $d = &$this->__dateOfBirth ;
 
-        $uss = strtoupper(sprintf("%02s%02s%02s%-3s%1s%-4s",
-            substr($d["year"], 2, 2), $d["month"], $d["day"],
+        $uss = strtoupper(sprintf('%02s%02s%02s%-3s%1s%-4s',
+            substr($d['year'], 2, 2), $d['month'], $d['day'],
             substr($this->getFirstName(), 0, 3),
             substr($this->getMiddleName(), 0, 1),
             substr($this->getLastName(),0, 4))) ;
 
         //  Replace and space characters with an asterisk
 
-        $uss = preg_replace("/ /", "*", $uss) ;
+        $uss = preg_replace('/ /', '*', $uss) ;
 
         return $uss ;
     }
@@ -686,22 +700,22 @@ class SwimTeamSwimmer extends SwimTeamDBI
      *
      * @return - string - old format USS number
      */
-    function getOldFormatUSSNumber($lsc = "")
+    function getOldFormatUSSNumber($lsc = '')
     {
         $d = &$this->__dateOfBirth ;
 
-        $uss = strtoupper(sprintf("%1s%02s%1s%1s%1s%02s%2s%2s",
-            $lsc, substr($d["year"], 2, 2),
+        $uss = strtoupper(sprintf('%1s%02s%1s%1s%1s%02s%2s%2s',
+            $lsc, substr($d['year'], 2, 2),
             substr($this->getFirstName(), 0, 1),
             substr($this->getMiddleName(), 0, 1),
             substr($this->getLastName(),0, 1),
-            $d["month"],
-            $d["day"],
-            substr($d["year"], 2, 2))) ;
+            $d['month'],
+            $d['day'],
+            substr($d['year'], 2, 2))) ;
 
         //  Replace and space characters with an asterisk
 
-        $uss = preg_replace("/ /", "*", $uss) ;
+        $uss = preg_replace('/ /', '*', $uss) ;
 
         return $uss ;
     }
@@ -722,17 +736,17 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
         if ($exact)
         {
-            $query = sprintf("SELECT id FROM %s
-                WHERE contact1id = \"%s\"
-                AND contact2id=\"%s\"
-                AND wpuserid=\"%s\"
-                AND firstname=\"%s\" AND
-                middlename=\"%s\" AND
-                nickname=\"%s\" AND
-                lastname=\"%s\" AND
-                gender=\"%s\" AND
-                birthdate=\"%s\" AND
-                results=\"%s\"",
+            $query = sprintf('SELECT id FROM %s
+                WHERE contact1id = "%s"
+                AND contact2id="%s"
+                AND wpuserid="%s"
+                AND firstname="%s" AND
+                middlename="%s" AND
+                nickname="%s" AND
+                lastname="%s" AND
+                gender="%s" AND
+                birthdate="%s" AND
+                results="%s"',
                 WPST_SWIMMERS_TABLE,
                 $this->getContact1Id(),
                 $this->getContact2Id(),
@@ -748,9 +762,9 @@ class SwimTeamSwimmer extends SwimTeamDBI
         }
         else
         {
-            $query = sprintf("SELECT id FROM %s WHERE (contact1id = \"%s\" OR
-                contact2id=\"%s\") AND (firstname=\"%s\" AND lastname=\"%s\"
-                AND gender=\"%s\")", WPST_SWIMMERS_TABLE,
+            $query = sprintf('SELECT id FROM %s WHERE (contact1id = "%s" OR
+                contact2id="%s") AND (firstname="%s" AND lastname="%s"
+                AND gender="%s")', WPST_SWIMMERS_TABLE,
                 $this->getContact1Id(), $this->getContact2Id(),
                 $this->getFirstName(), $this->getLastName(),
                 $this->getGender()) ;
@@ -782,7 +796,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT id FROM %s WHERE id = \"%s\"",
+        $query = sprintf('SELECT id FROM %s WHERE id = "%s"',
             WPST_SWIMMERS_TABLE, $id) ;
 
         $this->setQuery($query) ;
@@ -808,18 +822,18 @@ class SwimTeamSwimmer extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET
-                firstname=\"%s\",
-                middlename=\"%s\",
-                nickname=\"%s\",
-                lastname=\"%s\",
-                contact1id=\"%s\",
-                contact2id=\"%s\",
-                wpuserid=\"%s\",
-                gender=\"%s\",
-                results=\"%s\",
-                birthdate=\"%s\",
-                status=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET
+                firstname="%s",
+                middlename="%s",
+                nickname="%s",
+                lastname="%s",
+                contact1id="%s",
+                contact2id="%s",
+                wpuserid="%s",
+                gender="%s",
+                results="%s",
+                birthdate="%s",
+                status="%s"',
                 WPST_SWIMMERS_TABLE,
                 $this->getFirstName(),
                 $this->getMiddleName(),
@@ -861,19 +875,19 @@ class SwimTeamSwimmer extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("UPDATE %s SET
-                firstname=\"%s\",
-                middlename=\"%s\",
-                nickname=\"%s\",
-                lastname=\"%s\",
-                contact1id=\"%s\",
-                contact2id=\"%s\",
-                wpuserid=\"%s\",
-                gender=\"%s\",
-                results=\"%s\",
-                birthdate=\"%s\",
-                status=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                firstname="%s",
+                middlename="%s",
+                nickname="%s",
+                lastname="%s",
+                contact1id="%s",
+                contact2id="%s",
+                wpuserid="%s",
+                gender="%s",
+                results="%s",
+                birthdate="%s",
+                status="%s"
+                WHERE id="%s"',
                 WPST_SWIMMERS_TABLE,
                 $this->getFirstName(),
                 $this->getMiddleName(),
@@ -909,7 +923,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
         $ometa = new SwimTeamOptionMeta() ;
         $ometa->setSwimmerId($this->getId()) ;
@@ -918,7 +932,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -944,8 +958,8 @@ class SwimTeamSwimmer extends SwimTeamDBI
         {
             //  Construct the delete query
  
-            $query = sprintf("DELETE FROM %s
-                WHERE id=\"%s\"",
+            $query = sprintf('DELETE FROM %s
+                WHERE id="%s"',
                 WPST_SWIMMERS_TABLE,
                 $this->getId()
             ) ;
@@ -980,7 +994,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
         {
             $cutoffdate = $this->__cutoffDate() ;
 
-            $query = sprintf("SELECT %s FROM %s WHERE id = \"%s\"",
+            $query = sprintf('SELECT %s FROM %s WHERE id = "%s"',
                 sprintf(WPST_SWIMMERS_COLUMNS, $cutoffdate, $cutoffdate,
                 $cutoffdate), WPST_SWIMMERS_TABLE, $id) ;
 
@@ -1008,7 +1022,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
             $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-            if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+            if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
             $ometa = new SwimTeamOptionMeta() ;
             $ometa->setSwimmerId($this->getId()) ;
@@ -1017,7 +1031,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
             for ($oc = 1 ; $oc <= $options ; $oc++)
             {
-                $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
+                $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
 
                 if (get_option($oconst) != WPST_DISABLED)
                 {
@@ -1040,7 +1054,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
      * @param - string - optional filter to restrict query
      * @return - array - array of swimmers ids
      */
-    function getAllSwimmerIds($filter = null, $orderby = "lastname")
+    function getAllSwimmerIds($filter = null, $orderby = 'lastname')
     {
         //  Select the records for the season
 
@@ -1051,23 +1065,23 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
         if (($options_count === false) || ((int)$options_count === 0))
         {
-            $query = sprintf("SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s",
+            $query = sprintf('SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s',
                 WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE,
                 WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
         }
         else
         {
-            $query = sprintf("SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s, %s",
+            $query = sprintf('SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s, %s',
                 WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE, WPST_ROSTER_TABLE,
                 WPST_SEASONS_TABLE, WPST_OPTIONS_META_TABLE) ;
         }
 
         //  Build the filters
 
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         
         $this->setQuery($query) ;
@@ -1083,7 +1097,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
      */
     function __cutoffDate()
     {
-        $cutoffdate = sprintf("%s-%02s-%02s", date("Y"), 
+        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
             get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
             get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
 
@@ -1096,7 +1110,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -1144,7 +1158,7 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimTeamSwimmersGUIDataList($title, $width = "100%",
+    function SwimTeamSwimmersGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_SWIMMERS_DEFAULT_COLUMNS,
         $tables = WPST_SWIMMERS_DEFAULT_TABLES,
@@ -1165,8 +1179,8 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
 
         if ((current_user_can('edit_posts') || get_option(WPST_OPTION_REGISTRATION_SYSTEM) == WPST_OPEN))
         {
-            $this->__normal_actions[WPST_ACTION_REGISTER] = WPST_ACTION_REGISTER . " (" . WPST_SEASON . ")" ;
-            $this->__normal_actions[WPST_ACTION_UNREGISTER] = WPST_ACTION_UNREGISTER . " (" . WPST_SEASON . ")" ;
+            $this->__normal_actions[WPST_ACTION_REGISTER] = WPST_ACTION_REGISTER . ' (' . WPST_SEASON . ')' ;
+            $this->__normal_actions[WPST_ACTION_UNREGISTER] = WPST_ACTION_UNREGISTER . ' (' . WPST_SEASON . ')' ;
         }
 
         //  If Opt-In/Opt-Out usage model is set to Stroke, then allow the actions.
@@ -1174,10 +1188,10 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
         if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
         {
             $optin = get_option(WPST_OPTION_OPT_IN_LABEL) ;
-            $this->__normal_actions[WPST_ACTION_OPT_IN] = $optin . " (" . WPST_SWIMMEET . ")" ;
+            $this->__normal_actions[WPST_ACTION_OPT_IN] = $optin . ' (' . WPST_SWIMMEET . ')' ;
 
             $optout = get_option(WPST_OPTION_OPT_OUT_LABEL) ;
-            $this->__normal_actions[WPST_ACTION_OPT_OUT] = $optout . " (" . WPST_SWIMMEET . ")" ;
+            $this->__normal_actions[WPST_ACTION_OPT_OUT] = $optout . ' (' . WPST_SWIMMEET . ')' ;
         }
     }
 
@@ -1196,27 +1210,27 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
 		//add the columns in the display that you want to view.
 		//The API is :
 		//Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-	  	$this->add_header_item("First Name",
-	        "300", "firstname", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('First Name',
+	        '300', 'firstname', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Last Name",
-	        "300", "lastname", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Last Name',
+	        '300', 'lastname', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Gender",
-	        "150", "gender", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Gender',
+	        '150', 'gender', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Date of Birth",
-	        "250", "birthdate", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Date of Birth',
+	        '250', 'birthdate', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Age",
-	        "150", "age", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Age',
+	        '150', 'age', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Results",
-	        "150", "results", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Results',
+	        '150', 'results', SORTABLE, SEARCHABLE, 'left') ;
 
-		$this->add_header_item("Status",
-	       	"150", "status", false, SEARCHABLE, "left") ;
-	       	//"150", "status", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Status',
+	       	'150', 'status', false, SEARCHABLE, 'left') ;
+	       	//'150', 'status', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
@@ -1234,7 +1248,7 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
 
         //  The unique item is the second column.
 
-	    $this->add_action_column('radio', 'FIRST', "id") ;
+	    $this->add_action_column('radio', 'FIRST', 'id') ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -1268,31 +1282,31 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
 
 		switch ($col_name)
         {
-            case "First Name" :
-                if ($row_data["middlename"] != "")
-                    $obj = $row_data["firstname"] . " " .
-                        substr($row_data["middlename"], 0, 1) . "." ;
+            case 'First Name' :
+                if ($row_data['middlename'] != '')
+                    $obj = $row_data['firstname'] . ' ' .
+                        substr($row_data['middlename'], 0, 1) . '.' ;
                 else
-                    $obj = $row_data["firstname"] ;
+                    $obj = $row_data['firstname'] ;
                 break ;
 
-            case "Gender" :
-                $obj = __(ucfirst($row_data["gender"])) ;
+            case 'Gender' :
+                $obj = __(ucfirst($row_data['gender'])) ;
                 break ;
 
-            case "Results" :
-                $obj = __(ucfirst($row_data["results"])) ;
+            case 'Results' :
+                $obj = __(ucfirst($row_data['results'])) ;
                 break ;
 
-            case "Status" :
-                //$obj = __(ucfirst($row_data["status"])) ;
-                //$row_data["status"] = $swimmer->getStatus() ;
+            case 'Status' :
+                //$obj = __(ucfirst($row_data['status'])) ;
+                //$row_data['status'] = $swimmer->getStatus() ;
                 $obj = ucfirst($swimmer->getStatus()) ;
-                //$obj = __(ucfirst($row_data["status"])) ;
+                //$obj = __(ucfirst($row_data['status'])) ;
                 break ;
 
-            case "Age" :
-                $obj = $row_data["age"] . " (" . $row_data["agegroupage"] . ")" ;
+            case 'Age' :
+                $obj = $row_data['age'] . ' (' . $row_data['agegroupage'] . ')' ;
                 break ;
 
 		    default:
@@ -1308,7 +1322,7 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various swimmers.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamSwimmersGUIDataList
  */
@@ -1330,7 +1344,7 @@ class SwimTeamSwimmersAdminGUIDataList extends SwimTeamSwimmersGUIDataList
  * Extended InfoTable Class for presenting Swimmer
  * information as a table extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -1392,7 +1406,7 @@ class SwimTeamSwimmerProfileInfoTable extends SwimTeamInfoTable
 
         if (is_null($this->getId()))
         {
-            $this->add_row("No swimmer data.") ;
+            $this->add_row('No swimmer data.') ;
         }
         else
         {
@@ -1400,14 +1414,14 @@ class SwimTeamSwimmerProfileInfoTable extends SwimTeamInfoTable
             $s->loadSwimmerById($this->getSwimmerId()) ;
 
             if ($s->getNickName() == WPST_NULL_STRING)
-                $this->add_row("Name",
-                    $s->getFirstName() . " " . $s->getLastName()) ;
+                $this->add_row('Name',
+                    $s->getFirstName() . ' ' . $s->getLastName()) ;
             else
-                $this->add_row("Name",
-                    $s->getNickName() . " " . $s->getLastName()) ;
+                $this->add_row('Name',
+                    $s->getNickName() . ' ' . $s->getLastName()) ;
 
-            $this->add_row("Age", $s->getAge() . " (" . $s->getAgeGroupAge() . ")") ;
-            $this->add_row("Age Group", $s->getAgeGroupText()) ;
+            $this->add_row('Age', $s->getAge() . ' (' . $s->getAgeGroupAge() . ')') ;
+            $this->add_row('Age Group', $s->getAgeGroupText()) ;
 
             if ($brief) return ;
 
@@ -1423,16 +1437,16 @@ class SwimTeamSwimmerProfileInfoTable extends SwimTeamInfoTable
                 ($userdata->ID == $s->getCOntact2Id()) ||
                 ($userdata->user_level > 0))
             {
-                $this->add_row("Birth Date", $s->getDateOfBirthAsDate()) ;
+                $this->add_row('Birth Date', $s->getDateOfBirthAsDate()) ;
             }
 
-            $this->add_row(html_b("Primary Contact Information"), "&nbsp;") ;
+            $this->add_row(html_b('Primary Contact Information'), '&nbsp;') ;
             $this->__swimmerContactInfo($s->getContact1Id()) ;
 
-            $this->add_row(html_b("Secondary Contact Information"), "&nbsp;") ;
+            $this->add_row(html_b('Secondary Contact Information'), '&nbsp;') ;
             $this->__swimmerContactInfo($s->getContact2Id()) ;
 
-            $this->add_row(html_b("Web Site User Id"), "&nbsp;") ;
+            $this->add_row(html_b('Web Site User Id'), '&nbsp;') ;
             $this->__swimmerContactInfo($s->getWPUserId()) ;
  
             //  Report Optional Fields
@@ -1450,8 +1464,8 @@ class SwimTeamSwimmerProfileInfoTable extends SwimTeamInfoTable
 
             for ($oc = 1 ; $oc <= $options ; $oc++)
             {
-                $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-                $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+                $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+                $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
                 if (get_option($oconst) != WPST_DISABLED)
                 {
@@ -1479,34 +1493,34 @@ class SwimTeamSwimmerProfileInfoTable extends SwimTeamInfoTable
             {
                 if ($p->getContactInfo() == WPST_PUBLIC)
                 {
-                    $this->add_row("Name", $p->getFirstName() . " " . $p->getLastName()) ;
+                    $this->add_row('Name', $p->getFirstName() . ' ' . $p->getLastName()) ;
 
                     $address = $p->getStreet1() ;
-                    if ($p->getStreet2() != "")
-                        $address .= "<br/>" . $p->getStreet2() ;
-                    if ($p->getStreet3() != "")
-                        $address .= "<br/>" . $p->getStreet3() ;
+                    if ($p->getStreet2() != '')
+                        $address .= '<br/>' . $p->getStreet2() ;
+                    if ($p->getStreet3() != '')
+                        $address .= '<br/>' . $p->getStreet3() ;
 
-                    $address .= "<br/>" . $p->getCity() ;
-                    $address .= ", " . $p->getStateOrProvince() ;
-                    $address .= "<br/>" . $p->getPostalCode() ;
-                    $address .= "<br/>" . $p->getCountry() ;
+                    $address .= '<br/>' . $p->getCity() ;
+                    $address .= ', ' . $p->getStateOrProvince() ;
+                    $address .= '<br/>' . $p->getPostalCode() ;
+                    $address .= '<br/>' . $p->getCountry() ;
 
-                    $this->add_row("Address", $address) ;
+                    $this->add_row('Address', $address) ;
 
                     $phone = $p->getPrimaryPhone() ;
-                    if ($p->getSecondaryPhone() != "")
-                        $phone .= "<br/>" . $p->getSecondaryPhone() ;
-                    $this->add_row("Phone", $phone) ;
-                    $this->add_row("E-mail", html_a("mailto:" .
+                    if ($p->getSecondaryPhone() != '')
+                        $phone .= '<br/>' . $p->getSecondaryPhone() ;
+                    $this->add_row('Phone', $phone) ;
+                    $this->add_row('E-mail', html_a('mailto:' .
                         $p->getEmailAddress(), $p->getEmailAddress())) ;
                 }
                 else
                 {
-                    $this->add_row("Name",
-                        $p->getFirstName() . " " . $p->getLastName()) ;
-                    $this->add_row("Contact information is not public.",
-                        "&nbsp;") ;
+                    $this->add_row('Name',
+                        $p->getFirstName() . ' ' . $p->getLastName()) ;
+                    $this->add_row('Contact information is not public.',
+                        '&nbsp;') ;
                 }
             }
             else
@@ -1514,22 +1528,22 @@ class SwimTeamSwimmerProfileInfoTable extends SwimTeamInfoTable
                 //  No contact record in the swim team user table
                 //  bluff with whatever can be pulled from WP user table
 
-                //$this->add_row("No contact information available.", "&nbsp;") ;
+                //$this->add_row('No contact information available.', '&nbsp;') ;
                 $u = get_userdata($id) ;
 
-                $this->add_row("Name",
-                    $u->user_firstname . " " . $u->user_lastname) ;
-                $this->add_row("E-mail", html_a("mailto:" .
+                $this->add_row('Name',
+                    $u->user_firstname . ' ' . $u->user_lastname) ;
+                $this->add_row('E-mail', html_a('mailto:' .
                     $u->user_email, $u->user_email)) ;
             }
         }
         else if ($id == null)
         {
-            $this->add_row("No contact information available.", "&nbsp;") ;
+            $this->add_row('No contact information available.', '&nbsp;') ;
         }
         else
         {
-            $this->add_row("None", "&nbsp;") ;
+            $this->add_row('None', '&nbsp;') ;
         }
     }
 }

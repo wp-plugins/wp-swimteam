@@ -82,6 +82,30 @@ class SwimTeamEvent extends SwimTeamDBI
     var $__course ;
 
     /**
+     * min age property - minimum age for the event.
+     *
+     * The value of the min age property comes from
+     * age group record for this event.
+     */
+    var $__minage ;
+
+    /**
+     * max age property - maximum age for the event.
+     *
+     * The value of the max age property comes from
+     * age group record for this event.
+     */
+    var $__maxage ;
+
+    /**
+     * gender property - gender for the event.
+     *
+     * The value of the course property comes from
+     * the SDIF standard.
+     */
+    var $__gender ;
+
+    /**
      * Set the event id
      *
      * @param - int - id of the event
@@ -239,6 +263,74 @@ class SwimTeamEvent extends SwimTeamDBI
     function getCourse()
     {
         return ($this->__course) ;
+    }
+
+    /**
+     * Set the minage of the event
+     *
+     * @param - int - minage of the event
+     */
+    function setMinAge($minage)
+    {
+        $this->__minage = $minage ;
+    }
+
+    /**
+     * Get the minage of the event
+     *
+     * @return - int - minage of the event
+     */
+    function getMinAge()
+    {
+        return ($this->__minage) ;
+    }
+
+    /**
+     * Set the maxage of the event
+     *
+     * @param - int - maxage of the event
+     */
+    function setMaxAge($maxage)
+    {
+        $this->__maxage = $maxage ;
+    }
+
+    /**
+     * Get the maxage of the event
+     *
+     * @return - int - maxage of the event
+     */
+    function getMaxAge()
+    {
+        return ($this->__maxage) ;
+    }
+
+    /**
+     * Set the gender of the event
+     *
+     * @param - int - gender of the event
+     */
+    function setGender($gender)
+    {
+        //  Need to do some "parsing" to make sure the value
+        //  is stored as the "SDIF" value and not what WPST uses.
+ 
+        if ($gender == WPST_GENDER_MALE)
+            $this->__gender = WPST_SDIF_SWIMMER_SEX_CODE_MALE_VALUE ;
+        else if ($gender == WPST_GENDER_FEMALE)
+            $this->__gender = WPST_SDIF_SWIMMER_SEX_CODE_FEMALE_VALUE ;
+        else
+            $this->__gender = $gender ;
+    }
+
+    /**
+     * Get the gender of the event
+     *
+     * @return - int - gender of the event
+     */
+    function getGender()
+    {
+        return ($this->__gender) ;
     }
 
     /**
@@ -517,13 +609,22 @@ class SwimTeamEvent extends SwimTeamDBI
         //  Make sure it is a legal event id
         if ($this->getSwimTeamEventExistsByEventId($eventid))
         {
-            $query = sprintf('SELECT * FROM %s WHERE eventid="%s"',
-                WPST_EVENTS_TABLE, $eventid) ;
+            $where_clause = sprintf('%s AND %s.eventid="%s"',
+                WPST_EXTENDED_EVENTS_WHERE_CLAUSE, WPST_EVENTS_TABLE, $eventid) ;
+            $query = sprintf('SELECT %s FROM %s WHERE %s',
+                WPST_EXTENDED_EVENTS_COLUMNS, WPST_EXTENDED_EVENTS_TABLES, $where_clause) ;
+
+            //$query = sprintf('SELECT * FROM %s WHERE eventid="%s"',
+            //    WPST_EVENTS_TABLE, $eventid) ;
 
             $this->setQuery($query) ;
             $this->runSelectQuery() ;
 
             $result = $this->getQueryResult() ;
+
+            //print '<pre>' ;
+            //print_r($result) ;
+            //print '</pre>' ;
 
             $this->setEventId($result['eventid']) ;
             $this->setMeetId($result['meetid']) ;
@@ -533,6 +634,9 @@ class SwimTeamEvent extends SwimTeamDBI
             $this->setStroke($result['stroke']) ;
             $this->setDistance($result['distance']) ;
             $this->setCourse($result['course']) ;
+            $this->setMinAge($result['minage']) ;
+            $this->setMaxAge($result['maxage']) ;
+            $this->setGender($result['gender']) ;
         }
 
         $idExists = (bool)($this->getQueryCount() > 0) ;

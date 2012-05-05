@@ -827,6 +827,42 @@ class SwimTeamRoster extends SwimTeamDBI
     }
 
     /**
+     * Retrieve the Swimmer Ids for the swimmers based
+     * on a Season Id.  Swimmers can be restricted to only
+     * those who are/were active.
+     *
+     * @param - boolean - optional to restrict query to active swimmers
+     * @return - array - array of swimmers ids
+     */
+    function getAllSwimmerIdsByAgeGroupId($agegroupid)
+    {
+        //  Make sure we don't have a null season id, query will fail.
+        if ($this->getSeasonId() == null) die('No Season Id.') ;
+
+        //  Select the roster records that match the age group id
+
+        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
+            get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
+            get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
+
+        $select_clause = sprintf(WPST_ROSTER_COLUMNS, 
+            $cutoffdate, $cutoffdate, $cutoffdate) ;
+
+        $where_clause = sprintf(WPST_ROSTER_WHERE_CLAUSE,
+            $this->getSeasonId(), $cutoffdate, $cutoffdate,
+            $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate) ;
+
+        $query = sprintf('SELECT %s FROM %s WHERE %s AND %s.id="%s"',
+            $select_clause, WPST_ROSTER_TABLES, $where_clause,
+            WPST_AGE_GROUP_TABLE, $agegroupid) ;
+
+        $this->setQuery($query) ;
+        $this->runSelectQuery() ;
+
+        return $this->getQueryResults() ;
+    }
+
+    /**
      * Assign the swimmer labels
      *
      */
@@ -1159,7 +1195,7 @@ class SwimTeamRosterAdminGUIDataList extends SwimTeamRosterGUIDataList
      */
     var $__normal_actions = array(
          WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
-        ,WPST_ACTION_DIRECTORY => WPST_ACTION_DIRECTORY
+        //,WPST_ACTION_DIRECTORY => WPST_ACTION_DIRECTORY
         ,WPST_ACTION_UPDATE => WPST_ACTION_UPDATE
         ,WPST_ACTION_UNREGISTER => WPST_ACTION_UNREGISTER
         ,WPST_ACTION_ASSIGN_LABEL => WPST_ACTION_ASSIGN_LABEL

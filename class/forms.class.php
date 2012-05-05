@@ -518,6 +518,17 @@ class WpSwimTeamForm extends StandardFormContent
 
     /**
      * Provide a mechanism to overload form_content_buttons() method
+     * to have the button display "Export" instead of "Save".
+     *
+     * @return HTMLTag object
+     */
+    function form_content_buttons_Export_Cancel()
+    {
+        return $this->form_content_buttons_Action_Cancel('Export') ;
+    }
+
+    /**
+     * Provide a mechanism to overload form_content_buttons() method
      * to have the button display "Load" instead of "Save".
      *
      * @return HTMLTag object

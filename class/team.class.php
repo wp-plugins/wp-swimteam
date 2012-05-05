@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
  * @version $Revision$
@@ -16,13 +16,13 @@
  *
  */
 
-require_once("db.class.php") ;
-require_once("swimteam.include.php") ;
+require_once('db.class.php') ;
+require_once('swimteam.include.php') ;
 
 /**
  * Class definition of the Swim Team Profile
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -117,6 +117,11 @@ class SwimTeamProfile extends SwimTeamDBI
      * pool lanes property
      */
     var $__poollanes ;
+
+    /**
+     * coach user id property
+     */
+    var $__coachuserid ;
 
     /**
      * Set the id
@@ -479,6 +484,26 @@ class SwimTeamProfile extends SwimTeamDBI
     }
 
     /**
+     * Set the number of pool lanes
+     *
+     * @param - int - coach user id
+     */
+    function setCoachUserId($id)
+    {
+        $this->__coachuserid = $id;
+    }
+
+    /**
+     * Get the pool measurement units
+     *
+     * @return - int - coach user id
+     */
+    function getCoachUserId()
+    {
+        return ($this->__coachuserid) ;
+    }
+
+    /**
      * load Team Profile
      *
      * Load the option values from the Wordpress database.
@@ -541,8 +566,8 @@ class SwimTeamProfile extends SwimTeamDBI
         }
         else
         {
-            $this->setStreet2("") ;
-            update_option(WPST_OPTION_TEAM_STREET_2, "") ;
+            $this->setStreet2('') ;
+            update_option(WPST_OPTION_TEAM_STREET_2, '') ;
         }
 
         //  street 3
@@ -555,8 +580,8 @@ class SwimTeamProfile extends SwimTeamDBI
         }
         else
         {
-            $this->setStreet3("") ;
-            update_option(WPST_OPTION_TEAM_STREET_3, "") ;
+            $this->setStreet3('') ;
+            update_option(WPST_OPTION_TEAM_STREET_3, '') ;
         }
 
         //  city
@@ -639,8 +664,8 @@ class SwimTeamProfile extends SwimTeamDBI
         }
         else
         {
-            $this->setEmailAddress("") ;
-            update_option(WPST_OPTION_TEAM_EMAIL_ADDRESS, "") ;
+            $this->setEmailAddress('') ;
+            update_option(WPST_OPTION_TEAM_EMAIL_ADDRESS, '') ;
         }
 
         //  team email address
@@ -653,8 +678,8 @@ class SwimTeamProfile extends SwimTeamDBI
         }
         else
         {
-            $this->setEmailAddress("") ;
-            update_option(WPST_OPTION_TEAM_EMAIL_ADDRESS, "") ;
+            $this->setEmailAddress('') ;
+            update_option(WPST_OPTION_TEAM_EMAIL_ADDRESS, '') ;
         }
 
         //  tean web site
@@ -667,8 +692,8 @@ class SwimTeamProfile extends SwimTeamDBI
         }
         else
         {
-            $this->setWebSite("") ;
-            update_option(WPST_OPTION_TEAM_SECONDARY_PHONE, "") ;
+            $this->setWebSite('') ;
+            update_option(WPST_OPTION_TEAM_SECONDARY_PHONE, '') ;
         }
 
         //  measurement
@@ -712,6 +737,20 @@ class SwimTeamProfile extends SwimTeamDBI
             $this->setPoolLanes(WPST_DEFAULT_POOL_LANES) ;
             update_option(WPST_OPTION_TEAM_POOL_LANES, WPST_DEFAULT_POOL_LANES) ;
         }
+
+        //  coach user id
+        $option = get_option(WPST_OPTION_TEAM_COACH_USER_ID) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option)
+        {
+            $this->setCoachUserId($option) ;
+        }
+        else
+        {
+            $this->setCoachUserId(WPST_NULL_ID) ;
+            update_option(WPST_OPTION_TEAM_COACH_USER_ID, WPST_NULL_ID) ;
+        }
     }
 
     /**
@@ -737,6 +776,7 @@ class SwimTeamProfile extends SwimTeamDBI
         update_option(WPST_OPTION_TEAM_POOL_LENGTH, $this->getPoolLength()) ;
         update_option(WPST_OPTION_TEAM_POOL_MEASUREMENT_UNITS, $this->getPoolMeasurementUnits()) ;
         update_option(WPST_OPTION_TEAM_POOL_LANES, $this->getPoolLanes()) ;
+        update_option(WPST_OPTION_TEAM_COACH_USER_ID, $this->getCoachUserId()) ;
     }
 }
 ?>

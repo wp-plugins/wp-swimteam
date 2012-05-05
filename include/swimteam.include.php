@@ -13,7 +13,7 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 765 $
+ * @version $Revision: 806 $
  * @lastmodified $Date$
  * @lastmodifiedby $Author$
  *
@@ -139,6 +139,7 @@ define('WPST_ACTION_ASSIGN_LABELS', 'Assign Labels') ;
 define('WPST_ACTION_EXPORT_CSV', 'Export CSV') ;
 define('WPST_ACTION_EXPORT_SDIF', 'Export SDIF') ;
 define('WPST_ACTION_EXPORT_MMRE', 'Export MM Registration') ;
+define('WPST_ACTION_EXPORT_ENTRIES', 'Export Entries') ;
 define('WPST_ACTION_DIRECTORY', 'Directory') ;
 define('WPST_ACTION_EXECUTE', 'Execute') ;
 define('WPST_ACTION_OPT_IN', 'Opt In') ;
@@ -332,6 +333,7 @@ define('WPST_OPTION_TEAM_WEB_SITE', WPST_OPTION_PREFIX . 'team_web_site') ;
 define('WPST_OPTION_TEAM_POOL_LENGTH', WPST_OPTION_PREFIX . 'team_pool_length') ;
 define('WPST_OPTION_TEAM_POOL_LANES', WPST_OPTION_PREFIX . 'team_pool_lanes') ;
 define('WPST_OPTION_TEAM_POOL_MEASUREMENT_UNITS', WPST_OPTION_PREFIX . 'team_pool_measurement_units') ;
+define('WPST_OPTION_TEAM_COACH_USER_ID', WPST_OPTION_PREFIX . 'team_coach_user_id') ;
 
 // Define SDIF options stored in the Wordpress option table
 define('WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID', 'Wp-SwimTeam Id') ;

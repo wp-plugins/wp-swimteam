@@ -232,6 +232,13 @@ class RosterTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_swimmerid = array(
+            WPST_ACTION_DIRECTORY
+           ,WPST_ACTION_EXPORT_SDIF
+           ,WPST_ACTION_EXPORT_CSV
+           ,WPST_ACTION_EXPORT_MMRE
+           ,WPST_ACTION_ASSIGN_LABELS
+        ) ;
 
         //  The swimmerid is the argument which must be
         //  dealt with differently for GET and POST operations
@@ -277,16 +284,20 @@ class RosterTabContainer extends SwimTeamTabContainer
 
         if (empty($scriptargs) || is_null($action))
         {
-            $gdl = $this->__buildGDL() ;
-
-            $div->add($gdl) ;
+            $div->add($this->__buildGDL()) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Roster Action Summary') ;
+        }
+        else if (is_null($swimmerid) && !in_array($action, $actions_allowed_without_swimmerid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select a swimmer in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Roster Action Summary') ;
         }
         else  //  Crank up the form processing process
         {
-            $addbuttons = true ;
-
             switch ($action)
             {
                 case WPST_ACTION_PROFILE:
@@ -358,7 +369,9 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                     $c->add($if) ;
 
-                    $c->add(html_h4(sprintf('%s roster records exported in SDIF format.', $sdif->getSDIFCount()))) ;
+                    $c->add(html_div('updated fade',
+                        html_h4(sprintf('%s roster records exported in SDIF format.', $sdif->getSDIFCount())))) ;
+                    $c->add($this->__buildGDL()) ;
 
                     break ;
 
@@ -375,6 +388,7 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                     $c->add($if) ;
                     $c->add($csv->getReport(true)) ;
+                    $c->add(html_br(), SwimTeamGUIButtons::getButton('Return to Roster')) ;
                     
                     $div->add(html_div('updated fade',
                         html_h4(sprintf('Swim Team Swimmers Report
@@ -398,7 +412,9 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $c->add($if) ;
                     $c->add($re1->getReport(true)) ;
 
-                    $c->add(html_h4(sprintf('%s roster records exported in RE1 format.', $re1->getExportCount()))) ;
+                    $c->add(html_div('updated fade',
+                        html_h4(sprintf('%s roster records exported in RE1 format.', $re1->getExportCount())))) ;
+                    $c->add($this->__buildGDL()) ;
 
                     break ;
 
@@ -418,22 +434,22 @@ class RosterTabContainer extends SwimTeamTabContainer
                     }
                     else
                     {
-                        $c->add(html_div('updated fade',
+                        $c->add(html_div('error fade',
                             html_h4('Swimmer Labels are locked, no label assignments.'))) ;
                     }
 
-                    $gdl = $this->__buildGDL() ;
 
-                    $c->add($gdl) ;
+                    $c->add($this->__buildGDL()) ;
 
-                    $addbuttons = false ;
                     $this->setShowActionSummary() ;
                     $this->setActionSummaryHeader('Roster Action Summary') ;
 
                     break ;
 
                 default:
-                    $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
+                    $div->add(html_h4(html_div('error fade',
+                        sprintf('Unsupported action "%s" requested.', $action)))) ;
+                    $div->add($this->__buildGDL()) ;
                     break ;
             }
 
@@ -474,13 +490,10 @@ class RosterTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add($c) ;
-
-                if ($addbuttons)
-                    $div->add(SwimTeamGUIButtons::getButton('Return to Report Generator')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4('No content to display.')) ;
+                $div->add(html_div('error fade', html_h4('No content to display.'))) ;
             }
         }
 
@@ -593,6 +606,15 @@ class AdminRosterTabContainer extends RosterTabContainer
         //  Temporarily turn off search - the SQL gets corrupted.
         //$gdl->_search_flag = false ;
 
+        /*
+        print '<pre>' ;
+        //print_r($gdl) ;
+        printf('SELECT %s FROM %s WHERE %s', $gdl->__columns, $gdl->__tables, $gdl->__where_clause) ;
+        //print_r($gdl->__columns) ;
+        //print_r($gdl->__tables) ;
+        //print_r($gdl->__where_clause) ;
+        print '</pre>' ;
+         */
         return $gdl ;
     }
 }

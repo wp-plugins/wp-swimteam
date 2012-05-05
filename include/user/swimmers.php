@@ -199,6 +199,10 @@ class SwimmersTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_swimmerid = array(
+            WPST_ACTION_ADD
+           ,WPST_ACTION_GLOBAL_UPDATE
+        ) ;
 
         //  The swimmerid is the argument which must be
         //  dealt with differently for GET and POST operations
@@ -244,7 +248,25 @@ class SwimmersTabContainer extends SwimTeamTabContainer
 
         if (empty($scriptargs) || is_null($action))
         {
+            $gdl = $this->__buildGDL() ;
 
+            $div->add($gdl, html_div_center(html_h6('Age displayed in
+                parentheses is computed relative to the Swim Team age
+                group cutoff date.'))) ;
+
+            //  If the user profile is incomplete, eliminate any actions
+            if ($noprofile)
+            {
+                $gdl->disableAllActions() ;
+            }
+
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader($this->_tab_prefix . ' Swimmers Action Summary') ;
+        }
+        else if (is_null($swimmerid) && !in_array($action, $actions_allowed_without_swimmerid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select a swimmer in order to perform this action.'))) ;
             $gdl = $this->__buildGDL() ;
 
             $div->add($gdl, html_div_center(html_h6('Age displayed in

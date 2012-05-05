@@ -89,6 +89,9 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
         //  This allows passing arguments eithers as a GET or a POST
 
         $scriptargs = array_merge($_GET, $_POST) ;
+        $actions_allowed_without_eventgroupid = array(
+            WPST_ACTION_ADD
+        ) ;
 
         //print '<pre>' ;
         //print_r($scriptargs) ;
@@ -138,9 +141,15 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
             $div->set_style('clear: both;') ;
             $div->add(html_h3('Swim Team Event Groups')) ;
 
-            $gdl = $this->__buildGDL() ;
-
-            $div->add($gdl) ;
+            $div->add($this->__buildGDL()) ;
+            $this->setShowActionSummary() ;
+            $this->setActionSummaryHeader('Event Groups Action Summary') ;
+        }
+        else if (is_null($eventgroupid) && !in_array($action, $actions_allowed_without_eventgroupid))
+        {
+            $div->add(html_div('error fade',
+                html_h4('You must select an event group in order to perform this action.'))) ;
+            $div->add($this->__buildGDL()) ;
             $this->setShowActionSummary() ;
             $this->setActionSummaryHeader('Event Groups Action Summary') ;
         }

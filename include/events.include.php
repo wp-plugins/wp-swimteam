@@ -49,4 +49,12 @@ define('WPST_EVENT_GROUPS_WITH_EVENT_COUNT_COLUMNS',
     '(SELECT COUNT(' . WPST_EVENTS_TABLE . '.eventid) FROM ' .
     WPST_EVENTS_TABLE . ' WHERE ' . WPST_EVENT_GROUPS_TABLE . '.eventgroupid = ' .
     WPST_EVENTS_TABLE . '.eventgroupid) AS eventcount') ;
+
+/**
+ * Extended Event definitions
+ */
+define('WPST_EXTENDED_EVENTS_COLUMNS', WPST_EVENTS_TABLE . '.*, ' . WPST_AGE_GROUP_TABLE . '.*') ;
+define('WPST_EXTENDED_EVENTS_TABLES', WPST_EVENTS_TABLE . ', ' . WPST_AGE_GROUP_TABLE) ;
+define('WPST_EXTENDED_EVENTS_WHERE_CLAUSE', WPST_EVENTS_TABLE . '.agegroupid = ' . WPST_AGE_GROUP_TABLE . '.id') ;
+
 ?>
