@@ -81,7 +81,7 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         global $userdata ;
 
         $this->add_hidden_element('_action') ;
-        $this->add_hidden_element('UserId') ;
+        $this->add_hidden_element('_userid') ;
 
         $firstname = new FEText('First Name', true, '200px') ;
         $this->add_element($firstname) ;
@@ -254,7 +254,7 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
             $this->set_element_value('Country', ucwords(WPST_US_ONLY)) ;
 
         //  Need to pass the WP UserId along to the next step
-        $this->set_hidden_element_value('UserId', $this->getId()) ;
+        $this->set_hidden_element_value('_userid', $this->getId()) ;
 
         //  Need to set the action so the next step knows
         //  what to do when called from a GUIDataList.
@@ -471,7 +471,7 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         global $userdata ;
 
         $u = new SwimTeamUserProfile() ;
-        $u->setUserId($this->get_hidden_element_value('UserId')) ;
+        $u->setUserId($this->get_hidden_element_value('_userid')) ;
         $u->setStreet1($this->get_element_value('Street 1')) ;
         $u->setStreet2($this->get_element_value('Street 2')) ;
         $u->setStreet3($this->get_element_value('Street 3')) ;

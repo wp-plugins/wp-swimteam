@@ -187,7 +187,9 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
 
         $scriptargs = array_merge($_GET, $_POST) ;
         $actions_allowed_without_eventid = array(
-            WPST_ACTION_EVENTS_LOAD
+            WPST_ACTION_EVENTS_ADD
+           ,WPST_ACTION_EVENTS_IMPORT
+           ,WPST_ACTION_EVENTS_LOAD
            ,WPST_ACTION_EVENTS_REORDER
            ,WPST_ACTION_EVENTS_DELETE_ALL
         ) ;

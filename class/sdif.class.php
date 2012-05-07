@@ -501,10 +501,10 @@ class SDIFBasePyramid extends SDIFProfile
  * @access public
  * @see SDIFBasePyramid
  */
-class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
+class SDIFLSCRegistrationPyramid2 extends SDIFBasePyramid
 {
     /**
-     * Consturctor
+     * Constructor
      *
      */
     function SDIFLSCRegistration()
@@ -782,6 +782,206 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
 }
 
 /**
+ * Class definition of the SDIF LSC Registration Pyramid export
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see SDIFBasePyramid
+ */
+class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
+{
+    /**
+     * Consturctor
+     *
+     */
+    function SDIFLSCRegistrationPyramid()
+    {
+        parent::loadSDIFProfile() ;
+    }
+
+    /**
+     * GenerateSDIF - generate the SDIF content for the team roster.
+     *
+     * @return string - SDIF content
+     */
+    function generateSDIF($eventIds = array())
+    {
+        global $current_user ;
+
+        //  Need some information from the current user
+
+        $user = new SwimTeamUserProfile() ;
+        $user->loadUserProfileByUserId($current_user->ID) ;
+
+        // Shortcut to access property
+        $sdif = &$this->__sdifData ;
+
+        $sdif = array() ;
+
+        //  Add debug stuff?  The debug stuff invalidates the SDIF
+        //  but is useful for ensuring all of the information is in
+        //  the proper column.
+ 
+        if ($this->getSDIFDebugFlag())
+        {
+            $sdif[] = WPST_SDIF_COLUMN_DEBUG1 ;
+            $sdif[] = WPST_SDIF_COLUMN_DEBUG2 ;
+        }
+
+        /**
+         * Build the A0 record
+         */
+        $a0 = new SDIFA0Record() ;
+        $a0->setOrgCode($this->getOrgCode()) ;
+        $a0->setSDIFVersionNumber(WPST_SDIF_VERSION) ;
+        $a0->setFileCode(WPST_SDIF_FTT_CODE_MEET_REGISTRATIONS_VALUE) ;
+        $a0->setSoftwareName(WPST_SDIF_SOFTWARE_NAME) ;
+        $a0->setSoftwareVersion(WPST_SDIF_SOFTWARE_VERSION) ;
+        $a0->setContactName($user->GetFullName()) ;
+        $a0->setContactPhone($user->GetPrimaryPhone()) ;
+        $a0->setFileCreationOrUpdate(date('mdY')) ;
+        $a0->setSubmittedByLSC($this->getLSCCOde()) ;
+        
+        $sdif[] = $a0->GenerateRecord() ;
+
+        //  Need Team Profile information from database
+ 
+        $team = new SwimTeamProfile() ;
+        $team->loadTeamProfile() ;
+
+        /**
+         * Build the C1 record
+         */
+        $c1 = new SDIFC1Record() ;
+        $c1->setOrgCode($this->getOrgCode()) ;
+        $c1->setTeamCode($this->getTeamCode()) ;
+        $c1->setTeamName($team->getClubOrPoolName()) ;
+        $c1->setTeamNameAbrv($team->getTeamName()) ;
+        $c1->setTeamAddress1($team->getStreet1()) ;
+        $c1->setTeamAddress2($team->getStreet2()) ;
+        $c1->setTeamCity($team->getCity()) ;
+        $c1->setTeamState($team->getStateOrProvince()) ;
+        $c1->setTeamPostalCode($team->getPostalCode()) ;
+        $c1->setTeamCountryCode($this->getCountryCode()) ;
+        $c1->setRegionCode($this->getRegionCode()) ;
+
+        $sdif[] = $c1->GenerateRecord() ;
+
+        //  Need a bunch of data!
+
+        $season = new SwimTeamSeason() ;
+        $roster = new SwimTeamRoster() ;
+
+        //  Need to keep track of unique swimmers and D0, E0, F0,
+        //  and G0 record counts in order to terminate SDIF file.
+
+        $unique_swimmers = array() ;
+        $sdif_counters = array('b' => 0, 'c', 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
+
+        //  Load information from the database
+        //  to get the list of potential swimmers
+
+        $roster->setSeasonId($season->getActiveSeasonId()) ;
+        $swimmerIds = $roster->getSwimmerIds() ;
+
+        //  Need structures for swimmers and their primary contact
+ 
+        $swimmer = new SwimTeamSwimmer() ;
+        $contact = new SwimTeamUserProfile() ;
+
+        //  If no events are specified, use all events in the swim meet
+
+        $d1 = new SDIFD1Record() ;
+
+        $d1->setOrgCode($this->getOrgCode()) ;
+        $d1->setAttachCode(WPST_SDIF_ATTACHED_CODE_ATTACHED_VALUE) ;
+        $d1->setMemberCode(WPST_SDIF_MEMBERSHIP_CODE_CHANGE_VALUE) ;
+
+        $d2 = new SDIFD2Record() ;
+        $d2->setOrgCode($this->getOrgCode()) ;
+        $d2->setTeamCode($this->getTeamCode()) ;
+        $d2->setRegionCode($this->getRegionCode()) ;
+        $d2->setSwimmerCountryCode($this->getCountryCode()) ;
+        $d2->setAnswerCode(WPST_SDIF_ANSWER_CODE_NO_VALUE) ;
+        $d2->setSeasonCode(WPST_SDIF_SEASON_CODE_SEASON_1_VALUE) ;
+
+        //  May want to add a citizenship field for each swimmer but
+        //  for now, we'll use the country code for the swim team itself
+        $d1->setCitizenCode($this->getCountryCode()) ;
+
+        foreach ($swimmerIds as $key => &$swimmerId)
+        {
+            $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+            $contact->loadUserProfileByUserId($swimmer->getContact1Id()) ;
+                    
+            //  Initialize D1 record fields which are swimmer based
+            $d1->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
+            $d1->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
+            $d1->setUSS($swimmer->getUSSNumber()) ;
+            $d1->setPhoneNumber($contact->getPrimaryPhone()) ;
+            $d1->setSecondaryPhoneNumber($contact->getSecondaryPhone()) ;
+    
+            if ($this->getUseAgeGroupAge() == WPST_NO)
+                $d1->setAgeOrClass($swimmer->getAge()) ;
+            else
+                $d1->setAgeOrClass($swimmer->getAgeGroupAge()) ;
+            $d1->setGender($swimmer->getGender()) ;
+    
+            if ($this->getSDIFDebugFlag())
+            {
+                $sdif[] = WPST_SDIF_COLUMN_DEBUG1 ;
+                $sdif[] = WPST_SDIF_COLUMN_DEBUG2 ;
+            }
+    
+            $sdif[] = $d1->GenerateRecord() ;
+            $sdif_counters['d']++ ;
+
+            $d2->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
+            $d2->setSwimmerAddress1($contact->getFullStreetAddress()) ;
+            $d2->setSwimmerCity($contact->getCity()) ;
+            $d2->setSwimmerState($contact->getStateOrProvince()) ;
+            $d2->setSwimmerPostalCode($contact->getPostalCode()) ;
+            $sdif[] = $d2->GenerateRecord() ;
+            $sdif_counters['d']++ ;
+    
+            //  Update the various counters
+    
+            //  Track uninque swimmers
+            if (!in_array($swimmer->getId(), $unique_swimmers))
+                $unique_swimmers[] = $swimmer->getId() ;
+        }
+
+        //  Construct the Z0 file termination record
+ 
+        $z0 = new SDIFZ0Record() ;
+        $z0->setOrgCode($this->getOrgCode()) ;
+        $z0->setFileCode(WPST_SDIF_FTT_CODE_MEET_REGISTRATIONS_VALUE) ;
+        $z0->setNotes(WPST_NULL_STRING) ;
+        $z0->setBRecordCount(0) ;
+        $z0->setMeetCount(1) ;
+        $z0->setCRecordCount(1) ;
+        $z0->setTeamCount(1) ;
+        $z0->setDRecordCount($sdif_counters['d']) ;
+        $z0->setSwimmerCount(count($unique_swimmers)) ;
+        $z0->setERecordCount($sdif_counters['e']) ;
+        $z0->setFRecordCount($sdif_counters['f']) ;
+        $z0->setGRecordCount($sdif_counters['g']) ;
+        $z0->setBatchNumber(1) ;
+        $z0->setNewMemberCount(0) ;
+        $z0->setRenewMemberCount(0) ;
+        $z0->setChangeMemberCount(0) ;
+        $z0->setDeleteMemberCount(0) ;
+
+        $sdif[] = $z0->GenerateRecord() ;
+
+        //  Record the count of entries created
+
+        //$this->setSDIFCount($sdif_counters['d'] + $sdif_counters['e'] + $sdif_counters['f']) ;
+        $this->setSDIFCount(count($unique_swimmers)) ;
+    }
+}
+
+/**
  * Class definition of the SDIF Meet Entries Pyramid export
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
@@ -962,16 +1162,14 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         //  and G0 record counts in order to terminate SDIF file.
 
         $unique_swimmers = array() ;
-        $sdif_counters = array('d0' => 0, 'e0' => 0, 'f0' => 0, 'g0' => 0) ;
+        $sdif_counters = array('b' => 0, 'c', 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
 
         //  Load information from the database
         //  to get the list of potential swimmers
 
         $swimmeet->loadSwimMeetByMeetId($this->getSwimMeetId()) ;
-        //var_dump($swimmeet) ;
         $roster->setSeasonId($swimmeet->getSeasonId()) ;
         $swimmerIds = $roster->getSwimmerIds() ;
-        //var_dump($swimmerIds) ;
 
         //  Need structures for swimmers and their primary contact
  
@@ -1191,7 +1389,7 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
     
                     //  Update the various counters
                     $f0count++ ;
-                    $sdif_counters['f0']++ ;
+                    $sdif_counters['f']++ ;
     
                     //  Track uninque swimmers
                     if (!in_array($swimmer->getId(), $unique_swimmers))
@@ -1248,11 +1446,13 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
                         $sdif[] = WPST_SDIF_COLUMN_DEBUG2 ;
                     }
     
+                    //  Generate SDIF and update the various counters
+
                     $sdif[] = $d0->GenerateRecord($this->getZeroTimeMode()) ;
+                    $sdif_counters['d']++ ;
+
                     $sdif[] = $d3->GenerateRecord() ;
-    
-                    //  Update the various counters
-                    $sdif_counters['d0']++ ;
+                    $sdif_counters['d']++ ;
     
                     //  Track uninque swimmers
                     if (!in_array($swimmer->getId(), $unique_swimmers))
@@ -1272,11 +1472,11 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         $z0->setMeetCount(1) ;
         $z0->setCRecordCount(0) ;
         $z0->setTeamCount(1) ;
-        $z0->setDRecordCount($sdif_counters['d0']) ;
+        $z0->setDRecordCount($sdif_counters['d']) ;
         $z0->setSwimmerCount(count($unique_swimmers)) ;
-        $z0->setERecordCount($sdif_counters['e0']) ;
-        $z0->setFRecordCount($sdif_counters['f0']) ;
-        $z0->setGRecordCount($sdif_counters['g0']) ;
+        $z0->setERecordCount($sdif_counters['e']) ;
+        $z0->setFRecordCount($sdif_counters['f']) ;
+        $z0->setGRecordCount($sdif_counters['g']) ;
         $z0->setBatchNumber(1) ;
         $z0->setNewMemberCount(0) ;
         $z0->setRenewMemberCount(0) ;
@@ -1288,11 +1488,11 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         //  Need to go back and "update" the C2 record now that the 
         //  number of entries and types of records are now known.
 
-        $c2->setNumberOfIndividualEntries($sdif_counters['d0']) ;
+        $c2->setNumberOfIndividualEntries($sdif_counters['d']) ;
         $c2->setNumberOfAthletes(count($unique_swimmers)) ;
-        $c2->setNumberOfRelayEntries($sdif_counters['e0']) ;
-        $c2->setNumberOfRelaySwimmers($sdif_counters['f0']) ;
-        $c2->setNumberOfSplitRecords($sdif_counters['g0']) ;
+        $c2->setNumberOfRelayEntries($sdif_counters['e']) ;
+        $c2->setNumberOfRelaySwimmers($sdif_counters['f']) ;
+        $c2->setNumberOfSplitRecords($sdif_counters['g']) ;
 
         //  Scan through the SDIF records and update the C2 record
 
@@ -1302,7 +1502,7 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
 
         //  Record the count of entries created
 
-        $this->setSDIFCount($sdif_counters['d0'] + $sdif_counters['e0'] + $sdif_counters['f0']) ;
+        $this->setSDIFCount($sdif_counters['d'] + $sdif_counters['e'] + $sdif_counters['f']) ;
     }
 }
 
@@ -4068,6 +4268,21 @@ class SDIFD1Record extends SDIFDxRecord
     var $_admin_info_4 ;
 
     /**
+     * Secondary Phone Number property
+     */
+    var $_secondary_phone_number ;
+
+    /**
+     * USS Registration Date property
+     */
+    var $_uss_registration_date ;
+
+    /**
+     * Member Code property
+     */
+    var $_member_code ;
+
+    /**
      * Set Admin Info 1
      *
      * @param string admin info
@@ -4108,6 +4323,66 @@ class SDIFD1Record extends SDIFDxRecord
     }
 
     /**
+     * Set Secondary Phone Number
+     *
+     * @param string secondary phone number
+     */
+    function setSecondaryPhoneNumber($txt)
+    {
+        $this->_secondary_phone_number = $txt ;
+    }
+
+    /**
+     * Get Secondary Phone Number
+     *
+     * @return string secondary phone number
+     */
+    function getSecondaryPhoneNumber()
+    {
+        return $this->_secondary_phone_number ;
+    }
+
+    /**
+     * Set USS Registration Date
+     *
+     * @param string uss registration date
+     */
+    function setUSSRegistrationDate($txt)
+    {
+        $this->_uss_registration_date = $txt ;
+    }
+
+    /**
+     * Get USS Registration Date
+     *
+     * @return string uss registration date
+     */
+    function getUSSRegistrationDate()
+    {
+        return $this->_uss_registration_date ;
+    }
+
+    /**
+     * Set Member Code
+     *
+     * @param string member code
+     */
+    function setMemberCode($txt)
+    {
+        $this->_member_code = $txt ;
+    }
+
+    /**
+     * Get Member Code
+     *
+     * @return string member code
+     */
+    function getMemberCode()
+    {
+        return $this->_member_code ;
+    }
+
+    /**
      * Parse Record
      */
     function ParseRecord()
@@ -4136,26 +4411,365 @@ class SDIFD1Record extends SDIFDxRecord
         $this->setGender(trim(substr($this->_sdif_record, 73, 1))) ;
         $this->setAdminInfo1(trim(substr($this->_sdif_record, 74, 30))) ;
         $this->setAdminInfo4(trim(substr($this->_sdif_record, 104, 20))) ;
-        $this->setPhone(trim(substr($this->_sdif_record, 124, 12))) ;
+        $this->setPhoneNumber(trim(substr($this->_sdif_record, 124, 12))) ;
+        $this->setSecondaryPhoneNumber(trim(substr($this->_sdif_record, 136, 12))) ;
+        $this->setUSSRegistrationDate(trim(substr($this->_sdif_record, 148, 8))) ;
+        $this->setMemberCode(trim(substr($this->_sdif_record, 156, 1))) ;
+        $this->setFutureUse3(trim(substr($this->_sdif_record, 157, 3))) ;
 
         //  Construct 'new' and 'old' formats of the USS number
         //  from the name and birthdate fields.
-    /**
-     * Get Prelim Heat and Lane Numbers
-     *
-     * @return string prelim heat and lane numbers
-     */
-    function getPrelimHeatAndLaneNumbers($zerotimemode = WPST_SDIF_USE_BLANKS_VALUE)
-    {
-        if ($this->getPrelimTime() == 0.0)
-            return WPST_NULL_STRING ;
-        else
-            return sprintf('%-2s%-2s', $this->getPrelimHeatNumber(), $this->PrelimLaneNumber()) ;
-    }
-
 
         $this->setUSSNew() ;
         $this->setUSSOld() ;
+    }
+    /**
+     * Generate Record
+     *
+     * @return string SDIF D1 record
+     */
+    function GenerateRecord()
+    {
+        return sprintf(WPST_SDIF_D1_RECORD,
+            $this->getOrgCode(),
+            $this->getFutureUse1(),
+            $this->getTeamCode(),
+            $this->getTeamCode5(),
+            $this->getSwimmerName(),
+            $this->getFutureUse2(),
+            $this->getUSS(),
+            $this->getAttachCode(),
+            $this->getCitizenCode(),
+            $this->getBirthDate(),
+            $this->getAgeOrClass(),
+            $this->getGender(),
+            $this->getAdminInfo1(),
+            $this->getAdminInfo4(),
+            $this->getPhoneNumber(),
+            $this->getSecondaryPhoneNumber(),
+            $this->getUSSRegistrationDate(),
+            $this->getMemberCode(),
+            $this->getFutureUse3()
+        ) ;
+    }
+}
+
+/**
+ * SDIF D2 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see SDIFRecord
+ */
+class SDIFD2Record extends SDIFDxRecord
+{
+    /**
+     * Swimmer Name
+     */
+    var $_swimmer_name ;
+
+    /**
+     * Swimmer Alternate Mailing Name property
+     */
+    var $_swimmer_alternate_mailing_name ;
+
+    /**
+     * Swimmer Address Line 1
+     */
+    var $_swimmer_address_1 ;
+
+    /**
+     * Swimmer Address Line 2
+     */
+    var $_swimmer_address_2 ;
+
+    /**
+     * Swimmer City
+     */
+    var $_swimmer_city ;
+
+    /**
+     * Swimmer State
+     */
+    var $_swimmer_state ;
+
+    /**
+     * Swimmer Postal Code
+     */
+    var $_swimmer_postal_code ;
+
+    /**
+     * Swimmer Country Code
+     */
+    var $_swimmer_country_code ;
+
+    /**
+     * Answer Code property
+     */
+    var $_answer_code ;
+
+    /**
+     * Season Code property
+     */
+    var $_season_code ;
+
+    /**
+     * Set Swimmer Name
+     *
+     * @param string swimmer name
+     */
+    function setSwimmerName($txt)
+    {
+        $this->_swimmer_name = $txt ;
+    }
+
+    /**
+     * Get Swimmer Name
+     *
+     * @return string swimmer name
+     */
+    function getSwimmerName()
+    {
+        return $this->_swimmer_name ;
+    }
+
+    /**
+     * Set Swimmer Alternate Mailing Name
+     *
+     * @param string alternate mailing name
+     */
+    function setSwimmerAlternateMailingName($txt)
+    {
+        $this->_swimmer_alternate_mailing_name = $txt ;
+    }
+
+    /**
+     * Get Swimmer Alternate Mailing Name
+     *
+     * @return string alternate mailing name
+     */
+    function getSwimmerAlternateMailingName()
+    {
+        return $this->_swimmer_alternate_mailing_name ;
+    }
+
+    /**
+     * Set Swimmer Address 1
+     *
+     * @param string swimmer address 1
+     */
+    function setSwimmerAddress1($txt)
+    {
+        $this->_swimmer_address_1 = $txt ;
+    }
+
+    /**
+     * Get Swimmer Address 1
+     *
+     * @return string swimmer address 1
+     */
+    function getSwimmerAddress1()
+    {
+        return $this->_swimmer_address_1 ;
+    }
+
+    /**
+     * Set Swimmer Address 2
+     *
+     * @param string swimmer address 2
+     */
+    function setSwimmerAddress2($txt)
+    {
+        $this->_swimmer_address_2 = $txt ;
+    }
+
+    /**
+     * Get Swimmer Address 2
+     *
+     * @return string swimmer address 2
+     */
+    function getSwimmerAddress2()
+    {
+        return $this->_swimmer_address_2 ;
+    }
+
+    /**
+     * Set Swimmer City
+     *
+     * @param string swimmer city
+     */
+    function setSwimmerCity($txt)
+    {
+        $this->_swimmer_city = $txt ;
+    }
+
+    /**
+     * Get Swimmer City
+     *
+     * @return string swimmer city
+     */
+    function getSwimmerCity()
+    {
+        return $this->_swimmer_city ;
+    }
+
+    /**
+     * Set Swimmer State
+     *
+     * @param string swimmer state
+     */
+    function setSwimmerState($txt)
+    {
+        $this->_swimmer_state = $txt ;
+    }
+
+    /**
+     * Get Swimmer State
+     *
+     * @return string swimmer state
+     */
+    function getSwimmerState()
+    {
+        return $this->_swimmer_state ;
+    }
+
+    /**
+     * Set Swimmer Postal Code
+     *
+     * @param string swimmer postal code
+     */
+    function setSwimmerPostalCode($txt)
+    {
+        $this->_swimmer_postal_code = $txt ;
+    }
+
+    /**
+     * Get Swimmer Postal Code
+     *
+     * @return string swimmer postal code
+     */
+    function getSwimmerPostalCode()
+    {
+        return $this->_swimmer_postal_code ;
+    }
+
+    /**
+     * Set Swimmer Country Code
+     *
+     * @param string swimmer country code
+     */
+    function setSwimmerCountryCode($txt)
+    {
+        $this->_swimmer_country_code = $txt ;
+    }
+
+    /**
+     * Get Swimmer Country Code
+     *
+     * @return string swimmer country code
+     */
+    function getSwimmerCountryCode()
+    {
+        return $this->_swimmer_country_code ;
+    }
+
+    /**
+     * Set Answer Code
+     *
+     * @param string answer code
+     */
+    function setAnswerCode($txt)
+    {
+        $this->_answer_code = $txt ;
+    }
+
+    /**
+     * Get Answer Code
+     *
+     * @return string answer code
+     */
+    function getAnswerCode()
+    {
+        return $this->_answer_code ;
+    }
+
+    /**
+     * Set Season Code
+     *
+     * @param string season code
+     */
+    function setSeasonCode($txt)
+    {
+        $this->_season_code = $txt ;
+    }
+
+    /**
+     * Get Season Code
+     *
+     * @return string season code
+     */
+    function getSeasonCode()
+    {
+        return $this->_season_code ;
+    }
+
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        if (WPST_DEBUG)
+        {
+            $c = container() ;
+            $c->add(html_pre(WPST_SDIF_COLUMN_DEBUG1,
+                WPST_SDIF_COLUMN_DEBUG2, $this->_sdif_record)) ;
+            //print $c->render() ;
+        }
+
+        //  Extract the data from the SDIF record by substring position
+
+        $this->setOrgCode(trim(substr($this->_sdif_record, 2, 1))) ;
+        $this->setFutureUse1(trim(substr($this->_sdif_record, 3, 8))) ;
+        $this->setTeamCode(trim(substr($this->_sdif_record, 11, 6))) ;
+        $this->setTeamCode5(trim(substr($this->_sdif_record, 17, 1))) ;
+        $this->setSwimmerName(trim(substr($this->_sdif_record, 18, 28))) ;
+        $this->setSwimmerAlternateMailingName(trim(substr($this->_sdif_record, 46, 30))) ;
+        $this->setSwimmerAddress1(trim(substr($this->_sdif_record, 76, 30))) ;
+        $this->setSwimmerCity(trim(substr($this->_sdif_record, 106, 20))) ;
+        $this->setSwimmerState(trim(substr($this->_sdif_record, 126, 2))) ;
+        $this->setSwimmerPostalCode(trim(substr($this->_sdif_record, 140, 10))) ;
+        $this->setSwimmerCountryCode(trim(substr($this->_sdif_record, 150, 3))) ;
+        $this->setRegionCode(trim(substr($this->_sdif_record, 153, 1))) ;
+        $this->setAnswerCode(trim(substr($this->_sdif_record, 154, 1))) ;
+        $this->setSeasonCode(trim(substr($this->_sdif_record, 155, 1))) ;
+        $this->setFutureUse2(trim(substr($this->_sdif_record, 156, 4))) ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return sting - D2 SDIF record
+     */
+    function GenerateRecord()
+    {
+        return sprintf(WPST_SDIF_D2_RECORD,
+            $this->getOrgCode(),
+            $this->getFutureUse1(),
+            $this->getTeamCode(),
+            $this->getTeamCode5(),
+            $this->getSwimmerName(),
+            $this->getSwimmerAlternateMailingName(),
+            $this->getSwimmerAddress1(),
+            $this->getSwimmerCity(),
+            $this->getSwimmerState(),
+            $this->getSwimmerCountryCode(),
+            $this->getSwimmerPostalCode(),
+            $this->getSwimmerCountryCode(),
+            $this->getRegionCode(),
+            $this->getAnswerCode(),
+            $this->getSeasonCode(),
+            $this->getFutureUse2()
+        ) ;
     }
 }
 

@@ -209,6 +209,8 @@ class UsersTabContainer extends SwimTeamTabContainer
             $userid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
         else if (array_key_exists('userid', $scriptargs))
             $userid = $scriptargs['userid'] ;
+        else if (array_key_exists('_userid', $scriptargs))
+            $userid = $scriptargs['_userid'] ;
         else
             $userid = null ;
 

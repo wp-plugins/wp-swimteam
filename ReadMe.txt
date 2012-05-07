@@ -71,6 +71,18 @@ future developments and much more and is the definitive source for the Change Lo
 * Added checking and error messages for all Actions to ensure something is selected when required.
 * Added GUI for Meet Entries Export.
 
+= 1.23 =
+* Fixed bug which prevented adding of importing events for a swim meet which didn't already events.
+* New implemenation of LSC Registration Pyramid SDIF export to leverage SDIF re-architecture done for Meet Entries in v1.22.
+* Fixed bug in action checking which prevented updates to user profiles
+
+= 1.22 =
+* Added new Team Profile field to identify Coach by WordPress username.
+* Fixed numerous potential issues when either Swimmer or User option count was set to zero. The comparison was not accounting for the difference between zero and non-existant which resulted in using the default value of 5 in many instances.
+* Initial support for Meet Entries SDIF export. The current implementation makes some assumptions which will eventually be under user control via a form. The exported SDIF validates with the WinSwim SDIF Checker application but has not been tested extensively with any of the Hy-tek tools nor with WinSwim itself.
+* Added checking and error messages for all Actions to ensure something is selected when required.
+* Added GUI for Meet Entries Export.
+
 = 1.21 =
 * Fixed bug with URL construction for Tabs which in some hosting environments would end up with a bad URL landing the User on the WordPress login page.
 * Improved URL construction for Tabs, leveraging the WordPress API instead of parsing server variables.

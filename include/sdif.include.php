@@ -1326,10 +1326,10 @@ define('WPST_SDIF_D0_PARSE_RECORD', 'D0%1.1s%-8.8s%-28.28s%12.12s%-1.1s%3.3s%-8.
 define('WPST_SDIF_D0_GENERATE_RECORD', 'D0%1.1s%-8.8s%-28.28s%12.12s%-1.1s%3.3s%-8.8s%2.2s%-1.1s%-1.1s%04.4s%1.1s%04.4s%04.4s%8.8s%9.9s%9.9s%9.9s%9.9s%4.4s%4.4s%3.3s%3.3s%4.4s%2.2s') ;
 
 //  Define D1 record
-define('WPST_SDIF_D1_RECORD', 'D1%1.1s%-8.8s%-6.6s%1.1s%-28.28s%1.1s%-12.12s%1.1s%-3.3s%-8.8s%02.2s%1.1s%-30.30s%-20.20s%-12.12s%-12.12s%-8.8s%1.1s%-3.3s%2.2s') ;
+define('WPST_SDIF_D1_RECORD', 'D1%1.1s%-8.8s%-6.6s%1.1s%-28.28s%1.1s%-12.12s%1.1s%-3.3s%-8.8s%02.2s%1.1s%-30.30s%-20.20s%-12.12s%-12.12s%-8.8s%1.1s%-3.3s') ;
 
 //  Define D2 record
-define('WPST_SDIF_D2_RECORD', 'D2%1.1s%-8.8s%-6.6s%1.1s%-28.28s%-30.30s%-30.30s%-20.20s%-2.2s%-12.12s%-10.10s%-3.3s%1.1s%1.1s%1.1s%-4.4s%2.2s') ;
+define('WPST_SDIF_D2_RECORD', 'D2%1.1s%-8.8s%-6.6s%1.1s%-28.28s%-30.30s%-30.30s%-20.20s%-2.2s%-12.12s%-10.10s%-3.3s%1.1s%1.1s%1.1s%-4.4s') ;
 
 //  Define D3 record
 define('WPST_SDIF_D3_RECORD', 'D3%14.14s%-15.15s%2.2s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%118.118s') ;
