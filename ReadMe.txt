@@ -71,6 +71,10 @@ future developments and much more and is the definitive source for the Change Lo
 * Added checking and error messages for all Actions to ensure something is selected when required.
 * Added GUI for Meet Entries Export.
 
+= 1.24 =
+* Added missing B1 and B2 records from Meet Entries SDIF export.
+* Added filter to display user by First and Last Name instead of by username.
+
 = 1.23 =
 * Fixed bug which prevented adding of importing events for a swim meet which didn't already events.
 * New implemenation of LSC Registration Pyramid SDIF export to leverage SDIF re-architecture done for Meet Entries in v1.22.

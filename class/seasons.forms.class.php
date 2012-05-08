@@ -10,7 +10,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Seasons
  * @version $Revision$
@@ -19,13 +19,13 @@
  *
  */
 
-require_once("seasons.class.php") ;
-require_once("forms.class.php") ;
+require_once('seasons.class.php') ;
+require_once('forms.class.php') ;
 
 /**
  * Construct the Add Season form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -102,14 +102,14 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
         //  the delete operation, the fields are displayed
         //  but are set in the disabled state.
         //$disabled_field = (strtoupper(get_class($this))
-            //== strtoupper("WpSwimTeamSeasonDeleteForm")) ? true : false ;
+            //== strtoupper('WpSwimTeamSeasonDeleteForm')) ? true : false ;
 
 
         switch (strtoupper(get_class($this)))
         {
-            case strtoupper("WpSwimTeamSeasonOpenForm"):
-            case strtoupper("WpSwimTeamSeasonCloseForm"):
-            case strtoupper("WpSwimTeamSeasonDeleteForm"):
+            case strtoupper('WpSwimTeamSeasonOpenForm'):
+            case strtoupper('WpSwimTeamSeasonCloseForm'):
+            case strtoupper('WpSwimTeamSeasonDeleteForm'):
                 $disabled_field = true ;
                 break ;
 
@@ -118,14 +118,14 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
                 break ;
         }
 
-        $this->add_hidden_element("seasonid") ;
+        $this->add_hidden_element('_seasonid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
-        $description = new FEText("Description", !$disabled_field, "250px") ;
+        $description = new FEText('Description', !$disabled_field, '250px') ;
         $description->set_readonly($disabled_field) ;
         $this->add_element($description) ;
 
@@ -133,10 +133,10 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
         //  Start Field
 
         if ($disabled_field)
-            $season_start = new FEText("Start", !$disabled_field, "150px") ;
+            $season_start = new FEText('Start', !$disabled_field, '150px') ;
         else
-            $season_start = new FEDate("Start", !$disabled_field, null, null,
-                "Fdy", date("Y") - 3, date("Y") + 7) ;
+            $season_start = new FEDate('Start', !$disabled_field, null, null,
+                'Fdy', date('Y') - 3, date('Y') + 7) ;
 
         $season_start->set_readonly($disabled_field) ;
 
@@ -145,10 +145,10 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
 		
         //  End Field
         if ($disabled_field)
-            $season_end = new FEText("End", !$disabled_field, "150px") ;
+            $season_end = new FEText('End', !$disabled_field, '150px') ;
         else
-            $season_end = new FEDate("End", !$disabled_field, null, null,
-                "Fdy", date("Y") - 3, date("Y") + 7) ;
+            $season_end = new FEDate('End', !$disabled_field, null, null,
+                'Fdy', date('Y') - 3, date('Y') + 7) ;
         $season_end->set_readonly($disabled_field) ;
 
         $this->add_element($season_end);
@@ -156,7 +156,7 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
         //  Status options and labels are set based on
         //  the plugin options
 
-        $status = new FEListBox("Status", !$disabled_field, "150px");
+        $status = new FEListBox('Status', !$disabled_field, '150px');
         $status->set_list_data($this->_statusSelections()) ;
         $status->set_readonly($disabled_field) ;
 
@@ -166,14 +166,14 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
 
         if (!$disabled_field)
             $status->set_readonly(strtoupper(get_class($this))
-            == strtoupper("WpSwimTeamSeasonAddForm")) ;
+            == strtoupper('WpSwimTeamSeasonAddForm')) ;
 
         $this->add_element($status) ;
 
         //  Status options and labels are set based on
         //  the plugin options
 
-        $swimmerlabels = new FEListBox("Swimmer Labels", !$disabled_field, "150px");
+        $swimmerlabels = new FEListBox('Swimmer Labels', !$disabled_field, '150px');
         $swimmerlabels->set_list_data($this->_publicSwimmerIdSelections()) ;
         $swimmerlabels->set_readonly($disabled_field) ;
 
@@ -189,13 +189,13 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
     function form_init_data()
     {
         //  Initialize the form fields
-        $this->set_hidden_element_value("_action", WPST_ACTION_ADD) ;
-        $this->set_element_value("Start", array("year" => date("Y"),
-            "month" => date("m"), "day" => date("d"))) ;
-        $this->set_element_value("End", array("year" => date("Y"),
-            "month" => date("m"), "day" => date("d"))) ;
-        $this->set_element_value("Status", WPST_SEASONS_SEASON_INACTIVE) ;
-        $this->set_element_value("Swimmer Labels", WPST_UNLOCKED) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_ADD) ;
+        $this->set_element_value('Start', array('year' => date('Y'),
+            'month' => date('m'), 'day' => date('d'))) ;
+        $this->set_element_value('End', array('year' => date('Y'),
+            'month' => date('m'), 'day' => date('d'))) ;
+        $this->set_element_value('Status', WPST_SEASONS_SEASON_INACTIVE) ;
+        $this->set_element_value('Swimmer Labels', WPST_UNLOCKED) ;
     }
 
 
@@ -208,22 +208,22 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
     function form_content()
     {
         $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("Description"),
-            $this->element_form("Description")) ;
+        $table->add_row($this->element_label('Description'),
+            $this->element_form('Description')) ;
 
-        $table->add_row($this->element_label("Start"),
-            $this->element_form("Start")) ;
+        $table->add_row($this->element_label('Start'),
+            $this->element_form('Start')) ;
 
-        $table->add_row($this->element_label("End"),
-            $this->element_form("End")) ;
+        $table->add_row($this->element_label('End'),
+            $this->element_form('End')) ;
 
-        $table->add_row($this->element_label("Status"),
-            $this->element_form("Status")) ;
+        $table->add_row($this->element_label('Status'),
+            $this->element_form('Status')) ;
 
-        $table->add_row($this->element_label("Swimmer Labels"),
-            $this->element_form("Swimmer Labels")) ;
+        $table->add_row($this->element_label('Swimmer Labels'),
+            $this->element_form('Swimmer Labels')) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -243,40 +243,40 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
         //  Make sure position is unique
 
         $season = new SwimTeamSeason() ;
-        $season->setSeasonLabel($this->get_element_value("Description")) ;
-        $season->setSeasonStart($this->get_element_value("Start")) ;
-        $season->setSeasonEnd($this->get_element_value("End")) ;
-        $season->setSeasonStatus($this->get_element_value("Status")) ;
-        $season->setSwimmerLabels($this->get_element_value("Swimmer Labels")) ;
+        $season->setSeasonLabel($this->get_element_value('Description')) ;
+        $season->setSeasonStart($this->get_element_value('Start')) ;
+        $season->setSeasonEnd($this->get_element_value('End')) ;
+        $season->setSeasonStatus($this->get_element_value('Status')) ;
+        $season->setSwimmerLabels($this->get_element_value('Swimmer Labels')) ;
 
         if ($season->seasonExist())
         {
-            $this->add_error("Description", "Season already exists.");
-            $this->add_error("Start", "Season already exists.");
-            $this->add_error("End", "Season already exists.");
-            $this->add_error("Status", "Season already exists.");
+            $this->add_error('Description', 'Season already exists.');
+            $this->add_error('Start', 'Season already exists.');
+            $this->add_error('End', 'Season already exists.');
+            $this->add_error('Status', 'Season already exists.');
             $valid = false ;
         }
 
         //  Make sure dates are reasonable
         
-        $d = $this->get_element_value("Start") ;
-        $startTime = strtotime(sprintf("%04s-%02s-%02s", $d["year"], $d["month"], $d["day"])) ;
-        $d = $this->get_element_value("End") ;
-        $endTime = strtotime(sprintf("%04s-%02s-%02s", $d["year"], $d["month"], $d["day"])) ;
+        $d = $this->get_element_value('Start') ;
+        $startTime = strtotime(sprintf('%04s-%02s-%02s', $d['year'], $d['month'], $d['day'])) ;
+        $d = $this->get_element_value('End') ;
+        $endTime = strtotime(sprintf('%04s-%02s-%02s', $d['year'], $d['month'], $d['day'])) ;
 
  
         if ($startTime == $endTime)
         {
-            $this->add_error("Start", "Start date and End date are the same.") ;
-            $this->add_error("End", " Start date and End date are the same.") ;
+            $this->add_error('Start', 'Start date and End date are the same.') ;
+            $this->add_error('End', ' Start date and End date are the same.') ;
             $valid = false ;
         }
         
         if ($startTime > $endTime)
         {
-            $this->add_error("Start", "Start date occurs after End date.") ;
-            $this->add_error("End", " End date occurs before Start date.") ;
+            $this->add_error('Start', 'Start date occurs after End date.') ;
+            $this->add_error('End', ' End date occurs before Start date.') ;
             $valid = false ;
         }
         
@@ -292,14 +292,14 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
     function form_action()
     {
         $season = new SwimTeamSeason() ;
-        $season->setSeasonLabel($this->get_element_value("Description")) ;
-        $season->setSeasonStart($this->get_element_value("Start")) ;
-        $season->setSeasonEnd($this->get_element_value("End")) ;
-        $season->setSwimmerLabels($this->get_element_value("Swimmer Labels")) ;
+        $season->setSeasonLabel($this->get_element_value('Description')) ;
+        $season->setSeasonStart($this->get_element_value('Start')) ;
+        $season->setSeasonEnd($this->get_element_value('End')) ;
+        $season->setSwimmerLabels($this->get_element_value('Swimmer Labels')) ;
 
         //  Seasons always start inactive ...
         $season->setSeasonStatus(WPST_INACTIVE) ;
-        //$season->setSeasonStatus($this->get_element_value("Status")) ;
+        //$season->setSeasonStatus($this->get_element_value('Status')) ;
 
         $success = $season->addSeason() ;
 
@@ -308,11 +308,11 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
         if ($success) 
         {
             $season->setId($success) ;
-            $this->set_action_message("Season successfully added.") ;
+            $this->set_action_message('Season successfully added.') ;
         }
         else
         {
-            $this->set_action_message("Season was not successfully added.") ;
+            $this->set_action_message('Season was not successfully added.') ;
         }
 
         return $success ;
@@ -337,7 +337,7 @@ class WpSwimTeamSeasonAddForm extends WpSwimTeamForm
 /**
  * Construct the Update Season form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSeasonAddForm
  */
@@ -355,13 +355,13 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
         $season->loadSeasonById($this->getId()) ;
 
         //  Initialize the form fields
-        $this->set_hidden_element_value("seasonid", $this->getId()) ;
-        $this->set_hidden_element_value("_action", $action) ;
-        $this->set_element_value("Description", $season->getSeasonLabel()) ;
-        $this->set_element_value("Start", $season->getSeasonStart()) ;
-        $this->set_element_value("End", $season->getSeasonEnd()) ;
-        $this->set_element_value("Status", $season->getSeasonStatus()) ;
-        $this->set_element_value("Swimmer Labels", $season->getSwimmerLabels()) ;
+        $this->set_hidden_element_value('_seasonid', $this->getId()) ;
+        $this->set_hidden_element_value('_action', $action) ;
+        $this->set_element_value('Description', $season->getSeasonLabel()) ;
+        $this->set_element_value('Start', $season->getSeasonStart()) ;
+        $this->set_element_value('End', $season->getSeasonEnd()) ;
+        $this->set_element_value('Status', $season->getSeasonStatus()) ;
+        $this->set_element_value('Swimmer Labels', $season->getSwimmerLabels()) ;
     }
 
     /**
@@ -377,11 +377,11 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
         //  Need to validate several fields ...
 
         $season = new SwimTeamSeason() ;
-        $season->setSeasonLabel($this->get_element_value("Description")) ;
-        $season->setSeasonStart($this->get_element_value("Start")) ;
-        $season->setSeasonEnd($this->get_element_value("End")) ;
-        $season->setSeasonStatus($this->get_element_value("Status")) ;
-        $season->setSwimmerLabels($this->get_element_value("Swimmer Labels")) ;
+        $season->setSeasonLabel($this->get_element_value('Description')) ;
+        $season->setSeasonStart($this->get_element_value('Start')) ;
+        $season->setSeasonEnd($this->get_element_value('End')) ;
+        $season->setSeasonStatus($this->get_element_value('Status')) ;
+        $season->setSwimmerLabels($this->get_element_value('Swimmer Labels')) ;
 
         //  The existance check retains the id result of the query
         //  (if it found one) so it can be used for additional checking.
@@ -392,34 +392,34 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
 
             $qr = $season->getQueryResult() ;
 
-            if ($qr["id"] != $this->get_hidden_element_value("seasonid"))
+            if ($qr['id'] != $this->get_hidden_element_value('_seasonid'))
             {
-                $this->add_error("Description", "Similar season already exists.");
-                $this->add_error("Start", "Similar season already exists.");
-                $this->add_error("End", "Similar season already exists.");
+                $this->add_error('Description', 'Similar season already exists.');
+                $this->add_error('Start', 'Similar season already exists.');
+                $this->add_error('End', 'Similar season already exists.');
                 $valid = false ;
             }
             else
             {
                 //  Make sure dates are reasonable
         
-                $d = $this->get_element_value("Start") ;
-                $startTime = strtotime(sprintf("%04s-%02s-%02s",
-                    $d["year"], $d["month"], $d["day"])) ;
-                $d = $this->get_element_value("End") ;
-                $endTime = strtotime(sprintf("%04s-%02s-%02s",
-                    $d["year"], $d["month"], $d["day"])) ;
+                $d = $this->get_element_value('Start') ;
+                $startTime = strtotime(sprintf('%04s-%02s-%02s',
+                    $d['year'], $d['month'], $d['day'])) ;
+                $d = $this->get_element_value('End') ;
+                $endTime = strtotime(sprintf('%04s-%02s-%02s',
+                    $d['year'], $d['month'], $d['day'])) ;
  
                 if ($startTime == $endTime)
                 {
-                    $this->add_error("Start", "Start date and End date are the same.") ;
-                    $this->add_error("End", " Start date and End date are the same.") ;
+                    $this->add_error('Start', 'Start date and End date are the same.') ;
+                    $this->add_error('End', ' Start date and End date are the same.') ;
                     $valid = false ;
                 }
                 else if ($startTime > $endTime)
                 {
-                    $this->add_error("Start", "Start date occurs after End date.") ;
-                    $this->add_error("End", " End date occurs before Start date.") ;
+                    $this->add_error('Start', 'Start date occurs after End date.') ;
+                    $this->add_error('End', ' End date occurs before Start date.') ;
                     $valid = false ;
                 }
                 else
@@ -430,7 +430,7 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
                     //  ids which are already unlocked.
         
                     $oldSeason = new SwimTeamSeason() ;
-                    $oldSeason->setId($this->get_hidden_element_value("seasonid")) ;
+                    $oldSeason->setId($this->get_hidden_element_value('_seasonid')) ;
                     $oldSeason->loadSeasonById() ;
 
                     //  No change to either season status or swimmer ids?
@@ -440,34 +440,34 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
                         switch ($season->getSeasonStatus())
                         {
                             case WPST_SEASONS_SEASON_ACTIVE:
-                                $this->add_error("Status", "Season is already open.") ;
+                                $this->add_error('Status', 'Season is already open.') ;
                                 break ;
 
                             case WPST_SEASONS_SEASON_INACTIVE:
-                                $this->add_error("Status", "Season is already closed.") ;
+                                $this->add_error('Status', 'Season is already closed.') ;
                                 break ;
 
                             default:
-                                $this->add_error("Status", "No change to season status.") ;
+                                $this->add_error('Status', 'No change to season status.') ;
                                 break ;
                         }
 
                         switch ($season->getSwimmerLabels())
                         {
                             case WPST_LOCKED:
-                                $this->add_error("Swimmer Labels", "Swimmer Labels are already locked.") ;
+                                $this->add_error('Swimmer Labels', 'Swimmer Labels are already locked.') ;
                                 break ;
 
                             case WPST_UNLOCKED:
-                                $this->add_error("Swimmer Labels", "Swimmer Labels are already unlocked.") ;
+                                $this->add_error('Swimmer Labels', 'Swimmer Labels are already unlocked.') ;
                                 break ;
 
                             case WPST_FROZEN:
-                                $this->add_error("Swimmer Labels", "Swimmer Labels are already frozen.") ;
+                                $this->add_error('Swimmer Labels', 'Swimmer Labels are already frozen.') ;
                                 break ;
 
                             default:
-                                $this->add_error("Swimmer Labels", "No change to swimmer Ids status.") ;
+                                $this->add_error('Swimmer Labels', 'No change to swimmer Ids status.') ;
                                 break ;
                         }
 
@@ -489,12 +489,12 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
     function form_action()
     {
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
-        $season->setSeasonLabel($this->get_element_value("Description")) ;
-        $season->setSeasonStart($this->get_element_value("Start")) ;
-        $season->setSeasonEnd($this->get_element_value("End")) ;
-        $season->setSeasonStatus($this->get_element_value("Status")) ;
-        $season->setSwimmerLabels($this->get_element_value("Swimmer Labels")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
+        $season->setSeasonLabel($this->get_element_value('Description')) ;
+        $season->setSeasonStart($this->get_element_value('Start')) ;
+        $season->setSeasonEnd($this->get_element_value('End')) ;
+        $season->setSeasonStatus($this->get_element_value('Status')) ;
+        $season->setSwimmerLabels($this->get_element_value('Swimmer Labels')) ;
         $success = $season->updateSeason() ;
 
         //  If successful, store the added age group id in so it can be used later.
@@ -502,11 +502,11 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
         if ($success) 
         {
             $season->setId($success) ;
-            $this->set_action_message("Season successfully updated.") ;
+            $this->set_action_message('Season successfully updated.') ;
         }
         else
         {
-            $this->set_action_message("Season was not successfully updated.") ;
+            $this->set_action_message('Season was not successfully updated.') ;
         }
 
         return $success ;
@@ -516,7 +516,7 @@ class WpSwimTeamSeasonUpdateForm extends WpSwimTeamSeasonAddForm
 /**
  * Construct the Delete Season form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSeasonUpdateForm
  */
@@ -555,20 +555,20 @@ class WpSwimTeamSeasonDeleteForm extends WpSwimTeamSeasonUpdateForm
     function form_action()
     {
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $success = $season->deleteSeason() ;
 
         if ($success) 
-            $this->set_action_message("Season successfully deleted.") ;
+            $this->set_action_message('Season successfully deleted.') ;
         else
-            $this->set_action_message("Season was not successfully deleted.") ;
+            $this->set_action_message('Season was not successfully deleted.') ;
 
         return $success ;
     }
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Delete" instead of the default "Save".
+     * button display 'Delete' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -580,7 +580,7 @@ class WpSwimTeamSeasonDeleteForm extends WpSwimTeamSeasonUpdateForm
 /**
  * Construct the Open Season form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSeasonDeleteForm
  */
@@ -610,7 +610,7 @@ class WpSwimTeamSeasonOpenForm extends WpSwimTeamSeasonDeleteForm
         $valid = true ;
 
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $season->loadSeasonById() ;
  
         //  Don't want to open a season which is alreay opened
@@ -618,7 +618,7 @@ class WpSwimTeamSeasonOpenForm extends WpSwimTeamSeasonDeleteForm
         if ($season->getSeasonStatus() == WPST_SEASONS_SEASON_ACTIVE)
         {
             $valid = false ;
-            $this->add_error("Status", "Season is already open.") ;
+            $this->add_error('Status', 'Season is already open.') ;
         }
 
         return $valid ;
@@ -633,20 +633,20 @@ class WpSwimTeamSeasonOpenForm extends WpSwimTeamSeasonDeleteForm
     function form_action()
     {
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $success = $season->openSeason() ;
 
         if ($success) 
-            $this->set_action_message("Season successfully opened.") ;
+            $this->set_action_message('Season successfully opened.') ;
         else
-            $this->set_action_message("Season was not successfully opened.") ;
+            $this->set_action_message('Season was not successfully opened.') ;
 
         return $success ;
     }
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Delete" instead of the default "Save".
+     * button display 'Delete' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -658,7 +658,7 @@ class WpSwimTeamSeasonOpenForm extends WpSwimTeamSeasonDeleteForm
 /**
  * Construct the Close Season form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSeasonDeleteForm
  */
@@ -688,7 +688,7 @@ class WpSwimTeamSeasonCloseForm extends WpSwimTeamSeasonDeleteForm
         $valid = true ;
 
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $season->loadSeasonById() ;
  
         //  Don't want to close a season which is alreay closed
@@ -696,7 +696,7 @@ class WpSwimTeamSeasonCloseForm extends WpSwimTeamSeasonDeleteForm
         if ($season->getSeasonStatus() == WPST_SEASONS_SEASON_INACTIVE)
         {
             $valid = false ;
-            $this->add_error("Status", "Season is already closed.") ;
+            $this->add_error('Status', 'Season is already closed.') ;
         }
 
         return $valid ;
@@ -711,20 +711,20 @@ class WpSwimTeamSeasonCloseForm extends WpSwimTeamSeasonDeleteForm
     function form_action()
     {
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $success = $season->closeSeason() ;
 
         if ($success) 
-            $this->set_action_message("Season successfully closed.") ;
+            $this->set_action_message('Season successfully closed.') ;
         else
-            $this->set_action_message("Season was not successfully closed.") ;
+            $this->set_action_message('Season was not successfully closed.') ;
 
         return $success ;
     }
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Delete" instead of the default "Save".
+     * button display 'Delete' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -736,7 +736,7 @@ class WpSwimTeamSeasonCloseForm extends WpSwimTeamSeasonDeleteForm
 /**
  * Construct the Lock Swimmer Labels form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSeasonDeleteForm
  */
@@ -766,7 +766,7 @@ class WpSwimTeamLockSwimmerIdsForm extends WpSwimTeamSeasonDeleteForm
         $valid = true ;
 
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $season->loadSeasonById() ;
  
         //  Don't want to open a season which is alreay opened
@@ -774,7 +774,7 @@ class WpSwimTeamLockSwimmerIdsForm extends WpSwimTeamSeasonDeleteForm
         if ($season->getSwimmerLabels() == WPST_LOCKED)
         {
             $valid = false ;
-            $this->add_error("Swimmer Labels", "Swimmer Labels are already locked.") ;
+            $this->add_error('Swimmer Labels', 'Swimmer Labels are already locked.') ;
         }
 
         return $valid ;
@@ -789,20 +789,20 @@ class WpSwimTeamLockSwimmerIdsForm extends WpSwimTeamSeasonDeleteForm
     function form_action()
     {
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $success = $season->lockSwimmerIds() ;
 
         if ($success) 
-            $this->set_action_message("Swimmer Labels successfully locked.") ;
+            $this->set_action_message('Swimmer Labels successfully locked.') ;
         else
-            $this->set_action_message("Swimmer Labels were not successfully locked.") ;
+            $this->set_action_message('Swimmer Labels were not successfully locked.') ;
 
         return $success ;
     }
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Lock" instead of the default "Save".
+     * button display 'Lock' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -814,7 +814,7 @@ class WpSwimTeamLockSwimmerIdsForm extends WpSwimTeamSeasonDeleteForm
 /**
  * Construct the Unlock Swimmer Labels form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSeasonDeleteForm
  */
@@ -844,7 +844,7 @@ class WpSwimTeamUnlockSwimmerIdsForm extends WpSwimTeamSeasonDeleteForm
         $valid = true ;
 
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $season->loadSeasonById() ;
  
         //  Don't want to unlock swimmers labels which are already unlocked!
@@ -852,7 +852,7 @@ class WpSwimTeamUnlockSwimmerIdsForm extends WpSwimTeamSeasonDeleteForm
         if ($season->getSwimmerLabels() == WPST_UNLOCKED)
         {
             $valid = false ;
-            $this->add_error("Swimmer Labels", "Swimmer Labels are already unlocked.") ;
+            $this->add_error('Swimmer Labels', 'Swimmer Labels are already unlocked.') ;
         }
 
         return $valid ;
@@ -867,20 +867,20 @@ class WpSwimTeamUnlockSwimmerIdsForm extends WpSwimTeamSeasonDeleteForm
     function form_action()
     {
         $season = new SwimTeamSeason() ;
-        $season->setId($this->get_hidden_element_value("seasonid")) ;
+        $season->setId($this->get_hidden_element_value('_seasonid')) ;
         $success = $season->unlockSwimmerIds() ;
 
         if ($success) 
-            $this->set_action_message("Swimmer Labels successfully unlocked.") ;
+            $this->set_action_message('Swimmer Labels successfully unlocked.') ;
         else
-            $this->set_action_message("Swimmer Labels were not successfully unlocked.") ;
+            $this->set_action_message('Swimmer Labels were not successfully unlocked.') ;
 
         return $success ;
     }
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Unlock" instead of the default "Save".
+     * button display 'Unlock' instead of the default 'Save'.
      *
      */
     function form_content_buttons()

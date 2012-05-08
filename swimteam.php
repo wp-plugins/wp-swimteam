@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.23.838
- * Last Modified:  2012/05/07 18:44:02
+ * Version: 1.24.846
+ * Last Modified:  2012/05/08 22:05:40
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 755 2012-04-20 11:54:50Z mpwalsh8 $
+ * $Id: swimteam.php 842 2012-05-08 20:21:06Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,7 +20,7 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 755 $
+ * @version $Rev: 842 $
  * @lastmodified $Date$
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
@@ -916,6 +916,29 @@ function wpst_login_redirect($redirect_to, $request_redirect_to, $user)
  
 // add filter with default priority (10), filter takes (3) parameters
 add_filter('login_redirect','wpst_login_redirect', 10, 3);
+
+/**
+ * Default to First/Last instead of username for new users
+ *
+ * @param - $name string - URL to redirect to
+ * @return - string - proper display name
+ * @see http://lists.automattic.com/pipermail/wp-hackers/2012-May/043066.html
+ */
+function wpst_default_display_name($name)
+{
+    if (isset($_POST['display_name']))
+        return sanitize_text_field($_POST['display_name']) ;
+
+    if (isset($_POST['first_name']))
+    {
+        $name = sanitize_text_field($_POST['first_name']) ;
+        if (isset($_POST['last_name']))
+            $name .= ' '. sanitize_text_field($_POST['last_name']) ;
+    }
+
+    return $name ;
+}
+add_filter('pre_user_display_name','wpst_default_display_name') ;
 
 /**
  *  Build the WordPress Dashboard widget to dispkay an overview of the swim team.

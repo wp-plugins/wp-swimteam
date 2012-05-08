@@ -7,7 +7,7 @@
  *
  * (c) 2008 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage SwimClubs
  * @version $Revision$
@@ -16,11 +16,11 @@
  *
  */
 
-require_once("db.class.php") ;
-require_once("swimteam.include.php") ;
-require_once("table.class.php") ;
-require_once("widgets.class.php") ;
-require_once("team.class.php") ;
+require_once('db.class.php') ;
+require_once('swimteam.include.php') ;
+require_once('table.class.php') ;
+require_once('widgets.class.php') ;
+require_once('team.class.php') ;
 
 /**
  * Class definition of the Swim Team Profile
@@ -33,7 +33,7 @@ require_once("team.class.php") ;
  * The properties, methods, and even the GUI can be reused from the
  * team profile classes.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamProfile
  */
@@ -174,8 +174,8 @@ class SwimClubProfile extends SwimTeamProfile
     {
 	    //  Is a similar swimclub already in the database?
 
-        $query = sprintf("SELECT swimclubid FROM %s WHERE
-            teamname = \"%s\" AND cluborpoolname = \"%s\"",
+        $query = sprintf('SELECT swimclubid FROM %s WHERE
+            teamname = "%s" AND cluborpoolname = "%s"',
             WPST_SWIMCLUBS_TABLE, $this->getTeamName(),
             $this->getClubOrPoolName()) ;
 
@@ -205,7 +205,7 @@ class SwimClubProfile extends SwimTeamProfile
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT swimclubid FROM %s WHERE swimclubid = \"%s\"",
+        $query = sprintf('SELECT swimclubid FROM %s WHERE swimclubid = "%s"',
             WPST_SWIMCLUBS_TABLE, $id) ;
 
         $this->setQuery($query) ;
@@ -231,27 +231,27 @@ class SwimClubProfile extends SwimTeamProfile
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET
-                teamname=\"%s\",
-                cluborpoolname=\"%s\",
-                poollength=\"%s\",
-                poolmeasurementunits=\"%s\",
-                poollanes=\"%s\",
-                street1=\"%s\",
-                street2=\"%s\",
-                street3=\"%s\",
-                city=\"%s\",
-                stateorprovince=\"%s\",
-                postalcode=\"%s\",
-                country=\"%s\",
-                primaryphone=\"%s\",
-                secondaryphone=\"%s\",
-                contactname=\"%s\",
-                contactemail=\"%s\",
-                website=\"%s\",
-                googlemapsurl=\"%s\",
-                mapquesturl=\"%s\",
-                notes=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET
+                teamname="%s",
+                cluborpoolname="%s",
+                poollength="%s",
+                poolmeasurementunits="%s",
+                poollanes="%s",
+                street1="%s",
+                street2="%s",
+                street3="%s",
+                city="%s",
+                stateorprovince="%s",
+                postalcode="%s",
+                country="%s",
+                primaryphone="%s",
+                secondaryphone="%s",
+                contactname="%s",
+                contactemail="%s",
+                website="%s",
+                googlemapsurl="%s",
+                mapquesturl="%s",
+                notes="%s"',
                 WPST_SWIMCLUBS_TABLE,
                 $this->getTeamName(),
                 $this->getClubOrPoolName(),
@@ -299,28 +299,28 @@ class SwimClubProfile extends SwimTeamProfile
         {
             //  Construct the insert query
  
-            $query = sprintf("UPDATE %s SET
-                teamname=\"%s\",
-                cluborpoolname=\"%s\",
-                poollength=\"%s\",
-                poolmeasurementunits=\"%s\",
-                poollanes=\"%s\",
-                street1=\"%s\",
-                street2=\"%s\",
-                street3=\"%s\",
-                city=\"%s\",
-                stateorprovince=\"%s\",
-                postalcode=\"%s\",
-                country=\"%s\",
-                primaryphone=\"%s\",
-                secondaryphone=\"%s\",
-                contactname=\"%s\",
-                contactemail=\"%s\",
-                website=\"%s\",
-                googlemapsurl=\"%s\",
-                mapquesturl=\"%s\",
-                notes=\"%s\"
-                WHERE swimclubid=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                teamname="%s",
+                cluborpoolname="%s",
+                poollength="%s",
+                poolmeasurementunits="%s",
+                poollanes="%s",
+                street1="%s",
+                street2="%s",
+                street3="%s",
+                city="%s",
+                stateorprovince="%s",
+                postalcode="%s",
+                country="%s",
+                primaryphone="%s",
+                secondaryphone="%s",
+                contactname="%s",
+                contactemail="%s",
+                website="%s",
+                googlemapsurl="%s",
+                mapquesturl="%s",
+                notes="%s"
+                WHERE swimclubid="%s"',
                 WPST_SWIMCLUBS_TABLE,
                 $this->getTeamName(),
                 $this->getClubOrPoolName(),
@@ -350,7 +350,7 @@ class SwimClubProfile extends SwimTeamProfile
         }
         else
         {
-            wp_die("Serious database update error encountered.") ;
+            wp_die('Serious database update error encountered.') ;
         }
 
         return true ;
@@ -362,7 +362,7 @@ class SwimClubProfile extends SwimTeamProfile
      * Really need to think about this because deleting a swimclub
      * means deleting all of the meets that go with it.  So if a
      * swimclub has meets (which have results), disallow deleting
-     * the swimclub.  It can be "hidden" but can't be deleted.
+     * the swimclub.  It can be 'hidden' but can't be deleted.
      *
      */
     function deleteSwimClub()
@@ -375,8 +375,8 @@ class SwimClubProfile extends SwimTeamProfile
         {
             //  Construct the insert query
  
-            $query = sprintf("DELETE FROM %s
-                WHERE id=\"%s\"",
+            $query = sprintf('DELETE FROM %s
+                WHERE id="%s"',
                 WPST_SWIMCLUBS_TABLE,
                 $this->getSwimClubId()
             ) ;
@@ -408,7 +408,7 @@ class SwimClubProfile extends SwimTeamProfile
         //  Make sure it is a legal swimclub id
         if ($this->getSwimClubExistsById())
         {
-            $query = sprintf("SELECT * FROM %s WHERE swimclubid = \"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE swimclubid = "%s"',
                 WPST_SWIMCLUBS_TABLE, $swimclubid) ;
 
             $this->setQuery($query) ;
@@ -451,15 +451,15 @@ class SwimClubProfile extends SwimTeamProfile
      * @param - string - optional filter to restrict query
      * @return - array - array of swimmers ids
      */
-    function getAllSwimClubIds($filter = null, $orderby = "cluborpoolname")
+    function getAllSwimClubIds($filter = null, $orderby = 'cluborpoolname')
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT swimclubid FROM %s", WPST_SWIMCLUBS_TABLE) ;
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        $query = sprintf('SELECT swimclubid FROM %s', WPST_SWIMCLUBS_TABLE) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -473,7 +473,7 @@ class SwimClubProfile extends SwimTeamProfile
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -504,7 +504,7 @@ class SwimTeamSwimClubsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimTeamSwimClubsGUIDataList($title, $width = "100%",
+    function SwimTeamSwimClubsGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_SWIMCLUBS_DEFAULT_COLUMNS,
         $tables = WPST_SWIMCLUBS_DEFAULT_TABLES,
@@ -535,21 +535,21 @@ class SwimTeamSwimClubsGUIDataList extends SwimTeamGUIDataList
     {
 		//  Add the columns in the display that you want to view.  The API is :
 		//  Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-		$this->add_header_item("Club or Pool",
-	       	    "200", "cluborpoolname", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Club or Pool',
+	       	    '200', 'cluborpoolname', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Team Name",
-	         	    "150", "teamname", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Team Name',
+	         	    '150', 'teamname', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("City",
-	         	    "150", "city", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('City',
+	         	    '150', 'city', SORTABLE, SEARCHABLE, 'left') ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
 	  	$this->add_header_item($label,
-	         	    "150", "stateorprovince", SORTABLE, SEARCHABLE, "left") ;
+	         	    '150', 'stateorprovince', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Web Site",
-	         	    "200", "website", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Web Site',
+	         	    '200', 'website', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
@@ -567,7 +567,7 @@ class SwimTeamSwimClubsGUIDataList extends SwimTeamGUIDataList
 
         //  The unique item is the second column.
 
-	    $this->add_action_column('radio', 'FIRST', "swimclubid") ;
+	    $this->add_action_column('radio', 'FIRST', 'swimclubid') ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -599,13 +599,13 @@ class SwimTeamSwimClubsGUIDataList extends SwimTeamGUIDataList
 		switch ($col_name)
         {
                 /*
-            case "Updated" :
-                $obj = strftime("%Y-%m-%d @ %T", (int)$row_data["updated"]) ;
+            case 'Updated' :
+                $obj = strftime('%Y-%m-%d @ %T', (int)$row_data['updated']) ;
                 break ;
                 */
 
-            case "Web Site" :
-                $obj = html_a($row_data["website"], $row_data["website"]) ;
+            case 'Web Site' :
+                $obj = html_a($row_data['website'], $row_data['website']) ;
                 break ;
 
 		    default:
@@ -620,7 +620,7 @@ class SwimTeamSwimClubsGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various swimclubs.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamSwimClubsGUIDataList
  */
@@ -653,8 +653,8 @@ class SwimTeamSwimClubsAdminGUIDataList extends SwimTeamSwimClubsGUIDataList
 
         parent::user_setup() ;
 
-		$this->add_header_item("Id",
-	       	    "50", "swimclubid", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Id',
+	       	    '50', 'swimclubid', SORTABLE, SEARCHABLE, 'left') ;
 
     }
 }
@@ -663,7 +663,7 @@ class SwimTeamSwimClubsAdminGUIDataList extends SwimTeamSwimClubsGUIDataList
  * Extended InfoTable Class for presenting Swimmer
  * information as a table extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -705,70 +705,69 @@ class SwimClubProfileInfoTable extends SwimTeamInfoTable
 
         if (is_null($this->getSwimClubId()))
         {
-            $this->add_row("No swim club profile data.") ;
+            $this->add_row('No swim club profile data.') ;
         }
         else
         {
             $sc = new SwimClubProfile() ;
             $sc->loadSwimClubBySwimClubId($this->getSwimClubId()) ;
 
-
-            $this->add_row("Team Name", $sc->getTeamName()) ;
-            $this->add_row("Club or Pool Name", $sc->getClubOrPoolName()) ;
-            $this->add_row("Pool Length", $sc->getPoolLength() .
-                " " . ucfirst($sc->getPoolMeasurementUnits()) .
-                " (" . $sc->getPoolLanes() . " Lanes)") ;
+            $this->add_row('Team Name', $sc->getTeamName()) ;
+            $this->add_row('Club or Pool Name', $sc->getClubOrPoolName()) ;
+            $this->add_row('Pool Length', $sc->getPoolLength() .
+                ' ' . ucfirst($sc->getPoolMeasurementUnits()) .
+                ' (' . $sc->getPoolLanes() . ' Lanes)') ;
 
             $address = $sc->getStreet1() ;
-            if ($sc->getStreet2() != "")
-                $address .= "<br/>" . $sc->getStreet2() ;
-            if ($sc->getStreet3() != "")
-                $address .= "<br/>" . $sc->getStreet3() ;
+            if ($sc->getStreet2() != '')
+                $address .= '<br/>' . $sc->getStreet2() ;
+            if ($sc->getStreet3() != '')
+                $address .= '<br/>' . $sc->getStreet3() ;
 
-            $address .= "<br/>" . $sc->getCity() ;
-            $address .= ", " . $sc->getStateOrProvince() ;
-            $address .= "<br/>" . $sc->getPostalCode() ;
-            $address .= "<br/>" . $sc->getCountry() ;
+            $address .= '<br/>' . $sc->getCity() ;
+            $address .= ', ' . $sc->getStateOrProvince() ;
+            $address .= '<br/>' . $sc->getPostalCode() ;
+            $address .= '<br/>' . $sc->getCountry() ;
 
-            $this->add_row("Address", $address) ;
+            $this->add_row('Address', $address) ;
 
-            $this->add_row("Primary Phone", $sc->getPrimaryPhone()) ;
+            $this->add_row('Primary Phone', $sc->getPrimaryPhone()) ;
 
             //  Brief profile?
 
             if ($brief) return ;
 
-            $this->add_row("Secondary Phone", $sc->getSecondaryPhone()) ;
-            $this->add_row("Contact Name", $sc->getContactName()) ;
+            $this->add_row('Secondary Phone', $sc->getSecondaryPhone()) ;
+            $this->add_row('Contact Name', $sc->getContactName()) ;
 
             if ($sc->getEmailAddress() != WPST_NULL_STRING)
-                $this->add_row("Email Address", html_a("mailto:" .
+                $this->add_row('Email Address', html_a('mailto:' .
                     $sc->getEmailAddress(), $sc->getEmailAddress())) ;
             else
-                $this->add_row("Email Address", WPST_NULL_STRING) ;
+                $this->add_row('Email Address', WPST_NULL_STRING) ;
 
             if ($sc->getWebSite() != WPST_NULL_STRING)
-                $this->add_row("Web Site",
+                $this->add_row('Web Site',
                     html_a($sc->getWebSite(), $sc->getWebSite())) ;
             else
-                $this->add_row("Web Site", WPST_NULL_STRING) ;
+                $this->add_row('Web Site', WPST_NULL_STRING) ;
 
             if ($sc->getGoogleMapsURL() != WPST_NULL_STRING)
-                $this->add_row("Google Maps URL",
+                $this->add_row('Google Maps URL',
                     html_a($sc->getGoogleMapsURL(), $sc->getGoogleMapsURL())) ;
             else
-                $this->add_row("Google Maps URL", WPST_NULL_STRING) ;
+                $this->add_row('Google Maps URL', WPST_NULL_STRING) ;
 
             if ($sc->getMapQuestURL() != WPST_NULL_STRING)
-                $this->add_row("MapQuest URL",
+                $this->add_row('MapQuest URL',
                     html_a($sc->getMapQuestURL(), $sc->getMapQuestURL())) ;
             else
-                $this->add_row("MapQuest URL", WPST_NULL_STRING) ;
+                $this->add_row('MapQuest URL', WPST_NULL_STRING) ;
 
             if ($sc->getNotes() != WPST_NULL_STRING)
-                $this->add_row("Notes", nl2br($sc->getNotes())) ;
+                $this->add_row('Notes', nl2br($sc->getNotes())) ;
             else
-                $this->add_row("Notes", WPST_NULL_STRING) ;
+                $this->add_row('Notes', WPST_NULL_STRING) ;
 
             //  Only display the short code to users who can post
 
@@ -777,8 +776,8 @@ class SwimClubProfileInfoTable extends SwimTeamInfoTable
 
             if ($userdata->user_level > 0)
             { 
-                $this->add_row("Short Codes",
-                    sprintf("[wpst_club_profile clubid=%s [googlemap='y|yes|n|no'] [mapquestmap='y|yes|n|no] [links='y|yes|n|no']]",                   $sc->getSwimClubId())) ;
+                $this->add_row('Short Codes',
+                    sprintf('[wpst_club_profile clubid=%s [googlemap=\'y|yes|n|no\'] [mapquestmap=\'y|yes|n|no] [links=\'y|yes|n|no\']]',                   $sc->getSwimClubId())) ;
             }
         }
     }

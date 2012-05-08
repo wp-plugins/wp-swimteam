@@ -23,6 +23,7 @@ require_once('users.class.php') ;
 require_once('team.class.php') ;
 require_once('seasons.class.php') ;
 require_once('roster.class.php') ;
+require_once('swimclubs.class.php') ;
 
 /**
  * Class definition of the SDIF team profile
@@ -661,14 +662,14 @@ class SDIFLSCRegistrationPyramid2 extends SDIFBasePyramid
     {
         //  Need Team Profile information from database
  
-        $team = new SwimTeamProfile() ;
-        $team->loadTeamProfile() ;
+        $swimteam = new SwimTeamProfile() ;
+        $swimteam->loadTeamProfile() ;
 
         $c1 = sprintf(WPST_SDIF_C1_RECORD, $this->getOrgCode(),
             WPST_SDIF_FUTURE_USE, $this->getTeamCode(),
-            $team->getClubOrPoolName(), $team->getTeamName(),
-            $team->getStreet1(), $team->getStreet2(), $team->getCity(),
-            $team->getStateOrProvince(), $team->getPostalCode(),
+            $swimteam->getClubOrPoolName(), $swimteam->getTeamName(),
+            $swimteam->getStreet1(), $swimteam->getStreet2(), $swimteam->getCity(),
+            $swimteam->getStateOrProvince(), $swimteam->getPostalCode(),
             WPST_SDIF_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE,
             $this->getRegionCode(), WPST_SDIF_FUTURE_USE,
             WPST_SDIF_FUTURE_USE, WPST_SDIF_FUTURE_USE,
@@ -818,6 +819,12 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
 
         $sdif = array() ;
 
+        //  Need to keep track of unique swimmers and various
+        //  SDIF record counts in order to terminate SDIF file.
+
+        $unique_swimmers = array() ;
+        $sdif_counters = array('b' => 0, 'c' => 0, 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
+
         //  Add debug stuff?  The debug stuff invalidates the SDIF
         //  but is useful for ensuring all of the information is in
         //  the proper column.
@@ -846,8 +853,8 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
 
         //  Need Team Profile information from database
  
-        $team = new SwimTeamProfile() ;
-        $team->loadTeamProfile() ;
+        $swimteam = new SwimTeamProfile() ;
+        $swimteam->loadTeamProfile() ;
 
         /**
          * Build the C1 record
@@ -855,28 +862,23 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
         $c1 = new SDIFC1Record() ;
         $c1->setOrgCode($this->getOrgCode()) ;
         $c1->setTeamCode($this->getTeamCode()) ;
-        $c1->setTeamName($team->getClubOrPoolName()) ;
-        $c1->setTeamNameAbrv($team->getTeamName()) ;
-        $c1->setTeamAddress1($team->getStreet1()) ;
-        $c1->setTeamAddress2($team->getStreet2()) ;
-        $c1->setTeamCity($team->getCity()) ;
-        $c1->setTeamState($team->getStateOrProvince()) ;
-        $c1->setTeamPostalCode($team->getPostalCode()) ;
+        $c1->setTeamName($swimteam->getClubOrPoolName()) ;
+        $c1->setTeamNameAbrv($swimteam->getTeamName()) ;
+        $c1->setTeamAddress1($swimteam->getStreet1()) ;
+        $c1->setTeamAddress2($swimteam->getStreet2()) ;
+        $c1->setTeamCity($swimteam->getCity()) ;
+        $c1->setTeamState($swimteam->getStateOrProvince()) ;
+        $c1->setTeamPostalCode($swimteam->getPostalCode()) ;
         $c1->setTeamCountryCode($this->getCountryCode()) ;
         $c1->setRegionCode($this->getRegionCode()) ;
 
         $sdif[] = $c1->GenerateRecord() ;
+        $sdif_counters['c']++ ;
 
         //  Need a bunch of data!
 
         $season = new SwimTeamSeason() ;
         $roster = new SwimTeamRoster() ;
-
-        //  Need to keep track of unique swimmers and D0, E0, F0,
-        //  and G0 record counts in order to terminate SDIF file.
-
-        $unique_swimmers = array() ;
-        $sdif_counters = array('b' => 0, 'c', 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
 
         //  Load information from the database
         //  to get the list of potential swimmers
@@ -956,10 +958,10 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
         $z0 = new SDIFZ0Record() ;
         $z0->setOrgCode($this->getOrgCode()) ;
         $z0->setFileCode(WPST_SDIF_FTT_CODE_MEET_REGISTRATIONS_VALUE) ;
-        $z0->setNotes(WPST_NULL_STRING) ;
-        $z0->setBRecordCount(0) ;
+        $z0->setNotes(sprintf('Created:  %s', date('Y-m-d @ H:i'))) ;
+        $z0->setBRecordCount($sdif_counters['b']) ;
         $z0->setMeetCount(1) ;
-        $z0->setCRecordCount(1) ;
+        $z0->setCRecordCount($sdif_counters['c']) ;
         $z0->setTeamCount(1) ;
         $z0->setDRecordCount($sdif_counters['d']) ;
         $z0->setSwimmerCount(count($unique_swimmers)) ;
@@ -1080,6 +1082,29 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
             $sdif[] = WPST_SDIF_COLUMN_DEBUG2 ;
         }
 
+        //  Need to keep track of unique swimmers and various
+        //  SDIF record counts in order to terminate SDIF file.
+
+        $unique_swimmers = array() ;
+        $sdif_counters = array('b' => 0, 'c' => 0, 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
+
+        //  We'll need a bunch of data from the database ...
+
+        $swimmeet = new SwimMeet() ;
+        $meta = new SwimMeetMeta() ;
+        $event = new SwimMeetEvent() ;
+        $season = new SwimTeamSeason() ;
+        $roster = new SwimTeamRoster() ;
+        $swimclub = new SwimClubProfile() ;
+        $swimteam = new SwimTeamProfile() ;
+
+        //  Need Team Profile information from database
+        //  along with swim meet and opponent club details.
+ 
+        $swimteam->loadTeamProfile() ;
+        $swimmeet->loadSwimMeetByMeetId($this->getSwimMeetId()) ;
+        $swimclub->loadSwimClubBySwimClubId($swimmeet->getOpponentSwimClubId()) ;
+
         /**
          * Build the A0 record
          */
@@ -1096,10 +1121,75 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         
         $sdif[] = $a0->GenerateRecord() ;
 
-        //  Need Team Profile information from database
- 
-        $team = new SwimTeamProfile() ;
-        $team->loadTeamProfile() ;
+        /**
+         * Build the B1 record
+         */
+        $b1 = new SDIFB1Record() ;
+        $b1->setOrgCode($this->getOrgCode()) ;
+        $b1->setTeamCode($this->getTeamCode()) ;
+        $b1->setMeetName(sprintf('%s vs %s', $swimteam->getTeamName(), $swimclub->getTeamName())) ;
+
+        //  Meet address depends on meet location, 'Home' or 'Away'
+
+        if ($swimmeet->getLocation() == WPST_HOME)
+            $st = &$swimteam ;
+        else if ($swimmeet->getLocation() == WPST_AWAY)
+            $st = &$swimclub ;
+        else
+            $st = &$swimteam ;
+
+        $b1->setMeetAddress1($st->getStreet1()) ;
+        $b1->setMeetAddress2($st->getStreet2()) ;
+        $b1->setMeetCity($st->getCity()) ;
+        $b1->setMeetState($st->getStateOrProvince()) ;
+        $b1->setMeetPostalCode($st->getPostalCode()) ;
+        $b1->setMeetCountryCode($this->getCountryCode()) ;
+
+        switch ($swimmeet->getMeetType())
+        {
+            case WPST_DUAL_MEET:
+                $b1->setMeetCode(WPST_SDIF_MEET_TYPE_DUAL_VALUE) ;
+                break ;
+
+            case WPST_INVITATIONAL:
+                $b1->setMeetCode(WPST_SDIF_MEET_TYPE_INVITATIONAL_VALUE) ;
+                break ;
+
+            case WPST_TIME_TRIAL:
+                $b1->setMeetCode(WPST_SDIF_MEET_TYPE_TIME_TRIALS_VALUE) ;
+                break ;
+
+            default:
+                $b1->setMeetCode(WPST_SDIF_MEET_TYPE_OPEN_VALUE) ;
+                break ;
+        }
+
+        $b1->setMeetStart($swimmeet->getMeetDateAsMMDDYYYY()) ;
+        $b1->setMeetEnd($swimmeet->getMeetDateAsMMDDYYYY()) ;
+        $b1->setPoolAltitude(0) ;
+        $b1->setCourseCode(SDIFCodeTableMappings::GetCourseCode(
+            $st->getPoolMeasurementUnits(), $st->getPoolLength())) ;
+
+        $sdif[] = $b1->GenerateRecord() ;
+        $sdif_counters['b']++ ;
+
+        /**
+         * Build the B2 record
+         */
+        $b2 = new SDIFB2Record() ;
+        $b2->setOrgCode($this->getOrgCode()) ;
+        $b2->setTeamCode($this->getTeamCode()) ;
+        $b2->setMeetName($user->getFullName()) ;
+        $b2->setMeetAddress1($st->getStreet1()) ;
+        $b2->setMeetAddress2($st->getStreet2()) ;
+        $b2->setMeetCity($st->getCity()) ;
+        $b2->setMeetState($st->getStateOrProvince()) ;
+        $b2->setMeetPostalCode($st->getPostalCode()) ;
+        $b2->setMeetCountryCode($this->getCountryCode()) ;
+        $b2->setMeetHostPhone($user->getPrimaryPhone()) ;
+
+        $sdif[] = $b2->GenerateRecord() ;
+        $sdif_counters['b']++ ;
 
         /**
          * Build the C1 record
@@ -1107,17 +1197,18 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         $c1 = new SDIFC1Record() ;
         $c1->setOrgCode($this->getOrgCode()) ;
         $c1->setTeamCode($this->getTeamCode()) ;
-        $c1->setTeamName($team->getClubOrPoolName()) ;
-        $c1->setTeamNameAbrv($team->getTeamName()) ;
-        $c1->setTeamAddress1($team->getStreet1()) ;
-        $c1->setTeamAddress2($team->getStreet2()) ;
-        $c1->setTeamCity($team->getCity()) ;
-        $c1->setTeamState($team->getStateOrProvince()) ;
-        $c1->setTeamPostalCode($team->getPostalCode()) ;
+        $c1->setTeamName($swimteam->getClubOrPoolName()) ;
+        $c1->setTeamNameAbrv($swimteam->getTeamName()) ;
+        $c1->setTeamAddress1($swimteam->getStreet1()) ;
+        $c1->setTeamAddress2($swimteam->getStreet2()) ;
+        $c1->setTeamCity($swimteam->getCity()) ;
+        $c1->setTeamState($swimteam->getStateOrProvince()) ;
+        $c1->setTeamPostalCode($swimteam->getPostalCode()) ;
         $c1->setTeamCountryCode($this->getCountryCode()) ;
         $c1->setRegionCode($this->getRegionCode()) ;
 
         $sdif[] = $c1->GenerateRecord() ;
+        $sdif_counters['c']++ ;
 
         /**
          * Build the C2 record.  We'll actually build this twice, initially
@@ -1127,10 +1218,10 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         $c2 = new SDIFC2Record() ;
         $c2->setOrgCode($this->getOrgCode()) ;
         $c2->setTeamCode($this->getTeamCode()) ;
-        if ($team->getCoachUserId() !== WPST_NULL_ID)
+        if ($swimteam->getCoachUserId() !== WPST_NULL_ID)
         {
             $coach = new SwimTeamUserProfile() ;
-            $coach->loadUserProfileByUserId($team->getCoachUserId()) ;
+            $coach->loadUserProfileByUserId($swimteam->getCoachUserId()) ;
             $c2->setCoachName($coach->getFullName()) ;
             $c2->setCoachPhone($coach->getPrimaryPhone()) ;
         }
@@ -1145,29 +1236,15 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         $c2->setNumberOfRelayEntries(0) ;
         $c2->setNumberOfRelaySwimmers(0) ;
         $c2->setNumberOfSplitRecords(0) ;
-        $c2->setTeamNameAbrv($team->getTeamName()) ;
+        $c2->setTeamNameAbrv($swimteam->getTeamName()) ;
         $c2->setTeamCode5(WPST_NULL_STRING) ;
 
         $sdif[] = $c2->GenerateRecord() ;
-
-        //  Need a bunch of data!
-
-        $swimmeet = new SwimMeet() ;
-        $meta = new SwimMeetMeta() ;
-        $event = new SwimMeetEvent() ;
-        $season = new SwimTeamSeason() ;
-        $roster = new SwimTeamRoster() ;
-
-        //  Need to keep track of unique swimmers and D0, E0, F0,
-        //  and G0 record counts in order to terminate SDIF file.
-
-        $unique_swimmers = array() ;
-        $sdif_counters = array('b' => 0, 'c', 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
+        $sdif_counters['c']++ ;
 
         //  Load information from the database
         //  to get the list of potential swimmers
 
-        $swimmeet->loadSwimMeetByMeetId($this->getSwimMeetId()) ;
         $roster->setSeasonId($swimmeet->getSeasonId()) ;
         $swimmerIds = $roster->getSwimmerIds() ;
 
@@ -1467,10 +1544,10 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
         $z0 = new SDIFZ0Record() ;
         $z0->setOrgCode($this->getOrgCode()) ;
         $z0->setFileCode(WPST_SDIF_FTT_CODE_MEET_REGISTRATIONS_VALUE) ;
-        $z0->setNotes(WPST_NULL_STRING) ;
-        $z0->setBRecordCount(0) ;
+        $z0->setNotes(sprintf('Created:  %s', date('Y-m-d @ H:i'))) ;
+        $z0->setBRecordCount($sdif_counters['b']) ;
         $z0->setMeetCount(1) ;
-        $z0->setCRecordCount(0) ;
+        $z0->setCRecordCount($sdif_counters['c']) ;
         $z0->setTeamCount(1) ;
         $z0->setDRecordCount($sdif_counters['d']) ;
         $z0->setSwimmerCount(count($unique_swimmers)) ;
@@ -2420,6 +2497,11 @@ class SDIFBxRecord extends SDIFRecord
     var $_meet_country_code ;
 
     /**
+     * Meet Phone
+     */
+    var $_meet_host_phone ;
+
+    /**
      * Meet Code
      */
     var $_meet_code ;
@@ -2587,6 +2669,26 @@ class SDIFBxRecord extends SDIFRecord
     function getMeetCountryCode()
     {
         return $this->_meet_country_code ;
+    }
+
+    /**
+     * Set Meet Host Phone
+     *
+     * @param string meet host phone
+     */
+    function setMeetHostPhone($txt)
+    {
+        $this->_meet_host_phone = $txt ;
+    }
+
+    /**
+     * Get Meet Host Phone
+     *
+     * @return string meet host phone
+     */
+    function getMeetHostPhone()
+    {
+        return $this->_meet_host_phone ;
     }
 
     /**
@@ -2770,6 +2872,9 @@ class SDIFB1Record extends SDIFBxRecord
         //    $this->_future_use_2,
         //    $this->_course_code,
         //    $this->_future_use_3) ;
+        /**
+         * Build the B1 record
+         */
 
         //  Extract the data from the SDIF record by substring position
 
@@ -2783,12 +2888,114 @@ class SDIFB1Record extends SDIFBxRecord
         $this->setMeetPostalCode(trim(substr($this->_sdif_record, 107, 10))) ;
         $this->setMeetCountryCode(trim(substr($this->_sdif_record, 117, 3))) ;
         $this->setMeetCode(trim(substr($this->_sdif_record, 120, 1))) ;
-        $this->setMeetStart(trim(substr($this->_sdif_record, 121, 8))) ;
-        $this->setMeetEnd(trim(substr($this->_sdif_record, 129, 8))) ;
+        $this->setMeetStart(trim(substr($this->_sdif_record, 121, 8)), false) ;
+        $this->setMeetEnd(trim(substr($this->_sdif_record, 129, 8)), false) ;
         $this->setPoolAltitude(trim(substr($this->_sdif_record, 137, 4))) ;
         $this->setFutureUse2(trim(substr($this->_sdif_record, 141, 8))) ;
         $this->setCourseCode(trim(substr($this->_sdif_record, 149, 1))) ;
         $this->setFutureUse3(trim(substr($this->_sdif_record, 150, 10))) ;
+    }
+
+    /**
+     * Generate Record
+     */
+    function GenerateRecord()
+    {
+        return sprintf(WPST_SDIF_B1_RECORD,
+            $this->getOrgCode(),
+            $this->getFutureUse1(),
+            $this->getMeetName(),
+            $this->getMeetAddress1(),
+            $this->getMeetAddress2(),
+            $this->getMeetCity(),
+            $this->getMeetState(),
+            $this->getMeetPostalCode(),
+            $this->getMeetCountryCode(),
+            $this->getMeetCode(),
+            $this->getMeetStart(false),
+            $this->getMeetEnd(false),
+            $this->getPoolAltitude(),
+            $this->getFutureUse2(),
+            $this->getCourseCode(),
+            $this->getFutureUse3()
+        ) ;
+    }
+}
+
+/**
+ * SDIF B2 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see SDIFBxRecord
+ */
+class SDIFB2Record extends SDIFBxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        $c = container() ;
+        if (WPST_DEBUG)
+            $c->add(html_pre(WPST_SDIF_COLUMN_DEBUG1,
+                WPST_SDIF_COLUMN_DEBUG2, $this->_sdif_record)) ;
+        //print $c->render() ;
+
+        //  This doesn't work right and I am not sure why ...
+        //  it ends reading data from the wrong character position.
+
+        //$success = sscanf($this->_sdif_record, WPST_SDIF_B1_RECORD,
+        //    $this->_org_code,
+        //    $this->_future_use_1,
+        //    $this->_meet_name,
+        //    $this->_meet_address_1,
+        //    $this->_meet_address_2,
+        //    $this->_meet_city,
+        //    $this->_meet_state,
+        //    $this->_meet_postal_code,
+        //    $this->_meet_country_code,
+        //    $this->_meet_code,
+        //    $this->_meet_start,
+        //    $this->_meet_end,
+        //    $this->_pool_altitude,
+        //    $this->_future_use_2,
+        //    $this->_course_code,
+        //    $this->_future_use_3) ;
+
+        //  Extract the data from the SDIF record by substring position
+
+        $this->setOrgCode(trim(substr($this->_sdif_record, 2, 1))) ;
+        $this->setFutureUse1(trim(substr($this->_sdif_record, 3, 8))) ;
+        $this->setMeetName(trim(substr($this->_sdif_record, 11, 30))) ;
+        $this->setMeetAddress1(trim(substr($this->_sdif_record, 41, 22))) ;
+        $this->setMeetAddress2(trim(substr($this->_sdif_record, 63, 22))) ;
+        $this->setMeetCity(trim(substr($this->_sdif_record, 85, 20))) ;
+        $this->setMeetState(trim(substr($this->_sdif_record, 105, 2))) ;
+        $this->setMeetPostalCode(trim(substr($this->_sdif_record, 107, 10))) ;
+        $this->setMeetCountryCode(trim(substr($this->_sdif_record, 117, 3))) ;
+        $this->setMeetHostPhone(trim(substr($this->_sdif_record, 120, 1))) ;
+        $this->setFutureUse2(trim(substr($this->_sdif_record, 141, 8))) ;
+    }
+
+    /**
+     * Generate Record
+     */
+    function GenerateRecord()
+    {
+        return sprintf(WPST_SDIF_B2_RECORD,
+            $this->getOrgCode(),
+            $this->getFutureUse1(),
+            $this->getMeetName(),
+            $this->getMeetAddress1(),
+            $this->getMeetAddress2(),
+            $this->getMeetCity(),
+            $this->getMeetState(),
+            $this->getMeetPostalCode(),
+            $this->getMeetCountryCode(),
+            $this->getMeetHostPhone(),
+            $this->getFutureUse2()
+        ) ;
     }
 }
 
@@ -6420,9 +6627,9 @@ class SDIFCodeTables
 class SDIFCodeTableMappings
 {
     /**
-     * Return an array of course codes and their mappings
+     * Return an array of file format codes and their mappings
      *
-     * @return array org code mappings
+     * @return array file format code mappings
      */
     function GetFileFormat()
     {
@@ -6437,7 +6644,39 @@ class SDIFCodeTableMappings
     /**
      * Return an array of course codes and their mappings
      *
-     * @return array org code mappings
+     * @return string course code description
+     */
+    function GetCourseCode($units = WPST_METERS, $length = 25)
+    {
+        if (($units == WPST_YARDS) && ($length == 25))
+            return WPST_SDIF_COURSE_STATUS_CODE_SCY_VALUE ;
+        else if (($units == WPST_METERS) && ($length == 25))
+            return WPST_SDIF_COURSE_STATUS_CODE_SCM_VALUE ;
+        else if (($units == WPST_METERS) && ($length == 50))
+            return WPST_SDIF_COURSE_STATUS_CODE_LCM_VALUE  ;
+        else
+            return WPST_SDIF_COURSE_STATUS_CODE_DQ_VALUE ;
+    }
+
+    /**
+     * Return an array of course codes and their mappings
+     *
+     * @return string course code description
+     */
+    function GetCountryCode($country)
+    {
+        $codes = SDIFCodeTableMappings::GetCountryCodes() ;
+
+        if (array_key_exists($country, $codes))
+            return $codes[$country] ;
+        else
+            return WPST_NA ;
+    }
+
+    /**
+     * Return an array of zero time codes and their mappings
+     *
+     * @return array zero time code mappings
      */
     function GetZeroTimeMode()
     {

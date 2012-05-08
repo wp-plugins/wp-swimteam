@@ -91,7 +91,7 @@ class WpSwimTeamSwimClubAddForm extends WpSwimTeamTeamProfileForm
      */
     function form_init_data()
     {
-        $this->set_hidden_element_value("_action", WPST_SWIMCLUBS_ADD_SWIMCLUB) ;
+        $this->set_hidden_element_value("_action", WPST_ACTION_ADD) ;
         //  Default pool length based on plugin settings
 
         $option = get_option(WPST_OPTION_TEAM_POOL_LENGTH) ;
@@ -369,7 +369,7 @@ class WpSwimTeamSwimClubUpdateForm extends WpSwimTeamSwimClubAddForm
 
         parent::form_init_data() ;
 
-        $this->set_hidden_element_value("_action", WPST_SWIMCLUBS_UPDATE_SWIMCLUB) ;
+        $this->set_hidden_element_value("_action", WPST_ACTION_UPDATE) ;
 
         $sc = new SwimClubProfile() ;
         $sc->loadSwimClubBySwimClubId($this->getSwimClubId()) ;

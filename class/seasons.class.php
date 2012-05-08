@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Season
  * @version $Revision$
@@ -22,21 +22,21 @@
  *
  * The architecture of the SwimTeam plugin is based on a single
  * season being active.  When a new season is created, all other
- * seasons are tagged as "inactive" and all swimmers are tagged
- * "inactive" until they register for the "active" season.
+ * seasons are tagged as 'inactive' and all swimmers are tagged
+ * 'inactive' until they register for the 'active' season.
  *
  */
 
-require_once("db.class.php") ;
-require_once("swimteam.include.php") ;
-require_once("seasons.include.php") ;
-require_once("widgets.class.php") ;
-require_once("table.class.php") ;
+require_once('db.class.php') ;
+require_once('swimteam.include.php') ;
+require_once('seasons.include.php') ;
+require_once('widgets.class.php') ;
+require_once('table.class.php') ;
 
 /**
  * Class definition of the seasons
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -140,7 +140,7 @@ class SwimTeamSeason extends SwimTeamDBI
     function getSeasonStartAsArray()
     {
         list($year, $month, $day) = explode('-', $this->__seasonStart) ;
-        return array("day" => $day, "month" => $month, "year" => $year) ;
+        return array('day' => $day, 'month' => $month, 'year' => $year) ;
     }
 
     /**
@@ -152,7 +152,7 @@ class SwimTeamSeason extends SwimTeamDBI
     {
         $d = &$this->__seasonStart ;
 
-        return sprintf("%04s-%02s-%02s", $d["year"], $d["month"], $d["day"]) ;
+        return sprintf('%04s-%02s-%02s', $d['year'], $d['month'], $d['day']) ;
     }
 
     /**
@@ -183,7 +183,7 @@ class SwimTeamSeason extends SwimTeamDBI
     function getSeasonEndAsArray()
     {
         list($year, $month, $day) = explode('-', $this->__seasonEnd) ;
-        return array("day" => $day, "month" => $month, "year" => $year) ;
+        return array('day' => $day, 'month' => $month, 'year' => $year) ;
     }
 
     /**
@@ -195,7 +195,7 @@ class SwimTeamSeason extends SwimTeamDBI
     {
         $d = &$this->__seasonEnd ;
 
-        return sprintf("%04s-%02s-%02s", $d["year"], $d["month"], $d["day"]) ;
+        return sprintf('%04s-%02s-%02s', $d['year'], $d['month'], $d['day']) ;
     }
 
     /**
@@ -249,8 +249,8 @@ class SwimTeamSeason extends SwimTeamDBI
     {
 	    //  Is a similar season already in the database?
 
-        $query = sprintf("SELECT id FROM %s WHERE season_label = \"%s\"
-            AND season_start = \"%s\" AND season_end=\"%s\"",
+        $query = sprintf('SELECT id FROM %s WHERE season_label = "%s"
+            AND season_start = "%s" AND season_end="%s"',
             WPST_SEASONS_TABLE, $this->getSeasonLabel(),
             $this->getSeasonStartAsDate(), $this->getSeasonEndAsDate()) ;
 
@@ -280,7 +280,7 @@ class SwimTeamSeason extends SwimTeamDBI
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT id FROM %s WHERE id = \"%s\"",
+        $query = sprintf('SELECT id FROM %s WHERE id = "%s"',
             WPST_SEASONS_TABLE, $id) ;
 
         $this->setQuery($query) ;
@@ -306,12 +306,12 @@ class SwimTeamSeason extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET
-                season_label=\"%s\",
-                season_start=\"%s\",
-                season_end=\"%s\",
-                season_status=\"%s\",
-                swimmer_labels=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET
+                season_label="%s",
+                season_start="%s",
+                season_end="%s",
+                season_status="%s",
+                swimmer_labels="%s"',
                 WPST_SEASONS_TABLE,
                 $this->getSeasonLabel(),
                 $this->getSeasonStartAsDate(),
@@ -344,11 +344,11 @@ class SwimTeamSeason extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("UPDATE %s SET
-                season_label=\"%s\",
-                season_start=\"%s\",
-                season_end=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                season_label="%s",
+                season_start="%s",
+                season_end="%s"
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 $this->getSeasonLabel(),
                 $this->getSeasonStartAsDate(),
@@ -360,7 +360,7 @@ class SwimTeamSeason extends SwimTeamDBI
             $this->runUpdateQuery() ;
         }
         else
-            wp_die("wp-SwimTeam Error:  Severe error, action aborted.") ;
+            wp_die('wp-SwimTeam Error:  Severe error, action aborted.') ;
 
         //  Open or Close season
 
@@ -414,9 +414,9 @@ class SwimTeamSeason extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("UPDATE %s SET
-                status=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                status="%s"
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 WPST_SEASONS_SEASON_HIDDEN,
                 $this->getId()
@@ -443,8 +443,8 @@ class SwimTeamSeason extends SwimTeamDBI
             //  Construct the update query - make all seasons
             //  inactive before making the specified season active.
  
-            $query = sprintf("UPDATE %s SET
-                season_status=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                season_status="%s"',
                 WPST_SEASONS_TABLE,
                 WPST_SEASONS_SEASON_INACTIVE
             ) ;
@@ -452,9 +452,9 @@ class SwimTeamSeason extends SwimTeamDBI
             $this->setQuery($query) ;
             $this->runUpdateQuery() ;
 
-            $query = sprintf("UPDATE %s SET
-                season_status=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                season_status="%s"
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 WPST_SEASONS_SEASON_ACTIVE,
                 $this->getId()
@@ -482,9 +482,9 @@ class SwimTeamSeason extends SwimTeamDBI
         {
             //  Construct the update query 
  
-            $query = sprintf("UPDATE %s SET
-                season_status=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                season_status="%s"
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 WPST_SEASONS_SEASON_INACTIVE,
                 $this->getId()
@@ -505,7 +505,7 @@ class SwimTeamSeason extends SwimTeamDBI
      * Really need to think about this because deleting a season
      * means deleting all of the meets that go with it.  So if a
      * season has meets (which have results), disallow deleting
-     * the season.  It can be "hidden" but can't be deleted.
+     * the season.  It can be "hidden' but can't be deleted.
      *
      */
     function deleteSeason()
@@ -518,8 +518,8 @@ class SwimTeamSeason extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("DELETE FROM %s
-                WHERE id=\"%s\"",
+            $query = sprintf('DELETE FROM %s
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 $this->getId()
             ) ;
@@ -544,9 +544,9 @@ class SwimTeamSeason extends SwimTeamDBI
 
         if ($this->seasonExistById())
         {
-            $query = sprintf("UPDATE %s SET
-                swimmer_labels=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                swimmer_labels="%s"
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 WPST_LOCKED,
                 $this->getId()
@@ -572,9 +572,9 @@ class SwimTeamSeason extends SwimTeamDBI
 
         if ($this->seasonExistById())
         {
-            $query = sprintf("UPDATE %s SET
-                swimmer_labels=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                swimmer_labels="%s"
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 WPST_UNLOCKED,
                 $this->getId()
@@ -601,9 +601,9 @@ class SwimTeamSeason extends SwimTeamDBI
 
         if ($this->seasonExistById())
         {
-            $query = sprintf("UPDATE %s SET
-                swimmer_labels=\"%s\"
-                WHERE id=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                swimmer_labels="%s"
+                WHERE id="%s"',
                 WPST_SEASONS_TABLE,
                 WPST_FROZEN,
                 $this->getId()
@@ -636,7 +636,7 @@ class SwimTeamSeason extends SwimTeamDBI
         //  Make sure it is a legal season id
         if ($this->seasonExistById())
         {
-            $query = sprintf("SELECT * FROM %s WHERE id = \"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE id = "%s"',
                 WPST_SEASONS_TABLE, $id) ;
 
             $this->setQuery($query) ;
@@ -664,7 +664,7 @@ class SwimTeamSeason extends SwimTeamDBI
 
     function getActiveSeasonId()
     {
-        $query = sprintf("SELECT id FROM %s WHERE season_status = \"%s\"",
+        $query = sprintf('SELECT id FROM %s WHERE season_status = "%s"',
             WPST_SEASONS_TABLE, WPST_SEASONS_SEASON_ACTIVE) ;
 
         $this->setQuery($query) ;
@@ -698,7 +698,7 @@ class SwimTeamSeason extends SwimTeamDBI
         //  Make sure it is a legal season id
         if ($this->seasonExistById())
         {
-            $query = sprintf("SELECT * FROM %s WHERE id = \"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE id = "%s"',
                 WPST_SEASONS_TABLE, $id) ;
 
             $this->setQuery($query) ;
@@ -724,15 +724,15 @@ class SwimTeamSeason extends SwimTeamDBI
      * @param - string - optional filter to restrict query
      * @return - array - array of swimmers ids
      */
-    function getAllSeasonIds($filter = null, $orderby = "season_start")
+    function getAllSeasonIds($filter = null, $orderby = 'season_start')
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT id AS seasonid FROM %s", WPST_SEASONS_TABLE) ;
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        $query = sprintf('SELECT id AS seasonid FROM %s', WPST_SEASONS_TABLE) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -746,7 +746,7 @@ class SwimTeamSeason extends SwimTeamDBI
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -763,7 +763,7 @@ class SwimTeamSeasonsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimTeamSeasonsGUIDataList($title, $width = "100%",
+    function SwimTeamSeasonsGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_SEASONS_DEFAULT_COLUMNS,
         $tables = WPST_SEASONS_DEFAULT_TABLES,
@@ -795,20 +795,20 @@ class SwimTeamSeasonsGUIDataList extends SwimTeamGUIDataList
 		//add the columns in the display that you want to view.
 		//The API is :
 		//Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-		$this->add_header_item("Season",
-	       	    "200", "season_label", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Season',
+	       	    '200', 'season_label', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Starts",
-	         	    "200", "season_start", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Starts',
+	         	    '200', 'season_start', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Ends",
-	         	    "200", "season_end", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Ends',
+	         	    '200', 'season_end', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Status",
-	         	    "200", "season_status", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Status',
+	         	    '200', 'season_status', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Swimmer Labels",
-	         	    "200", "swimmer_labels", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Swimmer Labels',
+	         	    '200', 'swimmer_labels', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
@@ -839,25 +839,25 @@ class SwimTeamSeasonsGUIDataList extends SwimTeamGUIDataList
 		switch ($col_name)
         {
                 /*
-            case "Updated" :
-                $obj = strftime("%Y-%m-%d @ %T", (int)$row_data["updated"]) ;
+            case 'Updated' :
+                $obj = strftime('%Y-%m-%d @ %T', (int)$row_data['updated']) ;
                 break ;
                 */
 
-            case "Starts" :
-                $obj = date("F d, Y", strtotime($row_data["season_start"])) ;
+            case 'Starts' :
+                $obj = date('F d, Y', strtotime($row_data['season_start'])) ;
                 break ;
 
-            case "Ends" :
-                $obj = date("F d, Y", strtotime($row_data["season_end"])) ;
+            case 'Ends' :
+                $obj = date('F d, Y', strtotime($row_data['season_end'])) ;
                 break ;
 
-            case "Status" :
-                $obj = ucfirst($row_data["season_status"]) ;
+            case 'Status' :
+                $obj = ucfirst($row_data['season_status']) ;
                 break ;
 
-            case "Swimmer Labels" :
-                $obj = ucfirst($row_data["swimmer_labels"]) ;
+            case 'Swimmer Labels' :
+                $obj = ucfirst($row_data['swimmer_labels']) ;
                 break ;
 
 		    default:
@@ -872,7 +872,7 @@ class SwimTeamSeasonsGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various seasons.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamSeasonsGUIDataList
  */
@@ -898,7 +898,7 @@ class SwimTeamSeasonsAdminGUIDataList extends SwimTeamSeasonsGUIDataList
      * Property to store the possible actions - used to build action buttons
      */
     var $__empty_actions = array(
-         "add" => WPST_ACTION_ADD
+         WPST_ACTION_ADD => WPST_ACTION_ADD
     ) ;
 
     /**
@@ -918,8 +918,8 @@ class SwimTeamSeasonsAdminGUIDataList extends SwimTeamSeasonsGUIDataList
 
         parent::user_setup() ;
 
-		$this->add_header_item("Id",
-	       	    "50", "id", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Id',
+	       	    '50', 'id', SORTABLE, SEARCHABLE, 'left') ;
 
         //  turn on the 'collapsable' search block.
         //  The word 'Search' in the output will be clickable,
@@ -933,7 +933,7 @@ class SwimTeamSeasonsAdminGUIDataList extends SwimTeamSeasonsGUIDataList
 
         //  The unique item is the second column.
 
-	    $this->add_action_column('radio', 'FIRST', "id") ;
+	    $this->add_action_column('radio', 'FIRST', 'id') ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved

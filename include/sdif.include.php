@@ -1312,7 +1312,10 @@ define('WPST_SDIF_RECORD_TERMINATOR', chr(13) . chr(10)) ;
 define('WPST_SDIF_A0_RECORD', 'A0%1.1s%-8.8s%-2.2s%-30.30s%-20.20s%-10.10s%-20.20s%-12.12s%-8.8s%-42.42s%-2.2s%-3.3s') ;
 
 //  Define B1 record
-define('WPST_SDIF_B1_RECORD', 'B1%1s%8s%30s%22s%22s%20s%2s%10s%3s%1s%8s%8s%4s%8s%1s%10s') ;
+define('WPST_SDIF_B1_RECORD', 'B1%1.1s%8.8s%-30.30s%-22.22s%-22.22s%-20.20s%2.2s%-10.10s%3.3s%1.1s%8.8s%8.8s%4.4s%8.8s%1.1s%10.10s') ;
+
+//  Define B2 record
+define('WPST_SDIF_B2_RECORD', 'B2%1.1s%8.8s%-30.30s%-22.22s%-22.22s%-20.20s%2.2s%-10.10s%3.3s%12.12s%28.28s') ;
 
 //  Define C1 record
 //define('WPST_SDIF_C1_RECORD', 'C1%1.1s%-8.8s%-6.6s%-30.30s%-16.16s%-22.22s%-22.22s%-20.20s%-2.2s%-10.10s%-3.3s%1.1s%-6.6s%1.1s%-10.10s%2.2s') ;
