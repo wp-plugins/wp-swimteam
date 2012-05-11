@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: jobs.forms.class.php 857 2012-05-11 03:06:06Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Jobs
- * @version $Revision$
- * @lastmodified $Author$
- * @lastmodifiedby $Date$
+ * @version $Revision: 857 $
+ * @lastmodified $Author: mpwalsh8 $
+ * @lastmodifiedby $Date: 2012-05-10 23:06:06 -0400 (Thu, 10 May 2012) $
  *
  */
 
@@ -677,7 +677,7 @@ class WpSwimTeamJobsAllocateForm extends WpSwimTeamForm
         else
             $opponent = $meet->getMeetDescription() ;
     
-        $meetdate = date("m/d/Y", strtotime($meet->getMeetDate())) ;
+        $meetdate = date("m/d/Y", strtotime($meet->getMeetDateAsDate())) ;
 
         return array("date" => $meetdate, "opponent" => $opponent,
             "location" => ucwords($meet->getLocation())) ;
@@ -720,7 +720,7 @@ class WpSwimTeamJobsAllocateForm extends WpSwimTeamForm
                     else
                         $opponent = $meet->getMeetDescription() ;
     
-                    $meetdate = date("D M j, Y", strtotime($meet->getMeetDate())) ;
+                    $meetdate = date("D M j, Y", strtotime($meet->getMeetDateAsDate())) ;
 
                     $m[sprintf("%s %s (%s)", $meetdate, $opponent,
                         ucwords($meet->getLocation()))] = $meetId["meetid"] ;

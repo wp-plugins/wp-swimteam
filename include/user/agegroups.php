@@ -3,16 +3,16 @@
 /**
  * Age Groups admin page content.
  *
- * $Id$
+ * $Id: agegroups.php 862 2012-05-11 18:45:34Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 862 $
+ * @lastmodified $Date: 2012-05-11 14:45:34 -0400 (Fri, 11 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -62,7 +62,7 @@ class AgeGroupsTabContainer extends SwimTeamTabContainer
     function __buildGDL()
     {
         $gdl = new SwimTeamAgeGroupsAdminGUIDataList('Swim Team Age Groups',
-            '100%', 'minage') ;
+            '100%', 'minage, maxage, gender') ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;

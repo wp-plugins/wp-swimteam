@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: swimteam.include.php 849 2012-05-09 16:03:20Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 806 $
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 849 $
+ * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 

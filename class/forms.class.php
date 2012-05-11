@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: forms.class.php 851 2012-05-09 19:43:05Z mpwalsh8 $
  *
  * Form classes.  These classes manage the
  * entry and display of the various forms used
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage forms
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 851 $
+ * @lastmodified $Date: 2012-05-09 15:43:05 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -89,26 +89,12 @@ class FEWPUserListBox extends FEListBox
      */
     function FEWPUserListBox($label, $required = TRUE, $width = NULL, $height = NULL, $allowNone = TRUE, $currentuseronly = false)
     {
-        global $wpdb ;
+        $idList = array() ;
 
-        $db = new SwimTeamDBI() ;
-
-        //  Retrieve the list of valid Wordpress User unique IDs
- 
         if ($currentuseronly)
-        {
-            global $userdata ;
-            get_currentuserinfo() ;
-
-            $db->setQuery(sprintf('SELECT %susers.ID AS id FROM %susers WHERE %susers.ID="%s"',
-                $wpdb->prefix, $wpdb->prefix, $wpdb->prefix, $userdata->ID)) ;
-        }
+            $idList = array(get_current_user_id()) ;
         else
-            $db->setQuery(sprintf('SELECT %susers.ID AS id FROM %susers',
-                $wpdb->prefix, $wpdb->prefix)) ;
-        $db->runSelectQuery() ;
-
-        $idList = $db->getQueryResults();
+            $idList = get_users(array('blogid' => get_current_blog_id(), 'fields' => 'ID')) ;
 
         //  Construct a list of ID building the array
         //  key based on the user's Wordpress meta data.
@@ -117,7 +103,7 @@ class FEWPUserListBox extends FEListBox
 
         foreach ($idList as $id)
         {
-            $u = get_userdata($id['id']) ;
+            $u = get_userdata($id) ;
 
             $last = !empty($u->last_name) ? $u->last_name : strtoupper(WPST_NA) ;
             $first = !empty($u->first_name) ? $u->first_name : strtoupper(WPST_NA) ;

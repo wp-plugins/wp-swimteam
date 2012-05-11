@@ -3,16 +3,16 @@
 /**
  * AgeGroup classes.
  *
- * $Id$
+ * $Id: agegroups.class.php 861 2012-05-11 18:45:19Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage AgeGroups
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 861 $
+ * @lastmodified $Date: 2012-05-11 14:45:19 -0400 (Fri, 11 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -575,7 +575,7 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
      * @param string - where clause for database query
      */
     function SwimTeamAgeGroupsGUIDataList($title, $width = '100%',
-        $default_orderby='', $default_reverseorder=FALSE,
+        $default_orderby='minage, gender', $default_reverseorder=FALSE,
         $columns = WPST_AGT_DEFAULT_COLUMNS,
         $tables = WPST_AGT_DEFAULT_TABLES,
         $where_clause = WPST_AGT_DEFAULT_WHERE_CLAUSE)

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: swimmers.forms.class.php 855 2012-05-11 02:57:26Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Swimmers
- * @version $Revision$
- * @lastmodified $Author$
- * @lastmodifiedby $Date$
+ * @version $Revision: 855 $
+ * @lastmodified $Author: mpwalsh8 $
+ * @lastmodifiedby $Date: 2012-05-10 22:57:26 -0400 (Thu, 10 May 2012) $
  *
  */
 
@@ -1189,7 +1189,7 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
                 else
                     $opponent = $meet->getMeetDescription() ;
     
-                $meetdate = date('D M j, Y', strtotime($meet->getMeetDate())) ;
+                $meetdate = date('D M j, Y', strtotime($meet->getMeetDateAsDate())) ;
 
                 $m[sprintf('%s %s (%s)', $meetdate, $opponent,
                     ucfirst($meet->getLocation()))] = $meetId['meetid'] ;

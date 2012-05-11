@@ -3,16 +3,16 @@
 /**
  * UserProfile classes.
  *
- * $Id$
+ * $Id: users.class.php 852 2012-05-09 19:43:36Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage UserProfile
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 852 $
+ * @lastmodified $Date: 2012-05-09 15:43:36 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -715,14 +715,13 @@ class SwimTeamUserProfile extends SwimTeamDBI
 
         $query .= $orderby ;
 
-        /*
-        print '<pre>' ;
-        $this->setQuery('SELECT COUNT(ometaid) AS ometaidcount FROM wp_st_options_meta') ;
-        $this->runSelectQuery() ;
-        print_r($this->getQueryResults()) ;
-        print_r($query) ;
-        print '</pre>' ;
-         */
+        //print '<pre>' ;
+        //$this->setQuery('SELECT COUNT(ometaid) AS ometaidcount FROM wp_st_options_meta') ;
+        //$this->runSelectQuery() ;
+        //print_r($this->getQueryResults()) ;
+        //print_r($query) ;
+        //print '</pre>' ;
+        //printf('<pre>%s</pre>', print_r($this->_query, true)) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -780,6 +779,18 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
         //$this->setColumns($columns) ;
         //$this->setTables($tables) ;
         //$this->setWhereClause($where_clause) ;
+
+        //  Running in multi-site mode?  If so, need to limit
+        //  list of users to those allowed to access the blog.
+
+        if (is_multisite())
+        {
+            $blog_users = get_users(array('blogid' => get_current_blog_id(), 'fields' => 'ID')) ;
+
+            foreach ($blog_users as $blog_user)
+                $where_clause .= sprintf('%s%susers.ID="%s"',
+                    empty($where_clause) ? '' : ' OR ', WP_DB_BASE_PREFIX, $blog_user) ;
+        }
 
         //  Call the constructor of the parent class
         $this->SwimTeamGUIDataList($title, $width,

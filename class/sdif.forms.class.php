@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: sdif.forms.class.php 858 2012-05-11 03:07:23Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage SDIFProfile
- * @version $Revision$
- * @lastmodified $Author$
- * @lastmodifiedby $Date$
+ * @version $Revision: 858 $
+ * @lastmodified $Author: mpwalsh8 $
+ * @lastmodifiedby $Date: 2012-05-10 23:07:23 -0400 (Thu, 10 May 2012) $
  *
  */
 
@@ -471,6 +471,8 @@ class WpSwimTeamSDIFProfileForm extends WpSwimTeamForm
 
         $p->updateSDIFProfile() ;
 
+        $this->set_action_message('Swim Team SDIF profile updated.') ;
+
         return true ;
     }
 
@@ -482,7 +484,7 @@ class WpSwimTeamSDIFProfileForm extends WpSwimTeamForm
     function form_success()
     {
         $container = container() ;
-        $container->add(html_h3("Swim Team SDIF profile updated.")) ;
+        $container->add($this->_action_message) ;
 
         return $container ;
     }

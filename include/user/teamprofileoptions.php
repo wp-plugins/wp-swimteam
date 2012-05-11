@@ -3,16 +3,16 @@
 /**
  * Team Profile page content.
  *
- * $Id$
+ * $Id: teamprofileoptions.php 856 2012-05-11 03:04:50Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 856 $
+ * @lastmodified $Date: 2012-05-10 23:04:50 -0400 (Thu, 10 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -74,17 +74,7 @@ class TeamProfileOptionsTabContainer extends SwimTeamTabContainer
         //  Display the form again even if processing was successful.
 
         $fp->set_render_form_after_success(true) ;
-
-        //  If the Form Processor was succesful, let the user know
-
-        if ($fp->is_action_successful())
-        {
-	        $div->add(html_br(), $fp) ;
-        }
-        else
-        {
-	        $div->add(html_br(), $fp) ;
-        }
+        $div->add(html_br(), $fp) ;
 
         $this->add($div) ;
         $this->setShowInstructions() ;

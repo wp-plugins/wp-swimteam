@@ -3,16 +3,16 @@
 /**
  * Age Groups admin page content.
  *
- * $Id$
+ * $Id: swimmerprofileoptions.php 849 2012-05-09 16:03:20Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 849 $
+ * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 

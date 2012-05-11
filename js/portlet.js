@@ -1,7 +1,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: portlet.js 849 2012-05-09 16:03:20Z mpwalsh8 $
  *
  * jQuery Portet support - used to reorder events
  * and heats.  This code was adapted from the jQuery
@@ -19,9 +19,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Events
- * @version $Revision$
- * @lastmodified $Author$
- * @lastmodifiedby $Date$
+ * @version $Revision: 849 $
+ * @lastmodified $Author: mpwalsh8 $
+ * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
  * @see http://sonspring.com/journal/jquery-portlets
  */
 jQuery(document).ready(

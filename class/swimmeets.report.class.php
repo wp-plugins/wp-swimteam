@@ -3,16 +3,16 @@
 /**
  * Meets classes.
  *
- * $Id$
+ * $Id: swimmeets.report.class.php 854 2012-05-11 02:56:24Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Meets
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 854 $
+ * @lastmodified $Date: 2012-05-10 22:56:24 -0400 (Thu, 10 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -525,7 +525,7 @@ class SwimMeetReport extends SwimMeet
             else
                 $opponent = $this->getMeetDescription() ;
 
-            $meetdate = date('D M j, Y', strtotime($this->getMeetDate())) ;
+            $meetdate = date('D M j, Y', strtotime($this->getMeetDateAsDate())) ;
  
             //  Full meet scratches
 

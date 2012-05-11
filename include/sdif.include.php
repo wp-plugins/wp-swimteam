@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: sdif.include.php 860 2012-05-11 18:44:37Z mpwalsh8 $
  *
  * SDIF includes.  These includes define information used in 
  * the SDIF classes and child classes in the Wp-SwimTeam plugin.
@@ -16,9 +16,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage SDIF
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 860 $
+ * @lastmodified $Date: 2012-05-11 14:44:37 -0400 (Fri, 11 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -1325,8 +1325,8 @@ define('WPST_SDIF_C1_RECORD', 'C1%1.1s%-8.8s%-6.6s%-30.30s%-16.16s%-22.22s%-22.2
 define('WPST_SDIF_C2_RECORD', 'C2%1.1s%-8.8s%-6.6s%-30.30s%-12.12s%-6.6s%-6.6s%-5.5s%-6.6s%-6.6s%16.16s%-45.45s%1.1s%-10.10s') ;
 
 //  Define D0 record
-define('WPST_SDIF_D0_PARSE_RECORD', 'D0%1.1s%-8.8s%-28.28s%12.12s%-1.1s%3.3s%-8.8s%2.2s%-1.1s%-1.1s%04.4s%1.1s%04.4s%04.4s%8.8s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%2.2s%2.2s%2.2s%2.2s%3.3s%3.3s%4.4s%2.2s') ;
-define('WPST_SDIF_D0_GENERATE_RECORD', 'D0%1.1s%-8.8s%-28.28s%12.12s%-1.1s%3.3s%-8.8s%2.2s%-1.1s%-1.1s%04.4s%1.1s%04.4s%04.4s%8.8s%9.9s%9.9s%9.9s%9.9s%4.4s%4.4s%3.3s%3.3s%4.4s%2.2s') ;
+define('WPST_SDIF_D0_PARSE_RECORD', 'D0%1.1s%-8.8s%-28.28s%-12.12s%-1.1s%3.3s%-8.8s%2.2s%-1.1s%-1.1s%04.4s%1.1s%04.4s%04.4s%8.8s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%2.2s%2.2s%2.2s%2.2s%3.3s%3.3s%4.4s%2.2s') ;
+define('WPST_SDIF_D0_GENERATE_RECORD', 'D0%1.1s%-8.8s%-28.28s%-12.12s%-1.1s%3.3s%-8.8s%2.2s%-1.1s%-1.1s%04.4s%1.1s%04.4s%04.4s%8.8s%9.9s%9.9s%9.9s%9.9s%4.4s%4.4s%3.3s%3.3s%4.4s%2.2s') ;
 
 //  Define D1 record
 define('WPST_SDIF_D1_RECORD', 'D1%1.1s%-8.8s%-6.6s%1.1s%-28.28s%1.1s%-12.12s%1.1s%-3.3s%-8.8s%02.2s%1.1s%-30.30s%-20.20s%-12.12s%-12.12s%-8.8s%1.1s%-3.3s') ;
@@ -1335,7 +1335,7 @@ define('WPST_SDIF_D1_RECORD', 'D1%1.1s%-8.8s%-6.6s%1.1s%-28.28s%1.1s%-12.12s%1.1
 define('WPST_SDIF_D2_RECORD', 'D2%1.1s%-8.8s%-6.6s%1.1s%-28.28s%-30.30s%-30.30s%-20.20s%-2.2s%-12.12s%-10.10s%-3.3s%1.1s%1.1s%1.1s%-4.4s') ;
 
 //  Define D3 record
-define('WPST_SDIF_D3_RECORD', 'D3%14.14s%-15.15s%2.2s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%118.118s') ;
+define('WPST_SDIF_D3_RECORD', 'D3%-14.14s%-15.15s%2.2s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%1.1s%118.118s') ;
 
 //  Define E0 record
 define('WPST_SDIF_E0_PARSE_RECORD', 'E0%1.1s%-8.8s%1.1s%-6.6s%2.2s%1.1s%4.4s%1.1s%4.4s%4.4s%3.3s%8.8s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%2.2s%2.2s%2.2s%2.2s%3.3s%3.3s%4.4s%59.59s') ;

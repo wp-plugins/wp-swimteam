@@ -3,16 +3,16 @@
 /**
  * TeamProfile classes.
  *
- * $Id$
+ * $Id: sdif.class.php 863 2012-05-11 18:46:18Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 863 $
+ * @lastmodified $Date: 2012-05-11 14:46:18 -0400 (Fri, 11 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -913,13 +913,23 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
 
         foreach ($swimmerIds as $key => &$swimmerId)
         {
+            $roster->setSwimmerId($swimmerId['swimmerid']) ;
+            $roster->loadRosterBySeasonIdAndSwimmerId() ;
             $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
             $contact->loadUserProfileByUserId($swimmer->getContact1Id()) ;
                     
             //  Initialize D1 record fields which are swimmer based
             $d1->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
             $d1->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
-            $d1->setUSS($swimmer->getUSSNumber()) ;
+
+            //  How should the Swimmer Id appear in the SDIF file?
+            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                $d1->setUSS($swimmer->getId()) ;
+            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                $d1->setUSS($roster->getSwimmerLabel()) ;
+            else
+                $d1->setUSS($swimmer->getUSSNumber()) ;
+
             $d1->setPhoneNumber($contact->getPrimaryPhone()) ;
             $d1->setSecondaryPhoneNumber($contact->getSecondaryPhone()) ;
     
@@ -1434,13 +1444,23 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
 
                 foreach ($swimmerIds as $key => &$swimmerId)
                 {
+                    $roster->setSwimmerId($swimmerId['swimmerid']) ;
+                    $roster->loadRosterBySeasonIdAndSwimmerId() ;
                     $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
                     
-                    //  Initialize D0 record fields which are swimmer based
+                    //  Initialize F0 record fields which are swimmer based
                     $f0->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
                     $f0->setPreferredFirstName($swimmer->getFirstName($this->getUseNickName())) ;
                     $f0->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), false) ;
-                    $f0->setUSS($swimmer->getUSSNumber()) ;
+
+                    //  How should the Swimmer Id appear in the SDIF file?
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                        $f0->setUSS($swimmer->getId()) ;
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                        $f0->setUSS($roster->getSwimmerLabel()) ;
+                    else
+                        $f0->setUSS($swimmer->getUSSNumber()) ;
+
                     $f0->setUSSNew() ;
     
                     if ($this->getUseAgeGroupAge() == WPST_NO)
@@ -1502,14 +1522,31 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
 
                 foreach ($swimmerIds as $key => &$swimmerId)
                 {
+                    $roster->setSwimmerId($swimmerId['swimmerid']) ;
+                    $roster->loadRosterBySeasonIdAndSwimmerId() ;
                     $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
                     
                     //  Initialize D0 record fields which are swimmer based
                     $d0->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
                     $d0->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
                     $d3->setPreferredFirstName($swimmer->getFirstName($this->getUseNickName())) ;
-                    $d0->setUSS($swimmer->getUSSNumber()) ;
-                    $d3->setUSS($swimmer->getUSSNumber()) ;
+
+                    //  How should the Swimmer Id appear in the SDIF file?
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                    {
+                        $d0->setUSS($swimmer->getId()) ;
+                        $d3->setUSS($swimmer->getId()) ;
+                    }
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                    {
+                        $d0->setUSS($roster->getSwimmerLabel()) ;
+                        $d3->setUSS($roster->getSwimmerLabel()) ;
+                    }
+                    else
+                    {
+                        $d0->setUSS($swimmer->getUSSNumber()) ;
+                        $d3->setUSS($swimmer->getUSSNumber()) ;
+                    }
     
                     if ($this->getUseAgeGroupAge() == WPST_NO)
                         $d0->setAgeOrClass($swimmer->getAge()) ;

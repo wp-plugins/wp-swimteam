@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: users.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage UserProfiles
- * @version $Revision$
- * @lastmodified $Author$
- * @lastmodifiedby $Date$
+ * @version $Revision: 849 $
+ * @lastmodified $Author: mpwalsh8 $
+ * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
  *
  */
 

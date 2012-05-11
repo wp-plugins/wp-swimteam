@@ -71,9 +71,19 @@ future developments and much more and is the definitive source for the Change Lo
 * Added checking and error messages for all Actions to ensure something is selected when required.
 * Added GUI for Meet Entries Export.
 
+= 1.25 =
+* Fixed issue with missing users when running under Multi-Site.
+* Fixed User Drop Down select lists to work when running under Multi-Site.
+* Fixed display of swim meet date in several locations eliminating PHP warning message.
+* Updated SDIF profile success message presentation.
+* Added support for Swimmer Labels in SDIF Roster export.
+* Added support for Swimmer Labels in SDIF Meet Entries export.
+* Fixed default sort order on Age Groups so it is predictable.
+
 = 1.24 =
 * Added missing B1 and B2 records from Meet Entries SDIF export.
 * Added filter to display user by First and Last Name instead of by username.
+* Fixed a bug which prevented adding a season on a new installation.
 
 = 1.23 =
 * Fixed bug which prevented adding of importing events for a swim meet which didn't already events.

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: table.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
  *
  * Table classes.  These classes manage the
  * entry and display of the various tables used
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Tables
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodified $Author$
+ * @version $Revision: 849 $
+ * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodified $Author: mpwalsh8 $
  *
  */
 

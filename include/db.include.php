@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id$
+ * $Id: db.include.php 848 2012-05-09 16:00:58Z mpwalsh8 $
  *
  * DB includes.  These includes define information used in 
  * the DB classes and child classes in the Wp-SwimTeam plugin.
@@ -12,9 +12,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage DB
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 848 $
+ * @lastmodified $Date: 2012-05-09 12:00:58 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
@@ -56,10 +56,12 @@ define('WPST_DB_DSN', 'mysql://' . WPST_DB_USERNAME . ':' . WPST_DB_PASSWORD . '
 
 
 /**
- * Define table prefix
+ * Define table prefixes, need to account for multi-site!
  */
 define('WP_DB_PREFIX', $wpdb->prefix) ;
+define('WP_DB_BASE_PREFIX', $wpdb->base_prefix) ;
 define('WPST_DB_PREFIX', WP_DB_PREFIX . 'st_') ;
+define('WPST_DB_BASE_PREFIX', WP_DB_BASE_PREFIX . 'st_') ;
 
 /**
  * Database version - stored as a WP option

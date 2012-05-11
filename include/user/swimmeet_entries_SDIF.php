@@ -3,16 +3,16 @@
 /**
  * Swim Meet Entries Export SDIF page content.
  *
- * $Id$
+ * $Id: swimmeet_entries_SDIF.php 849 2012-05-09 16:03:20Z mpwalsh8 $
  *
  * (c) 2012 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage SDIF
- * @version $Revision$
- * @lastmodified $Date$
- * @lastmodifiedby $Author$
+ * @version $Revision: 849 $
+ * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
