@@ -3,15 +3,15 @@
 /**
  * Options classes.
  *
- * $Id: options.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: options.class.php 868 2012-05-12 03:55:08Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Options
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 868 $
+ * @lastmodified $Date: 2012-05-11 23:55:08 -0400 (Fri, 11 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -129,6 +129,11 @@ class SwimTeamOptions extends SwimTeamDBI
      * GDL rows to display property
      */
     var $__gdl_rows_to_display ;
+
+    /**
+     * Time Format string property
+     */
+    var $__time_format ;
 
     /**
      * enable google maps property
@@ -733,6 +738,26 @@ class SwimTeamOptions extends SwimTeamDBI
     function setGDLRowsToDisplay($rows)
     {
         $this->__gdl_rows_to_display = $rows ;
+    }
+
+    /**
+     * Get the Time Format string
+     *
+     * @return - string - Time Format string
+     */
+    function getTimeFormat()
+    {
+        return ($this->__time_format) ;
+    }
+
+    /**
+     * Set the Time Format string
+     *
+     * @param - string - Time Format string
+     */
+    function setTimeFormat($fmt)
+    {
+        $this->__time_format = $fmt ;
     }
 
     /**
@@ -1472,6 +1497,20 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, WPST_DEFAULT_GDL_ROWS_TO_DISPLAY) ;
         }
 
+        //  Time Format
+        $option = get_option(WPST_OPTION_TIME_FORMAT) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setTimeFormat($option) ;
+        }
+        else
+        {
+            $this->setTimeFormat(WPST_DEFAULT_TIME_FORMAT) ;
+            update_option(WPST_OPTION_TIME_FORMAT, WPST_DEFAULT_TIME_FORMAT) ;
+        }
+
         //  Enable Verbose Messages
         $option = get_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES) ;
 
@@ -2007,6 +2046,7 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_ENABLE_GOOGLE_MAPS, $this->getEnableGoogleMaps()) ;
         update_option(WPST_OPTION_GOOGLE_API_KEY, $this->getGoogleAPIKey()) ;
         update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, $this->getGDLRowsToDisplay()) ;
+        update_option(WPST_OPTION_TIME_FORMAT, $this->getTimeFormat()) ;
         update_option(WPST_OPTION_LOGIN_REDIRECT, $this->getLoginRedirectAction()) ;
         update_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL, $this->getStateOrProvinceLabel()) ;
         update_option(WPST_OPTION_USER_POSTAL_CODE_LABEL, $this->getPostalCodeLabel()) ;

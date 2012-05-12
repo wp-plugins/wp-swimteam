@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: options.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: options.forms.class.php 868 2012-05-12 03:55:08Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Options
- * @version $Revision: 849 $
+ * @version $Revision: 868 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2012-05-11 23:55:08 -0400 (Fri, 11 May 2012) $
  *
  */
 
@@ -1275,6 +1275,9 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $gdlrows = new FENumberInRange('Rows to Display', true, '100px', null, 5, 200) ;
         $this->add_element($gdlrows) ;
 
+        $timeformat = new FEText('Time Format', true, '100px') ;
+        $this->add_element($timeformat) ;
+
         $enablegooglemaps = new FEYesNoListBox('Enable Google Maps', true, '75px') ;
         $this->add_element($enablegooglemaps) ;
 
@@ -1307,6 +1310,7 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         //  Initialize the form fields
         $this->set_element_value('Enable Verbose Messages', $options->getEnableVerboseMessages()) ;
         $this->set_element_value('Rows to Display', $options->getGDLRowsToDisplay()) ;
+        $this->set_element_value('Time Format', $options->getTimeFormat()) ;
         $this->set_element_value('Enable Google Maps', $options->getEnableGoogleMaps()) ;
         $this->set_element_value('Google API Key', $options->getGoogleAPIKey()) ;
         $this->set_element_value('Login Redirect', WPST_NONE) ;
@@ -1328,6 +1332,10 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
 
         $table->add_row($this->element_label('Rows to Display'),
             $this->element_form('Rows to Display')) ;
+
+        $table->add_row($this->element_label('Time Format'),
+            html_span(null, $this->element_form('Time Format'),
+            html_a('http://php.net/manual/en/function.date.php', 'Help'))) ;
 
         $table->add_row(null, html_span(null,
             'Frequently wp-SwimTeam presents information in', html_br(),
@@ -1380,6 +1388,7 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
         $options->setEnableVerboseMessages($this->get_element_value('Enable Verbose Messages')) ;
         $options->setGDLRowsToDisplay($this->get_element_value('Rows to Display')) ;
+        $options->setTimeFormat($this->get_element_value('Time Format')) ;
         $options->setEnableGoogleMaps($this->get_element_value('Enable Google Maps')) ;
         $options->setGoogleAPIKey($this->get_element_value('Google API Key')) ;
         $options->setLoginRedirectAction($this->get_element_value('Login Redirect')) ;

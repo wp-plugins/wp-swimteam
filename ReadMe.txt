@@ -64,12 +64,10 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
-= 1.22 =
-* Added new Team Profile field to identify Coach by WordPress username.
-* Fixed numerous potential issues when either Swimmer or User option count was set to zero.  The comparison was not accounting for the difference between zero and non-existant which resulted in using the default value of 5 in many instances.
-* Initial support for Meet Entries SDIF export.  The current implementation makes some assumptions which will eventually be under user control via a form.  The exported SDIF validates with the WinSwim SDIF Checker application but has not been tested extensively with any of the Hy-tek tools nor with WinSwim itself.
-* Added checking and error messages for all Actions to ensure something is selected when required.
-* Added GUI for Meet Entries Export.
+= 1.26 =
+* Added new option to Miscellaneous tab to control how time is formatted.  Usage of the format is not yet pervasive through the plugin.
+* Enhanced wpst_meet_schedule shortcode with two new attributes:  fmt='time format' and 'showtime=yes|no'.  Default is not to show the time and use the time setting from the Miscellaneous tab.  The fmt attribute expects a string formatted following the conventions outlined in the [PHP date function ](http://php.net/manual/en/function.date.php).
+* Removed redundant code from Swim Meet module.
 
 = 1.25 =
 * Fixed issue with missing users when running under Multi-Site.

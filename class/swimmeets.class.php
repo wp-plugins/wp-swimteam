@@ -3,15 +3,15 @@
 /**
  * Meets classes.
  *
- * $Id: swimmeets.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: swimmeets.class.php 869 2012-05-12 03:55:47Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Meets
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 869 $
+ * @lastmodified $Date: 2012-05-11 23:55:47 -0400 (Fri, 11 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -646,23 +646,6 @@ class SwimMeet extends SwimTeamDBI
 
         return $this->getQueryResults() ;
     }
-
-    /**
-     * Map the opponent swim club id into text
-     *
-     * @return string - opponent text description
-     */
-    function __mapOpponentSwimClubIdToText($swimclubid)
-    {
-        //  Handle null id gracefully for non-dual meets
-
-        if ($swimclubid == WPST_NULL_ID) return ucfirst(WPST_NONE) ;
-
-        $swimclub = new SwimClubProfile() ;
-        $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
-
-        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
-    }
 }
 
 
@@ -818,12 +801,13 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
 		switch ($col_name)
         {
             case 'Season' :
-                $obj = $this->__mapSeasonIdToText($row_data['seasonid']) ;
+                $map = SwimTeamTextMap::__mapSeasonIdToText($row_data['seasonid']) ;
+                $obj = $map['label'] ;
                 break ;
 
             case 'Opponent' :
                 if ($row_data['meettype'] == WPST_DUAL_MEET)
-                    $obj = $this->__mapOpponentSwimClubIdToText($row_data['opponentswimclubid']) ;
+                    $obj = SwimTeamTextMap::__mapOpponentSwimClubIdToText($row_data['opponentswimclubid']) ;
                 else
                     $obj = $row_data['meetdescription'] ;
                 break ;
@@ -878,38 +862,6 @@ class SwimMeetsGUIDataList extends SwimTeamGUIDataList
 			    break;
 		}
 		return $obj;
-    }
-
-    /**
-     * Map the season id into text for the GDL
-     *
-     * @return string - season text description
-     */
-    function __mapSeasonIdToText($seasonid)
-    {
-        //  Season options and labels 
-
-        $season = new SwimTeamSeason() ;
-        $season->loadSeasonById($seasonid) ;
-
-        return $season->getSeasonLabel() ;
-    }
-
-    /**
-     * Map the opponent swim club id into text for the GDL
-     *
-     * @return string - opponent text description
-     */
-    function __mapOpponentSwimClubIdToText($swimclubid)
-    {
-        //  Handle null id gracefully for non-dual meets
-
-        if ($swimclubid == WPST_NULL_ID) return ucfirst(WPST_NONE) ;
-
-        $swimclub = new SwimClubProfile() ;
-        $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
-
-        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
     }
 }
 
@@ -1015,23 +967,6 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
     }
 
     /**
-     * Map the opponent swim club id into text for the GDL
-     *
-     * @return string - opponent text description
-     */
-    function __mapOpponentSwimClubIdToText($swimclubid)
-    {
-        //  Handle null id gracefully for non-dual meets
-
-        if ($swimclubid == WPST_NULL_ID) return ucfirst(WPST_NONE) ;
-
-        $swimclub = new SwimClubProfile() ;
-        $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
-
-        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
-    }
-
-    /**
      * Construct a summary of the active season.
      *
      */
@@ -1053,7 +988,7 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
             $meet->loadSwimMeetByMeetId($swimmeetid) ;
     
             if ($meet->getMeetType() == WPST_DUAL_MEET)
-                $opponent = $meet->__mapOpponentSwimClubIdToText(
+                $opponent = SwimTeamTextMap::__mapOpponentSwimClubIdToText(
                     $meet->getOpponentSwimClubId()) ;
             else
                 $opponent = $meet->getMeetDescription() ;
@@ -1091,35 +1026,20 @@ class SwimMeetInfoTable extends SwimTeamInfoTable
 class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
 {
     /**
-     * Map the opponent swim club id into text for the GDL
-     *
-     * @return string - opponent text description
-     */
-    /*
-    function __mapOpponentSwimClubIdToText($swimclubid)
-    {
-        //  Handle null id gracefully for non-dual meets
-
-        if ($swimclubid == WPST_NULL_ID) return ucfirst(WPST_NONE) ;
-
-        $swimclub = new SwimClubProfile() ;
-        $swimclub->loadSwimClubBySwimClubId($swimclubid) ;
-
-        return $swimclub->getClubOrPoolName() . ' ' . $swimclub->getTeamName() ;
-    }
-     */
-
-    /**
      * Construct a summary of the active season.
      *
      */
-    function constructSwimMeetScheduleInfoTable($seasonid = null)
+    function constructSwimMeetScheduleInfoTable($seasonid = null, $showstarttime = WPST_NO, $fmt = null)
     {
         $hdr = 0 ;
 
         //  Alternate the row colors
         $this->set_alt_color_flag(true) ;
         $this->set_column_header($hdr++, 'Date', null, 'left') ;
+
+        if ($showstarttime == WPST_YES)
+            $this->set_column_header($hdr++, 'Time', null, 'left') ;
+
         $this->set_column_header($hdr++, 'Opponent', null, 'left') ;
         $this->set_column_header($hdr++, 'Location', null, 'left') ;
         $this->set_column_header($hdr++, 'Result', null, 'left') ;
@@ -1153,11 +1073,17 @@ class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
                 $meet->loadSwimMeetByMeetId($meetId['meetid']) ;
     
                 if ($meet->getMeetType() == WPST_DUAL_MEET)
-                    $opponent = $meet->__mapOpponentSwimClubIdToText(
+                    $opponent = SwimTeamTextMap::__mapOpponentSwimClubIdToText(
                         $meet->getOpponentSwimClubId()) ;
                 else
                     $opponent = $meet->getMeetDescription() ;
     
+                if (empty($fmt))
+                    $fmt = get_option(WPST_OPTION_TIME_FORMAT) ;
+
+                $starttime = date(($fmt !== false) ? $fmt : WPST_DEFAULT_TIME_FORMAT,
+                    strtotime($meet->getMeetTime())) ;
+
                 //  Determine results - if the score is 0-0 after the
                 //  meet date then it is deemed a tie instead of a TBD.
     
@@ -1184,8 +1110,12 @@ class SwimMeetScheduleInfoTable extends SwimTeamInfoTable
                 }
     
                 $meetdate = date('D M j, Y', strtotime($meet->getMeetDateAsDate())) ;
-                $this->add_row($meetdate, $opponent,
-                    ucfirst($meet->getLocation()), $winloss) ;
+                if ($showstarttime == WPST_YES)
+                    $this->add_row($meetdate, $starttime, $opponent,
+                        ucfirst($meet->getLocation()), $winloss) ;
+                else
+                    $this->add_row($meetdate, $opponent,
+                        ucfirst($meet->getLocation()), $winloss) ;
             }
         }
     }

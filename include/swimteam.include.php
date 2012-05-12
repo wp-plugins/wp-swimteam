@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: swimteam.include.php 866 2012-05-12 03:53:32Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,8 +13,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 866 $
+ * @lastmodified $Date: 2012-05-11 23:53:32 -0400 (Fri, 11 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -208,6 +208,7 @@ define('WPST_DEFAULT_ENABLE_VERBOSE_MESSAGES', WPST_NO) ;
 define('WPST_DEFAULT_ENABLE_GOOGLE_MAPS', WPST_NO) ;
 define('WPST_DEFAULT_GOOGLE_API_KEY', 'Google API Key') ;
 define('WPST_DEFAULT_GDL_ROWS_TO_DISPLAY', 20) ;
+define('WPST_DEFAULT_TIME_FORMAT', 'H:i') ;
 define('WPST_DEFAULT_USER_OPTION_COUNT', 5) ;
 define('WPST_DEFAULT_USER_OPTION', WPST_DISABLED) ;
 define('WPST_DEFAULT_USER_OPTION_LABEL', 'Optional Field #') ;
@@ -247,6 +248,7 @@ define('WPST_OPTION_ENABLE_VERBOSE_MESSAGES', WPST_OPTION_PREFIX . 'enable_verbo
 define('WPST_OPTION_ENABLE_GOOGLE_MAPS', WPST_OPTION_PREFIX . 'enable_google_maps') ;
 define('WPST_OPTION_GOOGLE_API_KEY', WPST_OPTION_PREFIX . 'google_api_key') ;
 define('WPST_OPTION_GDL_ROWS_TO_DISPLAY', WPST_OPTION_PREFIX . 'gdl_rows_to_display') ;
+define('WPST_OPTION_TIME_FORMAT', WPST_OPTION_PREFIX . 'time_format') ;
 define('WPST_OPTION_OPT_IN_LABEL', WPST_OPTION_PREFIX . 'opt_in_label') ;
 define('WPST_OPTION_OPT_OUT_LABEL', WPST_OPTION_PREFIX . 'opt_out_label') ;
 define('WPST_OPTION_OPT_IN_OPT_OUT_EMAIL_ADDRESS', WPST_OPTION_PREFIX . 'opt_in_opt_out_email_address') ;
