@@ -3,15 +3,15 @@
 /**
  * Plugin shortcodes.
  *
- * $Id: shortcodes.include.php 871 2012-05-12 04:15:30Z mpwalsh8 $
+ * $Id: shortcodes.include.php 879 2012-05-13 15:39:10Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage shortcodes
- * @version $Revision: 871 $
- * @lastmodified $Date: 2012-05-12 00:15:30 -0400 (Sat, 12 May 2012) $
+ * @version $Revision: 879 $
+ * @lastmodified $Date: 2012-05-13 11:39:10 -0400 (Sun, 13 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -132,9 +132,9 @@ function wpst_meet_schedule_sc_handler($atts)
     //  If the season id is empty, use the current season.
 
     if (empty($seasonid))
-        $meetsummary->constructSwimMeetScheduleInfoTable(null, $starttime, $fmt) ;
+        $meetsummary->constructSwimMeetScheduleInfoTable(null, $showtime, $fmt) ;
     else
-        $meetsummary->constructSwimMeetScheduleInfoTable($seasonid, $starttime, $fmt) ;
+        $meetsummary->constructSwimMeetScheduleInfoTable($seasonid, $showtime, $fmt) ;
 
     $c->add(html_br(), $meetsummary, html_br(2)) ;
 
