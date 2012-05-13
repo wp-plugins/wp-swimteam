@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: forms.class.php 851 2012-05-09 19:43:05Z mpwalsh8 $
+ * $Id: forms.class.php 874 2012-05-13 01:48:42Z mpwalsh8 $
  *
  * Form classes.  These classes manage the
  * entry and display of the various forms used
@@ -13,8 +13,8 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage forms
- * @version $Revision: 851 $
- * @lastmodified $Date: 2012-05-09 15:43:05 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 874 $
+ * @lastmodified $Date: 2012-05-12 21:48:42 -0400 (Sat, 12 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -108,7 +108,7 @@ class FEWPUserListBox extends FEListBox
             $last = !empty($u->last_name) ? $u->last_name : strtoupper(WPST_NA) ;
             $first = !empty($u->first_name) ? $u->first_name : strtoupper(WPST_NA) ;
             $k = $last . ', ' . $first . ' (' . $u->user_login . ')' ;
-            $dataList[$k] = $id['id'] ;
+            $dataList[$k] = $id ;
         }
 
         //  Sort the datalist based on the contructed keys

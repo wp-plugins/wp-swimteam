@@ -3,15 +3,15 @@
 /**
  * Plugin shortcodes.
  *
- * $Id: shortcodes.include.php 867 2012-05-12 03:54:21Z mpwalsh8 $
+ * $Id: shortcodes.include.php 871 2012-05-12 04:15:30Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage shortcodes
- * @version $Revision: 867 $
- * @lastmodified $Date: 2012-05-11 23:54:21 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 871 $
+ * @lastmodified $Date: 2012-05-12 00:15:30 -0400 (Sat, 12 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -123,7 +123,7 @@ function wpst_meet_schedule_sc_handler($atts)
  
 	extract(shortcode_atts(array(
 		'seasonid' => '',
-        'starttime' => 'no',
+        'showtime' => 'no',
         'fmt' => ''
 	), $atts)) ;
 

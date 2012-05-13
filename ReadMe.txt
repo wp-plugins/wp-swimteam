@@ -64,6 +64,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.27 =
+* Fixed serious issue which incorrectly displayed job assignments on the assignment form and could have resulted in bad data being entered as a job assignment.
+
 = 1.26 =
 * Added new option to Miscellaneous tab to control how time is formatted.  Usage of the format is not yet pervasive through the plugin.
 * Enhanced wpst_meet_schedule shortcode with two new attributes:  fmt='time format' and 'showtime=yes|no'.  Default is not to show the time and use the time setting from the Miscellaneous tab.  The fmt attribute expects a string formatted following the conventions outlined in the [PHP date function ](http://php.net/manual/en/function.date.php).

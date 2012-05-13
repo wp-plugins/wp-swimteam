@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: version.include.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: version.include.php 876 2012-05-13 03:38:42Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -10,11 +10,11 @@
  *
  * (c) 2007 by Mike Walsh for Wp-SwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 876 $
+ * @lastmodified $Date: 2012-05-12 23:38:42 -0400 (Sat, 12 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -23,10 +23,11 @@
  * Define constants used for the plugin version number
  */
 define('WPST_MAJOR_VERSION', '1') ;
-define('WPST_MINOR_VERSION', '26') ;
-define('WPST_BUILD_NUMBER', '870') ;
+define('WPST_MINOR_VERSION', '27') ;
+define('WPST_BUILD_NUMBER', '877') ;
 define('WPST_VERSION', WPST_MAJOR_VERSION .
     '.' . WPST_MINOR_VERSION . '.' . WPST_BUILD_NUMBER) ;
-define('WPST_BUILD_TIME', '2012/05/12 05:02:29') ;
+define('WPST_BUILD_TIME', '2012/05/13 04:39:35') ;
 define('WPST_SOFTWARE_NAME', 'wp-SwimTeam') ;
+
 ?>
