@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 866 2012-05-12 03:53:32Z mpwalsh8 $
+ * $Id: swimteam.include.php 901 2012-06-04 01:43:40Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,13 +13,15 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 866 $
- * @lastmodified $Date: 2012-05-11 23:53:32 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 901 $
+ * @lastmodified $Date: 2012-06-03 21:43:40 -0400 (Sun, 03 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
 require_once('version.include.php') ;
+
+define('WPST_DEBUG', false) ;
 
 /**
  * Constants used across the plugin
@@ -139,6 +141,7 @@ define('WPST_ACTION_ASSIGN_LABELS', 'Assign Labels') ;
 define('WPST_ACTION_EXPORT_CSV', 'Export CSV') ;
 define('WPST_ACTION_EXPORT_SDIF', 'Export SDIF') ;
 define('WPST_ACTION_EXPORT_MMRE', 'Export MM Registration') ;
+define('WPST_ACTION_EXPORT_HY3', 'Export HY3') ;
 define('WPST_ACTION_EXPORT_ENTRIES', 'Export Entries') ;
 define('WPST_ACTION_DIRECTORY', 'Directory') ;
 define('WPST_ACTION_EXECUTE', 'Execute') ;
@@ -190,6 +193,7 @@ define('WPST_DEFAULT_AUTO_REGISTER', WPST_YES) ;
 define('WPST_DEFAULT_REGISTRATION_SYSTEM', WPST_CLOSED) ;
 define('WPST_DEFAULT_SWIMMER_LABEL_FORMAT', WPST_SIMPLE_NUMERIC) ;
 define('WPST_DEFAULT_SWIMMER_LABEL_FORMAT_CODE', '%-05s') ;
+define('WPST_DEFAULT_SWIMMER_LABEL_INITIAL_VALUE', 0) ;
 define('WPST_DEFAULT_JOB_SIGN_UP', WPST_USER) ;
 define('WPST_DEFAULT_JOB_CREDITS', 5) ;
 define('WPST_DEFAULT_JOB_CREDITS_REQUIRED', 0) ;
@@ -244,6 +248,7 @@ define('WPST_OPTION_REGISTRATION_SYSTEM', WPST_OPTION_PREFIX . 'registration_sys
 define('WPST_OPTION_GEOGRAPHY', WPST_OPTION_PREFIX . 'geography') ;
 define('WPST_OPTION_SWIMMER_LABEL_FORMAT', WPST_OPTION_PREFIX . 'swimmer_label_format') ;
 define('WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE', WPST_OPTION_PREFIX . 'swimmer_label_format_code') ;
+define('WPST_OPTION_SWIMMER_LABEL_INITIAL_VALUE', WPST_OPTION_PREFIX . 'swimmer_label_initial_value') ;
 define('WPST_OPTION_ENABLE_VERBOSE_MESSAGES', WPST_OPTION_PREFIX . 'enable_verbose_messages') ;
 define('WPST_OPTION_ENABLE_GOOGLE_MAPS', WPST_OPTION_PREFIX . 'enable_google_maps') ;
 define('WPST_OPTION_GOOGLE_API_KEY', WPST_OPTION_PREFIX . 'google_api_key') ;
@@ -376,4 +381,24 @@ define('WPST_CLOTHING_SIZE_XL_VALUE', 'XL') ;
 define('WPST_CLOTHING_SIZE_2XL_VALUE', '2XL') ;
 define('WPST_CLOTHING_SIZE_3XL_VALUE', '3XL') ;
 define('WPST_CLOTHING_SIZE_4XL_VALUE', '4XL') ;
+
+if (WPST_DEBUG) :
+/**
+ * Debug functions
+ */
+function wpst_preprint_r()
+{
+    $numargs = func_num_args() ;
+    $arg_list = func_get_args() ;
+    for ($i = 0; $i < $numargs; $i++) {
+	printf('<pre style="text-align:left;">%s</pre>', print_r($arg_list[$i], true)) ;
+    }
+}
+
+function wpst_whereami($f, $l)
+{
+    printf('<h2>%s::%s</h2>', basename($f), $l) ;
+}
+
+endif ;
 ?>

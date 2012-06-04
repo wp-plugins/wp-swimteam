@@ -64,6 +64,20 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.29
+* Fixed bug which prevented the Job Commitment report from running correctly.
+* Fixed bug which caused "$credit" to appear in the CSV version of the Job Committment Report instead of the actual number.
+* Added new option to set initial value on swimmer labels with numeric sequences.
+* Fixed bug with SDIF profile when Geography was set to US which resulted in a broken form.
+* Elimited some debug code which generated output when exporting entries.
+
+= 1.28 =
+* Added button to Swim Team User Profile form to quickly open user's WordPress User Profile form.
+* Tidied up several of the reports to make them consistent.  Each should now display the HTML report on screen when exporting another format.
+* Re-implemented download solution for actions which generate downloadable files (e.g. CSV, SDIF, etc.)
+* Phase 1 of Hy-tek HY3 export support.  Roster can be exported in HY3 format which imports into Hy-tek Team Manager.
+* Fixed bug which enabled job signup for all users regardless of setting on Jobs Options tab.
+
 = 1.27 =
 * Fixed serious issue which incorrectly displayed job assignments on the assignment form and could have resulted in bad data being entered as a job assignment.
 

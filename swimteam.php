@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.27.879
- * Last Modified:  2012/05/13 16:39:10
+ * Version: 1.29.902
+ * Last Modified:  2012/06/04 02:59:11
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 878 2012-05-13 10:28:44Z mpwalsh8 $
+ * $Id: swimteam.php 894 2012-05-30 01:48:30Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,8 +20,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 878 $
- * @lastmodified $Date: 2012-05-13 06:28:44 -0400 (Sun, 13 May 2012) $
+ * @version $Rev: 894 $
+ * @lastmodified $Date: 2012-05-29 21:48:30 -0400 (Tue, 29 May 2012) $
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
  */
@@ -573,8 +573,11 @@ function swimteam_database_init()
             if ($wpdb->get_var(sprintf("SHOW TABLES LIKE \"%s\"",
                 WPST_SWIMMEETS_META_TABLE)) == WPST_SWIMMEETS_META_TABLE)
             {
-	            $wpdb->query("ALTER TABLE " . WPST_SWIMMEETS_META_TABLE . 
-                    " CHANGE COLUMN `eventcode` `strokecode` BIGINT(20) NOT NULL DEFAULT '0'") ;
+                if ($wpdb->get_var(sprintf('SHOW COLUMNS FROM %s LIKE "eventcode"', WPST_SWIMMEETS_META_TABLE)))
+                {
+	                $wpdb->query("ALTER TABLE " . WPST_SWIMMEETS_META_TABLE . 
+                        " CHANGE COLUMN `eventcode` `strokecode` BIGINT(20) NOT NULL DEFAULT '0'") ;
+                }
             }
         }
 
@@ -628,8 +631,11 @@ function swimteam_database_init()
             if ($wpdb->get_var(sprintf("SHOW TABLES LIKE \"%s\"",
                 WPST_JOBS_TABLE)) == WPST_JOBS_TABLE)
             {
-	            $wpdb->query("ALTER TABLE " . WPST_JOBS_TABLE . 
-                    " CHANGE COLUMN `id` `jobid` INT(11) NOT NULL AUTO_INCREMENT FIRST;") ;
+                if ($wpdb->get_var(sprintf('SHOW COLUMNS FROM %s LIKE "id"', WPST_JOBS_TABLE)))
+                {
+	                $wpdb->query("ALTER TABLE " . WPST_JOBS_TABLE . 
+                        " CHANGE COLUMN `id` `jobid` INT(11) NOT NULL AUTO_INCREMENT FIRST;") ;
+                }
             }
         }
         

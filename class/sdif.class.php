@@ -3,15 +3,15 @@
 /**
  * TeamProfile classes.
  *
- * $Id: sdif.class.php 863 2012-05-11 18:46:18Z mpwalsh8 $
+ * $Id: sdif.class.php 899 2012-06-04 01:41:51Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision: 863 $
- * @lastmodified $Date: 2012-05-11 14:46:18 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 899 $
+ * @lastmodified $Date: 2012-06-03 21:41:51 -0400 (Sun, 03 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -492,293 +492,6 @@ class SDIFBasePyramid extends SDIFProfile
             fwrite($f, $sdif . WPST_SDIF_RECORD_TERMINATOR) ;
 
         fclose($f) ;
-    }
-}
-
-/**
- * Class definition of the SDIF LSC Registration export
- *
- * @author Mike Walsh <mpwalsh8@gmail.com>
- * @access public
- * @see SDIFBasePyramid
- */
-class SDIFLSCRegistrationPyramid2 extends SDIFBasePyramid
-{
-    /**
-     * Constructor
-     *
-     */
-    function SDIFLSCRegistration()
-    {
-        parent::loadSDIFProfile() ;
-    }
-
-    /**
-     * GenerateSDIF - generate the SDIF content for the team roster.
-     *
-     * @return string - SDIF content
-     */
-    function generateSDIF($swimmerid = null)
-    {
-        $sdif = &$this->__sdifData ;
-
-        $sdif = '' ;
-
-        //  Add debug stuff?  The debug stuff invalidates the SDIF
-        //  but is useful for ensuring all of the information is in
-        //  the proper column.
- 
-        if ($this->getSDIFDebugFlag())
-        {
-            $sdif .= WPST_SDIF_COLUMN_DEBUG1 ;
-            $sdif .= "\r\n";
-
-            $sdif .= WPST_SDIF_COLUMN_DEBUG2 ;
-            $sdif .= "\r\n";
-        }
-
-        $sdif .= $this->constructA0Record() ;
-        $sdif .= "\r\n";
-
-        $sdif .= $this->constructC1Record() ;
-        $sdif .= "\r\n";
-
-        //  Need to get the active roster
- 
-        $season = new SwimTeamSeason() ;
-        $roster = new SwimTeamRoster() ;
-        $roster->setSeasonId($season->getActiveSeasonId()) ;
-
-        if (is_null($swimmerid))
-            $swimmerIds = $roster->getSwimmerIds() ;
-        else
-            $swimmerIds = array(array('swimmerid' => $swimmerid)) ;
-
-        //  Need structures for swimmers and their primary contact
- 
-        $swimmer = new SwimTeamSwimmer() ;
-        $contact = new SwimTeamUserProfile() ;
-
-        $this->__sdifCount = 0 ;
-
-        foreach ($swimmerIds as $swimmerId)
-        {
-            if ($swimmer->loadSwimmerById($swimmerId['swimmerid']))
-            {
-                $this->__sdifCount++ ;
-
-                $roster->setSwimmerId($swimmerId['swimmerid']) ;
-                $roster->loadRosterBySeasonIdAndSwimmerId() ;
-
-                $label = $roster->getSwimmerLabel() ;
-
-                //  Phone number fields are provided by the contact
-
-                //  If for some reason the swimmer doesn't have a
-                //  parent/guardian contact record, use the Admin's.
-
-                if ($contact->userProfileExistsByUserId($swimmer->getContact1Id()))
-                {
-                    //printf('Contact 1:  %s %s %s %s<br>', $swimmer->getFirstName(), $swimmer->getLastName(), $swimmer->getContact1Id(), $swimmer->getContact2Id()) ;
-                    $contact->loadUserProfileByUserId($swimmer->getContact1Id()) ;
-                }
-                else if ($contact->userProfileExistsByUserId($swimmer->getContact2Id()))
-                {
-                    //printf('Contact 2:  %s %s %s %s<br>', $swimmer->getFirstName(), $swimmer->getLastName(), $swimmer->getContact1Id(), $swimmer->getContact2Id()) ;
-                    $contact->loadUserProfileByUserId($swimmer->getContact2Id()) ;
-                }
-                else
-                {
-                    //printf('Admin Contact:  %s %s %s %s<br>', $swimmer->getFirstName(), $swimmer->getLastName(), $swimmer->getContact1Id(), $swimmer->getContact2Id()) ;
-                    $contact->loadUserProfileByUserId(1) ;
-                }
-
-                $sdif .= $this->constructD1Record($swimmer, $contact, $label) ;
-                $sdif .= "\r\n" ;
-
-                $sdif .= $this->constructD2Record($swimmer, $contact) ;
-                $sdif .= "\r\n" ;
-            }
-            else  //  Should never get here, if we do, something is wrong ...
-            {
-                $d1 = sprintf('%2s', WPST_SDIF_RECORD_TERMINATOR) ;
-            }
-        }
-
-        $sdif .= $this->constructZ0Record(count($swimmerIds)) ;
-    }
-
-    /**
-     * Write the SDIF data to a file which can be sent to the browser
-     *
-     */
-    function generateSDIFFile()
-    {
-        //  Generate a temporary file to hold the data
- 
-        $this->setSDIFFile(tempnam('', 'SD3')) ;
-
-        //  Write the SDIF data to the file
-
-        $f = fopen($this->getSDIFFile(), 'w') ;
-        fwrite($f, $this->__sdifData) ;
-        fclose($f) ;
-    }
-
-    /**
-     * constructA0Record() - construct the A0 record.
-     *
-     * @return string - A0 record
-     */
-    function constructA0Record()
-    {
-        global $current_user ;
-
-        //  Need some information from the current user
-
-        $user = new SwimTeamUserProfile() ;
-        $user->loadUserProfileByUserId($current_user->ID) ;
-        $user_info = get_userdata($current_user->ID) ;
-
-        //  Construct the A0 record
- 
-        $a0 = sprintf(WPST_SDIF_A0_RECORD, $this->getOrgCode(),
-            WPST_SDIF_VERSION, WPST_SDIF_FTT_CODE_USS_REGISTRATION_VALUE,
-            WPST_SDIF_FUTURE_USE, WPST_SDIF_SOFTWARE_NAME,
-            WPST_SDIF_SOFTWARE_VERSION, $user_info->first_name . ' ' .
-            $user_info->last_name, $user->getPrimaryPhone(),
-            date('mdY'), WPST_SDIF_FUTURE_USE, $this->getLSCCOde(),
-            WPST_SDIF_FUTURE_USE, WPST_SDIF_RECORD_TERMINATOR) ;
-
-        return $a0 ;
-    }
-
-    /**
-     * constructC1Record() - construct the C1 record.
-     *
-     * @return string - C1 record
-     */
-    function constructC1Record()
-    {
-        //  Need Team Profile information from database
- 
-        $swimteam = new SwimTeamProfile() ;
-        $swimteam->loadTeamProfile() ;
-
-        $c1 = sprintf(WPST_SDIF_C1_RECORD, $this->getOrgCode(),
-            WPST_SDIF_FUTURE_USE, $this->getTeamCode(),
-            $swimteam->getClubOrPoolName(), $swimteam->getTeamName(),
-            $swimteam->getStreet1(), $swimteam->getStreet2(), $swimteam->getCity(),
-            $swimteam->getStateOrProvince(), $swimteam->getPostalCode(),
-            WPST_SDIF_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE,
-            $this->getRegionCode(), WPST_SDIF_FUTURE_USE,
-            WPST_SDIF_FUTURE_USE, WPST_SDIF_FUTURE_USE,
-            WPST_SDIF_RECORD_TERMINATOR) ;
-
-        return $c1 ;
-    }
-
-    /**
-     * constructD1Record() - construct the D1 record.
-     *
-     * @return string - D1 record
-     * @todo - fix Hard Coded value for United States
-     */
-    function constructD1Record($swimmer, $contact, $label)
-    {
-        //  Assumptions:
-        //
-        //  Phone number fields are provided by the primary contact.
-        //
-        //  Some of the data is unknown or can't be determined so
-        //  we'll make our best guess in order to have legal SDIF.
-        //
-        //  Use today date('mdY') for USS registration date
-        //  Use 'C' (change) for the Member Code
-        //
-        //  The specification only allows 12 characters for the USS#
-        //  however the USS# should be 14 characters.  The last two
-        //  characters will be trimmed - I suspect this field could
-        //  be left blank.
-
-        //  Use computed age or real age?
-
-        if (get_option(WPST_OPTION_SDIF_SWIMMER_USE_AGE_GROUP_AGE) == WPST_YES)
-            $age = $swimmer->getAgeGroupAge() ;
-        else
-            $age = $swimmer->getAge();
-
-        //  Build the D1 record
-
-        $d1 = sprintf(WPST_SDIF_D1_RECORD, $this->getOrgCode(),
-            WPST_SDIF_FUTURE_USE, $this->getTeamCode(),
-            WPST_SDIF_FUTURE_USE, $swimmer->getLastCommaFirstNames(get_option(WPST_OPTION_SDIF_SWIMMER_USE_NICKNAME)),
-            WPST_SDIF_FUTURE_USE, /*$swimmer->getUSSNumber(),*/ $label,
-            WPST_SDIF_ATTACHED_CODE_ATTACHED_VALUE,
-            WPST_SDIF_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE,
-            $swimmer->getDateOfBirthAsMMDDYYYY(), $age,
-            strtoupper(substr($swimmer->getGender(), 0, 1)),
-            WPST_SDIF_NO_VALUE,
-            WPST_SDIF_NO_VALUE, $contact->getPrimaryPhone(),
-            $contact->getSecondaryPhone(), date('mdY'),
-            WPST_SDIF_MEMBERSHIP_CODE_NEW_VALUE, WPST_SDIF_FUTURE_USE,
-            WPST_SDIF_RECORD_TERMINATOR) ;
-
-        return $d1 ;
-    }
-
-    /**
-     * constructD2Record() - construct the D2 record.
-     *
-     * @return string - D2 record
-     */
-    function constructD2Record($swimmer, $contact)
-    {
-        //  Assumptions:
-        //
-        //  Phone number fields are provided by the primary contact.
-        //
-        //  Some of the data is unknown or can't be determined so
-        //  we'll make our best guess in order to have legal SDIF.
-        //
-        //  Use today date('mdY') for USS registration date
-        //  Use 'C' (change) for the Member Code
-        //
-        //  The specification only allows 12 characters for the USS#
-        //  however the USS# should be 14 characters.  The last two
-        //  characters will be trimmed - I suspect this field could
-        //  be left blank.
-
-        $d2 = sprintf(WPST_SDIF_D2_RECORD, $this->getOrgCode(),
-            WPST_SDIF_FUTURE_USE, $this->getTeamCode(),
-            WPST_SDIF_FUTURE_USE, $swimmer->getLastCommaFirstNames(get_option(WPST_OPTION_SDIF_SWIMMER_USE_NICKNAME)),
-            $contact->getFullName(), $contact->getFullStreetAddress(30),
-            $contact->getCity(), $contact->getStateOrProvince(),
-            $contact->getCountry(), $contact->getPostalCode(),
-            WPST_SDIF_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE,
-            $this->getRegionCode(), WPST_SDIF_ANSWER_CODE_NO_VALUE,
-            WPST_SDIF_SEASON_CODE_SEASON_1_VALUE, WPST_SDIF_FUTURE_USE,
-            WPST_SDIF_RECORD_TERMINATOR) ;
-
-        return $d2 ;
-    }
-
-    /**
-     * constructZ0Record() - construct the Z0 record.
-     *
-     * @return string - Z0 record
-     */
-    function constructZ0Record($swimmerCount)
-    {
-        //  Construct the Z0 record
- 
-        $z0 = sprintf(WPST_SDIF_Z0_RECORD, $this->getOrgCode(),
-            WPST_SDIF_FUTURE_USE, WPST_SDIF_FTT_CODE_USS_REGISTRATION_VALUE,
-            WPST_SDIF_NO_VALUE, 0, 0, 0, 1, $swimmerCount * 2,
-            $swimmerCount, 0, 0, 0, 1, $swimmerCount, 0, 0, 0,
-            WPST_SDIF_FUTURE_USE, WPST_SDIF_RECORD_TERMINATOR) ;
-
-        return $z0 ;
     }
 }
 
@@ -1358,42 +1071,21 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
 
             $swimmerIds = $roster->getAllSwimmerIdsByAgeGroupId($event->getAgeGroupId()) ;
 
-            /*
-            printf('<h3>Event Id:  %s<br>Event Number %s  Distance:</h3>',
-                $eventId['eventid'], $event->getEventNumber(), $event->getDistance()) ;
-            printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
-            printf('<pre>') ;
-            print_r($event) ;
-            print_r($swimmerIds) ;
-            printf('</pre>') ;
-             */
-
             //  Need to tidy up the list of swimmers based on meet participation
             //  Is the meet set up as opt-in or opt-out?  Adjust the list accordingly.
 
-            //foreach ($swimmerIds as $swimmerId)
             foreach ($swimmerIds as $key => &$swimmerId)
             {
-                //printf('<h4>Swimmer Id:  %s<br>Event Number %s</h4>', $swimmerId['swimmerid'], $event->getEventNumber()) ;
                 //  Has swimmer entered or scratched this event?
                 //  Which mode is the data ingetDateOfBirthAsMMDDYYYY?  Stroke or Event?
 
                 if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
                 {
-                    printf('<h5>Stroke Mode</h5>') ;
                     $optinoptout = $meta->getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
                         $swimmeet->getMeetId(), $swimmeet->getParticipation()) ;
 
                     if (!empty($optinoptout)) $optinoptout = $optinoptout[0] ;
 
-                    /*
-                    print '<pre>' ;
-                    var_dump($optinoptout) ;
-                    var_dump($event->getStroke()) ;
-                    var_dump(in_array($event->getStroke(), $optinoptout)) ;
-                    var_dump(in_array($event->getStroke(), $optinoptout)) ;
-                    print '</pre>' ;
-                     */
                     $swimming = ($swimmeet->getParticipation() == WPST_OPT_IN) ?
                         in_array($event->getStroke(), $optinoptout) :
                         !in_array($event->getStroke(), $optinoptout) ;
@@ -1414,14 +1106,6 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
 
                 if (!$swimming) unset($swimmerIds[$key]) ;
             }
-
-            /*
-            printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
-            printf('<pre>') ;
-            print_r($swimmerIds) ;
-            var_dump($swimmeet->getParticipation()) ;
-            printf('</pre>') ;
-             */
 
             //  Now we know the swimmers and the events, time to generate records!
 
@@ -4081,7 +3765,6 @@ class SDIFDxRecord extends SDIFRecord
         //  Time in mm:ss.ss?
         if (preg_match('/[0-9][0-9]:[0-9][0-9]\.[0-9][0-9]/', $txt))
         {
-            //printf('<h3>mm:ss.ss - %s</h3>', $txt) ;
             $time = explode($txt, ':') ;
             $this->_finals_time_ft = $time[0] * 60 + $time[1] ;
 
@@ -4089,12 +3772,10 @@ class SDIFDxRecord extends SDIFRecord
         //  Time in ss.ss?
         else if (preg_match('/[0-9][0-9]\.[0-9][0-9]/', $txt))
         {
-            //printf('<h3>ss.ss - %s</h3>', $txt) ;
             $this->_finals_time_ft = (float)$txt ;
         }
         else
         {
-            //printf('<h3>????? - %s</h3>', $txt) ;
             $this->_finals_time_ft = 0.0 ;
         }
 

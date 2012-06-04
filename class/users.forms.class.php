@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: users.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: users.forms.class.php 881 2012-05-17 13:01:33Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage UserProfiles
- * @version $Revision: 849 $
+ * @version $Revision: 881 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2012-05-17 09:01:33 -0400 (Thu, 17 May 2012) $
  *
  */
 
@@ -572,6 +572,34 @@ class WpSwimTeamUserProfileForm extends WpSwimTeamForm
         //$container->add(html_h4($this->_action_message)) ;
 
         return $container ;
+    }
+
+    /**
+     * Overload form_content_buttons() method to have the
+     * button display "Delete" instead of the default "Save".
+     *
+     */
+    function form_content_buttons()
+    {
+        $div = parent::form_content_buttons() ;
+
+        //  If user is on own profile or can edit user profiles, add another button
+
+        if ((current_user_can('edit_users') ||
+            (get_current_user_id() == $this->get_hidden_element_value('_userid'))))
+        {
+            $editwpuser = sprintf('javascript:document.location=\'%s%s%s\'', get_admin_url(),
+                'user-edit.php?user_id=', $this->get_hidden_element_value('_userid')) ;
+
+            $edit_wp_user_profile_button =
+                form_button('Edit User\'s WordPress Profile', 'Edit User\'s WordPress Profile',
+                array('type'=>'button', 'style'=>'width: 90px;', 'onclick'=> $editwpuser));
+            $edit_wp_user_profile_button->set_style("vertical-align:middle");
+
+            $div->add(_HTML_SPACE, $edit_wp_user_profile_button) ;
+        }
+
+        return $div ;
     }
 }
 ?>

@@ -3,15 +3,15 @@
 /**
  * Job classes.
  *
- * $Id: jobs.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: jobs.class.php 892 2012-05-18 20:17:36Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Jobs
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 892 $
+ * @lastmodified $Date: 2012-05-18 16:17:36 -0400 (Fri, 18 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -564,7 +564,7 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
      */
     var $__normal_actions = array(
          WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
-        ,WPST_ACTION_SIGN_UP => WPST_ACTION_SIGN_UP
+        //,WPST_ACTION_SIGN_UP => WPST_ACTION_SIGN_UP
     ) ;
 
     /**

@@ -3,15 +3,15 @@
 /**
  * Options classes.
  *
- * $Id: options.class.php 868 2012-05-12 03:55:08Z mpwalsh8 $
+ * $Id: options.class.php 896 2012-06-04 01:39:57Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Options
- * @version $Revision: 868 $
- * @lastmodified $Date: 2012-05-11 23:55:08 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 896 $
+ * @lastmodified $Date: 2012-06-03 21:39:57 -0400 (Sun, 03 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -84,6 +84,11 @@ class SwimTeamOptions extends SwimTeamDBI
      * swimmer label format code property
      */
     var $__swimmer_label_format_code ;
+
+    /**
+     * swimmer label initial value property
+     */
+    var $__swimmer_label_initial_value ;
 
     /**
      * job sign up property
@@ -558,6 +563,26 @@ class SwimTeamOptions extends SwimTeamDBI
     function getSwimmerLabelFormatCode()
     {
         return ($this->__swimmer_label_format_code) ;
+    }
+
+    /**
+     * Set the swimmer label initial value
+     *
+     * @param - string - swimmer label initial value
+     */
+    function setSwimmerLabelInitialValue($number)
+    {
+        $this->__swimmer_label_initial_value = $number ;
+    }
+
+    /**
+     * Get the swimmer label initial value
+     *
+     * @return - string - swimmer label initial value
+     */
+    function getSwimmerLabelInitialValue()
+    {
+        return ($this->__swimmer_label_initial_value) ;
     }
 
     /**
@@ -1370,6 +1395,20 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE, WPST_DEFAULT_SWIMMER_LABEL_FORMAT_CODE) ;
         }
 
+        //  swimmer label initial value
+        $option = get_option(WPST_OPTION_SWIMMER_LABEL_INITIAL_VALUE) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setSwimmerLabelInitialValue($option) ;
+        }
+        else
+        {
+            $this->setSwimmerLabelInitialValue(WPST_DEFAULT_SWIMMER_LABEL_INITIAL_VALUE) ;
+            update_option(WPST_OPTION_SWIMMER_LABEL_INITIAL_VALUE, WPST_DEFAULT_SWIMMER_LABEL_INITIAL_VALUE) ;
+        }
+
         //  job sign up
         $option = get_option(WPST_OPTION_JOB_SIGN_UP) ;
 
@@ -1968,7 +2007,7 @@ class SwimTeamOptions extends SwimTeamDBI
         else
         {
             $this->setOptInOptOutUsageModel(WPST_STROKE) ;
-            update_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL, STROKE) ;
+            update_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL, WPST_STROKE) ;
         }
  
         //  opt in opt out mode
@@ -2040,6 +2079,7 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_JOB_EXPECTATIONS_URL, $this->getJobExpectationsURL()) ;
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT, $this->getSwimmerLabelFormat()) ;
         update_option(WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE, $this->getSwimmerLabelFormatCode()) ;
+        update_option(WPST_OPTION_SWIMMER_LABEL_INITIAL_VALUE, $this->getSwimmerLabelInitialValue()) ;
         update_option(WPST_OPTION_AUTO_REGISTER, $this->getAutoRegister()) ;
         update_option(WPST_OPTION_REGISTRATION_SYSTEM, $this->getRegistrationSystem()) ;
         update_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES, $this->getEnableVerboseMessages()) ;

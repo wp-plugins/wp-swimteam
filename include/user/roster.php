@@ -3,15 +3,15 @@
 /**
  * Roster page content.
  *
- * $Id: roster.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: roster.php 885 2012-05-18 04:53:24Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 885 $
+ * @lastmodified $Date: 2012-05-18 00:53:24 -0400 (Fri, 18 May 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -154,7 +154,7 @@ class RosterTabContainer extends SwimTeamTabContainer
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
             
         //  Handle the optional fields
 
@@ -196,7 +196,7 @@ class RosterTabContainer extends SwimTeamTabContainer
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
 
-        if (empty($options)) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
             
         //  Handle the optional fields
 
@@ -235,6 +235,7 @@ class RosterTabContainer extends SwimTeamTabContainer
         $actions_allowed_without_swimmerid = array(
             WPST_ACTION_DIRECTORY
            ,WPST_ACTION_EXPORT_SDIF
+           ,WPST_ACTION_EXPORT_HY3
            ,WPST_ACTION_EXPORT_CSV
            ,WPST_ACTION_EXPORT_MMRE
            ,WPST_ACTION_ASSIGN_LABELS
@@ -363,9 +364,10 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $sdif->generateSDIF($swimmerid) ;
                     $sdif->generateSDIFFile() ;
 
-                    $arg = urlencode($sdif->getSDIFFile()) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($sdif->getSDIFFile()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('txt')) ;
 
-                    $if = html_iframe(sprintf('%s/include/user/rosterSDIF.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                     $c->add($if) ;
 
@@ -375,26 +377,48 @@ class RosterTabContainer extends SwimTeamTabContainer
 
                     break ;
 
+                case WPST_ACTION_EXPORT_HY3:
+                    $c = container() ;
+                    require_once('hy-tek.class.php') ;
+
+                    $hy3 = new HY3Roster() ;
+                    //$hy3->setHy3DebugFlag(true) ;
+                    $hy3->generateHY3($swimmerid) ;
+                    $hy3->generateHY3File() ;
+
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($hy3->getHY3File()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('txt')) ;
+
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                    $c->add($if) ;
+
+                    $c->add(html_div('updated fade',
+                        html_h4(sprintf('%s roster records exported in HY3 format.', $hy3->getHY3Count())))) ;
+                    $c->add($this->__buildGDL()) ;
+
+                    break ;
+
                 case WPST_ACTION_EXPORT_CSV:
                     $c = container() ;
 
                     $csv = new SwimTeamSwimmersReportGeneratorCSV() ;
                     $this->__initializeReportGeneratorCSV($csv) ;
-                    $csv->generateReport($swimmerid, true) ;
+                    $csv->generateReport($swimmerid) ;
                     $csv->generateCSVFile() ;
-                    $arg = urlencode($csv->getCSVFile()) ;
 
-                    $if = html_iframe(sprintf('%s/include/user/reportgenCSV.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($csv->getCSVFile()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                     $c->add($if) ;
-                    $c->add($csv->getReport(true)) ;
+                    $c->add($csv->getReport()) ;
                     $c->add(html_br(), SwimTeamGUIButtons::getButton('Return to Roster')) ;
                     
                     $div->add(html_div('updated fade',
-                        html_h4(sprintf('Swim Team Swimmers Report
-                        Generated, %s record%s returned.',
-                        $csv->getRecordCount(),
-                        $csv->getRecordCount() == 1 ? '' : 's')))) ;                    
+                        html_h4(sprintf('Swim Team Swimmers Report Generated, %s record%s returned.',
+                        $csv->getRecordCount(), $csv->getRecordCount() == 1 ? '' : 's')))) ;                    
                     break ;
 
                 case WPST_ACTION_EXPORT_MMRE:
@@ -402,19 +426,21 @@ class RosterTabContainer extends SwimTeamTabContainer
 
                     $re1 = new SwimTeamSwimmersReportGeneratorRE1() ;
                     $this->__initializeReportGeneratorRE1($re1) ;
-                    $re1->generateReport(true) ;
+                    $re1->generateReport($swimmerid) ;
                     $re1->generateRE1File() ;
 
-                    $arg = urlencode($re1->getRE1File()) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($re1->getRE1File()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('txt')) ;
 
-                    $if = html_iframe(sprintf('%s/include/user/rosterRE1.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                     $c->add($if) ;
-                    $c->add($re1->getReport(true)) ;
+                    $c->add($re1->getReport()) ;
+                    $c->add(html_br(), SwimTeamGUIButtons::getButton('Return to Roster')) ;
 
-                    $c->add(html_div('updated fade',
-                        html_h4(sprintf('%s roster records exported in RE1 format.', $re1->getExportCount())))) ;
-                    $c->add($this->__buildGDL()) ;
+                    $div->add(html_div('updated fade',
+                        html_h4(sprintf('Swim Team Swimmers Report Generated, %s record%s exported. in Hy-tek Meet Manager RE1 format.',
+                        $re1->getRecordCount(), $re1->getRecordCount() == 1 ? '' : 's')))) ;                    
 
                     break ;
 

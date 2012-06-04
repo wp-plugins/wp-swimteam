@@ -3,15 +3,15 @@
 /**
  * Season classes.
  *
- * $Id: roster.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: roster.class.php 898 2012-06-04 01:41:18Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Roster
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 898 $
+ * @lastmodified $Date: 2012-06-03 21:41:18 -0400 (Sun, 03 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -877,11 +877,24 @@ class SwimTeamRoster extends SwimTeamDBI
         switch (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT))
         {
             case WPST_SIMPLE_NUMERIC:
-                $num = 1 ;
+                $iv = get_option(WPST_OPTION_SWIMMER_LABEL_INITIAL_VALUE) ;
+
+                //  If option isn't stored in the database, use the default
+                if ($iv === false)
+                    $iv = WPST_DEFAULT_SWIMMER_LABEL_INITIAL_VALUE ;
+
+                $num = $iv ;
+
                 break ;
 
             case WPST_AGE_GROUP_PREFIX_NUMERIC:
             case WPST_AGE_GROUP_PREFIX_WPST_ID:
+                $iv = get_option(WPST_OPTION_SWIMMER_LABEL_INITIAL_VALUE) ;
+
+                //  If option isn't stored in the database, use the default
+                if ($iv === false)
+                    $iv = WPST_DEFAULT_SWIMMER_LABEL_INITIAL_VALUE ;
+
                 $num = array() ;
                 $prefix = array() ;
 
@@ -893,7 +906,7 @@ class SwimTeamRoster extends SwimTeamDBI
                 foreach ($agegroups as $agegroup)
                 {
                     $a->loadAgeGroupById($agegroup["id"]) ;
-                    $prefix[$a->getId()]["num"] = 0 ;
+                    $prefix[$a->getId()]["num"] = $iv ;
                     $prefix[$a->getId()]["prefix"] = $a->getSwimmerLabelPrefix() ;
                 }
 
@@ -1202,6 +1215,7 @@ class SwimTeamRosterAdminGUIDataList extends SwimTeamRosterGUIDataList
         ,WPST_ACTION_ASSIGN_LABELS => WPST_ACTION_ASSIGN_LABELS
         ,WPST_ACTION_EXPORT_SDIF => WPST_ACTION_EXPORT_SDIF
         ,WPST_ACTION_EXPORT_CSV => WPST_ACTION_EXPORT_CSV
+        ,WPST_ACTION_EXPORT_HY3 => WPST_ACTION_EXPORT_HY3
         ,WPST_ACTION_EXPORT_MMRE => WPST_ACTION_EXPORT_MMRE
     ) ;
 

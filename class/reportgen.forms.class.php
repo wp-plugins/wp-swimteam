@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: reportgen.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: reportgen.forms.class.php 888 2012-05-18 04:57:05Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,25 +10,25 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Reports
- * @version $Revision: 849 $
+ * @version $Revision: 888 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2012-05-18 00:57:05 -0400 (Fri, 18 May 2012) $
  *
  */
 
-require_once("forms.class.php") ;
-require_once("reportgen.class.php") ;
+require_once('forms.class.php') ;
+require_once('reportgen.class.php') ;
 
-define("FEFILTER", " Filter") ;
-define("FEFILTERLB", FEFILTER . " Listbox") ;
+define('FEFILTER', ' Filter') ;
+define('FEFILTERLB', FEFILTER . ' Listbox') ;
 
 /**
  * Construct the Report Generator form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -47,31 +47,31 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_init_elements($filters = true)
     {
-        $internalid = new FECheckBox("Internal Id") ;
+        $internalid = new FECheckBox('Internal Id') ;
         $this->add_element($internalid) ;
 
-        $firstname = new FECheckBox("First Name") ;
+        $firstname = new FECheckBox('First Name') ;
         $this->add_element($firstname) ;
 
-        $lastname = new FECheckBox("Last Name") ;
+        $lastname = new FECheckBox('Last Name') ;
         $this->add_element($lastname) ;
 
-        $username = new FECheckBox("Username") ;
+        $username = new FECheckBox('Username') ;
         $this->add_element($username) ;
 
-        $emailaddress = new FECheckBox("E-mail Address") ;
+        $emailaddress = new FECheckBox('E-mail Address') ;
         $this->add_element($emailaddress) ;
 
-        $address1 = new FECheckBox("Street Address 1") ;
+        $address1 = new FECheckBox('Street Address 1') ;
         $this->add_element($address1) ;
 
-        $address2 = new FECheckBox("Street Address 2") ;
+        $address2 = new FECheckBox('Street Address 2') ;
         $this->add_element($address2) ;
 
-        $address3 = new FECheckBox("Street Address 3") ;
+        $address3 = new FECheckBox('Street Address 3') ;
         $this->add_element($address3) ;
 
-        $city = new FECheckBox("City") ;
+        $city = new FECheckBox('City') ;
         $this->add_element($city) ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
@@ -82,7 +82,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         $postalcode = new FECheckBox($label) ;
         $this->add_element($postalcode) ;
 
-        $country = new FECheckBox("Country") ;
+        $country = new FECheckBox('Country') ;
         $this->add_element($country) ;
 
         $label = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
@@ -93,19 +93,19 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         $secondaryphone = new FECheckBox($label) ;
         $this->add_element($secondaryphone) ;
 
-        $contactinfo = new FECheckBox("Contact Information") ;
+        $contactinfo = new FECheckBox('Contact Information') ;
         $this->add_element($contactinfo) ;
 
-        //$tshirtsize = new FECheckBox("T-Shirt Size") ;
+        //$tshirtsize = new FECheckBox('T-Shirt Size') ;
         //$this->add_element($tshirtsize) ;
 
-        //$swimmerlabel = new FECheckBox("Swimmer Label") ;
+        //$swimmerlabel = new FECheckBox('Swimmer Label') ;
         //$this->add_element($swimmerlabel) ;
 
-        $websitreid = new FECheckBox("Web Site Id") ;
+        $websitreid = new FECheckBox('Web Site Id') ;
         $this->add_element($websitreid) ;
 
-        $send_to = new FEListBox("Report", true, "200px");
+        $send_to = new FEListBox('Report', true, '200px');
         $send_to->set_list_data(array(
              ucfirst(WPST_GENERATE_STATIC_WEB_PAGE) => WPST_GENERATE_STATIC_WEB_PAGE
             ,ucfirst(WPST_GENERATE_CSV) => WPST_GENERATE_CSV
@@ -116,10 +116,10 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         if ($filters)
         {
-            $contactinfofilter = new FECheckBox("Contact Information" . FEFILTER) ;
+            $contactinfofilter = new FECheckBox('Contact Information' . FEFILTER) ;
             $this->add_element($contactinfofilter) ;
 
-            $contactinfofilterlb = new FEListBox("Contact Information" . FEFILTERLB, true, "100px");
+            $contactinfofilterlb = new FEListBox('Contact Information' . FEFILTERLB, true, '100px');
             $contactinfofilterlb->set_list_data(array(
                  ucfirst(WPST_PUBLIC) => WPST_PUBLIC
                 ,ucfirst(WPST_PRIVATE) => WPST_PRIVATE
@@ -141,8 +141,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -157,7 +157,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
                         (get_option($oconst) == WPST_NO_YES))
                     {
                         $offcb[$oc] = new FECheckBox(get_option($lconst) . FEFILTER) ;
-                        $offyn[$oc] = new FEYesNoListBox(get_option($lconst) . FEFILTERLB, false, "75px") ;
+                        $offyn[$oc] = new FEYesNoListBox(get_option($lconst) . FEFILTERLB, false, '75px') ;
                         $this->add_element($offcb[$oc]) ;
                         $this->add_element($offyn[$oc]) ;
                     }
@@ -174,30 +174,30 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_init_data($filters = true)
     {
-        $this->set_element_value("Internal Id", false) ;
-        $this->set_element_value("First Name", true) ;
-        $this->set_element_value("Last Name", true) ;
-        $this->set_element_value("Username", false) ;
-        $this->set_element_value("E-mail Address", true) ;
-        $this->set_element_value("Street Address 1", false) ;
-        $this->set_element_value("Street Address 2", false) ;
-        $this->set_element_value("Street Address 3", false) ;
-        $this->set_element_value("City", false) ;
+        $this->set_element_value('Internal Id', false) ;
+        $this->set_element_value('First Name', true) ;
+        $this->set_element_value('Last Name', true) ;
+        $this->set_element_value('Username', false) ;
+        $this->set_element_value('E-mail Address', true) ;
+        $this->set_element_value('Street Address 1', false) ;
+        $this->set_element_value('Street Address 2', false) ;
+        $this->set_element_value('Street Address 3', false) ;
+        $this->set_element_value('City', false) ;
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
         $this->set_element_value($label, false) ;
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
         $this->set_element_value($label, false) ;
-        $this->set_element_value("Country", false) ;
+        $this->set_element_value('Country', false) ;
         $label = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
         $this->set_element_value($label, false) ;
         $label = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
         $this->set_element_value($label, false) ;
-        $this->set_element_value("Contact Information", false) ;
+        $this->set_element_value('Contact Information', false) ;
 
         if ($filters)
         {
-            $this->set_element_value("Contact Information" . FEFILTER, false) ;
-            $this->set_element_value("Contact Information" . FEFILTERLB, WPST_PUBLIC) ;
+            $this->set_element_value('Contact Information' . FEFILTER, false) ;
+            $this->set_element_value('Contact Information' . FEFILTERLB, WPST_PUBLIC) ;
             //  How many user options does this configuration support?
 
             $options = get_option(WPST_OPTION_USER_OPTION_COUNT) ;
@@ -208,8 +208,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
             for ($oc = 1 ; $oc <= $options ; $oc++)
             {
-                $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-                $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+                $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+                $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
                 switch (get_option($oconst))
                 {
@@ -229,7 +229,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
             }
 
         }
-        $this->set_element_value("Report", WPST_GENERATE_STATIC_WEB_PAGE) ;
+        $this->set_element_value('Report', WPST_GENERATE_STATIC_WEB_PAGE) ;
     }
 
 
@@ -241,10 +241,10 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_content()
     {
-        //array_walk(debug_backtrace(),create_function('$a,$b','print "{$a[\'function\']}()(".basename($a[\'file\']).":{$a[\'line\']}); ";'));
-        $this->add_form_block("Contact Fields", $this->_contact_options()) ;
-        $this->add_form_block("Report Filters", $this->_report_filters()) ;
-        $this->add_form_block("Report Output", $this->_send_report_to()) ;
+        //array_walk(debug_backtrace(),create_function('$a,$b','print '{$a[\'function\']}()('.basename($a[\'file\']).':{$a[\'line\']}); ';'));
+        $this->add_form_block('Contact Fields', $this->_contact_options()) ;
+        $this->add_form_block('Report Filters', $this->_report_filters()) ;
+        $this->add_form_block('Report Output', $this->_send_report_to()) ;
     }
 
     /**
@@ -255,24 +255,24 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
     function &_contact_options()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_form("First Name"),
-            $this->element_form("Last Name")) ;
+        $table->add_row($this->element_form('First Name'),
+            $this->element_form('Last Name')) ;
 
-        $table->add_row($this->element_form("E-mail Address"),
-            $this->element_form("Username")) ;
+        $table->add_row($this->element_form('E-mail Address'),
+            $this->element_form('Username')) ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
-        $table->add_row($this->element_form("Street Address 1"),
+        $table->add_row($this->element_form('Street Address 1'),
             $this->element_form($label)) ;
 
         $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
-        $table->add_row($this->element_form("Street Address 2"),
+        $table->add_row($this->element_form('Street Address 2'),
             $this->element_form($label)) ;
 
-        $table->add_row($this->element_form("Street Address 3"),
-            $this->element_form("Country")) ;
+        $table->add_row($this->element_form('Street Address 3'),
+            $this->element_form('Country')) ;
 
         $plabel = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
         $slabel = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
@@ -280,7 +280,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         $table->add_row($this->element_form($plabel),
             $this->element_form($slabel)) ;
 
-        $table->add_row($this->element_form("Internal Id"),
+        $table->add_row($this->element_form('Internal Id'),
             _HTML_SPACE) ;
 
         //  How many user options does this configuration support?
@@ -296,8 +296,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -317,7 +317,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_form("Report")) ;
+        $table->add_row($this->element_form('Report')) ;
 
         return $table ;
     }
@@ -332,8 +332,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         error_reporting(E_ALL) ;
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_form("Contact Information" . FEFILTER),
-            $this->element_form("Contact Information" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Contact Information' . FEFILTER),
+            $this->element_form('Contact Information' . FEFILTERLB)) ;
 
         //  How many user options does this configuration support?
 
@@ -345,8 +345,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
             if ((get_option($oconst) == WPST_YES_NO) ||
                 (get_option($oconst) == WPST_NO_YES))
@@ -382,31 +382,31 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         $rpt = &$this->__report ;
 
-        if (!is_null($this->get_element_value("Internal Id")))
+        if (!is_null($this->get_element_value('Internal Id')))
             $rpt->setinternalId(true) ;
 
-        if (!is_null($this->get_element_value("First Name")))
+        if (!is_null($this->get_element_value('First Name')))
             $rpt->setFirstName(true) ;
 
-        if (!is_null($this->get_element_value("Last Name")))
+        if (!is_null($this->get_element_value('Last Name')))
             $rpt->setLastName(true) ;
 
-        if (!is_null($this->get_element_value("Username")))
+        if (!is_null($this->get_element_value('Username')))
             $rpt->setUsername(true) ;
 
-        if (!is_null($this->get_element_value("E-mail Address")))
+        if (!is_null($this->get_element_value('E-mail Address')))
             $rpt->setEmailAddress(true) ;
 
-        if (!is_null($this->get_element_value("Street Address 1")))
+        if (!is_null($this->get_element_value('Street Address 1')))
             $rpt->setStreetAddress1(true) ;
 
-        if (!is_null($this->get_element_value("Street Address 2")))
+        if (!is_null($this->get_element_value('Street Address 2')))
             $rpt->setStreetAddress2(true) ;
 
-        if (!is_null($this->get_element_value("Street Address 3")))
+        if (!is_null($this->get_element_value('Street Address 3')))
             $rpt->setStreetAddress3(true) ;
 
-        if (!is_null($this->get_element_value("City")))
+        if (!is_null($this->get_element_value('City')))
             $rpt->setCity(true) ;
 
         $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
@@ -417,7 +417,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         if (!is_null($this->get_element_value($label)))
             $rpt->setPostalCode(true) ;
 
-        if (!is_null($this->get_element_value("Country")))
+        if (!is_null($this->get_element_value('Country')))
             $rpt->setCountry(true) ;
 
         $label = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
@@ -428,7 +428,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         if (!is_null($this->get_element_value($label)))
             $rpt->setSecondaryPhone(true) ;
 
-        if (!is_null($this->get_element_value("Contact Information")))
+        if (!is_null($this->get_element_value('Contact Information')))
             $rpt->setContactInformation(true) ;
 
         //  How many user options does this configuration support?
@@ -441,8 +441,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -470,10 +470,10 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
  
         if ($filters)
         {
-            if (!is_null($this->get_element_value("Contact Information" . FEFILTER)))
+            if (!is_null($this->get_element_value('Contact Information' . FEFILTER)))
             {
                 $rpt->setGenderFilter(true) ;
-                $rpt->setGenderFilterValue($this->get_element_value("Contact Information" . FEFILTERLB)) ;
+                $rpt->setGenderFilterValue($this->get_element_value('Contact Information' . FEFILTERLB)) ;
             }
         }
     }
@@ -486,13 +486,13 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_action()
     {
-        if ($this->get_element_value("Report") == WPST_GENERATE_STATIC_WEB_PAGE)
+        if ($this->get_element_value('Report') == WPST_GENERATE_STATIC_WEB_PAGE)
         {
             $csv = false ;
             $this->__report = new SwimTeamUsersReportGenerator() ;
             
         }
-        else if ($this->get_element_value("Report") == WPST_GENERATE_CSV)
+        else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
             $this->__report = new SwimTeamUsersReportGeneratorCSV() ;
@@ -521,9 +521,9 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         
         //  Build the message that goes back to the user
 
-        $this->set_action_message(sprintf("Swim Team Users Report Generated,
-            %s record%s returned.", $rpt->getRecordCount(),
-            $rpt->getRecordCount() == 1 ? "" : "s")) ;
+        $this->set_action_message(sprintf('Swim Team Users Report Generated,
+            %s record%s returned.', $rpt->getRecordCount(),
+            $rpt->getRecordCount() == 1 ? '' : 's')) ;
 
         return true ;
     }
@@ -544,7 +544,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 
     /**
      * Overload form_content_buttons() method to have the
-     * button display "Generate" instead of the default "Save".
+     * button display 'Generate' instead of the default 'Save'.
      *
      */
     function form_content_buttons()
@@ -556,7 +556,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
 /**
  * Construct the Report Generator form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamUsersReportGeneratorForm
  */
@@ -607,7 +607,7 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         //  Find all of the meets in the season
 
         $meet = new SwimMeet() ;
-        $meetIds = $meet->getAllMeetIds(sprintf("seasonid=\"%s\"", $seasonid)) ;
+        $meetIds = $meet->getAllMeetIds(sprintf('seasonid="%s"', $seasonid)) ;
 
         //  Handle case where no meets have been scheduled yet
 
@@ -615,7 +615,7 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         {
             foreach ($meetIds as $meetId)
             {
-                $meet->loadSwimMeetByMeetId($meetId["meetid"]) ;
+                $meet->loadSwimMeetByMeetId($meetId['meetid']) ;
     
                 if ($meet->getMeetType() == WPST_DUAL_MEET)
                     $opponent = SwimTeamTextMap::__mapOpponentSwimClubIdToText(
@@ -623,10 +623,10 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
                 else
                     $opponent = $meet->getMeetDescription() ;
     
-                $meetdate = date("D M j, Y", strtotime($meet->getMeetDateAsDate())) ;
+                $meetdate = date('D M j, Y', strtotime($meet->getMeetDateAsDate())) ;
 
-                $m[sprintf("%s %s (%s)", $meetdate, $opponent,
-                    ucfirst($meet->getLocation()))] = $meetId["meetid"] ;
+                $m[sprintf('%s %s (%s)', $meetdate, $opponent,
+                    ucfirst($meet->getLocation()))] = $meetId['meetid'] ;
             }
         }
 
@@ -646,35 +646,35 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 
         //  Swim  Meet check box list
 
-        $meets = new FECheckBoxList("Swim Meet", true, "400px", "100px");
+        $meets = new FECheckBoxList('Swim Meet', true, '400px', '100px');
         $meets->set_list_data($this->_swimmeetSelections()) ;
         $meets->enable_checkall(true) ;
 
         $this->add_element($meets) ;
 
-        $jobposition = new FECheckBox("Position") ;
+        $jobposition = new FECheckBox('Position') ;
         $this->add_element($jobposition) ;
 
-        $jobdescription = new FECheckBox("Description") ;
+        $jobdescription = new FECheckBox('Description') ;
         $this->add_element($jobdescription) ;
 
-        $jobduration = new FECheckBox("Duration") ;
+        $jobduration = new FECheckBox('Duration') ;
         $this->add_element($jobduration) ;
 
-        $jobtype = new FECheckBox("Type") ;
+        $jobtype = new FECheckBox('Type') ;
         $this->add_element($jobtype) ;
 
-        $jobcredits = new FECheckBox("Credits") ;
+        $jobcredits = new FECheckBox('Credits') ;
         $this->add_element($jobcredits) ;
 
-        $jobnotes = new FECheckBox("Notes") ;
+        $jobnotes = new FECheckBox('Notes') ;
         $this->add_element($jobnotes) ;
 
-        $jobdurationfilter = new FECheckBox("Duration" . FEFILTER) ;
+        $jobdurationfilter = new FECheckBox('Duration' . FEFILTER) ;
         $jobdurationfilter->set_disabled(true) ;
         $this->add_element($jobdurationfilter) ;
 
-        $jobdurationfilterlb = new FEListBox("Duration" . FEFILTERLB, true, "100px");
+        $jobdurationfilterlb = new FEListBox('Duration' . FEFILTERLB, true, '100px');
         $jobdurationfilterlb->set_list_data(array(
              ucwords(WPST_JOB_DURATION_FULL_MEET) => WPST_JOB_DURATION_FULL_MEET
             ,ucwords(WPST_JOB_DURATION_PARTIAL_MEET) => WPST_JOB_DURATION_PARTIAL_MEET
@@ -684,11 +684,11 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         )) ;
         $this->add_element($jobdurationfilterlb) ;
 
-        $jobtypefilter = new FECheckBox("Type" . FEFILTER) ;
+        $jobtypefilter = new FECheckBox('Type' . FEFILTER) ;
         $jobtypefilter->set_disabled(true) ;
         $this->add_element($jobtypefilter) ;
 
-        $jobtypefilterlb = new FEListBox("Type" . FEFILTERLB, true, "100px");
+        $jobtypefilterlb = new FEListBox('Type' . FEFILTERLB, true, '100px');
         $jobtypefilterlb->set_list_data(array(
              ucwords(WPST_JOB_TYPE_VOLUNTEER) => WPST_JOB_TYPE_VOLUNTEER
             ,ucwords(WPST_JOB_TYPE_PAID) => WPST_JOB_TYPE_PAID
@@ -707,16 +707,16 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         //  Pick up the form initialization from the parent form
         parent::form_init_data(false) ;
 
-        $this->set_element_value("Position", true) ;
-        $this->set_element_value("Description", false) ;
-        $this->set_element_value("Duration", true) ;
-        $this->set_element_value("Type", false) ;
-        $this->set_element_value("Credits", false) ;
-        $this->set_element_value("Notes", true) ;
-        $this->set_element_value("Duration" . FEFILTER, false) ;
-        $this->set_element_value("Duration" . FEFILTERLB, WPST_JOB_DURATION_FULL_MEET) ;
-        $this->set_element_value("Type" . FEFILTER, false) ;
-        $this->set_element_value("Type" . FEFILTERLB, WPST_JOB_TYPE_VOLUNTEER) ;
+        $this->set_element_value('Position', true) ;
+        $this->set_element_value('Description', false) ;
+        $this->set_element_value('Duration', true) ;
+        $this->set_element_value('Type', false) ;
+        $this->set_element_value('Credits', false) ;
+        $this->set_element_value('Notes', true) ;
+        $this->set_element_value('Duration' . FEFILTER, false) ;
+        $this->set_element_value('Duration' . FEFILTERLB, WPST_JOB_DURATION_FULL_MEET) ;
+        $this->set_element_value('Type' . FEFILTER, false) ;
+        $this->set_element_value('Type' . FEFILTERLB, WPST_JOB_TYPE_VOLUNTEER) ;
     }
 
     /**
@@ -727,11 +727,11 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
      */
     function form_content()
     {
-        $this->add_form_block("Swim Meets", $this->_swim_meet_options()) ;
-        $this->add_form_block("Job Assignment Fields", $this->_job_assignment_options()) ;
-        $this->add_form_block("Contact Fields", $this->_contact_options()) ;
-        $this->add_form_block("Report Filters", $this->_report_filters()) ;
-        $this->add_form_block("Report Output", $this->_send_report_to()) ;
+        $this->add_form_block('Swim Meets', $this->_swim_meet_options()) ;
+        $this->add_form_block('Job Assignment Fields', $this->_job_assignment_options()) ;
+        $this->add_form_block('Contact Fields', $this->_contact_options()) ;
+        $this->add_form_block('Report Filters', $this->_report_filters()) ;
+        $this->add_form_block('Report Output', $this->_send_report_to()) ;
     }
 
     /**
@@ -742,9 +742,9 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
     function &_swim_meet_options()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_form("Swim Meet")) ;
+        $table->add_row($this->element_form('Swim Meet')) ;
 
         return $table ;
     }
@@ -757,16 +757,16 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
     function &_job_assignment_options()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_form("Position"),
-            $this->element_form("Description")) ;
+        $table->add_row($this->element_form('Position'),
+            $this->element_form('Description')) ;
 
-        $table->add_row($this->element_form("Duration"),
-            $this->element_form("Type")) ;
+        $table->add_row($this->element_form('Duration'),
+            $this->element_form('Type')) ;
 
-        $table->add_row($this->element_form("Credits"),
-            $this->element_form("Notes")) ;
+        $table->add_row($this->element_form('Credits'),
+            $this->element_form('Notes')) ;
 
         return $table ;
     }
@@ -781,11 +781,11 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         //$table = parent::_report_filters() ;
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_form("Duration" . FEFILTER),
-            $this->element_form("Duration" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Duration' . FEFILTER),
+            $this->element_form('Duration' . FEFILTERLB)) ;
 
-        $table->add_row($this->element_form("Type" . FEFILTER),
-            $this->element_form("Type" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Type' . FEFILTER),
+            $this->element_form('Type' . FEFILTERLB)) ;
 
         return $table ;
     }
@@ -802,38 +802,38 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 
         $rpt = &$this->__report ;
 
-        if (!is_null($this->get_element_value("Position")))
+        if (!is_null($this->get_element_value('Position')))
             $rpt->setJobPosition(true) ;
 
-        if (!is_null($this->get_element_value("Description")))
+        if (!is_null($this->get_element_value('Description')))
             $rpt->setJobDescription(true) ;
 
-        if (!is_null($this->get_element_value("Duration")))
+        if (!is_null($this->get_element_value('Duration')))
             $rpt->setJobDuration(true) ;
 
-        if (!is_null($this->get_element_value("Type")))
+        if (!is_null($this->get_element_value('Type')))
             $rpt->setJobType(true) ;
 
-        if (!is_null($this->get_element_value("Credits")))
+        if (!is_null($this->get_element_value('Credits')))
             $rpt->setJobCredits(true) ;
 
-        if (!is_null($this->get_element_value("Notes")))
+        if (!is_null($this->get_element_value('Notes')))
             $rpt->setJobNotes(true) ;
 
-        $rpt->setSwimMeetIds($this->get_element_value("Swim Meet")) ;
+        $rpt->setSwimMeetIds($this->get_element_value('Swim Meet')) ;
 
         //  Filters
  
-        if (!is_null($this->get_element_value("Duration" . FEFILTER)))
+        if (!is_null($this->get_element_value('Duration' . FEFILTER)))
         {
             $rpt->setJobDurationFilter(true) ;
-            $rpt->setJobDurationFilterValue($this->get_element_value("Duration" . FEFILTERLB)) ;
+            $rpt->setJobDurationFilterValue($this->get_element_value('Duration' . FEFILTERLB)) ;
         }
  
-        if (!is_null($this->get_element_value("Type" . FEFILTER)))
+        if (!is_null($this->get_element_value('Type' . FEFILTER)))
         {
             $rpt->setJobTypeFilter(true) ;
-            $rpt->setJobTypeFilterValue($this->get_element_value("Type" . FEFILTERLB)) ;
+            $rpt->setJobTypeFilterValue($this->get_element_value('Type' . FEFILTERLB)) ;
         }
     }
 
@@ -845,13 +845,13 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
      */
     function form_action()
     {
-        if ($this->get_element_value("Report") == WPST_GENERATE_STATIC_WEB_PAGE)
+        if ($this->get_element_value('Report') == WPST_GENERATE_STATIC_WEB_PAGE)
         {
             $csv = false ;
             $this->__report = new SwimTeamJobAssignmentsReportGenerator() ;
             
         }
-        else if ($this->get_element_value("Report") == WPST_GENERATE_CSV)
+        else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
             $this->__report = new SwimTeamJobAssignmentsReportGeneratorCSV() ;
@@ -874,9 +874,9 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         $rpt->setReportTitle('Swim Team Job Assignments Report') ;
         $rpt->generateReport() ;
         
-        $this->set_action_message(sprintf("Swim Team Job Assignments Report Generated,
-            %s record%s returned.", $rpt->getRecordCount(),
-            $rpt->getRecordCount() == 1 ? "" : "s")) ;
+        $this->set_action_message(sprintf('Swim Team Job Assignments Report Generated,
+            %s record%s returned.', $rpt->getRecordCount(),
+            $rpt->getRecordCount() == 1 ? '' : 's')) ;
 
         return true ;
     }
@@ -886,7 +886,7 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 /**
  * Construct the Report Generator form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamUsersReportGeneratorForm
  */
@@ -937,7 +937,7 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         //  Find all of the seasons in the season
 
         $season = new SwimTeamSeason() ;
-        //$seasonIds = $season->getAllSeasonIds(sprintf("seasonid=\"%s\"", $seasonid)) ;
+        //$seasonIds = $season->getAllSeasonIds(sprintf('seasonid="%s"', $seasonid)) ;
         $seasonIds = $season->getAllSeasonIds() ;
 
         //  Handle case where no seasons have been scheduled yet
@@ -948,10 +948,10 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
             {
                 $season->loadSeasonById($seasonId['seasonid']) ;
     
-                $seasonstart = date("M j, Y", strtotime($season->getSeasonStart())) ;
-                $seasonend = date("M j, Y", strtotime($season->getSeasonEnd())) ;
+                $seasonstart = date('M j, Y', strtotime($season->getSeasonStart())) ;
+                $seasonend = date('M j, Y', strtotime($season->getSeasonEnd())) ;
 
-                $s[sprintf("%s [%s - %s] (%s)", $season->getSeasonLabel(), $seasonstart,
+                $s[sprintf('%s [%s - %s] (%s)', $season->getSeasonLabel(), $seasonstart,
                     $seasonend, $season->getSeasonStatus())] = $seasonId['seasonid'] ;
             }
         }
@@ -972,36 +972,36 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 
         //  Swim  Meet check box list
 
-        //$seasons = new FECheckBoxList("Swim Seasons", true, "100%", "100px");
-        $seasons = new FEListBox("Swim Seasons", true, "100%", "100px");
+        //$seasons = new FECheckBoxList('Swim Seasons', true, '100%', '100px');
+        $seasons = new FEListBox('Swim Seasons', true, '100%', '100px');
         $seasons->set_list_data($this->_swimseasonSelections()) ;
         //$seasons->enable_checkall(true) ;
 
         $this->add_element($seasons) ;
 
-        //$jobposition = new FECheckBox("Position") ;
+        //$jobposition = new FECheckBox('Position') ;
         //$this->add_element($jobposition) ;
 
-        //$jobdescription = new FECheckBox("Description") ;
+        //$jobdescription = new FECheckBox('Description') ;
         //$this->add_element($jobdescription) ;
 
-        //$jobduration = new FECheckBox("Duration") ;
+        //$jobduration = new FECheckBox('Duration') ;
         //$this->add_element($jobduration) ;
 
-        //$jobtype = new FECheckBox("Type") ;
+        //$jobtype = new FECheckBox('Type') ;
         //$this->add_element($jobtype) ;
 
-        //$jobcredits = new FECheckBox("Credits") ;
+        //$jobcredits = new FECheckBox('Credits') ;
         //$this->add_element($jobcredits) ;
 
-        //$jobnotes = new FECheckBox("Notes") ;
+        //$jobnotes = new FECheckBox('Notes') ;
         //$this->add_element($jobnotes) ;
 
-        //$jobdurationfilter = new FECheckBox("Duration" . FEFILTER) ;
+        //$jobdurationfilter = new FECheckBox('Duration' . FEFILTER) ;
         //$jobdurationfilter->set_disabled(true) ;
         //$this->add_element($jobdurationfilter) ;
 
-        //$jobdurationfilterlb = new FEListBox("Duration" . FEFILTERLB, true, "100px");
+        //$jobdurationfilterlb = new FEListBox('Duration' . FEFILTERLB, true, '100px');
         //$jobdurationfilterlb->set_list_data(array(
              //ucwords(WPST_JOB_DURATION_FULL_MEET) => WPST_JOB_DURATION_FULL_MEET
             //,ucwords(WPST_JOB_DURATION_PARTIAL_MEET) => WPST_JOB_DURATION_PARTIAL_MEET
@@ -1217,7 +1217,7 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
 /**
  * Construct the Report Generator form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1236,95 +1236,95 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
-        $firstname = new FECheckBox("First Name") ;
+        $firstname = new FECheckBox('First Name') ;
         $this->add_element($firstname) ;
 
-        $middlename = new FECheckBox("Middle Name") ;
+        $middlename = new FECheckBox('Middle Name') ;
         $this->add_element($middlename) ;
 
-        $nickname = new FECheckBox("Nickname") ;
+        $nickname = new FECheckBox('Nickname') ;
         $this->add_element($nickname) ;
 
-        $lastname = new FECheckBox("Last Name") ;
+        $lastname = new FECheckBox('Last Name') ;
         $this->add_element($lastname) ;
 
-        $gender = new FECheckBox("Gender") ;
+        $gender = new FECheckBox('Gender') ;
         $this->add_element($gender) ;
 
-        $birthdate = new FECheckBox("Birth Date") ;
+        $birthdate = new FECheckBox('Birth Date') ;
         $this->add_element($birthdate) ;
 
-        $age = new FECheckBox("Age") ;
+        $age = new FECheckBox('Age') ;
         $this->add_element($age) ;
 
-        $agegroup = new FECheckBox("Age Group") ;
+        $agegroup = new FECheckBox('Age Group') ;
         $this->add_element($agegroup) ;
 
-        $primarycontact = new FECheckBox("Primary Contact") ;
+        $primarycontact = new FECheckBox('Primary Contact') ;
         //$primarycontact->set_disabled(true) ;
         $this->add_element($primarycontact) ;
 
-        $primarycontactdetail = new FECheckBox("Primary Contact Detail") ;
+        $primarycontactdetail = new FECheckBox('Primary Contact Detail') ;
         //$primarycontactdetail->set_disabled(true) ;
         $this->add_element($primarycontactdetail) ;
 
-        $secondarycontact = new FECheckBox("Secondary Contact") ;
+        $secondarycontact = new FECheckBox('Secondary Contact') ;
         //$secondarycontact->set_disabled(true) ;
         $this->add_element($secondarycontact) ;
 
-        $secondarycontactdetail = new FECheckBox("Secondary Contact Detail") ;
+        $secondarycontactdetail = new FECheckBox('Secondary Contact Detail') ;
         //$secondarycontactdetail->set_disabled(true) ;
         $this->add_element($secondarycontactdetail) ;
 
-        $status = new FECheckBox("Status") ;
+        $status = new FECheckBox('Status') ;
         $this->add_element($status) ;
 
-        $results = new FECheckBox("Results") ;
+        $results = new FECheckBox('Results') ;
         $this->add_element($results) ;
 
-        $swimmerlabel = new FECheckBox("Swimmer Label") ;
+        $swimmerlabel = new FECheckBox('Swimmer Label') ;
         $this->add_element($swimmerlabel) ;
 
-        $websitreid = new FECheckBox("Web Site Id") ;
+        $websitreid = new FECheckBox('Web Site Id') ;
         $this->add_element($websitreid) ;
 
-        $nicknameoverride = new FECheckBox("Nickname Override") ;
+        $nicknameoverride = new FECheckBox('Nickname Override') ;
         $this->add_element($nicknameoverride) ;
 
-        $internalid = new FECheckBox("Internal Id") ;
+        $internalid = new FECheckBox('Internal Id') ;
         $this->add_element($internalid) ;
 
-        $genderfilter = new FECheckBox("Gender" . FEFILTER) ;
+        $genderfilter = new FECheckBox('Gender' . FEFILTER) ;
         $this->add_element($genderfilter) ;
 
-        $genderfilterlb = new FEListBox("Gender" . FEFILTERLB, true, "100px");
+        $genderfilterlb = new FEListBox('Gender' . FEFILTERLB, true, '100px');
         $genderfilterlb->set_list_data(array(
              ucfirst(WPST_GENDER_MALE) => WPST_GENDER_MALE
             ,ucfirst(WPST_GENDER_FEMALE) => WPST_GENDER_FEMALE
         )) ;
         $this->add_element($genderfilterlb) ;
 
-        $statusfilter = new FECheckBox("Status" . FEFILTER) ;
+        $statusfilter = new FECheckBox('Status' . FEFILTER) ;
         $this->add_element($statusfilter) ;
 
-        $statusfilterlb = new FEListBox("Status" . FEFILTERLB, true, "100px");
+        $statusfilterlb = new FEListBox('Status' . FEFILTERLB, true, '100px');
         $statusfilterlb->set_list_data(array(
              ucfirst(WPST_ACTIVE) => WPST_ACTIVE
             ,ucfirst(WPST_INACTIVE) => WPST_INACTIVE
         )) ;
         $this->add_element($statusfilterlb) ;
 
-        $resultsfilter = new FECheckBox("Results" . FEFILTER) ;
+        $resultsfilter = new FECheckBox('Results' . FEFILTER) ;
         $this->add_element($resultsfilter) ;
 
-        $resultsfilterlb = new FEListBox("Results" . FEFILTERLB, true, "100px");
+        $resultsfilterlb = new FEListBox('Results' . FEFILTERLB, true, '100px');
         $resultsfilterlb->set_list_data(array(
              ucfirst(WPST_PUBLIC) => WPST_PUBLIC
             ,ucfirst(WPST_PRIVATE) => WPST_PRIVATE
         )) ;
         $this->add_element($resultsfilterlb) ;
 
-        $send_to = new FEListBox("Report", true, "200px");
+        $send_to = new FEListBox('Report', true, '200px');
         $send_to->set_list_data(array(
              ucfirst(WPST_GENERATE_STATIC_WEB_PAGE) => WPST_GENERATE_STATIC_WEB_PAGE
             //,ucfirst(WPST_GENERATE_DYNAMIC_WEB_PAGE) => WPST_GENERATE_DYNAMIC_WEB_PAGE
@@ -1346,8 +1346,8 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -1359,7 +1359,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
                 if (get_option($oconst) == WPST_YES_NO)
                 {
                     $offcb[$oc] = new FECheckBox(get_option($lconst) . FEFILTER) ;
-                    $offyn[$oc] = new FEYesNoListBox(get_option($lconst) . FEFILTERLB, false, "75px") ;
+                    $offyn[$oc] = new FEYesNoListBox(get_option($lconst) . FEFILTERLB, false, '75px') ;
                     $this->add_element($offcb[$oc]) ;
                     $this->add_element($offyn[$oc]) ;
                 }
@@ -1375,30 +1375,30 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_init_data()
     {
-        $this->set_element_value("First Name", true) ;
-        $this->set_element_value("Middle Name", false) ;
-        $this->set_element_value("Nickname", false) ;
-        $this->set_element_value("Last Name", true) ;
-        $this->set_element_value("Gender", true) ;
-        $this->set_element_value("Birth Date", true) ;
-        $this->set_element_value("Age", true) ;
-        $this->set_element_value("Age Group", true) ;
-        $this->set_element_value("Primary Contact", false) ;
-        $this->set_element_value("Secondary Contact", false) ;
-        $this->set_element_value("Primary Contact Detail", false) ;
-        $this->set_element_value("Secondary Contact Detail", false) ;
-        $this->set_element_value("Results", false) ;
-        $this->set_element_value("Status", false) ;
-        $this->set_element_value("Swimmer Label", true) ;
-        $this->set_element_value("Web Site Id", false) ;
-        $this->set_element_value("Nickname Override", false) ;
-        $this->set_element_value("Internal Id", false) ;
-        $this->set_element_value("Results" . FEFILTER, false) ;
-        $this->set_element_value("Status" . FEFILTER, true) ;
-        $this->set_element_value("Gender" . FEFILTERLB, WPST_GENDER_BOTH) ;
-        $this->set_element_value("Status" . FEFILTERLB, WPST_ACTIVE) ;
-        $this->set_element_value("Results" . FEFILTERLB, WPST_PUBLIC) ;
-        $this->set_element_value("Report", WPST_GENERATE_STATIC_WEB_PAGE) ;
+        $this->set_element_value('First Name', true) ;
+        $this->set_element_value('Middle Name', false) ;
+        $this->set_element_value('Nickname', false) ;
+        $this->set_element_value('Last Name', true) ;
+        $this->set_element_value('Gender', true) ;
+        $this->set_element_value('Birth Date', true) ;
+        $this->set_element_value('Age', true) ;
+        $this->set_element_value('Age Group', true) ;
+        $this->set_element_value('Primary Contact', false) ;
+        $this->set_element_value('Secondary Contact', false) ;
+        $this->set_element_value('Primary Contact Detail', false) ;
+        $this->set_element_value('Secondary Contact Detail', false) ;
+        $this->set_element_value('Results', false) ;
+        $this->set_element_value('Status', false) ;
+        $this->set_element_value('Swimmer Label', true) ;
+        $this->set_element_value('Web Site Id', false) ;
+        $this->set_element_value('Nickname Override', false) ;
+        $this->set_element_value('Internal Id', false) ;
+        $this->set_element_value('Results' . FEFILTER, false) ;
+        $this->set_element_value('Status' . FEFILTER, true) ;
+        $this->set_element_value('Gender' . FEFILTERLB, WPST_GENDER_BOTH) ;
+        $this->set_element_value('Status' . FEFILTERLB, WPST_ACTIVE) ;
+        $this->set_element_value('Results' . FEFILTERLB, WPST_PUBLIC) ;
+        $this->set_element_value('Report', WPST_GENERATE_STATIC_WEB_PAGE) ;
     }
 
 
@@ -1410,9 +1410,9 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_content()
     {
-        $this->add_form_block("Contact Fields", $this->_report_options()) ;
-        $this->add_form_block("Report Filters", $this->_report_filters()) ;
-        $this->add_form_block("Report Output", $this->_send_report_to()) ;
+        $this->add_form_block('Contact Fields', $this->_report_options()) ;
+        $this->add_form_block('Report Filters', $this->_report_filters()) ;
+        $this->add_form_block('Report Output', $this->_send_report_to()) ;
     }
 
     /**
@@ -1423,34 +1423,34 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
     function &_report_options()
     {
         $table = html_table($this->_width, 0, 4) ;
-        //$table->set_style("border: 1px solid") ;
+        //$table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_form("First Name"),
-            $this->element_form("Middle Name")) ;
+        $table->add_row($this->element_form('First Name'),
+            $this->element_form('Middle Name')) ;
 
-        $table->add_row($this->element_form("Last Name"),
-            $this->element_form("Nickname")) ;
+        $table->add_row($this->element_form('Last Name'),
+            $this->element_form('Nickname')) ;
 
-        $table->add_row($this->element_form("Birth Date"),
-            $this->element_form("Gender")) ;
+        $table->add_row($this->element_form('Birth Date'),
+            $this->element_form('Gender')) ;
 
-        $table->add_row($this->element_form("Age"),
-            $this->element_form("Age Group")) ;
+        $table->add_row($this->element_form('Age'),
+            $this->element_form('Age Group')) ;
 
-        $table->add_row($this->element_form("Primary Contact"),
-            $this->element_form("Primary Contact Detail")) ;
+        $table->add_row($this->element_form('Primary Contact'),
+            $this->element_form('Primary Contact Detail')) ;
 
-        $table->add_row($this->element_form("Secondary Contact"),
-            $this->element_form("Secondary Contact Detail")) ;
+        $table->add_row($this->element_form('Secondary Contact'),
+            $this->element_form('Secondary Contact Detail')) ;
 
-        $table->add_row($this->element_form("Status"),
-            $this->element_form("Results")) ;
+        $table->add_row($this->element_form('Status'),
+            $this->element_form('Results')) ;
 
-        $table->add_row($this->element_form("Swimmer Label"),
-            $this->element_form("Web Site Id")) ;
+        $table->add_row($this->element_form('Swimmer Label'),
+            $this->element_form('Web Site Id')) ;
 
-        $table->add_row($this->element_form("Nickname Override"),
-            $this->element_form("Internal Id")) ;
+        $table->add_row($this->element_form('Nickname Override'),
+            $this->element_form('Internal Id')) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -1462,8 +1462,8 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -1483,7 +1483,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_form("Report")) ;
+        $table->add_row($this->element_form('Report')) ;
 
         return $table ;
     }
@@ -1497,14 +1497,14 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
     {
         $table = html_table($this->_width, 0, 4) ;
 
-        $table->add_row($this->element_form("Gender" . FEFILTER),
-            $this->element_form("Gender" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Gender' . FEFILTER),
+            $this->element_form('Gender' . FEFILTERLB)) ;
 
-        $table->add_row($this->element_form("Status" . FEFILTER),
-            $this->element_form("Status" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Status' . FEFILTER),
+            $this->element_form('Status' . FEFILTERLB)) ;
 
-        $table->add_row($this->element_form("Results" . FEFILTER),
-            $this->element_form("Results" . FEFILTERLB)) ;
+        $table->add_row($this->element_form('Results' . FEFILTER),
+            $this->element_form('Results' . FEFILTERLB)) ;
 
         //  How many swimmer options does this configuration support?
 
@@ -1516,8 +1516,8 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) == WPST_YES_NO)
             {
@@ -1549,18 +1549,18 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
      */
     function form_action()
     {
-        if ($this->get_element_value("Report") == WPST_GENERATE_STATIC_WEB_PAGE)
+        if ($this->get_element_value('Report') == WPST_GENERATE_STATIC_WEB_PAGE)
         {
             $csv = false ;
             $this->__report = new SwimTeamSwimmersReportGenerator() ;
-            //$this->__report = new SwimTeamInfoTable("Swim Team Report", "800px") ;
+            //$this->__report = new SwimTeamInfoTable('Swim Team Report', '800px') ;
             
         }
-        else if ($this->get_element_value("Report") == WPST_GENERATE_CSV)
+        else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
             $this->__report = new SwimTeamSwimmersReportGeneratorCSV() ;
-            //$this->__report = new SwimTeamInfoTable("Swim Team Report", "800px") ;
+            //$this->__report = new SwimTeamInfoTable('Swim Team Report', '800px') ;
             //$this->__report = new Container() ;
         }
         else
@@ -1572,58 +1572,58 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         $rpt = &$this->__report ;
 
-        if (!is_null($this->get_element_value("First Name")))
+        if (!is_null($this->get_element_value('First Name')))
             $rpt->setFirstName(true) ;
 
-        if (!is_null($this->get_element_value("Middle Name")))
+        if (!is_null($this->get_element_value('Middle Name')))
             $rpt->setMiddleName(true) ;
 
-        if (!is_null($this->get_element_value("Nickname")))
+        if (!is_null($this->get_element_value('Nickname')))
             $rpt->setNickName(true) ;
 
-        if (!is_null($this->get_element_value("Last Name")))
+        if (!is_null($this->get_element_value('Last Name')))
             $rpt->setLastName(true) ;
 
-        if (!is_null($this->get_element_value("Birth Date")))
+        if (!is_null($this->get_element_value('Birth Date')))
             $rpt->setBirthDate(true) ;
 
-        if (!is_null($this->get_element_value("Age")))
+        if (!is_null($this->get_element_value('Age')))
             $rpt->setAge(true) ;
 
-        if (!is_null($this->get_element_value("Age Group")))
+        if (!is_null($this->get_element_value('Age Group')))
             $rpt->setAgeGroup(true) ;
 
-        if (!is_null($this->get_element_value("Gender")))
+        if (!is_null($this->get_element_value('Gender')))
             $rpt->setGender(true) ;
 
-        if (!is_null($this->get_element_value("Primary Contact")))
+        if (!is_null($this->get_element_value('Primary Contact')))
             $rpt->setPrimaryContact(true) ;
 
-        if (!is_null($this->get_element_value("Primary Contact Detail")))
+        if (!is_null($this->get_element_value('Primary Contact Detail')))
             $rpt->setPrimaryContactDetail(true) ;
 
-        if (!is_null($this->get_element_value("Secondary Contact")))
+        if (!is_null($this->get_element_value('Secondary Contact')))
             $rpt->setSecondaryContact(true) ;
 
-        if (!is_null($this->get_element_value("Secondary Contact Detail")))
+        if (!is_null($this->get_element_value('Secondary Contact Detail')))
             $rpt->setSecondaryContactDetail(true) ;
 
-        if (!is_null($this->get_element_value("Status")))
+        if (!is_null($this->get_element_value('Status')))
             $rpt->setStatus(true) ;
 
-        if (!is_null($this->get_element_value("Results")))
+        if (!is_null($this->get_element_value('Results')))
             $rpt->setResults(true) ;
 
-        if (!is_null($this->get_element_value("Swimmer Label")))
+        if (!is_null($this->get_element_value('Swimmer Label')))
             $rpt->setSwimmerLabel(true) ;
 
-        if (!is_null($this->get_element_value("Web Site Id")))
+        if (!is_null($this->get_element_value('Web Site Id')))
             $rpt->setWebSiteId(true) ;
 
-        if (!is_null($this->get_element_value("Nickname Override")))
+        if (!is_null($this->get_element_value('Nickname Override')))
             $rpt->setNickNameOverride(true) ;
 
-        if (!is_null($this->get_element_value("Internal Id")))
+        if (!is_null($this->get_element_value('Internal Id')))
             $rpt->setInternalId(true) ;
 
         //  How many swimmer options does this configuration support?
@@ -1636,8 +1636,8 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -1659,22 +1659,22 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         //  Filters
  
-        if (!is_null($this->get_element_value("Gender" . FEFILTER)))
+        if (!is_null($this->get_element_value('Gender' . FEFILTER)))
         {
             $rpt->setGenderFilter(true) ;
-            $rpt->setGenderFilterValue($this->get_element_value("Gender" . FEFILTERLB)) ;
+            $rpt->setGenderFilterValue($this->get_element_value('Gender' . FEFILTERLB)) ;
         }
 
-        if (!is_null($this->get_element_value("Status" . FEFILTER)))
+        if (!is_null($this->get_element_value('Status' . FEFILTER)))
         {
             $rpt->setStatusFilter(true) ;
-            $rpt->setStatusFilterValue($this->get_element_value("Status" . FEFILTERLB)) ;
+            $rpt->setStatusFilterValue($this->get_element_value('Status' . FEFILTERLB)) ;
         }
 
-        if (!is_null($this->get_element_value("Results" . FEFILTER)))
+        if (!is_null($this->get_element_value('Results' . FEFILTER)))
         {
             $rpt->setResultsFilter(true) ;
-            $rpt->setResultsFilterValue($this->get_element_value("Results" . FEFILTERLB)) ;
+            $rpt->setResultsFilterValue($this->get_element_value('Results' . FEFILTERLB)) ;
         }
 
         $rpt->generateReport() ;
@@ -1683,9 +1683,9 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
 
         //if ($csv) $rpt->generateReport(null, true) ;
         
-        $this->set_action_message(sprintf("Swim Team Report Generated,
-            %s record%s returned.", $rpt->getRecordCount(),
-            $rpt->getRecordCount() == 1 ? "" : "s")) ;
+        $this->set_action_message(sprintf('Swim Team Report Generated,
+            %s record%s returned.', $rpt->getRecordCount(),
+            $rpt->getRecordCount() == 1 ? '' : 's')) ;
 
         return true ;
     }

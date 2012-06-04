@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: options.forms.class.php 868 2012-05-12 03:55:08Z mpwalsh8 $
+ * $Id: options.forms.class.php 896 2012-06-04 01:39:57Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Options
- * @version $Revision: 868 $
+ * @version $Revision: 896 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-11 23:55:08 -0400 (Fri, 11 May 2012) $
+ * @lastmodifiedby $Date: 2012-06-03 21:39:57 -0400 (Sun, 03 Jun 2012) $
  *
  */
 
@@ -817,6 +817,9 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         $swimmerlabelformatcode = new FEText('Swimmer Label Format', true, '100px');
         $this->add_element($swimmerlabelformatcode) ;
 
+        $swimmerlabelinitialvalue = new FENumberInRange('Swimmer Label Initial Value', false, '100px', null, 0, 1000) ;
+        $this->add_element($swimmerlabelinitialvalue) ;
+
         //  Swimmer optional fields
         //  How many swimmer options does this configuration support?
 
@@ -876,6 +879,7 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         $this->set_element_value('Female Gender Label', $options->getGenderLabelFemale()) ;
         $this->set_element_value('Swimmer Labels', $options->getSwimmerLabelFormat()) ;
         $this->set_element_value('Swimmer Label Format', $options->getSwimmerLabelFormatCode()) ;
+        $this->set_element_value('Swimmer Label Initial Value', $options->getSwimmerLabelInitialValue()) ;
 
         //  Initialize the form fields
         //  How many swimmer options does this configuration support?
@@ -920,6 +924,9 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
 
         $table->add_row($this->element_label('Swimmer Label Format'),
             $this->element_form('Swimmer Label Format')) ;
+
+        $table->add_row($this->element_label('Swimmer Label Initial Value'),
+            $this->element_form('Swimmer Label Initial Value')) ;
 
         $table->add_row('&nbsp;', '&nbsp;', '&nbsp;') ;
 
@@ -980,6 +987,7 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
         $options->setGenderLabelFemale($this->get_element_value('Female Gender Label')) ;
         $options->setSwimmerLabelFormat($this->get_element_value('Swimmer Labels')) ;
         $options->setSwimmerLabelFormatCode($this->get_element_value('Swimmer Label Format')) ;
+        $options->setSwimmerLabelInitialValue($this->get_element_value('Swimmer Label Initial Value')) ;
 
         //  How many swimmer options does this configuration support?
 

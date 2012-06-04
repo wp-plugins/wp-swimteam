@@ -3,32 +3,32 @@
 /**
  * Reports classes.
  *
- * $Id: reportgen.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: reportgen.class.php 897 2012-06-04 01:40:36Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Reports
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 897 $
+ * @lastmodified $Date: 2012-06-03 21:40:36 -0400 (Sun, 03 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once("db.class.php") ;
-require_once("jobs.class.php") ;
-require_once("table.class.php") ;
-require_once("seasons.class.php") ;
-require_once("swimmers.class.php") ;
-require_once("roster.class.php") ;
-require_once("users.csv.class.php") ;
-require_once("swimteam.include.php") ;
+require_once('db.class.php') ;
+require_once('jobs.class.php') ;
+require_once('table.class.php') ;
+require_once('seasons.class.php') ;
+require_once('swimmers.class.php') ;
+require_once('roster.class.php') ;
+require_once('users.csv.class.php') ;
+require_once('swimteam.include.php') ;
 
 /**
  * Class definition of the base report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -252,7 +252,7 @@ class SwimTeamReportGenerator extends SwimTeamDBI
 /**
  * Class definition of the report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamReportGenerator
  */
@@ -621,7 +621,7 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
     {
         //  Construct filters
 
-        $filter = "" ;
+        $filter = '' ;
 
         //  How many user options does this configuration support?
 
@@ -633,16 +633,16 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
                 if ($this->getOptionalFieldFilter($oconst))
                 {
                     $filter .=
-                        sprintf("%s%s.ometakey='%s' AND %s.ometavalue='%s'",
-                        ($filter == "" ? "" : " AND "), WPST_OPTIONS_META_TABLE,
+                        sprintf('%s%s.ometakey="%s" AND %s.ometavalue="%s"',
+                        ($filter == '' ? '' : ' AND '), WPST_OPTIONS_META_TABLE,
                         $oconst, WPST_OPTIONS_META_TABLE,
                         $this->getOptionalFieldFilterValue($oconst)) ;
                 }
@@ -655,15 +655,15 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 
         if (!empty($filter))
         {
-            $filter .= sprintf(" AND %s.userid = %susers.ID",
+            $filter .= sprintf(' AND %s.userid = %susers.ID',
                 WPST_OPTIONS_META_TABLE, WP_DB_PREFIX) ;
         }
 
         //  Contact filter?
 
         if ($this->getContactInformationFilter())
-            $filter .= sprintf("%scontactinfo='%s'",
-                ($filter == "" ? "" : " AND "), $this->getContactInformationFilterValue()) ;
+            $filter .= sprintf('%scontactinfo="%s"',
+                ($filter == '' ? '' : ' AND '), $this->getContactInformationFilterValue()) ;
 
         return $filter ;
     }
@@ -676,26 +676,26 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
      */
     function getHTMLTableHeader(&$tr)
     {
-        if ($this->getInternalId()) $tr[] = "Internal Id" ;
-        if ($this->getFirstName()) $tr[] = "First Name" ;
-        if ($this->getLastName()) $tr[] = "Last Name" ;
-        if ($this->getUsername()) $tr[] = "Username" ;
-        if ($this->getEmailAddress()) $tr[] = "E-mail Address" ;
-        if ($this->getStreetAddress1()) $tr[] = "Street Address 1" ;
-        if ($this->getStreetAddress2()) $tr[] = "Street Address 2" ;
-        if ($this->getStreetAddress3()) $tr[] = "Street Address 3" ;
-        if ($this->getCity()) $tr[] = "City" ;
+        if ($this->getInternalId()) $tr[] = 'Internal Id' ;
+        if ($this->getFirstName()) $tr[] = 'First Name' ;
+        if ($this->getLastName()) $tr[] = 'Last Name' ;
+        if ($this->getUsername()) $tr[] = 'Username' ;
+        if ($this->getEmailAddress()) $tr[] = 'E-mail Address' ;
+        if ($this->getStreetAddress1()) $tr[] = 'Street Address 1' ;
+        if ($this->getStreetAddress2()) $tr[] = 'Street Address 2' ;
+        if ($this->getStreetAddress3()) $tr[] = 'Street Address 3' ;
+        if ($this->getCity()) $tr[] = 'City' ;
         if ($this->getStateOrProvince()) $tr[] = 
             get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
         if ($this->getPostalCode()) $tr[] = 
             get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
-        if ($this->getCountry()) $tr[] = "Country" ;
+        if ($this->getCountry()) $tr[] = 'Country' ;
         if ($this->getPrimaryPhone())
             $tr[] = get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) ;
         if ($this->getSecondaryPhone())
             $tr[] = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
-        if ($this->getContactInformation()) $tr[] = "Contact Information" ;
-        //if ($this->getTShirtSize()) $tr[] = "T-Shirt Size" ;
+        if ($this->getContactInformation()) $tr[] = 'Contact Information' ;
+        //if ($this->getTShirtSize()) $tr[] = 'T-Shirt Size' ;
 
         //  How many user options does this configuration support?
 
@@ -707,8 +707,8 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -789,7 +789,7 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
         
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -834,7 +834,7 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
         //  Generate the column headers
  
         for ($i = 0 ; $i < count($tr) ; $i++)
-            $table->set_column_header($i, $tr[$i], null, "left") ;
+            $table->set_column_header($i, $tr[$i], null, 'left') ;
 
         //  Get all the user ids using the appropriate filter
 
@@ -897,7 +897,7 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 /**
  * Class definition of the CSV report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamUsersReportGenerator
  */
@@ -976,59 +976,59 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
      */
     function getCSVHeader($eol = false)
     {
-        $csv = "" ;
+        $csv = '' ;
         //  Generate the column headers
  
         if ($this->getFirstName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"First Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"First Name"' ;
 
         if ($this->getLastName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Last Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Last Name"' ;
 
         if ($this->getUsername())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Userame\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Userame"' ;
 
         if ($this->getEmailAddress())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"E-mail Address\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"E-mail Address"' ;
 
         if ($this->getStreetAddress1())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Street Address 1\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Street Address 1"' ;
 
         if ($this->getStreetAddress2())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Street Address 2\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Street Address 2"' ;
 
         if ($this->getStreetAddress3())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Street Address 3\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Street Address 3"' ;
 
         if ($this->getCity())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"City\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"City"' ;
 
         
         if ($this->getStateOrProvince())
         {
             $label = get_option(WPST_OPTION_USER_STATE_OR_PROVINCE_LABEL) ;
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" . $label . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' . $label . '"' ;
         }
 
         if ($this->getPostalCode())
         {
             $label = get_option(WPST_OPTION_USER_POSTAL_CODE_LABEL) ;
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" . $label . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' . $label . '"' ;
         }
 
         if ($this->getCountry())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Country\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Country"' ;
 
         if ($this->getPrimaryPhone())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" .
-                get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' .
+                get_option(WPST_OPTION_USER_PRIMARY_PHONE_LABEL) . '"' ;
 
         if ($this->getSecondaryPhone())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" .
-            get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL). "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' .
+            get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL). '"' ;
 
         if ($this->getContactInformation())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Contact Information\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Contact Information"' ;
 
         //  How many user options does this configuration support?
 
@@ -1039,15 +1039,15 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
         //  Handle the optional fields
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_USER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_USER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
                 if ($this->getOptionalField($oconst))
                 {
-                    $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" .
-                        get_option($lconst) . "\"" ;
+                    $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' .
+                        get_option($lconst) . '"' ;
                 }
             }
         }
@@ -1067,67 +1067,67 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
      */
     function getCSVRecord(&$u, &$om, $eol = false)
     {
-        $csv = "" ;
+        $csv = '' ;
 
         if ($this->getInternalId())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getId() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getId() . '"' ;
 
         if ($this->getFirstName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getFirstName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getFirstName() . '"' ;
 
         if ($this->getLastName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getLastName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getLastName() . '"' ;
 
         if ($this->getUsername())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getUsername() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getUsername() . '"' ;
 
         if ($this->getEmailAddress())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getEmailAddress() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getEmailAddress() . '"' ;
 
         if ($this->getStreetAddress1())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getStreet1() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getStreet1() . '"' ;
 
         if ($this->getStreetAddress2())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getStreet2() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getStreet2() . '"' ;
 
         if ($this->getStreetAddress3())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getStreet3() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getStreet3() . '"' ;
 
         if ($this->getCity())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getCity() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getCity() . '"' ;
 
         if ($this->getStateOrProvince())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getStateOrProvince() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getStateOrProvince() . '"' ;
 
         if ($this->getPostalCode())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getPostalCode() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getPostalCode() . '"' ;
 
         if ($this->getCountry())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getCountry() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getCountry() . '"' ;
 
         if ($this->getPrimaryPhone())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getPrimaryPhone() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getPrimaryPhone() . '"' ;
 
         if ($this->getSecondaryPhone())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getSecondaryPhone() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getSecondaryPhone() . '"' ;
 
         if ($this->getContactInformation())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $u->getContactInfo() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $u->getContactInfo() . '"' ;
 
         //  How many user options does this configuration support?
 
@@ -1141,15 +1141,15 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_USER_OPTION" . $oc) ;
+            $oconst = constant('WPST_OPTION_USER_OPTION' . $oc) ;
         
             if (get_option($oconst) != WPST_DISABLED)
             {
                 if ($this->getOptionalField($oconst))
                 {
                     $om->loadOptionMetaByUserIdAndKey($u->getUserId(), $oconst) ;
-                    $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                        "\"" . ucfirst($om->getOptionMetaValue()) . "\"" ;
+                    $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                        '"' . ucfirst($om->getOptionMetaValue()) . '"' ;
 
                 }
             }
@@ -1181,7 +1181,7 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
      */
     function generateCSVReport()
     {
-        $this->__csvData = "" ;
+        $this->__csvData = '' ;
 
         $csv = &$this->__csvData ;
 
@@ -1189,7 +1189,7 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
         $swimmer = new SwimTeamSwimmer() ;
         $user = new SwimTeamUsersCSV() ;
 
-        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . $this->getCSVHeader() ;
+        $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . $this->getCSVHeader() ;
         $csv .= "\r\n" ;
 
         $this->__recordcount = 0 ;
@@ -1231,13 +1231,13 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
         //  Generate a temporary file to hold the data
  
         $this->setCSVFile(tempnam(ABSPATH .
-            "/" . get_option('upload_path'), "CSV")) ;
+            '/' . get_option('upload_path'), 'CSV')) ;
 
-        $this->setCSVFile(tempnam('', "CSV")) ;
+        $this->setCSVFile(tempnam('', 'CSV')) ;
 
         //  Write the CSV data to the file
 
-        $f = fopen($this->getCSVFile(), "w") ;
+        $f = fopen($this->getCSVFile(), 'w') ;
         fwrite($f, $this->__csvData) ;
         fclose($f) ;
     }
@@ -1246,7 +1246,7 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
 /**
  * Class definition of the Job Assignments report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamUsersReportGeneratorCSV
  */
@@ -1485,13 +1485,13 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
      */
     function getHTMLTableHeader(&$tr)
     {
-        $tr = array("Date", "Opponent", "Location") ;
-        if ($this->getJobPosition()) $tr[] = "Position" ;
-        if ($this->getJobDescription()) $tr[] = "Description" ;
-        if ($this->getJobDuration()) $tr[] = "Duration" ;
-        if ($this->getJobType()) $tr[] = "Type" ;
-        if ($this->getJobCredits()) $tr[] = "Credits" ;
-        if ($this->getJobNotes()) $tr[] = "Notes" ;
+        $tr = array('Date', 'Opponent', 'Location') ;
+        if ($this->getJobPosition()) $tr[] = 'Position' ;
+        if ($this->getJobDescription()) $tr[] = 'Description' ;
+        if ($this->getJobDuration()) $tr[] = 'Duration' ;
+        if ($this->getJobType()) $tr[] = 'Type' ;
+        if ($this->getJobCredits()) $tr[] = 'Credits' ;
+        if ($this->getJobNotes()) $tr[] = 'Notes' ;
 
         $tr = parent::getHTMLTableHeader($tr) ;
 
@@ -1564,7 +1564,7 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
         //  Generate the column headers
  
         for ($i = 0 ; $i < count($tr) ; $i++)
-            $table->set_column_header($i, $tr[$i], null, "left") ;
+            $table->set_column_header($i, $tr[$i], null, 'left') ;
 
         //  Loop through the swim meet Ids
 
@@ -1652,7 +1652,7 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
 /**
  * Class definition of the CSV report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamJobAssignmentsReportGenerator
  */
@@ -1668,25 +1668,25 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
     {
         //  Generate the column headers
 
-        $csv = "\"Date\",\"Opponent\",\"Location\"" ;
+        $csv = '"Date","Opponent","Location"' ;
 
         if ($this->getJobPosition() )
-            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). "\"Position\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Position"' ;
 
         if ($this->getJobDescription())
-            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . "\"Description\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Description"' ;
 
         if ($this->getJobDuration())
-            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). "\"Duration\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Duration"' ;
 
         if ($this->getJobType())
-            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). "\"Type\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Type"' ;
 
         if ($this->getJobCredits())
-            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . "\"Credits\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Credits"' ;
 
         if ($this->getJobNotes())
-            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . "\"Notes\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Notes"' ;
 
         //  Call the parent CSV Header method to get the rest of the header fields
 
@@ -1694,7 +1694,7 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
 
         //  Handle line endings
 
-        if ($eol) $csv .= '\r\n' ;
+        if ($eol) $csv .= "\r\n" ;
 
         return $csv ;
     }
@@ -1711,29 +1711,29 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
     {
         if ($this->getJobPosition())
             $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
-                "\"" . $job->getJobPosition() . "\"" ;
+                '"' . $job->getJobPosition() . '"' ;
 
         if ($this->getJobDescription())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $job->getJobDescription() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $job->getJobDescription() . '"' ;
 
         if ($this->getJobDuration())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucwords($job->getJobDuration()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucwords($job->getJobDuration()) . '"' ;
 
         if ($this->getJobType())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucwords($job->getJobType()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucwords($job->getJobType()) . '"' ;
 
         if ($this->getJobCredits())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $job->getJobCredits() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $job->getJobCredits() . '"' ;
 
         if ($this->getJobNotes())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $job->getJobNotes() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $job->getJobNotes() . '"' ;
 
-        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
+        $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
             parent::getCSVRecord($u, $om, false) ;
 
         //  Terminate the string?
@@ -1762,7 +1762,7 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
      */
     function generateCSVReport()
     {
-        $this->__csvData = "" ;
+        $this->__csvData = '' ;
         $this->__recordcount = 0 ;
 
         $csv = &$this->__csvData ;
@@ -1776,7 +1776,7 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
         $ometa = new SwimTeamOptionMeta() ;
 
         //  Generate the column headers
-        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . $this->getCSVHeader() ;
+        $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . $this->getCSVHeader() ;
         $csv .= "\r\n" ;
 
         //  Loop through the swim meet Ids
@@ -1830,7 +1830,7 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
                     $this->__recordcount++ ;
 
                     $row = array() ;
-                    $key = &$jaid["jobassignmentid"] ;
+                    $key = &$jaid['jobassignmentid'] ;
 
                     $ja->loadJobAssignmentByJobAssignmentId($key) ;
                     $job->loadJobByJobId($ja->getJobId()) ;
@@ -1838,10 +1838,9 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
                     $user->loadUserProfileByUserId($ja->getUserId()) ;
         
                     $detail = SwimTeamTextMap::__mapMeetIdToText($swimmeetid) ;
-                    $csv .= "\"" . $detail["date"] . "\"," ;
-                    $csv .= "\"" . $detail["opponent"] . "\"," ;
-                    $csv .= "\"" . $detail["location"] . "\"," ;
-                    //$csv .= "\"" . SwimTeamTextMap::__mapMeetIdToText($swimmeetid) . "\", " ;
+                    $csv .= '"' . $detail['date'] . '",' ;
+                    $csv .= '"' . $detail['opponent'] . '",' ;
+                    $csv .= '"' . $detail['location'] . '",' ;
                     $csv .= $this->getCSVRecord($ja, $job, $user, $ometa, true) ;
                 }
             }
@@ -1862,7 +1861,7 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
 /**
  * Class definition of the Job Commitments report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamUsersReportGeneratorCSV
  */
@@ -2011,6 +2010,8 @@ class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGenerator
      */
     function getHTMLTableRow(&$u, &$om, &$tr)
     {
+        if (WPST_DEBUG) wpst_whereami(__FILE__, __LINE__) ;
+
         $tr = parent::getHTMLTableRow($u, $om, $tr) ;
         $credits = $this->getCredits($u->getUserId()) ;
 
@@ -2020,13 +2021,13 @@ class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGenerator
 
         if ($credits < get_option(WPST_OPTION_JOB_CREDITS_REQUIRED))
         {
-            $span = html_span(null, ($credits != null) ? $credits : "0") ;
+            $span = html_span(null, ($credits != null) ? $credits : '0') ;
             $span->set_style('font-weight: bold; color: red;') ;
             $tr[] = $span ;
         }
         else
         {
-            $tr[] = ($credits != null) ? $credits : "0" ;
+            $tr[] = ($credits != null) ? $credits : '0' ;
         }
 
         return $tr ;
@@ -2055,7 +2056,7 @@ class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGenerator
 /**
  * Class definition of the Job Commitments CSV report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamJobCommitmentsReportGenerator
  */
@@ -2071,7 +2072,7 @@ class SwimTeamJobCommitmentsReportGeneratorCSV extends SwimTeamJobCommitmentsRep
     {
         $csv = parent::getCSVHeader() ;
 
-        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Credits\"" ;
+        $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Credits"' ;
 
         if ($eol) $csv .= "\r\n" ;
 
@@ -2094,7 +2095,7 @@ class SwimTeamJobCommitmentsReportGeneratorCSV extends SwimTeamJobCommitmentsRep
 
         $credits = ($credits != null) ? $credits : 0 ;
 
-        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"$credits\"" ;
+        $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' . $credits. '"' ;
 
         if ($eol) $csv .= "\r\n" ;
 
@@ -2129,7 +2130,7 @@ class SwimTeamJobCommitmentsReportGeneratorCSV extends SwimTeamJobCommitmentsRep
 /**
  * Class definition of the report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamReportGenerator
  */
@@ -2600,7 +2601,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      *
      * @param string - value to use to filter report
      */
-    function setGenderFilterValue($filter = "")
+    function setGenderFilterValue($filter = '')
     {
         $this->__genderfiltervalue = $filter ;
     }
@@ -2640,7 +2641,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      *
      * @param string - value to use to filter report
      */
-    function setStatusFilterValue($filter = "")
+    function setStatusFilterValue($filter = '')
     {
         $this->__statusfiltervalue = $filter ;
     }
@@ -2680,7 +2681,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      *
      * @param string - value to use to filter report
      */
-    function setResultsFilterValue($filter = "")
+    function setResultsFilterValue($filter = '')
     {
         $this->__resultsfiltervalue = $filter ;
     }
@@ -2704,7 +2705,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
     {
         //  Construct filters
 
-        $filter = "" ;
+        $filter = '' ;
 
         //  How many user options does this configuration support?
 
@@ -2716,16 +2717,16 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
                 if ($this->getOptionalFieldFilter($oconst))
                 {
                     $filter .=
-                        sprintf("%s%s.ometakey='%s' AND %s.ometavalue='%s'",
-                        ($filter == "" ? "" : " AND "), WPST_OPTIONS_META_TABLE,
+                        sprintf('%s%s.ometakey="%s" AND %s.ometavalue="%s"',
+                        ($filter == '' ? '' : ' AND '), WPST_OPTIONS_META_TABLE,
                         $oconst, WPST_OPTIONS_META_TABLE,
                         $this->getOptionalFieldFilterValue($oconst)) ;
                 }
@@ -2738,31 +2739,28 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
 
         if (!empty($filter))
         {
-            $filter .= sprintf(" AND %s.swimmerid = %s.id",
+            $filter .= sprintf(' AND %s.swimmerid = %s.id',
                 WPST_OPTIONS_META_TABLE, WPST_SWIMMERS_TABLE) ;
         }
 
         //  Construct filters
 
         if ($this->getGenderFilter())
-            $filter .= sprintf("%sgender='%s'",
-                ($filter == "" ? "" : " AND "), $this->getGenderFilterValue()) ;
+            $filter .= sprintf('%sgender="%s"',
+                ($filter == '' ? '' : ' AND '), $this->getGenderFilterValue()) ;
 
         if ($this->getStatusFilter())
-            //  wp_st_roster.swimmerid = wp_st_swimmers.id AND wp_st_roster.seasonid = wp_st_seasons.id AND wp_st_seasons.season_status = 'active' AND wp_st_roster.status ='active'
-            $filter .= sprintf("%s%s.swimmerid = %s.id AND
-                %s.seasonid = %s.id AND %s.season_status = '%s' AND
-                %s.status ='%s'",
-                ($filter == "" ? "" : " AND "), WPST_ROSTER_TABLE,
+            $filter .= sprintf('%s%s.swimmerid = %s.id AND
+                %s.seasonid = %s.id AND %s.season_status = "%s" AND
+                %s.status ="%s"',
+                ($filter == '' ? '' : ' AND '), WPST_ROSTER_TABLE,
                 WPST_SWIMMERS_TABLE, WPST_ROSTER_TABLE, WPST_SEASONS_TABLE,
                 WPST_SEASONS_TABLE, WPST_ACTIVE, WPST_ROSTER_TABLE,
                 $this->getStatusFilterValue()) ;
-            //$filter .= sprintf("%sstatus='%s'",
-                //($filter == "" ? "" : " AND "), $this->getStatusFilterValue()) ;
 
         if ($this->getResultsFilter())
-            $filter .= sprintf("%sresults='%s'",
-                ($filter == "" ? "" : " AND "), $this->getResultsFilterValue()) ;
+            $filter .= sprintf('%sresults="%s"',
+                ($filter == '' ? '' : ' AND '), $this->getResultsFilterValue()) ;
 
         return $filter ;
     }
@@ -2775,21 +2773,21 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      */
     function getHTMLTableHeader(&$tr)
     {
-        if ($this->getInternalId()) $tr[] = "Internal Id" ;
-        if ($this->getFirstName()) $tr[] = "First Name" ;
-        if ($this->getMiddleName()) $tr[] = "Middle Name" ;
-        if ($this->getNickName()) $tr[] = "Nick Name" ;
-        if ($this->getLastName()) $tr[] = "Last Name" ;
-        if ($this->getBirthDate()) $tr[] = "Birth Date" ;
-        if ($this->getAge()) $tr[] = "Age" ;
-        if ($this->getAgeGroup()) $tr[] = "Age Group" ;
-        if ($this->getGender()) $tr[] = "Gender" ;
-        if ($this->getStatus()) $tr[] = "Status" ;
-        if ($this->getSwimmerLabel()) $tr[] = "Swimmer Label" ;
-        if ($this->getResults()) $tr[] = "Results" ;
-        if ($this->getWebSiteId()) $tr[] = "Web Site Id" ;
-        if ($this->getPrimaryContact()) $tr[] = "Primary Contact" ;
-        if ($this->getSecondaryContact()) $tr[] = "Secondary Contact" ;
+        if ($this->getInternalId()) $tr[] = 'Internal Id' ;
+        if ($this->getFirstName()) $tr[] = 'First Name' ;
+        if ($this->getMiddleName()) $tr[] = 'Middle Name' ;
+        if ($this->getNickName()) $tr[] = 'Nick Name' ;
+        if ($this->getLastName()) $tr[] = 'Last Name' ;
+        if ($this->getBirthDate()) $tr[] = 'Birth Date' ;
+        if ($this->getAge()) $tr[] = 'Age' ;
+        if ($this->getAgeGroup()) $tr[] = 'Age Group' ;
+        if ($this->getGender()) $tr[] = 'Gender' ;
+        if ($this->getStatus()) $tr[] = 'Status' ;
+        if ($this->getSwimmerLabel()) $tr[] = 'Swimmer Label' ;
+        if ($this->getResults()) $tr[] = 'Results' ;
+        if ($this->getWebSiteId()) $tr[] = 'Web Site Id' ;
+        if ($this->getPrimaryContact()) $tr[] = 'Primary Contact' ;
+        if ($this->getSecondaryContact()) $tr[] = 'Secondary Contact' ;
 
         //  How many swimmer options does this configuration support?
 
@@ -2801,8 +2799,8 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -2830,7 +2828,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
 
         if ($this->getFirstName())
         {
-            if ($this->getNickNameOverride() && $s->getNickName() != "")
+            if ($this->getNickNameOverride() && $s->getNickName() != '')
                 $tr[] = $s->getNickName() ;
             else
                 $tr[] = $s->getFirstName() ;
@@ -2841,7 +2839,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
         if ($this->getLastName()) $tr[] = $s->getLastName() ;
         if ($this->getBirthDate()) $tr[] = $s->getDateOfBirthAsDate() ;
         if ($this->getAge())
-            $tr[] = $s->getAge() . " (" .  $s->getAgeGroupAge() . ")" ;
+            $tr[] = $s->getAge() . ' (' .  $s->getAgeGroupAge() . ')' ;
         if ($this->getAgeGroup()) $tr[] = $s->getAgeGroupText() ;
         if ($this->getGender()) $tr[] = ucfirst($s->getGender()) ;
         if ($this->getStatus()) $tr[] = ucfirst($s->getStatus()) ;
@@ -2888,7 +2886,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
     
             if (get_option($oconst) != WPST_DISABLED)
             {
@@ -2907,7 +2905,16 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
      * Generate the Report
      *
      */
-    function generateReport($swimmerid = null)
+    function generateReport()
+    {
+        $this->generateHTMLReport() ;
+    }
+
+    /**
+     * Generate the HMTL Report
+     *
+     */
+    function generateHTMLReport($swimmerid = null)
     {
         $this->__reporttable = new SwimTeamInfoTable($this->getReportTitle(), '100%') ;
         $table = &$this->__reporttable ;
@@ -2924,7 +2931,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
         //  Generate the column headers
  
         for ($i = 0 ; $i < count($tr) ; $i++)
-            $table->set_column_header($i, $tr[$i], null, "left") ;
+            $table->set_column_header($i, $tr[$i], null, 'left') ;
 
         //  Get all the swimmer ids using the appropriate filter
 
@@ -2934,7 +2941,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
         if (is_null($swimmerid))
             $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
         else
-            $swimmerIds = array(array("swimmerid" => $swimmerid)) ;
+            $swimmerIds = array(array('swimmerid' => $swimmerid)) ;
 
         //  Loop through the swimmers
 
@@ -2944,8 +2951,8 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
         {
             $this->__recordcount++ ;
 
-            $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
-            $label = $this->getCurrentSwimmerLabel($swimmerId["swimmerid"]) ;
+            $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+            $label = $this->getCurrentSwimmerLabel($swimmerId['swimmerid']) ;
 
             $tr = array() ;
             $tr = $this->getHTMLTableRow($swimmer, $ometa, $label, $tr) ;
@@ -2958,12 +2965,32 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
             call_user_method_array('add_row', $table, $tr) ;
         }
     }
+
+    /**
+     * Get HTML report table
+     *
+     * @return html_table - report table
+     */
+    function getHTMLReport()
+    {
+        return $this->__reporttable ;
+    }
+
+    /**
+     * Get HTML report table
+     *
+     * @return html_table - report table
+     */
+    function getReport()
+    {
+        return $this->getHTMLReport() ;
+    }
 }
 
 /**
  * Class definition of the CSV report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamSwimmersReportGenerator
  */
@@ -3019,23 +3046,9 @@ class SwimTeamSwimmersReportGeneratorExport extends SwimTeamSwimmersReportGenera
      *
      * @return html_table - report table
      */
-    function getReport($html = false)
+    function getReport()
     {
-        if ($html)
-            return parent::getReport() ;
-        else
-            return new Container(html_pre($this->__exportData)) ;
-    }
-
-    /**
-     * Generate the Report
-     *
-     */
-    function generateReport($swimmerid = null, $html = false)
-    {
-        //  Generate the HTML representation too?
-
-        if ($html) parent::generateReport($swimmerid, $html) ;
+        return parent::getHTMLReport() ;
     }
 
     /**
@@ -3047,13 +3060,13 @@ class SwimTeamSwimmersReportGeneratorExport extends SwimTeamSwimmersReportGenera
         //  Generate a temporary file to hold the data
  
         $this->setExportFile(tempnam(ABSPATH .
-            "/" . get_option('upload_path'), "Export")) ;
+            '/' . get_option('upload_path'), 'Export')) ;
 
-        $this->setExportFile(tempnam('', "Export")) ;
+        $this->setExportFile(tempnam('', 'Export')) ;
 
         //  Write the Export data to the file
 
-        $f = fopen($this->getExportFile(), "w") ;
+        $f = fopen($this->getExportFile(), 'w') ;
         fwrite($f, $this->__exportData) ;
         fclose($f) ;
     }
@@ -3062,7 +3075,7 @@ class SwimTeamSwimmersReportGeneratorExport extends SwimTeamSwimmersReportGenera
 /**
  * Class definition of the CSV report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamSwimmersReportGenerator
  */
@@ -3086,62 +3099,62 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
      */
     function getCSVHeader($eol = false)
     {
-        $csv = "" ;
+        $csv = '' ;
         //  Generate the column headers
  
         if ($this->getInternalId())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Internal Id\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Internal Id"' ;
 
         if ($this->getFirstName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"First Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"First Name"' ;
 
         if ($this->getMiddleName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Middle Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Middle Name"' ;
 
         if ($this->getNickName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Nick Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Nick Name"' ;
 
         if ($this->getLastName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Last Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Last Name"' ;
 
         if ($this->getBirthDate())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Birth Date\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Birth Date"' ;
 
         if ($this->getAge())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Age\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Age"' ;
 
         if ($this->getAgeGroup())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Age Group\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Age Group"' ;
 
         if ($this->getGender())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Gender\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Gender"' ;
 
         if ($this->getStatus())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Status\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Status"' ;
 
         if ($this->getSwimmerLabel())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Swimmer Label\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Swimmer Label"' ;
 
         if ($this->getResults())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Results\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Results"' ;
 
         if ($this->getWebSiteId())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Web Site Id\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Web Site Id"' ;
 
         //  Primary Contact
 
         if ($this->getPrimaryContact())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                "\"Primary Contact\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                '"Primary Contact"' ;
         }
 
         //  Secondary Contact
 
         if ($this->getSecondaryContact())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                "\"Secondary Contact\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                '"Secondary Contact"' ;
         }
 
         //  How many swimmer options does this configuration support?
@@ -3161,8 +3174,8 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
             {
                 if ($this->getOptionalField($oconst))
                 {
-                    $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" .
-                        get_option($lconst) . "\"" ;
+                    $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' .
+                        get_option($lconst) . '"' ;
                 }
             }
         }
@@ -3181,74 +3194,74 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
      */
     function getCSVRecord(&$s, &$om, $sid, $eol = false)
     {
-        $csv = "" ;
+        $csv = '' ;
 
         if ($this->getInternalId())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getSwimmerId() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getSwimmerId() . '"' ;
 
         if ($this->getFirstName())
         {
-            if ($this->getNickNameOverride() && $s->getNickName() != "")
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                    "\"" . $s->getNickName() . "\"" ;
+            if ($this->getNickNameOverride() && $s->getNickName() != '')
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                    '"' . $s->getNickName() . '"' ;
             else
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                    "\"" . $s->getFirstName() . "\"" ;
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                    '"' . $s->getFirstName() . '"' ;
         }
 
         if ($this->getMiddleName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getMiddleName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getMiddleName() . '"' ;
 
         if ($this->getNickName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getNickName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getNickName() . '"' ;
 
         if ($this->getLastName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getLastName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getLastName() . '"' ;
 
         if ($this->getBirthDate())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getDateOfBirthAsDate() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getDateOfBirthAsDate() . '"' ;
 
         if ($this->getAge())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getAge() . " (" .
-                $s->getAgeGroupAge() . ")" . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getAge() . ' (' .
+                $s->getAgeGroupAge() . ')' . '"' ;
 
         if ($this->getAgeGroup())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getAgeGroupText() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getAgeGroupText() . '"' ;
 
         if ($this->getGender())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucfirst($s->getGender()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucfirst($s->getGender()) . '"' ;
 
         if ($this->getStatus())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucfirst($s->getStatus()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucfirst($s->getStatus()) . '"' ;
 
         if ($this->getSwimmerLabel())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .  "\"" .
-            $this->getCurrentSwimmerLabel($sid) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .  '"' .
+            $this->getCurrentSwimmerLabel($sid) . '"' ;
 
         if ($this->getResults())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucfirst($s->getResults()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucfirst($s->getResults()) . '"' ;
 
         if ($this->getWebSiteId())
         {
             if ($s->getWPUserId() == WPST_NONE)
             {
-                 $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"\"" ;
+                 $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '""' ;
             }
             else
             {
                 $u = get_userdata($s->getWPUserId()) ;
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                    "\"" . $u->user_login . "\"" ;
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                    '"' . $u->user_login . '"' ;
             }
         }
 
@@ -3289,8 +3302,8 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
                 if ($this->getOptionalField($oconst))
                 {
                     $om->loadOptionMetaBySwimmerIdAndKey($s->getSwimmerId(), $oconst) ;
-                    $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                        "\"" . ucfirst($om->getOptionMetaValue()) . "\"" ;
+                    $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                        '"' . ucfirst($om->getOptionMetaValue()) . '"' ;
                 }
             }
         }
@@ -3305,32 +3318,45 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
      * Generate the Report
      *
      */
-    function generateReport($swimmerid = null, $html = false)
+    function generateReport($swimmerid = null)
     {
-        $this->__exportData = "" ;
+        $this->generateCSVReport($swimmerid) ;
 
+        //  Generate the HTML representation too!
+
+        parent::generateHTMLReport($swimmerid) ;
+    }
+
+    /**
+     * Generate the CSV Report
+     *
+     */
+    function generateCSVReport($swimmerid = null)
+    {
         $csv = &$this->__exportData ;
+
+        $csv = '' ;
 
         $season = new SwimTeamSeason() ;
         $ometa = new SwimTeamOptionMeta() ;
         $swimmer = new SwimTeamSwimmer() ;
         $user = new SwimTeamUsersCSV() ;
 
-        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . $this->getCSVHeader() ;
+        $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . $this->getCSVHeader() ;
         //  Show Primary Contact Detail?
 
         if ($this->getPrimaryContactDetail())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                $user->getCSVHeader("Primary ") ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                $user->getCSVHeader('Primary ') ;
         }
 
         //  Show Secondary Contact Detail?
 
         if ($this->getSecondaryContactDetail())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                $user->getCSVHeader("Secondary ") ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                $user->getCSVHeader('Secondary ') ;
         }
 
         $csv .= "\r\n" ;
@@ -3340,7 +3366,7 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
         if (is_null($swimmerid))
             $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
         else
-            $swimmerIds = array(array("swimmerid" => $swimmerid)) ;
+            $swimmerIds = array(array('swimmerid' => $swimmerid)) ;
 
         //  Loop through the swimmers
 
@@ -3350,15 +3376,15 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
         {
             $this->__exportCount++ ;
 
-            $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
+            $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
 
-            $csv .= $this->getCSVRecord($swimmer, $ometa, $swimmerId["swimmerid"]) ;
+            $csv .= $this->getCSVRecord($swimmer, $ometa, $swimmerId['swimmerid']) ;
             //  Show Primary Contact Detail?
 
             if ($this->getPrimaryContactDetail())
             {
                 $user->loadUserProfileByUserId($swimmer->getContact1Id()) ;
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
                     $user->getCSVRecord($user, $ometa) ;
             }
 
@@ -3367,16 +3393,12 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
             if ($this->getSecondaryContactDetail())
             {
                 $user->loadUserProfileByUserId($swimmer->getContact2Id()) ;
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
                     $user->getCSVRecord($user, $ometa) ;
             }
 
             $csv .= "\r\n" ;
         }
-
-        //  Generate the HTML representation too?
-
-        if ($html) parent::generateReport($swimmerid, $html) ;
     }
 
     /**
@@ -3392,7 +3414,7 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
 /**
  * Class definition of the Meet Manager RE1 report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamSwimmersReportGenerator
  */
@@ -3466,16 +3488,16 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
      */
     function getRE1Header($eol = false)
     {
-        $re1 = "" ;
+        $re1 = '' ;
         $this->setClubName(get_option(WPST_OPTION_TEAM_NAME)) ;
         $this->setClubAbbreviation(get_option(WPST_OPTION_SDIF_TEAM_CODE)) ;
 
         //  Generate the file header
  
-        $re1 .= sprintf("\"%s Registration\"", $this->getClubAbbreviation()) ;
-        $re1 .= sprintf(";\"%s\"", date("m/d/y")) ;
-        $re1 .= ";\"http://www.wp-SwimTeam.org\"" ;
-        $re1 .= sprintf(";\"%s\"", $this->getClubAbbreviation()) ;
+        $re1 .= sprintf('"%s Registration"', $this->getClubAbbreviation()) ;
+        $re1 .= sprintf(';"%s"', date('m/d/y')) ;
+        $re1 .= ';"http://www.wp-SwimTeam.org"' ;
+        $re1 .= sprintf(';"%s"', $this->getClubAbbreviation()) ;
 
         if ($eol) $re1 .= "\r\n" ;
 
@@ -3491,7 +3513,7 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
      */
     function getRE1Record(&$s, $sid, $eol = false)
     {
-        $re1 = "" ;
+        $re1 = '' ;
 
         //  Use the swimmer label if it is defined.
         //  If it isn't, use the USS Number.
@@ -3520,10 +3542,10 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
         //  --Club abbreviation
         //  --Club name
         //  --Preferred first name
-        //  --?? (Always "N" in all provided examples)
+        //  --?? (Always 'N' in all provided examples)
         //  
 
-        $re1 .= sprintf("\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"%s\";\"N\"",
+        $re1 .= sprintf('"%s";"%s";"%s";"%s";"%s";"%s";"%s";"%s";"%s";"N"',
             $regnum,
             $s->getLastName(),
             $s->getFirstName(),
@@ -3546,9 +3568,22 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
      * Generate the Report
      *
      */
-    function generateReport($html = false)
+    function generateReport($swimmerid = null)
     {
-        $this->__exportData = "" ;
+        $this->generateRE1Report($swimmerid) ;
+
+        //  Generate the HTML representation too!
+
+        parent::generateHTMLReport($swimmerid) ;
+    }
+
+    /**
+     * Generate the RE1 Report
+     *
+     */
+    function generateRE1Report($swimmerid = null)
+    {
+        $this->__exportData = '' ;
 
         $re1 = &$this->__exportData ;
 
@@ -3559,7 +3594,10 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
 
         //  Get all the swimmer ids using the appropriate filter
 
-        $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
+        if (is_null($swimmerid))
+            $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
+        else
+            $swimmerIds = array(array('swimmerid' => $swimmerid)) ;
 
         //  Loop through the swimmers
 
@@ -3569,15 +3607,11 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
         {
             $this->__exportCount++ ;
 
-            $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
+            $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
 
-            $re1 .= $this->getRE1Record($swimmer, $swimmerId["swimmerid"]) ;
+            $re1 .= $this->getRE1Record($swimmer, $swimmerId['swimmerid']) ;
             $re1 .= "\r\n" ;
         }
-
-        //  Generate the HTML representation too?
-
-        if ($html) parent::generateReport($html) ;
     }
 
     /**
@@ -3593,7 +3627,7 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
 /**
  * Class definition of the CSV report generator
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamSwimmersReportGenerator
  */
@@ -3665,58 +3699,58 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
      */
     function getCSVHeader($eol = false)
     {
-        $csv = "" ;
+        $csv = '' ;
         //  Generate the column headers
  
         if ($this->getFirstName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"First Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"First Name"' ;
 
         if ($this->getMiddleName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Middle Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Middle Name"' ;
 
         if ($this->getNickName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : ""). "\"Nick Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : ''). '"Nick Name"' ;
 
         if ($this->getLastName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Last Name\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Last Name"' ;
 
         if ($this->getBirthDate())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Birth Date\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Birth Date"' ;
 
         if ($this->getAge())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Age\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Age"' ;
 
         if ($this->getAgeGroup())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Age Group\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Age Group"' ;
 
         if ($this->getGender())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Gender\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Gender"' ;
 
         if ($this->getStatus())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Status\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Status"' ;
 
         if ($this->getSwimmerLabel())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Swimmer Label\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Swimmer Label"' ;
 
         if ($this->getResults())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Results\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Results"' ;
 
         if ($this->getWebSiteId())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"Web Site Id\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"Web Site Id"' ;
         //  Primary Contact
 
         if ($this->getPrimaryContact())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                "\"Primary Contact\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                '"Primary Contact"' ;
         }
 
         //  Secondary Contact
 
         if ($this->getSecondaryContact())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                "\"Secondary Contact\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                '"Secondary Contact"' ;
         }
 
         //  How many swimmer options does this configuration support?
@@ -3729,15 +3763,15 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
                 if ($this->getOptionalField($oconst))
                 {
-                    $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" .
-                        get_option($lconst) . "\"" ;
+                    $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' .
+                        get_option($lconst) . '"' ;
                 }
             }
         }
@@ -3756,70 +3790,70 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
      */
     function getCSVRecord(&$s, &$om, $sid, $eol = false)
     {
-        $csv = "" ;
+        $csv = '' ;
 
         if ($this->getFirstName())
         {
-            if ($this->getNickNameOverride() && $s->getNickName() != "")
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                    "\"" . $s->getNickName() . "\"" ;
+            if ($this->getNickNameOverride() && $s->getNickName() != '')
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                    '"' . $s->getNickName() . '"' ;
             else
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                    "\"" . $s->getFirstName() . "\"" ;
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                    '"' . $s->getFirstName() . '"' ;
         }
 
         if ($this->getMiddleName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getMiddleName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getMiddleName() . '"' ;
 
         if ($this->getNickName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getNickName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getNickName() . '"' ;
 
         if ($this->getLastName())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getLastName() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getLastName() . '"' ;
 
         if ($this->getBirthDate())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getDateOfBirthAsDate() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getDateOfBirthAsDate() . '"' ;
 
         if ($this->getAge())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getAge() . " (" .
-                $s->getAgeGroupAge() . ")" . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getAge() . ' (' .
+                $s->getAgeGroupAge() . ')' . '"' ;
 
         if ($this->getAgeGroup())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . $s->getAgeGroupText() . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . $s->getAgeGroupText() . '"' ;
 
         if ($this->getGender())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucfirst($s->getGender()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucfirst($s->getGender()) . '"' ;
 
         if ($this->getStatus())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucfirst($s->getStatus()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucfirst($s->getStatus()) . '"' ;
 
         if ($this->getSwimmerLabel())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .  "\"" .
-            $this->getCurrentSwimmerLabel($sid) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .  '"' .
+            $this->getCurrentSwimmerLabel($sid) . '"' ;
 
         if ($this->getResults())
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                "\"" . ucfirst($s->getResults()) . "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                '"' . ucfirst($s->getResults()) . '"' ;
 
         if ($this->getWebSiteId())
         {
             if ($s->getWPUserId() == WPST_NONE)
             {
-                 $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"\"" ;
+                 $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '""' ;
             }
             else
             {
                 $u = get_userdata($s->getWPUserId()) ;
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . 
-                    "\"" . $u->user_login . "\"" ;
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . 
+                    '"' . $u->user_login . '"' ;
             }
         }
 
@@ -3828,8 +3862,8 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
         if ($this->getPrimaryContact())
         {
             $u = get_userdata($s->getContact1Id()) ;
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" .
-                $u->first_name . " " . $u->last_name .  "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' .
+                $u->first_name . ' ' . $u->last_name .  '"' ;
         }
 
         //  Secondary Contact
@@ -3837,8 +3871,8 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
         if ($this->getSecondaryContact())
         {
             $u = get_userdata($s->getContact2Id()) ;
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . "\"" .
-                $u->first_name . " " . $u->last_name .  "\"" ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . '"' .
+                $u->first_name . ' ' . $u->last_name .  '"' ;
         }
 
         //  How many swimmer options does this configuration support?
@@ -3851,16 +3885,16 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
 
         for ($oc = 1 ; $oc <= $options ; $oc++)
         {
-            $oconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc) ;
-            $lconst = constant("WPST_OPTION_SWIMMER_OPTION" . $oc . "_LABEL") ;
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
                 
             if (get_option($oconst) != WPST_DISABLED)
             {
                 if ($this->getOptionalField($oconst))
                 {
                     $om->loadOptionMetaBySwimmerIdAndKey($s->getSwimmerId(), $oconst) ;
-                    $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                        "\"" . ucfirst($om->getOptionMetaValue()) . "\"" ;
+                    $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                        '"' . ucfirst($om->getOptionMetaValue()) . '"' ;
                 }
             }
         }
@@ -3877,7 +3911,7 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
      */
     function generateReport($html = false)
     {
-        $this->__csvData = "" ;
+        $this->__csvData = '' ;
 
         $csv = &$this->__csvData ;
 
@@ -3886,21 +3920,21 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
         $swimmer = new SwimTeamSwimmer() ;
         $user = new SwimTeamUsersCSV() ;
 
-        $csv .= (($csv != WPST_NULL_STRING) ? "," : "") . $this->getCSVHeader() ;
+        $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') . $this->getCSVHeader() ;
         //  Show Primary Contact Detail?
 
         if ($this->getPrimaryContactDetail())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                $user->getCSVHeader("Primary ") ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                $user->getCSVHeader('Primary ') ;
         }
 
         //  Show Secondary Contact Detail?
 
         if ($this->getSecondaryContactDetail())
         {
-            $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
-                $user->getCSVHeader("Secondary ") ;
+            $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
+                $user->getCSVHeader('Secondary ') ;
         }
 
         $csv .= "\r\n" ;
@@ -3917,15 +3951,15 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
         {
             $this->__recordcount++ ;
 
-            $swimmer->loadSwimmerById($swimmerId["swimmerid"]) ;
+            $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
 
-            $csv .= $this->getCSVRecord($swimmer, $ometa, $swimmerId["swimmerid"]) ;
+            $csv .= $this->getCSVRecord($swimmer, $ometa, $swimmerId['swimmerid']) ;
             //  Show Primary Contact Detail?
 
             if ($this->getPrimaryContactDetail())
             {
                 $user->loadUserProfileByUserId($swimmer->getContact1Id()) ;
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
                     $user->getCSVRecord($user, $ometa) ;
             }
 
@@ -3934,7 +3968,7 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
             if ($this->getSecondaryContactDetail())
             {
                 $user->loadUserProfileByUserId($swimmer->getContact2Id()) ;
-                $csv .= (($csv != WPST_NULL_STRING) ? "," : "") .
+                $csv .= (($csv != WPST_NULL_STRING) ? ',' : '') .
                     $user->getCSVRecord($user, $ometa) ;
             }
 
@@ -3955,13 +3989,13 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
         //  Generate a temporary file to hold the data
  
         $this->setCSVFile(tempnam(ABSPATH .
-            "/" . get_option('upload_path'), "CSV")) ;
+            '/' . get_option('upload_path'), 'CSV')) ;
 
-        $this->setCSVFile(tempnam('', "CSV")) ;
+        $this->setCSVFile(tempnam('', 'CSV')) ;
 
         //  Write the CSV data to the file
 
-        $f = fopen($this->getCSVFile(), "w") ;
+        $f = fopen($this->getCSVFile(), 'w') ;
         fwrite($f, $this->__csvData) ;
         fclose($f) ;
     }
