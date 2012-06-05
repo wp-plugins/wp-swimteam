@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmeets.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: swimmeets.forms.class.php 904 2012-06-05 14:29:21Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
- * @version $Revision: 849 $
+ * @version $Revision: 904 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2012-06-05 10:29:21 -0400 (Tue, 05 Jun 2012) $
  *
  */
 
@@ -307,7 +307,7 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
 }
 
 /**
- * Construct the Admin SwimMeet OptInOut form
+ * Construct the Admin Swim Meet Entries Export form
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
@@ -1076,7 +1076,7 @@ class WpSwimTeamSwimMeetDeleteForm extends WpSwimTeamSwimMeetUpdateForm
  * @access public
  * @see WpSwimTeamForm
  */
-class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamForm
+class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamSwimMeetForm
 {
     /**
      * action property - used to pass the action to the form processor

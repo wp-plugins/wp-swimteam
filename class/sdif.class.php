@@ -3,15 +3,15 @@
 /**
  * TeamProfile classes.
  *
- * $Id: sdif.class.php 899 2012-06-04 01:41:51Z mpwalsh8 $
+ * $Id: sdif.class.php 905 2012-06-05 14:30:10Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision: 899 $
- * @lastmodified $Date: 2012-06-03 21:41:51 -0400 (Sun, 03 Jun 2012) $
+ * @version $Revision: 905 $
+ * @lastmodified $Date: 2012-06-05 10:30:10 -0400 (Tue, 05 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1077,14 +1077,23 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
             foreach ($swimmerIds as $key => &$swimmerId)
             {
                 //  Has swimmer entered or scratched this event?
-                //  Which mode is the data ingetDateOfBirthAsMMDDYYYY?  Stroke or Event?
+                //  Which mode is the data in Stroke or Event?
 
                 if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
                 {
-                    $optinoptout = $meta->getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
+                    $strokecodes = $meta->getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
                         $swimmeet->getMeetId(), $swimmeet->getParticipation()) ;
 
-                    if (!empty($optinoptout)) $optinoptout = $optinoptout[0] ;
+                    //  Clean up array so it is easier to work with
+
+                    $optinoptout = array() ;
+                    if (!empty($strokecodes))
+                    {
+                        foreach ($strokecodes as $strokecode)
+                            $optinoptout[] = $strokecode['strokecode'] ;
+                    }
+
+                    //  Determine if swimmer is swimming in this event
 
                     $swimming = ($swimmeet->getParticipation() == WPST_OPT_IN) ?
                         in_array($event->getStroke(), $optinoptout) :
@@ -1092,10 +1101,19 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
                 }
                 else
                 {
-                    $optinoptout = $meta->getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
+                    $eventids = $meta->getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
                         $swimmeet->getMeetId(), $swimmeet->getParticipation()) ;
 
-                    if (!empty($optinoptout)) $optinoptout = $optinoptout[0] ;
+                    //  Clean up array so it is easier to work with
+
+                    $optinoptout = array() ;
+                    if (!empty($eventids))
+                    {
+                        foreach ($eventids as $eventid)
+                            $optinoptout[] = $eventid['eventid'] ;
+                    }
+
+                    //  Determine if swimmer is swimming in this event
 
                     $swimming = ($swimmeet->getParticipation() == WPST_OPT_IN) ?
                         in_array($event->getEventId(), $optinoptout) :
