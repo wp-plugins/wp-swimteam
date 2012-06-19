@@ -3,15 +3,15 @@
 /**
  * Swimmer classes.
  *
- * $Id: swimmers.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: swimmers.class.php 909 2012-06-13 17:14:00Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 909 $
+ * @lastmodified $Date: 2012-06-13 13:14:00 -0400 (Wed, 13 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -442,13 +442,13 @@ class SwimTeamSwimmer extends SwimTeamDBI
         if ($useNickName == WPST_YES)
         {
             if ($this->getNickName() == WPST_NULL_STRING)
-               $first = $this->getFirstName() ;
+                $first = $this->getFirstName() ;
             else
                 $first = $this->getNickName() ;
         }
         else
         {
-            $first = $this->getNickName() ;
+            $first = $this->getFirstName() ;
         }
 
         return ($first . ' ' . $this->getLastName()) ;

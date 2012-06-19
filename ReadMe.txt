@@ -64,6 +64,12 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.31 =
+* Completed Hy-tek Roster export.  All fields that can be mapped into some sort of logical Hy-tek Team Manager field are now supported.  TM supports up to three custom fields in the roster import file, if optional swimmer fields are enabled, the first three (or fewer) will be mapped into the corresponding TM custom field.
+* Fixed bug where in some instances, the first name would be blank.
+* Fixed alignment (right instead of left) of Swimmer Id field on F0 records in entries export.
+* Fixed minor white space issue in PHP source code which in some cases seems to cause the Job Commitment Report to hang.
+
 = 1.30 =
 * Fixed entries export bug where entries were created for swimmers who had opted out of events except for Freestyle.
 

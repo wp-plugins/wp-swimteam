@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: sdif.include.php 860 2012-05-11 18:44:37Z mpwalsh8 $
+ * $Id: sdif.include.php 915 2012-06-19 13:05:27Z mpwalsh8 $
  *
  * SDIF includes.  These includes define information used in 
  * the SDIF classes and child classes in the Wp-SwimTeam plugin.
@@ -16,8 +16,8 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage SDIF
- * @version $Revision: 860 $
- * @lastmodified $Date: 2012-05-11 14:44:37 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 915 $
+ * @lastmodified $Date: 2012-06-19 09:05:27 -0400 (Tue, 19 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1342,7 +1342,7 @@ define('WPST_SDIF_E0_PARSE_RECORD', 'E0%1.1s%-8.8s%1.1s%-6.6s%2.2s%1.1s%4.4s%1.1
 define('WPST_SDIF_E0_GENERATE_RECORD', 'E0%1.1s%-8.8s%1.1s%-6.6s%2.2s%1.1s%4.4s%1.1s%4.4s%4.4s%3.3s%8.8s%9.9s%9.9s%9.9s%9.9s%2.2s%2.2s%2.2s%2.2s%3.3s%3.3s%4.4s%59.59s') ;
 
 //  Define F0 record
-define('WPST_SDIF_F0_RECORD', 'F0%1.1s%12.12s%6.6s%1.1s%-28.28s%12.12s%3.3s%8.8s%2.2s%1.1s%1.1s%1.1s%1.1s%8.8s%1.1s%4.4s%14.14s%-15.15s%39.39s') ;
+define('WPST_SDIF_F0_RECORD', 'F0%1.1s%12.12s%6.6s%1.1s%-28.28s%-12.12s%3.3s%8.8s%2.2s%1.1s%1.1s%1.1s%1.1s%8.8s%1.1s%4.4s%14.14s%-15.15s%39.39s') ;
 
 //  Define Z0 record
 //define('WPST_SDIF_Z0_RECORD', 'Z0%1.1s%-8.8s%-2.2s%-30.30s%3.3s%3.3s%4.4s%4.4s%6.6s%6.6s%5.5s%6.6s%6.6s%5.5s%3.3s%3.3s%3.3s%3.3s%-57s%-2.2s') ;

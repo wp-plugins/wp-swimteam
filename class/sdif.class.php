@@ -3,15 +3,15 @@
 /**
  * TeamProfile classes.
  *
- * $Id: sdif.class.php 905 2012-06-05 14:30:10Z mpwalsh8 $
+ * $Id: sdif.class.php 907 2012-06-05 23:01:26Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision: 905 $
- * @lastmodified $Date: 2012-06-05 10:30:10 -0400 (Tue, 05 Jun 2012) $
+ * @version $Revision: 907 $
+ * @lastmodified $Date: 2012-06-05 19:01:26 -0400 (Tue, 05 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -518,7 +518,7 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
      *
      * @return string - SDIF content
      */
-    function generateSDIF($eventIds = array())
+    function generateSDIF($swimmerIds = array())
     {
         global $current_user ;
 
@@ -597,7 +597,22 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
         //  to get the list of potential swimmers
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $swimmerIds = $roster->getSwimmerIds() ;
+
+        //  If no swimmers are specified, pull the whole roster
+        //  and clean up the array so it as expected.
+
+        if (empty($swimmerIds))
+        {
+            $swimmerIds = array() ;
+            $allSwimmerIds = $roster->getSwimmerIds() ;
+
+            foreach ($allSwimmerIds as $swimmerId)
+                $swimmerIds[] = $swimmerId['swimmerid'] ;
+        }
+        else if (!is_array($swimmerIds))
+        {
+            $swimmerIds = array($swimmerIds) ;
+        }
 
         //  Need structures for swimmers and their primary contact
  

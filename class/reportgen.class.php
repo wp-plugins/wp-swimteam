@@ -3,15 +3,15 @@
 /**
  * Reports classes.
  *
- * $Id: reportgen.class.php 897 2012-06-04 01:40:36Z mpwalsh8 $
+ * $Id: reportgen.class.php 914 2012-06-17 22:31:13Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Reports
- * @version $Revision: 897 $
- * @lastmodified $Date: 2012-06-03 21:40:36 -0400 (Sun, 03 Jun 2012) $
+ * @version $Revision: 914 $
+ * @lastmodified $Date: 2012-06-17 18:31:13 -0400 (Sun, 17 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1544,7 +1544,6 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
      */
     function generateHTMLReport()
     {
-
         $this->__reporttable = new SwimTeamInfoTable($this->getReportTitle(), '100%') ;
         $table = &$this->__reporttable ;
         $table->set_alt_color_flag(true) ;
@@ -2010,8 +2009,6 @@ class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGenerator
      */
     function getHTMLTableRow(&$u, &$om, &$tr)
     {
-        if (WPST_DEBUG) wpst_whereami(__FILE__, __LINE__) ;
-
         $tr = parent::getHTMLTableRow($u, $om, $tr) ;
         $credits = $this->getCredits($u->getUserId()) ;
 

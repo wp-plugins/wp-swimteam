@@ -163,54 +163,51 @@ define('WPST_HY3_C1_RECORD', 'C1%-5.5s%-30.30s%-16.16s%-63.63s%-3.3s%-6.6s%-2.2s
 define('WPST_HY3_C2_RECORD', 'C2%-30.30s%-30.30s%-30.30s%-2.2s%-10.10s%-3.3s%-1.1s%-4.4s%-16.16s%-2.2s') ;
 
 //  Define C3 record
-define('WPST_HY3_C3_RECORD', 'C3%-29.29s%-20.20s%-20.20s%-20.20s%-36.36s%-2.2s') ;
+define('WPST_HY3_C3_RECORD', 'C3%-30.30s%-20.20s%-20.20s%-20.20s%-36.36s%-2.2s') ;
 
 //  Define D1 record
-define('WPST_HY3_D1_RECORD', 'D1%1.1s%5.5s%-20.20s%-20.20s%-20.20s%1.1s%-14.14s%5.5s%8.8s%1.1s%2.2s%5.5s%1.1s%-23.23s%-2.2s') ;
-
-//  Define HY3 D1x record
-define('WPST_HY3_D1x_RECORD', 'D1%1.1s%5.5s%-20.20s%-20.20s%-20.20s%1.1s%-14.14s%5.5s%8.8s%1.1s%2.2s%5.5s%1.1s%23.23s%-2.2s') ;
+define('WPST_HY3_D1_RECORD', 'D1%1.1s%-5.5s%-20.20s%-20.20s%-20.20s%1.1s%-14.14s%-5.5s%8.8s%1.1s%2.2s%1.1s%4.4s%3.3s%3.3s%1.1s%3.3s%1.1s%3.3s%3.3s%6.6s%-2.2s') ;
 
 //  Define HY3 D2 record
-define('WPST_HY3_D2_RECORD', 'D2%-30.30s%-30.30s%-20.20s          %-2.2s%-10.10s%3.3s') ;
+define('WPST_HY3_D2_RECORD', 'D2%-30.30s%-30.30s%-20.20s%10.10s%-2.2s%-10.10s%3.3s%21.21s%-2.2s') ;
 
 //  Define HY3 D3 record
 define('WPST_HY3_D3_RECORD', 'D3%-30.30s%-20.20s%-20.20s%-20.20s%-36.36s') ;
 
 //  Define HY3 D4 record
-define('WPST_HY3_D4_RECORD', 'D4%-40.40s%-30.30s%-20.20s          %-2.2s%-10.10s%3.3s') ;
+define('WPST_HY3_D4_RECORD', 'D4%-40.40s%-30.30s%-20.20s%10.10s%-2.2s%-10.10s%3.3s%11.11s%-2.2s') ;
 
 //  Define HY3 D5 record
-define('WPST_HY3_D5_RECORD', 'D5%-40.40s%-30.30sX FFFFFFFFFFFFF%-20.20s%-10.10s%-10.10s') ;
+define('WPST_HY3_D5_RECORD', 'D5%-40.40s%-30.30sX%1.1sFFFFFFFFFFFFF%4.4s%-8.8s%8.8s%-10.10s%-10.10s%1.1s%-2.2s') ;
 
 //  Define HY3 D6 record
-define('WPST_HY3_D6_RECORD', 'D6%-30.30s%-20.20s%-30.30s%-20.20s') ;
+define('WPST_HY3_D6_RECORD', 'D6%-30.30s%-20.20s%-30.30s%-20.20s%26.26s%-2.2s') ;
 
 //  Define HY3 D7 record
-define('WPST_HY3_D7_RECORD', 'D7%-20.20s%-20.20s%-20.20s%-50.50s%-14.14s') ;
+define('WPST_HY3_D7_RECORD', 'D7%-20.20s%-20.20s%-20.20s%-50.50s%-14.14s%2.2s%-2.2s') ;
 
 //  Define HY3 D8 record
-define('WPST_HY3_D8_RECORD', 'D8%-120.120s') ;
+define('WPST_HY3_D8_RECORD', 'D8%-120.120s%6.6s%-2.2s') ;
 
 //  Define HY3 D9 record
-define('WPST_HY3_D9_RECORD', 'D9%-120.120s') ;
+define('WPST_HY3_D9_RECORD', 'D9%-120.120s%6.6s%-2.2s') ;
 
 //  Define HY3 DA record
-define('WPST_HY3_DA_RECORD', 'DA%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s') ;
+define('WPST_HY3_DA_RECORD', 'DA%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%6.6s%-2.2s') ;
 
 //  Define HY3 DB record
-define('WPST_HY3_DB_RECORD', 'DB%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s') ;
+define('WPST_HY3_DB_RECORD', 'DB%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%6.6s%-2.2s') ;
 
 //  Define HY3 DC record
-define('WPST_HY3_DC_RECORD', 'DC%128s') ;
+define('WPST_HY3_DC_RECORD', 'DC%120s%6.6s%-2.2s') ;
 
 //  Define HY3 DD record
-define('WPST_HY3_DD_RECORD', 'DD%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s') ;
+define('WPST_HY3_DD_RECORD', 'DD%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%-20.20s%6.6s%-2.2s') ;
 
 //  Define HY3 DE record
-define('WPST_HY3_DE_RECORD', 'DE%-36.36s%-50.50s%-14.14s%-20.20s') ;
+define('WPST_HY3_DE_RECORD', 'DE%-36.36s%-50.50s%-14.14s%-20.20s%6.6s%-2.2s') ;
 
 //  Define HY3 DF record
-define('WPST_HY3_DF_RECORD', 'DF%-20.20s%-20.20s%-50.50s') ;
+define('WPST_HY3_DF_RECORD', 'DF%-20.20s%-20.20s%-50.50s%6.6s%-2.2s') ;
 
 ?>

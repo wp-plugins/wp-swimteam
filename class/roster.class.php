@@ -3,15 +3,15 @@
 /**
  * Season classes.
  *
- * $Id: roster.class.php 898 2012-06-04 01:41:18Z mpwalsh8 $
+ * $Id: roster.class.php 910 2012-06-13 17:14:48Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Roster
- * @version $Revision: 898 $
- * @lastmodified $Date: 2012-06-03 21:41:18 -0400 (Sun, 03 Jun 2012) $
+ * @version $Revision: 910 $
+ * @lastmodified $Date: 2012-06-13 13:14:48 -0400 (Wed, 13 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -71,6 +71,11 @@ class SwimTeamRoster extends SwimTeamDBI
      * swimmer number property - swimmer number of the swimmer
      */
     var $__swimmerlabel = WPST_NULL_STRING ;
+
+    /**
+     * registration date property - date swimmer was registered
+     */
+    var $__registration_date ;
 
     /**
      * Set the roster entry id
@@ -202,6 +207,39 @@ class SwimTeamRoster extends SwimTeamDBI
     function getSwimmerLabel()
     {
         return ($this->__swimmerlabel) ;
+    }
+
+    /**
+     * Set the registration date of birth
+     *
+     * @param - array - registration date of birth
+     */
+    function setRegistrationDateAsDate($date)
+    {
+        $this->__registration_date = array('year' => date('Y', strtotime($date)),
+            'month' => date('m', strtotime($date)), 'day' => date('d', strtotime($date))) ;
+    }
+
+    /**
+     * Get the registration date of birth
+     *
+     * @return - array - registration date as an array
+     */
+    function getRegistrationDate()
+    {
+        return ($this->__registration_date) ;
+    }
+
+    /**
+     * Get the registration date as MMDDYYYY
+     *
+     * @return - string - registration date as MMDDYYYY
+     */
+    function getRegistrationDateAsMMDDYYYY()
+    {
+        $d = &$this->__registration_date ;
+
+        return sprintf('%02s%02s%04s', $d['month'], $d['day'], $d['year']) ;
     }
 
     /**
@@ -737,6 +775,7 @@ class SwimTeamRoster extends SwimTeamDBI
             $this->setContactId($result['contactid']) ;
             $this->setRosterStatus($result['status']) ;
             $this->setSwimmerLabel($result['swimmerlabel']) ;
+            $this->setRegistrationDateAsDate($result['registered']) ;
         }
 
         $idExists = (bool)($this->getQueryCount() > 0) ;
@@ -771,6 +810,7 @@ class SwimTeamRoster extends SwimTeamDBI
             $this->setContactId($result['contactid']) ;
             $this->setRosterStatus($result['status']) ;
             $this->setSwimmerLabel($result['swimmerlabel']) ;
+            $this->setRegistrationDateAsDate($result['registered']) ;
         }
 
 	    return $idExists ;

@@ -217,8 +217,6 @@ class HY3Roster extends HY3BaseRecord
          * Build the A1 record
          */
         $a1 = new HY3A1Record() ;
-        //printf('<pre>%s</pre>', print_r($a1, true)) ;
-        //printf('<pre>%s</pre>', print_r(get_class_methods(get_class($a1)), true)) ;
         $a1->setFileCode(WPST_HY3_FTC_MEET_TEAM_ROSTER_VALUE) ;
         $a1->setFileDescription('Swim Team Roster') ;
         $a1->setSoftwareVendor(WPST_HY3_SOFTWARE_NAME) ;
@@ -277,58 +275,215 @@ class HY3Roster extends HY3BaseRecord
         //  Need structures for swimmers and their primary contact
  
         $swimmer = new SwimTeamSwimmer() ;
-        $contact = new SwimTeamUserProfile() ;
+        $contact1 = new SwimTeamUserProfile() ;
+        $contact2 = new SwimTeamUserProfile() ;
+        $contact3 = new SwimTeamUserProfile() ;
 
-        //  If no events are specified, use all events in the swim meet
+        //  Need records for the Hy-Tek roster - there are a bunch!
+        //  Hy-Tek team manager defines a number of fields which somewhat
+        //  contradict each other - Primary Contact, Secondary Contact
+        //  Mother's Name, Father's Name, etc.  We'll make our best guess
+        //  at populating as much data as possible with assumptions.  In
+        //  particular, the wp-SwimTeam Contact 1 is assumed to be the
+        //  swimmer's Mother and the wp-SwimTeam Contact 2 is assumed to
+        //  be the swimmer's Father.
 
         $d1 = new HY3D1Record() ;
-
-        /*
         $d2 = new HY3D2Record() ;
-        $d2->setOrgCode($this->getOrgCode()) ;
-        $d2->setTeamCode($this->getTeamCode()) ;
-        $d2->setRegionCode($this->getRegionCode()) ;
-        $d2->setSwimmerCountryCode($this->getCountryCode()) ;
-        $d2->setAnswerCode(WPST_HYTEK_ANSWER_CODE_NO_VALUE) ;
-        $d2->setSeasonCode(WPST_HYTEK_SEASON_CODE_SEASON_1_VALUE) ;
-         */
+        $d3 = new HY3D3Record() ;
+        $d4 = new HY3D4Record() ;
+        $d5 = new HY3D5Record() ;
+        $d6 = new HY3D6Record() ;
+        $d7 = new HY3D7Record() ;
+        $d8 = new HY3D8Record() ;
+        $d9 = new HY3D9Record() ;
+        $da = new HY3DARecord() ;
+        $db = new HY3DBRecord() ;
+        $dc = new HY3DCRecord() ;
+        $dd = new HY3DDRecord() ;
+        $de = new HY3DERecord() ;
+        $df = new HY3DFRecord() ;
+
+        //  Loop through roster
 
         foreach ($swimmerIds as $key => &$swimmerId)
         {
             $roster->setSwimmerId($swimmerId['swimmerid']) ;
             $roster->loadRosterBySeasonIdAndSwimmerId() ;
             $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
-            $contact->loadUserProfileByUserId($swimmer->getContact1Id()) ;
+            $contact1->loadUserProfileByUserId($swimmer->getContact1Id()) ;
+            $contact2->loadUserProfileByUserId($swimmer->getContact2Id()) ;
+            $contact3->loadUserProfileByUserId($swimmer->getWpUserId()) ;
                     
             //  Initialize D1 record fields which are swimmer based
-            $d1->setSwimmerLastName($swimmer->getLastName()) ;
-            $d1->setSwimmerFirstName($swimmer->getFirstName()) ;
-            $d1->setSwimmerMiddleInitial(substr($swimmer->getMiddleName(), 0, 1)) ;
+            $d1->setAthleteLastName($swimmer->getLastName()) ;
+            $d1->setAthleteFirstName($swimmer->getFirstName()) ;
+            $d1->setAthleteMiddleInitial(substr($swimmer->getMiddleName(), 0, 1)) ;
 
             if ($swimmer->getNickname() != '')
-                $d1->setSwimmerNickname($swimmer->getNickname()) ;
+                $d1->setAthleteNickname($swimmer->getNickname()) ;
             else
-                $d1->setSwimmerNickname($swimmer->getFirstName()) ;
+                $d1->setAthleteNickname($swimmer->getFirstName()) ;
 
-            $d1->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
+            $d1->setAthleteBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
 
             //  How should the Swimmer Id appear in the HY3 file?
             if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
-                $d1->setUSS($swimmer->getId()) ;
+                $d1->setAthleteId($swimmer->getId()) ;
             if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
-                $d1->setUSS($roster->getSwimmerLabel()) ;
+                $d1->setAthleteId($roster->getSwimmerLabel()) ;
             else
-                $d1->setUSS($swimmer->getUSSNumber()) ;
+                $d1->setAthleteId($swimmer->getUSSNumber()) ;
 
-            //$d1->setPhoneNumber($contact->getPrimaryPhone()) ;
-            //$d1->setSecondaryPhoneNumber($contact->getSecondaryPhone()) ;
-    
             if ($this->getUseAgeGroupAge() == WPST_NO)
-                $d1->setAgeOrClass($swimmer->getAge()) ;
+                $d1->setAthleteAge($swimmer->getAge()) ;
             else
-                $d1->setAgeOrClass($swimmer->getAgeGroupAge()) ;
-            $d1->setGender($swimmer->getGender()) ;
+                $d1->setAthleteAge($swimmer->getAgeGroupAge()) ;
+
+            $d1->setGender(ucwords($swimmer->getGender())) ;
+            $d1->setRegistrationCountry($this->getCountryCode()) ;
+
+            //  Fill in the unused fields
+            $d1->setDatabaseId1(WPST_HY3_UNUSED) ;
+            $d1->setDatabaseId2(WPST_HY3_UNUSED) ;
+            $d1->setAthleteSchoolYear(WPST_HY3_UNUSED) ;
+            $d1->setGroup(WPST_HY3_UNUSED) ;
+            $d1->setSubgroup(WPST_HY3_UNUSED) ;
+            $d1->setInactive(WPST_HY3_UNUSED) ;
+            $d1->setWmGroup(WPST_HY3_UNUSED) ;
+            $d1->setWmSubgroup(WPST_HY3_UNUSED) ;
     
+            //  Build D2 record
+            $d2->setPrimaryContactAddress1($contact1->getStreet1()) ;
+            $d2->setPrimaryContactAddress2($contact1->getStreet2()) ;
+            $d2->setPrimaryContactCity($contact1->getCity()) ;
+            $d2->setPrimaryContactState($contact1->getStateOrProvince()) ;
+            $d2->setPrimaryContactPostalCode($contact1->getPostalCode()) ;
+            $d2->setPrimaryContactCountry($contact1->getCountry()) ;
+
+            //  Build D3 record
+            $d3->setFathersOfficePhoneNumber($contact2->getSecondaryPhone()) ;
+            $d3->setPrimaryContactHomePhoneNumber($contact1->getPrimaryPhone()) ;
+            $d3->setPrimaryContactFaxNumber($contact1->getSecondaryPhone()) ;
+            $d3->setFathersEmailAddress($contact2->getEmailAddress()) ;
+    
+            //  Build D4 record
+            $d4->setSecondaryContactMailto($swimmer->getFirstAndLastNames() .
+                ' c/o ' . $contact2->getFullName()) ;
+            $d4->setSecondaryContactAddress1($contact2->getStreet1()) ;
+            $d4->setSecondaryContactCity($contact2->getCity()) ;
+            $d4->setSecondaryContactState($contact2->getStateOrProvince()) ;
+            $d4->setSecondaryContactPostalCode($contact2->getPostalCode()) ;
+            $d4->setSecondaryContactCountry($contact2->getCountry()) ;
+
+            //  Build D5 record
+            $d5->setPrimaryContactMailto($swimmer->getFirstAndLastNames() .
+                ' c/o ' . $contact1->getFullName()) ;
+            $d5->setSecondaryContactAddress2($contact2->getStreet2()) ;
+            $d5->setRegistrationDate($roster->getRegistrationDateAsMMDDYYYY()) ;
+            $d5->setPrimaryContactCity($contact1->getCity()) ;
+            $d5->setSecondaryContactCity($contact2->getCity()) ;
+
+            //  Build D6 record
+            $d6->setDoctorsName(WPST_HY3_UNUSED) ;
+            $d6->setDoctorsPhoneNumber(WPST_HY3_UNUSED) ;
+            $d6->setEmergencyContactName(WPST_HY3_UNUSED) ;
+            $d6->setEmergencyContactPhoneNumber(WPST_HY3_UNUSED) ;
+
+            //  Build D7 record
+            $d7->setDoctorsName(WPST_HY3_UNUSED) ;
+            $d7->setSecondaryContactParent1OfficePhoneNumber($contact1->getSecondaryPhone()) ;
+            $d7->setSecondaryContactHomePhoneNumber($contact2->getPrimaryPhone()) ;
+            $d7->setSecondaryContactFaxNumber($contact2->getSecondaryPhone()) ;
+            $d7->setSecondaryContactParent1EmailAddress($contact1->getEmailAddress()) ;
+            $d7->setFathersEmailAddress($contact2->getEmailAddress()) ;
+
+            //  Build D8 record
+            $d8->setMedicalConditionDescription(WPST_HY3_UNUSED) ;
+
+            //  Build D9 record
+            $d9->setMedicationDescription(WPST_HY3_UNUSED) ;
+
+            //  Build DA record
+            $da->setCustomField1Name(WPST_HY3_UNUSED) ;
+            $da->setCustomField1Value(WPST_HY3_UNUSED) ;
+            $da->setCustomField2Name(WPST_HY3_UNUSED) ;
+            $da->setCustomField2Value(WPST_HY3_UNUSED) ;
+            $da->setCustomField3Name(WPST_HY3_UNUSED) ;
+            $da->setCustomField3Value(WPST_HY3_UNUSED) ;
+
+            //  The Hy-tek HY3 file supports 3 custom fields so if swimmer
+            //  fileds are enabled, we'll map up to three of theme into the
+            //  Hy-tek custom fields.
+
+            $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
+
+            if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+
+            $ometa = new SwimTeamOptionMeta() ;
+            $ometa->setSwimmerId($swimmerId['swimmerid']) ;
+
+            //  Load the swimmer options
+
+            for ($oc = 1 ; $oc <= $options ; $oc++)
+            {
+                $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+                $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
+                
+                if (get_option($oconst) != WPST_DISABLED)
+                {
+                    $label = get_option($lconst) ;
+                    $ometa->loadOptionMetaBySwimmerIdAndKey($swimmerId['swimmerid'], $oconst) ;
+
+                    switch ($oc)
+                    {
+                        case 1:
+                            $da->setCustomField1Name($label) ;
+                            $da->setCustomField1Value($ometa->getOptionMetaValue()) ;
+                            break ;
+
+                        case 2:
+                            $da->setCustomField2Name($label) ;
+                            $da->setCustomField2Value($ometa->getOptionMetaValue()) ;
+                            break ;
+
+                        case 3:
+                            $da->setCustomField3Name($label) ;
+                            $da->setCustomField3Value($ometa->getOptionMetaValue()) ;
+                            break ;
+
+                        default:
+                            break ;
+                    }
+                }
+            }
+
+            //  Build DB record
+            $db->setFathersLastName($contact2->getLastName()) ;
+            $db->setFathersFirstName($contact2->getFirstName()) ;
+            $db->setMothersFirstName($contact1->getFirstName()) ;
+            $db->setSecondaryContactLastName($contact2->getLastName()) ;
+            $db->setSecondaryContactParent1Name($contact1->getFullName()) ;
+            $db->setSecondaryContactParent2Name($contact2->getFullName()) ;
+
+            //  Build DD record
+            $dd->setFathersCellPhoneNumber($contact2->getSecondaryPhone()) ;
+            $dd->setMothersOfficePhoneNumber($contact1->getSecondaryPhone()) ;
+            $dd->setMothersCellPhoneNumber($contact1->getSecondaryPhone()) ;
+            $dd->setSecondaryContactParent1CellPhoneNumber($contact1->getSecondaryPhone()) ;
+            $dd->setSecondaryContactParent2OfficePhoneNumber($contact2->getSecondaryPhone()) ;
+            $dd->setSecondaryContactParent2CellPhoneNumber($contact2->getSecondaryPhone()) ;
+
+            //  Build DE record
+            $de->setMothersEmailAddress($contact1->getEmailAddress()) ;
+            $de->setSecondaryContactParent2EmailAddress($contact2->getEmailAddress()) ;
+            $de->setMothersLastName($contact1->getLastName()) ;
+ 
+            //  Build DF record
+            $df->setAthletesMiddleName($swimmer->getMiddleName()) ;
+            $df->setAthletesCellPhoneNumber($contact3->getPrimaryPhone()) ;
+            $df->setAthletesEmailAddress($contact3->getEmailAddress()) ;
+
             if ($this->getHY3DebugFlag())
             {
                 $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
@@ -337,16 +492,23 @@ class HY3Roster extends HY3BaseRecord
             }
     
             $hy3[] = $d1->GenerateRecord() ;
+            $hy3[] = $d2->GenerateRecord() ;
+            $hy3[] = $d3->GenerateRecord() ;
+            $hy3[] = $d4->GenerateRecord() ;
+            $hy3[] = $d5->GenerateRecord() ;
+            $hy3[] = $d6->GenerateRecord() ;
+            $hy3[] = $d7->GenerateRecord() ;
+            $hy3[] = $d8->GenerateRecord() ;
+            $hy3[] = $d9->GenerateRecord() ;
+            $hy3[] = $da->GenerateRecord() ;
+            $hy3[] = $db->GenerateRecord() ;
+            $hy3[] = $dc->GenerateRecord() ;
+            $hy3[] = $dd->GenerateRecord() ;
+            $hy3[] = $de->GenerateRecord() ;
+            $hy3[] = $df->GenerateRecord() ;
+
             $hy3_counters['d']++ ;
 
-            //$d2->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
-            //$d2->setSwimmerAddress1($contact->getFullStreetAddress()) ;
-            //$d2->setSwimmerCity($contact->getCity()) ;
-            //$d2->setSwimmerState($contact->getStateOrProvince()) ;
-            //$d2->setSwimmerPostalCode($contact->getPostalCode()) ;
-            //$hy3[] = $d2->GenerateRecord() ;
-            //$hy3_counters['d']++ ;
-    
             //  Update the various counters
     
             //  Track uninque swimmers
@@ -726,16 +888,6 @@ class HY3MeetEntries extends HY3BaseRecord
 
             $swimmerIds = $roster->getAllSwimmerIdsByAgeGroupId($event->getAgeGroupId()) ;
 
-            /*
-            printf('<h3>Event Id:  %s<br>Event Number %s  Distance:</h3>',
-                $eventId['eventid'], $event->getEventNumber(), $event->getDistance()) ;
-            printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
-            printf('<pre>') ;
-            print_r($event) ;
-            print_r($swimmerIds) ;
-            printf('</pre>') ;
-             */
-
             //  Need to tidy up the list of swimmers based on meet participation
             //  Is the meet set up as opt-in or opt-out?  Adjust the list accordingly.
 
@@ -754,14 +906,6 @@ class HY3MeetEntries extends HY3BaseRecord
 
                     if (!empty($optinoptout)) $optinoptout = $optinoptout[0] ;
 
-                    /*
-                    print '<pre>' ;
-                    var_dump($optinoptout) ;
-                    var_dump($event->getStroke()) ;
-                    var_dump(in_array($event->getStroke(), $optinoptout)) ;
-                    var_dump(in_array($event->getStroke(), $optinoptout)) ;
-                    print '</pre>' ;
-                     */
                     $swimming = ($swimmeet->getParticipation() == WPST_OPT_IN) ?
                         in_array($event->getStroke(), $optinoptout) :
                         !in_array($event->getStroke(), $optinoptout) ;
@@ -782,14 +926,6 @@ class HY3MeetEntries extends HY3BaseRecord
 
                 if (!$swimming) unset($swimmerIds[$key]) ;
             }
-
-            /*
-            printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
-            printf('<pre>') ;
-            print_r($swimmerIds) ;
-            var_dump($swimmeet->getParticipation()) ;
-            printf('</pre>') ;
-             */
 
             //  Now we know the swimmers and the events, time to generate records!
 
@@ -1978,7 +2114,7 @@ class HY3C1Record extends HY3Record
     /**
      * Generate Record
      *
-     * @return sting - C1 HY3 record
+     * @return string - C1 HY3 record
      */
     function GenerateRecord()
     {
@@ -1993,8 +2129,6 @@ class HY3C1Record extends HY3Record
             WPST_HY3_UNUSED
         ) ;
 
-        printf('<pre>%s</pre>', print_r($this, true)) ;
-        printf('<pre>%s</pre>', print_r($hy3, true)) ;
         return $this->CalculateHy3Checksum($hy3) ;
     }
 }
@@ -2231,7 +2365,7 @@ class HY3C2Record extends HY3Record
     /**
      * Generate Record
      *
-     * @return sting - C1 HY3 record
+     * @return string - C1 HY3 record
      */
     function GenerateRecord()
     {
@@ -2361,7 +2495,7 @@ class HY3C3Record extends HY3C1Record
     /**
      * Generate Record
      *
-     * @return sting - C3 HY3 record
+     * @return string - C3 HY3 record
      */
     function GenerateRecord()
     {
@@ -2379,120 +2513,1775 @@ class HY3C3Record extends HY3C1Record
 }
 
 /**
+ * HY3 Dx record - base record for all Dx records
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3Record
+ */
+class HY3DxRecord extends HY3Record
+{
+    /**
+     *   Gender property
+     */
+    var $__gender ;
+
+    /**
+     *   Database Id1 property
+     */
+    var $__database_id1 ;
+
+    /**
+     *   Athlete Last Name property
+     */
+    var $__athlete_last_name ;
+
+    /**
+     *   Athlete First Name property
+     */
+    var $__athlete_first_name ;
+
+    /**
+     *   Athlete Nickname property
+     */
+    var $__athlete_nickname ;
+
+    /**
+     *   Athlete Middle Initial property
+     */
+    var $__athlete_middle_initial ;
+
+    /**
+     *   Athlete Id property
+     */
+    var $__athlete_id ;
+
+    /**
+     *   Database Id2 property
+     */
+    var $__database_id2 ;
+
+    /**
+     *   Athlete Birth Date property
+     */
+    var $__athlete_birth_date ;
+
+    /**
+     *   Athlete Age property
+     */
+    var $__athlete_age ;
+
+    /**
+     *   Athlete School Year property
+     */
+    var $__athlete_school_year ;
+
+    /**
+     *   Group property
+     */
+    var $__group ;
+
+    /**
+     *   Subgroup property
+     */
+    var $__subgroup ;
+
+    /**
+     *   Inactive property
+     */
+    var $__inactive ;
+
+    /**
+     *   Registration Country property
+     */
+    var $__registration_country ;
+
+    /**
+     *   Wm Group property
+     */
+    var $__wm_group ;
+
+    /**
+     *   Wm Subgroup property
+     */
+    var $__wm_subgroup ;
+
+    /**
+     *   Primary Contact Address1 property
+     */
+    var $__primary_contact_address1 ;
+
+    /**
+     *   Primary Contact Address2 property
+     */
+    var $__primary_contact_address2 ;
+
+    /**
+     *   Primary Contact City property
+     */
+    var $__primary_contact_city ;
+
+    /**
+     *   Primary Contact State property
+     */
+    var $__primary_contact_state ;
+
+    /**
+     *   Primary Contact Postal Code property
+     */
+    var $__primary_contact_postal_code ;
+
+    /**
+     *   Primary Contact Country property
+     */
+    var $__primary_contact_country ;
+
+    /**
+     *   Fathers Office Phone Number property
+     */
+    var $__fathers_office_phone_number ;
+
+    /**
+     *   Primary Contact Home Phone Number property
+     */
+    var $__primary_contact_home_phone_number ;
+
+    /**
+     *   Primary Contact Fax Number property
+     */
+    var $__primary_contact_fax_number ;
+
+    /**
+     *   Fathers Email Address property
+     */
+    var $__fathers_email_address ;
+
+    /**
+     *   Secondary Contact Mailto property
+     */
+    var $__secondary_contact_mailto ;
+
+    /**
+     *   Secondary Contact Address1 property
+     */
+    var $__secondary_contact_address1 ;
+
+    /**
+     *   Secondary Contact City property
+     */
+    var $__secondary_contact_city ;
+
+    /**
+     *   Secondary Contact State property
+     */
+    var $__secondary_contact_state ;
+
+    /**
+     *   Secondary Contact Postal Code property
+     */
+    var $__secondary_contact_postal_code ;
+
+    /**
+     *   Secondary Contact Country property
+     */
+    var $__secondary_contact_country ;
+
+    /**
+     *   Primary Contact Mailto property
+     */
+    var $__primary_contact_mailto ;
+
+    /**
+     *   Secondary Contact Address2 property
+     */
+    var $__secondary_contact_address2 ;
+
+    /**
+     *   Registration Date property
+     */
+    var $__registration_date ;
+
+    /**
+     *   Doctors Name property
+     */
+    var $__doctors_name ;
+
+    /**
+     *   Doctors Phone Number property
+     */
+    var $__doctors_phone_number ;
+
+    /**
+     *   Emergency Contact Name property
+     */
+    var $__emergency_contact_name ;
+
+    /**
+     *   Emergency Contact Phone Number property
+     */
+    var $__emergency_contact_phone_number ;
+
+    /**
+     *   Secondary Contact Parent1 Office Phone Number property
+     */
+    var $__secondary_contact_parent1_office_phone_number ;
+
+    /**
+     *   Secondary Contact Home Phone Number property
+     */
+    var $__secondary_contact_home_phone_number ;
+
+    /**
+     *   Secondary Contact Fax Number property
+     */
+    var $__secondary_contact_fax_number ;
+
+    /**
+     *   Secondary Contact Parent1 Email Address property
+     */
+    var $__secondary_contact_parent1_email_address ;
+
+    /**
+     *   Medical Condition Description property
+     */
+    var $__medical_condition_description ;
+
+    /**
+     *   Medication Description property
+     */
+    var $__medication_description ;
+
+    /**
+     *   Custom Field 1 Name property
+     */
+    var $__custom_field_1_name ;
+
+    /**
+     *   Custom Field 1 Value property
+     */
+    var $__custom_field_1_value ;
+
+    /**
+     *   Custom Field 2 Name property
+     */
+    var $__custom_field_2_name ;
+
+    /**
+     *   Custom Field 2 Value property
+     */
+    var $__custom_field_2_value ;
+
+    /**
+     *   Custom Field 3 Name property
+     */
+    var $__custom_field_3_name ;
+
+    /**
+     *   Custom Field 3 Value property
+     */
+    var $__custom_field_3_value ;
+
+    /**
+     *   Fathers Last Name property
+     */
+    var $__fathers_last_name ;
+
+    /**
+     *   Fathers First Name property
+     */
+    var $__fathers_first_name ;
+
+    /**
+     *   Mothers First Name property
+     */
+    var $__mothers_first_name ;
+
+    /**
+     *   Secondary Contact Last Name property
+     */
+    var $__secondary_contact_last_name ;
+
+    /**
+     *   Secondary Contact Parent1 Name property
+     */
+    var $__secondary_contact_parent1_name ;
+
+    /**
+     *   Secondary Contact Parent2 Name property
+     */
+    var $__secondary_contact_parent2_name ;
+
+    /**
+     *   Fathers Cell Phone Number property
+     */
+    var $__fathers_cell_phone_number ;
+
+    /**
+     *   Mothers Office Phone Number property
+     */
+    var $__mothers_office_phone_number ;
+
+    /**
+     *   Mothers Cell Phone Number property
+     */
+    var $__mothers_cell_phone_number ;
+
+    /**
+     *   Secondary Contact Parent1 Cell Phone Number property
+     */
+    var $__secondary_contact_parent1_cell_phone_number ;
+
+    /**
+     *   Secondary Contact Parent2 Office Phone Number property
+     */
+    var $__secondary_contact_parent2_office_phone_number ;
+
+    /**
+     *   Secondary Contact Parent2 Cell Phone Number property
+     */
+    var $__secondary_contact_parent2_cell_phone_number ;
+
+    /**
+     *   Mothers Email Address property
+     */
+    var $__mothers_email_address ;
+
+    /**
+     *   Secondary Contact Parent2 Email Address property
+     */
+    var $__secondary_contact_parent2_email_address ;
+
+    /**
+     *   Mothers Last Name property
+     */
+    var $__mothers_last_name ;
+
+    /**
+     *   Athletes Middle Name property
+     */
+    var $__athletes_middle_name ;
+
+    /**
+     *   Athletes Cell Phone Number property
+     */
+    var $__athletes_cell_phone_number ;
+
+    /**
+     *   Athletes Email Address property
+     */
+    var $__athletes_email_address ;
+
+    /**
+     *  Set Gender property
+     *
+     *  @param string -  gender
+     */
+    function setGender($value = null)
+    {
+        $this->__gender = $value ;
+    }
+
+    /**
+     *  Get Gender property
+     *
+     *  @return string -  gender
+     */
+    function getGender()
+    {
+        return $this->__gender ;
+    }
+
+    /**
+     *  Set Database Id1 property
+     *
+     *  @param string -  database id1
+     */
+    function setDatabaseId1($value = null)
+    {
+        $this->__database_id1 = $value ;
+    }
+
+    /**
+     *  Get Database Id1 property
+     *
+     *  @return string -  database id1
+     */
+    function getDatabaseId1()
+    {
+        return $this->__database_id1 ;
+    }
+
+    /**
+     *  Set Athlete Last Name property
+     *
+     *  @param string -  athlete last name
+     */
+    function setAthleteLastName($value = null)
+    {
+        $this->__athlete_last_name = $value ;
+    }
+
+    /**
+     *  Get Athlete Last Name property
+     *
+     *  @return string -  athlete last name
+     */
+    function getAthleteLastName()
+    {
+        return $this->__athlete_last_name ;
+    }
+
+    /**
+     *  Set Athlete First Name property
+     *
+     *  @param string -  athlete first name
+     */
+    function setAthleteFirstName($value = null)
+    {
+        $this->__athlete_first_name = $value ;
+    }
+
+    /**
+     *  Get Athlete First Name property
+     *
+     *  @return string -  athlete first name
+     */
+    function getAthleteFirstName()
+    {
+        return $this->__athlete_first_name ;
+    }
+
+    /**
+     *  Set Athlete Nickname property
+     *
+     *  @param string -  athlete nickname
+     */
+    function setAthleteNickname($value = null)
+    {
+        $this->__athlete_nickname = $value ;
+    }
+
+    /**
+     *  Get Athlete Nickname property
+     *
+     *  @return string -  athlete nickname
+     */
+    function getAthleteNickname()
+    {
+        return $this->__athlete_nickname ;
+    }
+
+    /**
+     *  Set Athlete Middle Initial property
+     *
+     *  @param string -  athlete middle initial
+     */
+    function setAthleteMiddleInitial($value = null)
+    {
+        $this->__athlete_middle_initial = $value ;
+    }
+
+    /**
+     *  Get Athlete Middle Initial property
+     *
+     *  @return string -  athlete middle initial
+     */
+    function getAthleteMiddleInitial()
+    {
+        return $this->__athlete_middle_initial ;
+    }
+
+    /**
+     *  Set Athlete Id property
+     *
+     *  @param string -  athlete id
+     */
+    function setAthleteId($value = null)
+    {
+        $this->__athlete_id = $value ;
+    }
+
+    /**
+     *  Get Athlete Id property
+     *
+     *  @return string -  athlete id
+     */
+    function getAthleteId()
+    {
+        return $this->__athlete_id ;
+    }
+
+    /**
+     *  Set Database Id2 property
+     *
+     *  @param string -  database id2
+     */
+    function setDatabaseId2($value = null)
+    {
+        $this->__database_id2 = $value ;
+    }
+
+    /**
+     *  Get Database Id2 property
+     *
+     *  @return string -  database id2
+     */
+    function getDatabaseId2()
+    {
+        return $this->__database_id2 ;
+    }
+
+    /**
+     *  Set Athlete Birth Date property
+     *
+     *  @param string -  athlete birth date
+     */
+    function setAthleteBirthDate($value = null)
+    {
+        $this->__athlete_birth_date = $value ;
+    }
+
+    /**
+     *  Get Athlete Birth Date property
+     *
+     *  @return string -  athlete birth date
+     */
+    function getAthleteBirthDate()
+    {
+        return $this->__athlete_birth_date ;
+    }
+
+    /**
+     *  Set Athlete Age property
+     *
+     *  @param string -  athlete age
+     */
+    function setAthleteAge($value = null)
+    {
+        $this->__athlete_age = $value ;
+    }
+
+    /**
+     *  Get Athlete Age property
+     *
+     *  @return string -  athlete age
+     */
+    function getAthleteAge()
+    {
+        return $this->__athlete_age ;
+    }
+
+    /**
+     *  Set Athlete School Year property
+     *
+     *  @param string -  athlete school year
+     */
+    function setAthleteSchoolYear($value = null)
+    {
+        $this->__athlete_school_year = $value ;
+    }
+
+    /**
+     *  Get Athlete School Year property
+     *
+     *  @return string -  athlete school year
+     */
+    function getAthleteSchoolYear()
+    {
+        return $this->__athlete_school_year ;
+    }
+
+    /**
+     *  Set Group property
+     *
+     *  @param string -  group
+     */
+    function setGroup($value = null)
+    {
+        $this->__group = $value ;
+    }
+
+    /**
+     *  Get Group property
+     *
+     *  @return string -  group
+     */
+    function getGroup()
+    {
+        return $this->__group ;
+    }
+
+    /**
+     *  Set Subgroup property
+     *
+     *  @param string -  subgroup
+     */
+    function setSubgroup($value = null)
+    {
+        $this->__subgroup = $value ;
+    }
+
+    /**
+     *  Get Subgroup property
+     *
+     *  @return string -  subgroup
+     */
+    function getSubgroup()
+    {
+        return $this->__subgroup ;
+    }
+
+    /**
+     *  Set Inactive property
+     *
+     *  @param string -  inactive
+     */
+    function setInactive($value = null)
+    {
+        $this->__inactive = $value ;
+    }
+
+    /**
+     *  Get Inactive property
+     *
+     *  @return string -  inactive
+     */
+    function getInactive()
+    {
+        return $this->__inactive ;
+    }
+
+    /**
+     *  Set Registration Country property
+     *
+     *  @param string -  registration country
+     */
+    function setRegistrationCountry($value = null)
+    {
+        $this->__registration_country = $value ;
+    }
+
+    /**
+     *  Get Registration Country property
+     *
+     *  @return string -  registration country
+     */
+    function getRegistrationCountry()
+    {
+        return $this->__registration_country ;
+    }
+
+    /**
+     *  Set Wm Group property
+     *
+     *  @param string -  wm group
+     */
+    function setWmGroup($value = null)
+    {
+        $this->__wm_group = $value ;
+    }
+
+    /**
+     *  Get Wm Group property
+     *
+     *  @return string -  wm group
+     */
+    function getWmGroup()
+    {
+        return $this->__wm_group ;
+    }
+
+    /**
+     *  Set Wm Subgroup property
+     *
+     *  @param string -  wm subgroup
+     */
+    function setWmSubgroup($value = null)
+    {
+        $this->__wm_subgroup = $value ;
+    }
+
+    /**
+     *  Get Wm Subgroup property
+     *
+     *  @return string -  wm subgroup
+     */
+    function getWmSubgroup()
+    {
+        return $this->__wm_subgroup ;
+    }
+
+    /**
+     *  Set Primary Contact Address1 property
+     *
+     *  @param string -  primary contact address1
+     */
+    function setPrimaryContactAddress1($value = null)
+    {
+        $this->__primary_contact_address1 = $value ;
+    }
+
+    /**
+     *  Get Primary Contact Address1 property
+     *
+     *  @return string -  primary contact address1
+     */
+    function getPrimaryContactAddress1()
+    {
+        return $this->__primary_contact_address1 ;
+    }
+
+    /**
+     *  Set Primary Contact Address2 property
+     *
+     *  @param string -  primary contact address2
+     */
+    function setPrimaryContactAddress2($value = null)
+    {
+        $this->__primary_contact_address2 = $value ;
+    }
+
+    /**
+     *  Get Primary Contact Address2 property
+     *
+     *  @return string -  primary contact address2
+     */
+    function getPrimaryContactAddress2()
+    {
+        return $this->__primary_contact_address2 ;
+    }
+
+    /**
+     *  Set Primary Contact City property
+     *
+     *  @param string -  primary contact city
+     */
+    function setPrimaryContactCity($value = null)
+    {
+        $this->__primary_contact_city = $value ;
+    }
+
+    /**
+     *  Get Primary Contact City property
+     *
+     *  @return string -  primary contact city
+     */
+    function getPrimaryContactCity()
+    {
+        return $this->__primary_contact_city ;
+    }
+
+    /**
+     *  Set Primary Contact State property
+     *
+     *  @param string -  primary contact state
+     */
+    function setPrimaryContactState($value = null)
+    {
+        $this->__primary_contact_state = $value ;
+    }
+
+    /**
+     *  Get Primary Contact State property
+     *
+     *  @return string -  primary contact state
+     */
+    function getPrimaryContactState()
+    {
+        return $this->__primary_contact_state ;
+    }
+
+    /**
+     *  Set Primary Contact Postal Code property
+     *
+     *  @param string -  primary contact postal code
+     */
+    function setPrimaryContactPostalCode($value = null)
+    {
+        $this->__primary_contact_postal_code = $value ;
+    }
+
+    /**
+     *  Get Primary Contact Postal Code property
+     *
+     *  @return string -  primary contact postal code
+     */
+    function getPrimaryContactPostalCode()
+    {
+        return $this->__primary_contact_postal_code ;
+    }
+
+    /**
+     *  Set Primary Contact Country property
+     *
+     *  @param string -  primary contact country
+     */
+    function setPrimaryContactCountry($value = null)
+    {
+        $this->__primary_contact_country = $value ;
+    }
+
+    /**
+     *  Get Primary Contact Country property
+     *
+     *  @return string -  primary contact country
+     */
+    function getPrimaryContactCountry()
+    {
+        return $this->__primary_contact_country ;
+    }
+
+    /**
+     *  Set Fathers Office Phone Number property
+     *
+     *  @param string -  fathers office phone number
+     */
+    function setFathersOfficePhoneNumber($value = null)
+    {
+        $this->__fathers_office_phone_number = $value ;
+    }
+
+    /**
+     *  Get Fathers Office Phone Number property
+     *
+     *  @return string -  fathers office phone number
+     */
+    function getFathersOfficePhoneNumber()
+    {
+        return $this->__fathers_office_phone_number ;
+    }
+
+    /**
+     *  Set Primary Contact Home Phone Number property
+     *
+     *  @param string -  primary contact home phone number
+     */
+    function setPrimaryContactHomePhoneNumber($value = null)
+    {
+        $this->__primary_contact_home_phone_number = $value ;
+    }
+
+    /**
+     *  Get Primary Contact Home Phone Number property
+     *
+     *  @return string -  primary contact home phone number
+     */
+    function getPrimaryContactHomePhoneNumber()
+    {
+        return $this->__primary_contact_home_phone_number ;
+    }
+
+    /**
+     *  Set Primary Contact Fax Number property
+     *
+     *  @param string -  primary contact fax number
+     */
+    function setPrimaryContactFaxNumber($value = null)
+    {
+        $this->__primary_contact_fax_number = $value ;
+    }
+
+    /**
+     *  Get Primary Contact Fax Number property
+     *
+     *  @return string -  primary contact fax number
+     */
+    function getPrimaryContactFaxNumber()
+    {
+        return $this->__primary_contact_fax_number ;
+    }
+
+    /**
+     *  Set Fathers Email Address property
+     *
+     *  @param string -  fathers email address
+     */
+    function setFathersEmailAddress($value = null)
+    {
+        $this->__fathers_email_address = $value ;
+    }
+
+    /**
+     *  Get Fathers Email Address property
+     *
+     *  @return string -  fathers email address
+     */
+    function getFathersEmailAddress()
+    {
+        return $this->__fathers_email_address ;
+    }
+
+    /**
+     *  Set Secondary Contact Mailto property
+     *
+     *  @param string -  secondary contact mailto
+     */
+    function setSecondaryContactMailto($value = null)
+    {
+        $this->__secondary_contact_mailto = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Mailto property
+     *
+     *  @return string -  secondary contact mailto
+     */
+    function getSecondaryContactMailto()
+    {
+        return $this->__secondary_contact_mailto ;
+    }
+
+    /**
+     *  Set Secondary Contact Address1 property
+     *
+     *  @param string -  secondary contact address1
+     */
+    function setSecondaryContactAddress1($value = null)
+    {
+        $this->__secondary_contact_address1 = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Address1 property
+     *
+     *  @return string -  secondary contact address1
+     */
+    function getSecondaryContactAddress1()
+    {
+        return $this->__secondary_contact_address1 ;
+    }
+
+    /**
+     *  Set Secondary Contact City property
+     *
+     *  @param string -  secondary contact city
+     */
+    function setSecondaryContactCity($value = null)
+    {
+        $this->__secondary_contact_city = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact City property
+     *
+     *  @return string -  secondary contact city
+     */
+    function getSecondaryContactCity()
+    {
+        return $this->__secondary_contact_city ;
+    }
+
+    /**
+     *  Set Secondary Contact State property
+     *
+     *  @param string -  secondary contact state
+     */
+    function setSecondaryContactState($value = null)
+    {
+        $this->__secondary_contact_state = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact State property
+     *
+     *  @return string -  secondary contact state
+     */
+    function getSecondaryContactState()
+    {
+        return $this->__secondary_contact_state ;
+    }
+
+    /**
+     *  Set Secondary Contact Postal Code property
+     *
+     *  @param string -  secondary contact postal code
+     */
+    function setSecondaryContactPostalCode($value = null)
+    {
+        $this->__secondary_contact_postal_code = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Postal Code property
+     *
+     *  @return string -  secondary contact postal code
+     */
+    function getSecondaryContactPostalCode()
+    {
+        return $this->__secondary_contact_postal_code ;
+    }
+
+    /**
+     *  Set Secondary Contact Country property
+     *
+     *  @param string -  secondary contact country
+     */
+    function setSecondaryContactCountry($value = null)
+    {
+        $this->__secondary_contact_country = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Country property
+     *
+     *  @return string -  secondary contact country
+     */
+    function getSecondaryContactCountry()
+    {
+        return $this->__secondary_contact_country ;
+    }
+
+    /**
+     *  Set Primary Contact Mailto property
+     *
+     *  @param string -  primary contact mailto
+     */
+    function setPrimaryContactMailto($value = null)
+    {
+        $this->__primary_contact_mailto = $value ;
+    }
+
+    /**
+     *  Get Primary Contact Mailto property
+     *
+     *  @return string -  primary contact mailto
+     */
+    function getPrimaryContactMailto()
+    {
+        return $this->__primary_contact_mailto ;
+    }
+
+    /**
+     *  Set Secondary Contact Address2 property
+     *
+     *  @param string -  secondary contact address2
+     */
+    function setSecondaryContactAddress2($value = null)
+    {
+        $this->__secondary_contact_address2 = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Address2 property
+     *
+     *  @return string -  secondary contact address2
+     */
+    function getSecondaryContactAddress2()
+    {
+        return $this->__secondary_contact_address2 ;
+    }
+
+    /**
+     *  Set Registration Date property
+     *
+     *  @param string -  registration date
+     */
+    function setRegistrationDate($value = null)
+    {
+        $this->__registration_date = $value ;
+    }
+
+    /**
+     *  Get Registration Date property
+     *
+     *  @return string -  registration date
+     */
+    function getRegistrationDate()
+    {
+        return $this->__registration_date ;
+    }
+
+    /**
+     *  Set Doctors Name property
+     *
+     *  @param string -  doctors name
+     */
+    function setDoctorsName($value = null)
+    {
+        $this->__doctors_name = $value ;
+    }
+
+    /**
+     *  Get Doctors Name property
+     *
+     *  @return string -  doctors name
+     */
+    function getDoctorsName()
+    {
+        return $this->__doctors_name ;
+    }
+
+    /**
+     *  Set Doctors Phone Number property
+     *
+     *  @param string -  doctors phone number
+     */
+    function setDoctorsPhoneNumber($value = null)
+    {
+        $this->__doctors_phone_number = $value ;
+    }
+
+    /**
+     *  Get Doctors Phone Number property
+     *
+     *  @return string -  doctors phone number
+     */
+    function getDoctorsPhoneNumber()
+    {
+        return $this->__doctors_phone_number ;
+    }
+
+    /**
+     *  Set Emergency Contact Name property
+     *
+     *  @param string -  emergency contact name
+     */
+    function setEmergencyContactName($value = null)
+    {
+        $this->__emergency_contact_name = $value ;
+    }
+
+    /**
+     *  Get Emergency Contact Name property
+     *
+     *  @return string -  emergency contact name
+     */
+    function getEmergencyContactName()
+    {
+        return $this->__emergency_contact_name ;
+    }
+
+    /**
+     *  Set Emergency Contact Phone Number property
+     *
+     *  @param string -  emergency contact phone number
+     */
+    function setEmergencyContactPhoneNumber($value = null)
+    {
+        $this->__emergency_contact_phone_number = $value ;
+    }
+
+    /**
+     *  Get Emergency Contact Phone Number property
+     *
+     *  @return string -  emergency contact phone number
+     */
+    function getEmergencyContactPhoneNumber()
+    {
+        return $this->__emergency_contact_phone_number ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent1 Office Phone Number property
+     *
+     *  @param string -  secondary contact parent1 office phone number
+     */
+    function setSecondaryContactParent1OfficePhoneNumber($value = null)
+    {
+        $this->__secondary_contact_parent1_office_phone_number = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent1 Office Phone Number property
+     *
+     *  @return string -  secondary contact parent1 office phone number
+     */
+    function getSecondaryContactParent1OfficePhoneNumber()
+    {
+        return $this->__secondary_contact_parent1_office_phone_number ;
+    }
+
+    /**
+     *  Set Secondary Contact Home Phone Number property
+     *
+     *  @param string -  secondary contact home phone number
+     */
+    function setSecondaryContactHomePhoneNumber($value = null)
+    {
+        $this->__secondary_contact_home_phone_number = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Home Phone Number property
+     *
+     *  @return string -  secondary contact home phone number
+     */
+    function getSecondaryContactHomePhoneNumber()
+    {
+        return $this->__secondary_contact_home_phone_number ;
+    }
+
+    /**
+     *  Set Secondary Contact Fax Number property
+     *
+     *  @param string -  secondary contact fax number
+     */
+    function setSecondaryContactFaxNumber($value = null)
+    {
+        $this->__secondary_contact_fax_number = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Fax Number property
+     *
+     *  @return string -  secondary contact fax number
+     */
+    function getSecondaryContactFaxNumber()
+    {
+        return $this->__secondary_contact_fax_number ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent1 Email Address property
+     *
+     *  @param string -  secondary contact parent1 email address
+     */
+    function setSecondaryContactParent1EmailAddress($value = null)
+    {
+        $this->__secondary_contact_parent1_email_address = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent1 Email Address property
+     *
+     *  @return string -  secondary contact parent1 email address
+     */
+    function getSecondaryContactParent1EmailAddress()
+    {
+        return $this->__secondary_contact_parent1_email_address ;
+    }
+
+    /**
+     *  Set Medical Condition Description property
+     *
+     *  @param string -  medical condition description
+     */
+    function setMedicalConditionDescription($value = null)
+    {
+        $this->__medical_condition_description = $value ;
+    }
+
+    /**
+     *  Get Medical Condition Description property
+     *
+     *  @return string -  medical condition description
+     */
+    function getMedicalConditionDescription()
+    {
+        return $this->__medical_condition_description ;
+    }
+
+    /**
+     *  Set Medication Description property
+     *
+     *  @param string -  medication description
+     */
+    function setMedicationDescription($value = null)
+    {
+        $this->__medication_description = $value ;
+    }
+
+    /**
+     *  Get Medication Description property
+     *
+     *  @return string -  medication description
+     */
+    function getMedicationDescription()
+    {
+        return $this->__medication_description ;
+    }
+
+    /**
+     *  Set Custom Field 1 Name property
+     *
+     *  @param string -  custom field 1 name
+     */
+    function setCustomField1Name($value = null)
+    {
+        $this->__custom_field_1_name = $value ;
+    }
+
+    /**
+     *  Get Custom Field 1 Name property
+     *
+     *  @return string -  custom field 1 name
+     */
+    function getCustomField1Name()
+    {
+        return $this->__custom_field_1_name ;
+    }
+
+    /**
+     *  Set Custom Field 1 Value property
+     *
+     *  @param string -  custom field 1 value
+     */
+    function setCustomField1Value($value = null)
+    {
+        $this->__custom_field_1_value = $value ;
+    }
+
+    /**
+     *  Get Custom Field 1 Value property
+     *
+     *  @return string -  custom field 1 value
+     */
+    function getCustomField1Value()
+    {
+        return $this->__custom_field_1_value ;
+    }
+
+    /**
+     *  Set Custom Field 2 Name property
+     *
+     *  @param string -  custom field 2 name
+     */
+    function setCustomField2Name($value = null)
+    {
+        $this->__custom_field_2_name = $value ;
+    }
+
+    /**
+     *  Get Custom Field 2 Name property
+     *
+     *  @return string -  custom field 2 name
+     */
+    function getCustomField2Name()
+    {
+        return $this->__custom_field_2_name ;
+    }
+
+    /**
+     *  Set Custom Field 2 Value property
+     *
+     *  @param string -  custom field 2 value
+     */
+    function setCustomField2Value($value = null)
+    {
+        $this->__custom_field_2_value = $value ;
+    }
+
+    /**
+     *  Get Custom Field 2 Value property
+     *
+     *  @return string -  custom field 2 value
+     */
+    function getCustomField2Value()
+    {
+        return $this->__custom_field_2_value ;
+    }
+
+    /**
+     *  Set Custom Field 3 Name property
+     *
+     *  @param string -  custom field 3 name
+     */
+    function setCustomField3Name($value = null)
+    {
+        $this->__custom_field_3_name = $value ;
+    }
+
+    /**
+     *  Get Custom Field 3 Name property
+     *
+     *  @return string -  custom field 3 name
+     */
+    function getCustomField3Name()
+    {
+        return $this->__custom_field_3_name ;
+    }
+
+    /**
+     *  Set Custom Field 3 Value property
+     *
+     *  @param string -  custom field 3 value
+     */
+    function setCustomField3Value($value = null)
+    {
+        $this->__custom_field_3_value = $value ;
+    }
+
+    /**
+     *  Get Custom Field 3 Value property
+     *
+     *  @return string -  custom field 3 value
+     */
+    function getCustomField3Value()
+    {
+        return $this->__custom_field_3_value ;
+    }
+
+    /**
+     *  Set Fathers Last Name property
+     *
+     *  @param string -  fathers last name
+     */
+    function setFathersLastName($value = null)
+    {
+        $this->__fathers_last_name = $value ;
+    }
+
+    /**
+     *  Get Fathers Last Name property
+     *
+     *  @return string -  fathers last name
+     */
+    function getFathersLastName()
+    {
+        return $this->__fathers_last_name ;
+    }
+
+    /**
+     *  Set Fathers First Name property
+     *
+     *  @param string -  fathers first name
+     */
+    function setFathersFirstName($value = null)
+    {
+        $this->__fathers_first_name = $value ;
+    }
+
+    /**
+     *  Get Fathers First Name property
+     *
+     *  @return string -  fathers first name
+     */
+    function getFathersFirstName()
+    {
+        return $this->__fathers_first_name ;
+    }
+
+    /**
+     *  Set Mothers First Name property
+     *
+     *  @param string -  mothers first name
+     */
+    function setMothersFirstName($value = null)
+    {
+        $this->__mothers_first_name = $value ;
+    }
+
+    /**
+     *  Get Mothers First Name property
+     *
+     *  @return string -  mothers first name
+     */
+    function getMothersFirstName()
+    {
+        return $this->__mothers_first_name ;
+    }
+
+    /**
+     *  Set Secondary Contact Last Name property
+     *
+     *  @param string -  secondary contact last name
+     */
+    function setSecondaryContactLastName($value = null)
+    {
+        $this->__secondary_contact_last_name = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Last Name property
+     *
+     *  @return string -  secondary contact last name
+     */
+    function getSecondaryContactLastName()
+    {
+        return $this->__secondary_contact_last_name ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent1 Name property
+     *
+     *  @param string -  secondary contact parent1 name
+     */
+    function setSecondaryContactParent1Name($value = null)
+    {
+        $this->__secondary_contact_parent1_name = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent1 Name property
+     *
+     *  @return string -  secondary contact parent1 name
+     */
+    function getSecondaryContactParent1Name()
+    {
+        return $this->__secondary_contact_parent1_name ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent2 Name property
+     *
+     *  @param string -  secondary contact parent2 name
+     */
+    function setSecondaryContactParent2Name($value = null)
+    {
+        $this->__secondary_contact_parent2_name = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent2 Name property
+     *
+     *  @return string -  secondary contact parent2 name
+     */
+    function getSecondaryContactParent2Name()
+    {
+        return $this->__secondary_contact_parent2_name ;
+    }
+
+    /**
+     *  Set Fathers Cell Phone Number property
+     *
+     *  @param string -  fathers cell phone number
+     */
+    function setFathersCellPhoneNumber($value = null)
+    {
+        $this->__fathers_cell_phone_number = $value ;
+    }
+
+    /**
+     *  Get Fathers Cell Phone Number property
+     *
+     *  @return string -  fathers cell phone number
+     */
+    function getFathersCellPhoneNumber()
+    {
+        return $this->__fathers_cell_phone_number ;
+    }
+
+    /**
+     *  Set Mothers Office Phone Number property
+     *
+     *  @param string -  mothers office phone number
+     */
+    function setMothersOfficePhoneNumber($value = null)
+    {
+        $this->__mothers_office_phone_number = $value ;
+    }
+
+    /**
+     *  Get Mothers Office Phone Number property
+     *
+     *  @return string -  mothers office phone number
+     */
+    function getMothersOfficePhoneNumber()
+    {
+        return $this->__mothers_office_phone_number ;
+    }
+
+    /**
+     *  Set Mothers Cell Phone Number property
+     *
+     *  @param string -  mothers cell phone number
+     */
+    function setMothersCellPhoneNumber($value = null)
+    {
+        $this->__mothers_cell_phone_number = $value ;
+    }
+
+    /**
+     *  Get Mothers Cell Phone Number property
+     *
+     *  @return string -  mothers cell phone number
+     */
+    function getMothersCellPhoneNumber()
+    {
+        return $this->__mothers_cell_phone_number ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent1 Cell Phone Number property
+     *
+     *  @param string -  secondary contact parent1 cell phone number
+     */
+    function setSecondaryContactParent1CellPhoneNumber($value = null)
+    {
+        $this->__secondary_contact_parent1_cell_phone_number = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent1 Cell Phone Number property
+     *
+     *  @return string -  secondary contact parent1 cell phone number
+     */
+    function getSecondaryContactParent1CellPhoneNumber()
+    {
+        return $this->__secondary_contact_parent1_cell_phone_number ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent2 Office Phone Number property
+     *
+     *  @param string -  secondary contact parent2 office phone number
+     */
+    function setSecondaryContactParent2OfficePhoneNumber($value = null)
+    {
+        $this->__secondary_contact_parent2_office_phone_number = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent2 Office Phone Number property
+     *
+     *  @return string -  secondary contact parent2 office phone number
+     */
+    function getSecondaryContactParent2OfficePhoneNumber()
+    {
+        return $this->__secondary_contact_parent2_office_phone_number ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent2 Cell Phone Number property
+     *
+     *  @param string -  secondary contact parent2 cell phone number
+     */
+    function setSecondaryContactParent2CellPhoneNumber($value = null)
+    {
+        $this->__secondary_contact_parent2_cell_phone_number = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent2 Cell Phone Number property
+     *
+     *  @return string -  secondary contact parent2 cell phone number
+     */
+    function getSecondaryContactParent2CellPhoneNumber()
+    {
+        return $this->__secondary_contact_parent2_cell_phone_number ;
+    }
+
+    /**
+     *  Set Mothers Email Address property
+     *
+     *  @param string -  mothers email address
+     */
+    function setMothersEmailAddress($value = null)
+    {
+        $this->__mothers_email_address = $value ;
+    }
+
+    /**
+     *  Get Mothers Email Address property
+     *
+     *  @return string -  mothers email address
+     */
+    function getMothersEmailAddress()
+    {
+        return $this->__mothers_email_address ;
+    }
+
+    /**
+     *  Set Secondary Contact Parent2 Email Address property
+     *
+     *  @param string -  secondary contact parent2 email address
+     */
+    function setSecondaryContactParent2EmailAddress($value = null)
+    {
+        $this->__secondary_contact_parent2_email_address = $value ;
+    }
+
+    /**
+     *  Get Secondary Contact Parent2 Email Address property
+     *
+     *  @return string -  secondary contact parent2 email address
+     */
+    function getSecondaryContactParent2EmailAddress()
+    {
+        return $this->__secondary_contact_parent2_email_address ;
+    }
+
+    /**
+     *  Set Mothers Last Name property
+     *
+     *  @param string -  mothers last name
+     */
+    function setMothersLastName($value = null)
+    {
+        $this->__mothers_last_name = $value ;
+    }
+
+    /**
+     *  Get Mothers Last Name property
+     *
+     *  @return string -  mothers last name
+     */
+    function getMothersLastName()
+    {
+        return $this->__mothers_last_name ;
+    }
+
+    /**
+     *  Set Athletes Middle Name property
+     *
+     *  @param string -  athletes middle name
+     */
+    function setAthletesMiddleName($value = null)
+    {
+        $this->__athletes_middle_name = $value ;
+    }
+
+    /**
+     *  Get Athletes Middle Name property
+     *
+     *  @return string -  athletes middle name
+     */
+    function getAthletesMiddleName()
+    {
+        return $this->__athletes_middle_name ;
+    }
+
+    /**
+     *  Set Athletes Cell Phone Number property
+     *
+     *  @param string -  athletes cell phone number
+     */
+    function setAthletesCellPhoneNumber($value = null)
+    {
+        $this->__athletes_cell_phone_number = $value ;
+    }
+
+    /**
+     *  Get Athletes Cell Phone Number property
+     *
+     *  @return string -  athletes cell phone number
+     */
+    function getAthletesCellPhoneNumber()
+    {
+        return $this->__athletes_cell_phone_number ;
+    }
+
+    /**
+     *  Set Athletes Email Address property
+     *
+     *  @param string -  athletes email address
+     */
+    function setAthletesEmailAddress($value = null)
+    {
+        $this->__athletes_email_address = $value ;
+    }
+
+    /**
+     *  Get Athletes Email Address property
+     *
+     *  @return string -  athletes email address
+     */
+    function getAthletesEmailAddress()
+    {
+        return $this->__athletes_email_address ;
+    }
+
+}
+
+/**
  * HY3 D1 record
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
- * @see HY3D1Record
+ * @see HY3DxRecord
  */
-class HY3D1Record extends HY3Record
+class HY3D1Record extends HY3DxRecord
 {
-    /**
-     * Swimmer Last Name
-     */
-    var $_swimmer_last_name ;
-
-    /**
-     * Swimmer First Name
-     */
-    var $_swimmer_first_name ;
-
-    /**
-     * Swimmer Nickname
-     */
-    var $_swimmer_nickname ;
-
-    /**
-     * Swimmer Middle Initial
-     */
-    var $_swimmer_middle_initial ;
-
-    /**
-     * Swimmer School Year
-     */
-    var $_swimmer_school_year ;
-
-    /**
-     * Set Swimmer Last Name
-     *
-     * @param string swimmer last name
-     */
-    function setSwimmerLastName($txt)
-    {
-        $this->_swimmer_last_name = $txt ;
-    }
-
-    /**
-     * Get Swimmer Last Name
-     *
-     * @return string swimmer last name
-     */
-    function getSwimmerLastName()
-    {
-        return $this->_swimmer_last_name ;
-    }
-
-    /**
-     * Set Swimmer First Name
-     *
-     * @param string swimmer first name
-     */
-    function setSwimmerFirstName($txt)
-    {
-        $this->_swimmer_first_name = $txt ;
-    }
-
-    /**
-     * Get Swimmer First Name
-     *
-     * @return string swimmer first name
-     */
-    function getSwimmerFirstName()
-    {
-        return $this->_swimmer_first_name ;
-    }
-
-    /**
-     * Set Swimmer Nickname
-     *
-     * @param string swimmer nickname
-     */
-    function setSwimmerNickname($txt)
-    {
-        $this->_swimmer_nickname = $txt ;
-    }
-
-    /**
-     * Get Swimmer Nickname
-     *
-     * @return string swimmer nickname
-     */
-    function getSwimmerNickname()
-    {
-        return $this->_swimmer_nickname ;
-    }
-
-    /**
-     * Set Swimmer Middle Initial
-     *
-     * @param string swimmer middle initial
-     */
-    function setSwimmerMiddleInitial($txt)
-    {
-        $this->_swimmer_middle_initial = $txt ;
-    }
-
-    /**
-     * Get Swimmer Middle Initial
-     *
-     * @return string swimmer middle initial
-     */
-    function getSwimmerMiddleInitial()
-    {
-        return $this->_swimmer_middle_initial ;
-    }
-
-
     /**
      * Parse Record
      */
@@ -2508,37 +4297,44 @@ class HY3D1Record extends HY3Record
 
         //  Extract the data from the HY3 record by substring position
 
-        $this->setSwimmerLastName(trim(substr($this->_hy3_record, 8, 20))) ;
-        $this->setSwimmerFirstName(trim(substr($this->_hy3_record, 28, 20))) ;
-        $this->setSwimmerNickname(trim(substr($this->_hy3_record, 48, 20))) ;
-        $this->setSwimmerMiddleInitial(trim(substr($this->_hy3_record, 68, 1))) ;
-        $this->setUSS(trim(substr($this->_hy3_record, 69, 14))) ;
-        $this->setBirthDate(trim(substr($this->_hy3_record, 88, 8))) ;
-        $this->setAge(trim(substr($this->_hy3_record, 97, 2))) ;
+        $this->setAthleteLastName(trim(substr($this->_hy3_record, 8, 20))) ;
+        $this->setAthleteFirstName(trim(substr($this->_hy3_record, 28, 20))) ;
+        $this->setAthleteNickname(trim(substr($this->_hy3_record, 48, 20))) ;
+        $this->setAthleteMiddleInitial(trim(substr($this->_hy3_record, 68, 1))) ;
+        $this->setAthleteId(trim(substr($this->_hy3_record, 69, 14))) ;
+        $this->setAthleteBirthDate(trim(substr($this->_hy3_record, 88, 8))) ;
+        $this->setAthleteAge(trim(substr($this->_hy3_record, 97, 2))) ;
         $this->setChecksum(trim(substr($this->_hy3_record, 150, 128))) ;
     }
 
     /**
      * Generate Record
      *
-     * @return sting - D1 HY3 record
+     * @return string - D1 HY3 record
      */
     function GenerateRecord()
     {
         $hy3 = sprintf(WPST_HY3_D1_RECORD,
             $this->getGender(),
+            $this->getDatabaseId1(),
+            $this->getAthleteLastName(),
+            $this->getAthleteFirstName(),
+            $this->getAthleteNickname(),
+            $this->getAthleteMiddleInitial(),
+            $this->getAthleteId(),
+            $this->getDatabaseId2(),
+            $this->getAthleteBirthDate(),
             WPST_HY3_UNUSED,
-            $this->getSwimmerLastName(),
-            $this->getSwimmerFirstName(),
-            $this->getSwimmerNickname(),
-            $this->getSwimmerMiddleInitial(),
-            $this->getUSS(),
+            $this->getAthleteAge(),
+            $this->getAthleteSchoolYear(),
             WPST_HY3_UNUSED,
-            $this->getBirthDate(),
+            $this->getGroup(),
+            $this->getSubgroup(),
+            $this->getInactive(),
+            $this->getRegistrationCountry(),
             WPST_HY3_UNUSED,
-            $this->getAgeOrClass(),
-            WPST_HY3_UNUSED,
-            '0',
+            $this->getWmGroup(),
+            $this->getWmSubgroup(),
             WPST_HY3_UNUSED,
             WPST_HY3_UNUSED
         ) ;
@@ -2548,1464 +4344,42 @@ class HY3D1Record extends HY3Record
 }
 
 /**
- * HY3 Dx record
- *
- * @author Mike Walsh <mpwalsh8@gmail.com>
- * @access public
- * @see HY3Record
- */
-class HY3DxRecord extends HY3Record
-{
-    /**
-     * Event Gender property
-     */
-    var $_event_gender ;
-
-    /**
-     * Event Distance property
-     */
-    var $_event_distance ;
-
-    /**
-     * Stroke Code property
-     */
-    var $_stroke_code ;
-
-    /**
-     * Event Number property
-     */
-    var $_event_number ;
-
-    /**
-     * Event Age Code property
-     */
-    var $_event_age_code ;
-
-    /**
-     * Swim Date property
-     */
-    var $_swim_date ;
-
-    /**
-     * Swim Date Database property
-     */
-    var $_swim_date_db ;
-
-    /**
-     * Seed Time property
-     */
-    var $_seed_time ;
-
-    /**
-     * Seed Course Code property
-     */
-    var $_seed_course_code ;
-
-    /**
-     * Prelim Time property
-     */
-    var $_prelim_time ;
-
-    /**
-     * Prelim Course Code property
-     */
-    var $_prelim_course_code ;
-
-    /**
-     * Swim Off Time property
-     */
-    var $_swim_off_time ;
-
-    /**
-     * Swim Off Course Code property
-     */
-    var $_swim_off_course_code ;
-
-    /**
-     * Finals Time property
-     */
-    var $_finals_time ;
-
-    /**
-     * Finals Time internal property
-     */
-    var $_finals_time_ft ;
-
-    /**
-     * Finals Course Code property
-     */
-    var $_finals_course_code ;
-
-    /**
-     * Prelim Heat Number property
-     */
-    var $_prelim_heat_number ;
-
-    /**
-     * Prelim Lane Number property
-     */
-    var $_prelim_lane_number ;
-
-    /**
-     * Finals Heat Number property
-     */
-    var $_finals_heat_number ;
-
-    /**
-     * Finals Lane Number property
-     */
-    var $_finals_lane_number ;
-
-    /**
-     * Prelim Place Ranking property
-     */
-    var $_prelim_place_ranking ;
-
-    /**
-     * Finals Place Ranking property
-     */
-    var $_finals_place_ranking ;
-
-    /**
-     * Finals Points property
-     */
-    var $_finals_points ;
-
-    /**
-     * Event Time Class Code property
-     */
-    var $_event_time_class_code ;
-
-    /**
-     * Swimmer Flight Status property
-     */
-    var $_swimmer_flight_status ;
-
-    /**
-     * Preferred First Name property
-     */
-    var $_preferred_first_name ;
-
-    /**
-     * Set Result Id
-     *
-     * @param string result id
-     */
-    function setResultId($txt)
-    {
-        $this->_resultid = $txt ;
-    }
-
-    /**
-     * Get Result Id
-     *
-     * @return string result id
-     */
-    function getResultId()
-    {
-        return $this->_resultid ;
-    }
-
-    /**
-     * Set Swimmer Id
-     *
-     * @param string swimmer id
-     */
-    function setSwimmerId($txt)
-    {
-        $this->_swimmerid = $txt ;
-    }
-
-    /**
-     * Get Swimmer Id
-     *
-     * @return string swimmer id
-     */
-    function getSwimmerId()
-    {
-        return $this->_swimmerid ;
-    }
-
-    /**
-     * Set Event Gender
-     *
-     * @param string event gender
-     */
-    function setEventGender($txt)
-    {
-        //  Need to do some "parsing" to make sure the value
-        //  is stored as the "HY3" value and not what WPST uses.
- 
-        if ($txt == WPST_GENDER_MALE)
-            $this->_event_gender = WPST_HYTEK_SWIMMER_SEX_CODE_MALE_VALUE ;
-        else if ($txt == WPST_GENDER_FEMALE)
-            $this->_event_gender = WPST_HYTEK_SWIMMER_SEX_CODE_FEMALE_VALUE ;
-        else
-            $this->_event_gender = $txt ;
-    }
-
-    /**
-     * Get Event Gender
-     *
-     * @return string event gender
-     */
-    function getEventGender()
-    {
-        return $this->_event_gender ;
-    }
-
-    /**
-     * Set Event Distance
-     *
-     * @param string event distance
-     */
-    function setEventDistance($txt)
-    {
-        $this->_event_distance = $txt ;
-    }
-
-    /**
-     * Get Event Distance
-     *
-     * @return string event distance
-     */
-    function getEventDistance()
-    {
-        return $this->_event_distance ;
-    }
-
-    /**
-     * Set Event Number
-     *
-     * @param string event number
-     */
-    function setEventNumber($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_event_number = $txt ;
-    }
-
-    /**
-     * Get Event Number
-     *
-     * @return string event number
-     */
-    function getEventNumber()
-    {
-        return $this->_event_number ;
-    }
-
-    /**
-     * Set Event Age Code
-     *
-     * @param string event age code
-     */
-    function setEventAgeCode($minage, $maxage)
-    {
-        $txt = sprintf('%02d', $minage) ;
-
-        if ($maxage > 99)
-            $txt .= UN ;
-        else
-            $txt .= sprintf('%02d', $maxage) ;
-
-        $this->_event_age_code = $txt ;
-    }
-
-    /**
-     * Get Event Age Code
-     *
-     * @return string event age code
-     */
-    function getEventAgeCode()
-    {
-        return $this->_event_age_code ;
-    }
-
-    /**
-     * Set Swim Date
-     *
-     * @param string swim date
-     * @param boolean date provided in database format
-     */
-    function setSwimDate($txt, $db = false)
-    {
-        if (empty($txt))
-        {
-            $this->_swim_date = WPST_NULL_STRING ;
-            $this->_swim_date_db = WPST_NULL_STRING ;
-        }
-        else if ($db)
-        {
-            $this->_swim_date_db = $txt ;
- 
-            //  The swim date date is stored in YYYY-MM-DD in the database but
-            //  HY3 B1 record expects it in MMDDYYYY format so the dates are
-            //  reformatted appropriately.
-
-            $date = &$this->_swim_date_db ;
-
-            $this->_swim_date = sprintf('%02s%02s%04s',
-                substr($date, 5, 2), substr($date, 8, 2), substr($date, 0, 4)) ;
-        }
-        else
-        {
-            $this->_swim_date = $txt ;
- 
-            //  The swim date date is stored in MMDDYYYY format in the HY3 B1
-            //  record.  The database needs dates in YYYY-MM-DD format so the
-            //  dates are reformatted appropriately.
-
-            $date = &$this->_swim_date ;
-
-            $this->_swim_date_db = sprintf('%04s-%02s-%02s',
-                substr($date, 4, 4), substr($date, 0, 2), substr($date, 2, 2)) ;
-        }
-    }
-
-    /**
-     * Get Swim Date
-     *
-     * @param boolean date returned in database format
-     * @return string swim date
-     */
-    function getSwimDate($db = true)
-    {
-        if ($db)
-            return $this->_swim_date_db ;
-        else
-            return $this->_swim_date ;
-    }
-
-    /**
-     * Set Seed Time
-     *
-     * @param string seed time
-     */
-    function setSeedTime($txt)
-    {
-        if (empty($txt)) $txt = 0.0 ;
-
-        $this->_seed_time = $txt ;
-    }
-
-    /**
-     * Get Seed Time
-     *
-     * @return string seed time
-     */
-    function getSeedTime()
-    {
-        return $this->_seed_time ;
-    }
-
-    /**
-     * Set Seed Course Code
-     *
-     * @param string seed course code
-     */
-    function setSeedCourseCode($txt)
-    {
-        $this->_seed_course_code = $txt ;
-    }
-
-    /**
-     * Get Seed Course Code
-     *
-     * @return string seed course code
-     */
-    function getSeedCourseCode()
-    {
-        return $this->_seed_course_code ;
-    }
-
-    /**
-     * Get Seed Time and Course Code
-     *
-     * @return string seed time and course code
-     */
-    function getSeedTimeAndCourseCode($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        if ($zerotimemode == WPST_HYTEK_USE_BLANKS_VALUE)
-            return WPST_NULL_STRING ;
-        else if ($zerotimemode == WPST_HYTEK_USE_NT_VALUE)
-            return WPST_HYTEK_TIME_EXPLANATION_CODE_NO_TIME_VALUE . $this->getCourseCode() ;
-        else
-            return $this->_seed_time . $this->getCourseCode() ;
-    }
-
-    /**
-     * Set Prelim Time
-     *
-     * @param string prelim time
-     */
-    function setPrelimTime($txt)
-    {
-        if (empty($txt)) $txt = 0.0 ;
-
-        $this->_prelim_time = $txt ;
-    }
-
-    /**
-     * Get Prelim Time
-     *
-     * @return string prelim time
-     */
-    function getPrelimTime()
-    {
-        return $this->_prelim_time ;
-    }
-
-    /**
-     * Set Prelim Course Code
-     *
-     * @param string prelim course code
-     */
-    function setPrelimCourseCode($txt)
-    {
-        $this->_prelim_course_code = $txt ;
-    }
-
-    /**
-     * Get Prelim Course Code
-     *
-     * @return string prelim course code
-     */
-    function getPrelimCourseCode()
-    {
-        return $this->_prelim_course_code ;
-    }
-
-    /**
-     * Get Prelim Time and Course Code
-     *
-     * @return string prelim time and course code
-     */
-    function getPrelimTimeAndCourseCode($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        if ($zerotimemode == WPST_HYTEK_USE_BLANKS_VALUE)
-            return WPST_NULL_STRING ;
-        else if ($zerotimemode == WPST_HYTEK_USE_NT_VALUE)
-            return WPST_HYTEK_TIME_EXPLANATION_CODE_NO_TIME_VALUE . $this->getCourseCode() ;
-        else
-            return $this->_prelim_time . $this->getCourseCode() ;
-    }
-
-    /**
-     * Set Swim Off Time
-     *
-     * @param string swim off time
-     */
-    function setSwimOffTime($txt)
-    {
-        if (empty($txt)) $txt = 0.0 ;
-
-        $this->_swim_off_time = $txt ;
-    }
-
-    /**
-     * Get Swim Off Time
-     *
-     * @return string swim off time
-     */
-    function getSwimOffTime()
-    {
-        return $this->_swim_off_time ;
-    }
-
-    /**
-     * Set Swim Off Course Code
-     *
-     * @param string swim off course code
-     */
-    function setSwimOffCourseCode($txt)
-    {
-        $this->_swim_off_course_code = $txt ;
-    }
-
-    /**
-     * Get Swim Off Course Code
-     *
-     * @return string swim off course code
-     */
-    function getSwimOffCourseCode()
-    {
-        return $this->_swim_off_course_code ;
-    }
-
-    /**
-     * Get Swim Off Time and Course Code
-     *
-     * @return string swim_off time and course code
-     */
-    function getSwimOffTimeAndCourseCode($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        if ($zerotimemode == WPST_HYTEK_USE_BLANKS_VALUE)
-            return WPST_NULL_STRING ;
-        else if ($zerotimemode == WPST_HYTEK_USE_NT_VALUE)
-            return WPST_HYTEK_TIME_EXPLANATION_CODE_NO_TIME_VALUE . $this->getCourseCode() ;
-        else
-            return $this->_swim_off_time . $this->getCourseCode() ;
-    }
-
-    /**
-     * Set Finals Time
-     *
-     * @param string finals time
-     */
-    function setFinalsTime($txt, $db = false)
-    {
-        //  A time can be format can be formatted several way.
-        //
-        //  1)  All blanks
-        //  2)  mm:ss.ss - the mm: portion of the time is optional
-        //  3)  Time Code value - DQ, NS, etc. - from the Time Code table.
-        //
-        //  Internally Flip=Turn will store times as a floating point number
-        //  representing the total number of seconds for the time.  This means
-        //  a time such as 1:01.22 will be stored as 61.22.  Storing times in
-        //  this manner makes them much easier to compare for fastest and/or
-        //  slowest times.
-
-        $this->_finals_time = $txt ;
-
-        //  Time in mm:ss.ss?
-        if (preg_match('/[0-9][0-9]:[0-9][0-9]\.[0-9][0-9]/', $txt))
-        {
-            //printf('<h3>mm:ss.ss - %s</h3>', $txt) ;
-            $time = explode($txt, ':') ;
-            $this->_finals_time_ft = $time[0] * 60 + $time[1] ;
-
-        }
-        //  Time in ss.ss?
-        else if (preg_match('/[0-9][0-9]\.[0-9][0-9]/', $txt))
-        {
-            //printf('<h3>ss.ss - %s</h3>', $txt) ;
-            $this->_finals_time_ft = (float)$txt ;
-        }
-        else
-        {
-            //printf('<h3>????? - %s</h3>', $txt) ;
-            $this->_finals_time_ft = 0.0 ;
-        }
-
-    }
-
-    /**
-     * Get Finals Time
-     *
-     * @return string finals time
-     */
-    function getFinalsTime($ft = false)
-    {
-        if ($ft)
-            return $this->_finals_time_ft ;
-        else
-            return $this->_finals_time ;
-    }
-
-    /**
-     * Set Finals Course Code
-     *
-     * @param string finals course code
-     */
-    function setFinalsCourseCode($txt)
-    {
-        $this->_finals_course_code = $txt ;
-    }
-
-    /**
-     * Get Finals Course Code
-     *
-     * @return string finals course code
-     */
-    function getFinalsCourseCode()
-    {
-        return $this->_finals_course_code ;
-    }
-
-    /**
-     * Get Finals Time and Course Code
-     *
-     * @return string finals time and course code
-     */
-    function getFinalsTimeAndCourseCode($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        if ($zerotimemode == WPST_HYTEK_USE_BLANKS_VALUE)
-            return WPST_NULL_STRING ;
-        else if ($zerotimemode == WPST_HYTEK_USE_NT_VALUE)
-            return WPST_HYTEK_TIME_EXPLANATION_CODE_NO_TIME_VALUE . $this->getCourseCode() ;
-        else
-            return $this->_finals_time . $this->getCourseCode() ;
-    }
-
-    /**
-     * Set Prelim Heat Number
-     *
-     * @param string prelim heat number
-     */
-    function setPrelimHeatNumber($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_prelim_heat_number = $txt ;
-    }
-
-    /**
-     * Get Prelim Heat Number
-     *
-     * @return string prelim heat number
-     */
-    function getPrelimHeatNumber()
-    {
-        return $this->_prelim_heat_number ;
-    }
-
-    /**
-     * Set Prelim Lane Number
-     *
-     * @param string prelim lane number
-     */
-    function setPrelimLaneNumber($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_prelim_lane_number = $txt ;
-    }
-
-    /**
-     * Get Prelim Lane Number
-     *
-     * @return string prelim lane number
-     */
-    function getPrelimLaneNumber()
-    {
-        return $this->_prelim_lane_number ;
-    }
-
-    /**
-     * Get Prelim Heat and Lane Numbers
-     *
-     * @return string prelim heat and lane numbers
-     */
-    function getPrelimHeatAndLaneNumbers($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        if ($this->getPrelimTime() == 0.0)
-            return WPST_NULL_STRING ;
-        else
-            return sprintf('%-2s%-2s', $this->getPrelimHeatNumber(), $this->PrelimLaneNumber()) ;
-    }
-
-    /**
-     * Set Finals Heat Number
-     *
-     * @param string finals heat number
-     */
-    function setFinalsHeatNumber($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_finals_heat_number = $txt ;
-    }
-
-    /**
-     * Get Finals Heat Number
-     *
-     * @return string finals heat number
-     */
-    function getFinalsHeatNumber()
-    {
-        return $this->_finals_heat_number ;
-    }
-
-    /**
-     * Set Finals Lane Number
-     *
-     * @param string finals lane number
-     */
-    function setFinalsLaneNumber($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_finals_lane_number = $txt ;
-    }
-
-    /**
-     * Get Finals Lane Number
-     *
-     * @return string finals lane number
-     */
-    function getFinalsLaneNumber()
-    {
-        return $this->_finals_lane_number ;
-    }
-
-    /**
-     * Get Finals Heat and Lane Numbers
-     *
-     * @return string finals heat and lane numbers
-     */
-    function getFinalsHeatAndLaneNumbers($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        if ($this->getFinalsTime() == 0.0)
-            return WPST_NULL_STRING ;
-        else
-            return sprintf('%-2s%-2s', $this->getFinalsHeatNumber(), $this->FinalsLaneNumber()) ;
-    }
-
-    /**
-     * Set Prelim Place Ranking
-     *
-     * @param string prelim place ranking
-     */
-    function setPrelimPlaceRanking($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_prelim_place_ranking = $txt ;
-    }
-
-    /**
-     * Get Prelim Place Ranking
-     *
-     * @return string prelim place ranking
-     */
-    function getPrelimPlaceRanking()
-    {
-        return $this->_prelim_place_ranking ;
-    }
-
-    /**
-     * Set Finals Place Ranking
-     *
-     * @param string finals place ranking
-     */
-    function setFinalsPlaceRanking($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_finals_place_ranking = $txt ;
-    }
-
-    /**
-     * Get Finals Place Ranking
-     *
-     * @return string finals place ranking
-     */
-    function getFinalsPlaceRanking()
-    {
-        return $this->_finals_place_ranking ;
-    }
-
-    /**
-     * Set Finals Points
-     *
-     * @param string finals points
-     */
-    function setFinalsPoints($txt)
-    {
-        if (empty($txt)) $txt = 0 ;
-
-        $this->_finals_points = $txt ;
-    }
-
-    /**
-     * Get Finals Points
-     *
-     * @return string finals points
-     */
-    function getFinalsPoints()
-    {
-        return $this->_finals_points ;
-    }
-
-    /**
-     * Set Event Time Class Code
-     *
-     * @param string event time class code
-     */
-    function setEventTimeClassCode($txt)
-    {
-        $this->_event_time_class_code = $txt ;
-    }
-
-    /**
-     * Get Event Time Class Code
-     *
-     * @return string event time class code
-     */
-    function getEventTimeClassCode()
-    {
-        return $this->_event_time_class_code ;
-    }
-
-    /**
-     * Set Swimmer Flight Status
-     *
-     * @param string swimmer flight status
-     */
-    function setSwimmerFlightStatus($txt)
-    {
-        $this->_swimmer_flight_status = $txt ;
-    }
-
-    /**
-     * Get Swimmer Flight Status
-     *
-     * @return string swimmer flight status
-     */
-    function getSwimmerFlightStatus()
-    {
-        return $this->_swimmer_flight_status ;
-    }
-
-    /**
-     * Set Preferred First Name
-     *
-     * @param string preferred first name
-     */
-    function setPreferredFirstName($txt)
-    {
-        $this->_preferred_first_name = $txt ;
-    }
-
-    /**
-     * Get Preferred First Name
-     *
-     * @return string preferred first name
-     */
-    function getPreferredFirstName()
-    {
-        return $this->_preferred_first_name ;
-    }
-}
-
-/**
- * HY3 D0 record
- *
- * @author Mike Walsh <mpwalsh8@gmail.com>
- * @access public
- * @see HY3DxRecord
- */
-class HY3D0Record extends HY3DxRecord
-{
-    /**
-     * Parse Record
-     */
-    function ParseRecord()
-    {
-        if (WPST_DEBUG)
-        {
-            $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
-            print $c->render() ;
-        }
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 8))) ;
-        $this->setSwimmerName(trim(substr($this->_hy3_record, 11, 28))) ;
-        $this->setUSS(trim(substr($this->_hy3_record, 39, 12))) ;
-        $this->setAttachCode(trim(substr($this->_hy3_record, 51, 1))) ;
-        $this->setCitizenCode(trim(substr($this->_hy3_record, 52, 3))) ;
-        $this->setBirthDate(trim(substr($this->_hy3_record, 55, 8))) ;
-        $this->setAgeOrClass(trim(substr($this->_hy3_record, 63, 2))) ;
-        $this->setGender(trim(substr($this->_hy3_record, 65, 1))) ;
-        $this->setEventGender(trim(substr($this->_hy3_record, 66, 1))) ;
-        $this->setEventDistance(trim(substr($this->_hy3_record, 67, 4))) ;
-        $this->setStrokeCode(trim(substr($this->_hy3_record, 71, 1))) ;
-        $this->setEventNumber(trim(substr($this->_hy3_record, 72, 4))) ;
-        $this->setEventAgeCode(trim(substr($this->_hy3_record, 76, 4))) ;
-        $this->setSwimDate(trim(substr($this->_hy3_record, 80, 8))) ;
-        $this->setSeedTime(trim(substr($this->_hy3_record, 88, 8))) ;
-        $this->setSeedCourseCode(trim(substr($this->_hy3_record, 96, 1))) ;
-        $this->setPrelimTime(trim(substr($this->_hy3_record, 97, 8))) ;
-        $this->setPrelimCourseCode(trim(substr($this->_hy3_record, 105, 1))) ;
-        $this->setSwimOffTime(trim(substr($this->_hy3_record, 106, 8))) ;
-        $this->setSwimOffCourseCode(trim(substr($this->_hy3_record, 114, 1))) ;
-        $this->setFinalsTime(trim(substr($this->_hy3_record, 115, 8))) ;
-        $this->setFinalsCourseCode(trim(substr($this->_hy3_record, 123, 1))) ;
-        $this->setPrelimHeatNumber(trim(substr($this->_hy3_record, 124, 2))) ;
-        $this->setPrelimLaneNumber(trim(substr($this->_hy3_record, 126, 2))) ;
-        $this->setFinalsHeatNumber(trim(substr($this->_hy3_record, 128, 2))) ;
-        $this->setFinalsLaneNumber(trim(substr($this->_hy3_record, 130, 2))) ;
-        $this->setPrelimPlaceRanking(trim(substr($this->_hy3_record, 132, 3))) ;
-        $this->setFinalsPlaceRanking(trim(substr($this->_hy3_record, 135, 3))) ;
-        $this->setFinalsPoints(trim(substr($this->_hy3_record, 138, 4))) ;
-        $this->setEventTimeClassCode(trim(substr($this->_hy3_record, 142, 2))) ;
-        $this->setSwimmerFlightStatus(trim(substr($this->_hy3_record, 144, 1))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 145, 15))) ;
-
-        //  Construct 'new' and 'old' formats of the USS number
-        //  from the name and birthdate fields.
-
-        $this->setUSSNew() ;
-        $this->setUSSOld() ;
-    }
-    /**
-     * Generate Record
-     *
-     * @return string HY3 D0 record
-     */
-    function GenerateRecord($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        return sprintf(WPST_HYTEK_D0_GENERATE_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
-            $this->getSwimmerName(),
-            $this->getUSS(),
-            $this->getAttachCode(),
-            $this->getCitizenCode(),
-            $this->getBirthDate(),
-            $this->getAgeOrClass(),
-            $this->getGender(),
-            $this->getEventGender(),
-            $this->getEventDistance(),
-            $this->getStrokeCode(),
-            $this->getEventNumber(),
-            $this->getEventAgeCode(),
-            $this->getSwimDate(false),
-            $this->getSeedTimeAndCourseCode($zerotimemode),
-            $this->getPrelimTimeAndCourseCode($zerotimemode),
-            $this->getSwimOffTimeAndCourseCode($zerotimemode),
-            $this->getFinalsTimeAndCourseCode($zerotimemode),
-            $this->getPrelimHeatAndLaneNumbers(),
-            $this->getFinalsHeatAndLaneNumbers(),
-            $this->getPrelimPlaceRanking(),
-            $this->getFinalsPlaceRanking(),
-            $this->getFinalsPoints(),
-            $this->getEventTimeClassCode(),
-            $this->getSwimmerFlightStatus(),
-            $this->getFutureUse2()
-        ) ;
-    }
-}
-
-/**
- * HY3 D1 record
- *
- * @author Mike Walsh <mpwalsh8@gmail.com>
- * @access public
- * @see HY3DxRecord
- */
-class HY3D1xRecord extends HY3DxRecord
-{
-    /**
-     * First Admin property
-     */
-    var $_admin_info_1 ;
-
-    /**
-     * Fourth Admin property
-     */
-    var $_admin_info_4 ;
-
-    /**
-     * Secondary Phone Number property
-     */
-    var $_secondary_phone_number ;
-
-    /**
-     * USS Registration Date property
-     */
-    var $_uss_registration_date ;
-
-    /**
-     * Member Code property
-     */
-    var $_member_code ;
-
-    /**
-     * Set Admin Info 1
-     *
-     * @param string admin info
-     */
-    function setAdminInfo1($txt)
-    {
-        $this->_admin_info_1 = $txt ;
-    }
-
-    /**
-     * Get Admin Info
-     *
-     * @return string admin info
-     */
-    function getAdminInfo1()
-    {
-        return $this->_admin_info_1 ;
-    }
-
-    /**
-     * Set Admin Info 4
-     *
-     * @param string admin info
-     */
-    function setAdminInfo4($txt)
-    {
-        $this->_admin_info_4 = $txt ;
-    }
-
-    /**
-     * Get Admin Info
-     *
-     * @return string admin info
-     */
-    function getAdminInfo4()
-    {
-        return $this->_admin_info_4 ;
-    }
-
-    /**
-     * Set Secondary Phone Number
-     *
-     * @param string secondary phone number
-     */
-    function setSecondaryPhoneNumber($txt)
-    {
-        $this->_secondary_phone_number = $txt ;
-    }
-
-    /**
-     * Get Secondary Phone Number
-     *
-     * @return string secondary phone number
-     */
-    function getSecondaryPhoneNumber()
-    {
-        return $this->_secondary_phone_number ;
-    }
-
-    /**
-     * Set USS Registration Date
-     *
-     * @param string uss registration date
-     */
-    function setUSSRegistrationDate($txt)
-    {
-        $this->_uss_registration_date = $txt ;
-    }
-
-    /**
-     * Get USS Registration Date
-     *
-     * @return string uss registration date
-     */
-    function getUSSRegistrationDate()
-    {
-        return $this->_uss_registration_date ;
-    }
-
-    /**
-     * Set Member Code
-     *
-     * @param string member code
-     */
-    function setMemberCode($txt)
-    {
-        $this->_member_code = $txt ;
-    }
-
-    /**
-     * Get Member Code
-     *
-     * @return string member code
-     */
-    function getMemberCode()
-    {
-        return $this->_member_code ;
-    }
-
-    /**
-     * Parse Record
-     */
-    function ParseRecord()
-    {
-        if (WPST_DEBUG)
-        {
-            $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
-            print $c->render() ;
-        }
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 8))) ;
-        $this->setTeamCode(trim(substr($this->_hy3_record, 11, 6))) ;
-        $this->setTeamCode5(trim(substr($this->_hy3_record, 17, 1))) ;
-        $this->setSwimmerName(trim(substr($this->_hy3_record, 18, 28))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 46, 1))) ;
-        $this->setUSS(trim(substr($this->_hy3_record, 47, 12))) ;
-        $this->setAttachCode(trim(substr($this->_hy3_record, 59, 1))) ;
-        $this->setCitizenCode(trim(substr($this->_hy3_record, 60, 3))) ;
-        $this->setBirthDate(trim(substr($this->_hy3_record, 63, 8))) ;
-        $this->setAgeOrClass(trim(substr($this->_hy3_record, 71, 2))) ;
-        $this->setGender(trim(substr($this->_hy3_record, 73, 1))) ;
-        $this->setAdminInfo1(trim(substr($this->_hy3_record, 74, 30))) ;
-        $this->setAdminInfo4(trim(substr($this->_hy3_record, 104, 20))) ;
-        $this->setPhoneNumber(trim(substr($this->_hy3_record, 124, 12))) ;
-        $this->setSecondaryPhoneNumber(trim(substr($this->_hy3_record, 136, 12))) ;
-        $this->setUSSRegistrationDate(trim(substr($this->_hy3_record, 148, 8))) ;
-        $this->setMemberCode(trim(substr($this->_hy3_record, 156, 1))) ;
-        $this->setFutureUse3(trim(substr($this->_hy3_record, 157, 3))) ;
-
-        //  Construct 'new' and 'old' formats of the USS number
-        //  from the name and birthdate fields.
-
-        $this->setUSSNew() ;
-        $this->setUSSOld() ;
-    }
-    /**
-     * Generate Record
-     *
-     * @return string HY3 D1 record
-     */
-    function GenerateRecord()
-    {
-        return sprintf(WPST_HYTEK_D1_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
-            $this->getTeamCode(),
-            $this->getTeamCode5(),
-            $this->getSwimmerName(),
-            $this->getFutureUse2(),
-            $this->getUSS(),
-            $this->getAttachCode(),
-            $this->getCitizenCode(),
-            $this->getBirthDate(),
-            $this->getAgeOrClass(),
-            $this->getGender(),
-            $this->getAdminInfo1(),
-            $this->getAdminInfo4(),
-            $this->getPhoneNumber(),
-            $this->getSecondaryPhoneNumber(),
-            $this->getUSSRegistrationDate(),
-            $this->getMemberCode(),
-            $this->getFutureUse3()
-        ) ;
-    }
-}
-
-/**
  * HY3 D2 record
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
- * @see HY3Record
+ * @see HY3DxRecord
  */
 class HY3D2Record extends HY3DxRecord
 {
-    /**
-     * Swimmer Name
-     */
-    var $_swimmer_name ;
-
-    /**
-     * Swimmer Alternate Mailing Name property
-     */
-    var $_swimmer_alternate_mailing_name ;
-
-    /**
-     * Swimmer Address Line 1
-     */
-    var $_swimmer_address_1 ;
-
-    /**
-     * Swimmer Address Line 2
-     */
-    var $_swimmer_address_2 ;
-
-    /**
-     * Swimmer City
-     */
-    var $_swimmer_city ;
-
-    /**
-     * Swimmer State
-     */
-    var $_swimmer_state ;
-
-    /**
-     * Swimmer Postal Code
-     */
-    var $_swimmer_postal_code ;
-
-    /**
-     * Swimmer Country Code
-     */
-    var $_swimmer_country_code ;
-
-    /**
-     * Answer Code property
-     */
-    var $_answer_code ;
-
-    /**
-     * Season Code property
-     */
-    var $_season_code ;
-
-    /**
-     * Set Swimmer Name
-     *
-     * @param string swimmer name
-     */
-    function setSwimmerName($txt)
-    {
-        $this->_swimmer_name = $txt ;
-    }
-
-    /**
-     * Get Swimmer Name
-     *
-     * @return string swimmer name
-     */
-    function getSwimmerName()
-    {
-        return $this->_swimmer_name ;
-    }
-
-    /**
-     * Set Swimmer Alternate Mailing Name
-     *
-     * @param string alternate mailing name
-     */
-    function setSwimmerAlternateMailingName($txt)
-    {
-        $this->_swimmer_alternate_mailing_name = $txt ;
-    }
-
-    /**
-     * Get Swimmer Alternate Mailing Name
-     *
-     * @return string alternate mailing name
-     */
-    function getSwimmerAlternateMailingName()
-    {
-        return $this->_swimmer_alternate_mailing_name ;
-    }
-
-    /**
-     * Set Swimmer Address 1
-     *
-     * @param string swimmer address 1
-     */
-    function setSwimmerAddress1($txt)
-    {
-        $this->_swimmer_address_1 = $txt ;
-    }
-
-    /**
-     * Get Swimmer Address 1
-     *
-     * @return string swimmer address 1
-     */
-    function getSwimmerAddress1()
-    {
-        return $this->_swimmer_address_1 ;
-    }
-
-    /**
-     * Set Swimmer Address 2
-     *
-     * @param string swimmer address 2
-     */
-    function setSwimmerAddress2($txt)
-    {
-        $this->_swimmer_address_2 = $txt ;
-    }
-
-    /**
-     * Get Swimmer Address 2
-     *
-     * @return string swimmer address 2
-     */
-    function getSwimmerAddress2()
-    {
-        return $this->_swimmer_address_2 ;
-    }
-
-    /**
-     * Set Swimmer City
-     *
-     * @param string swimmer city
-     */
-    function setSwimmerCity($txt)
-    {
-        $this->_swimmer_city = $txt ;
-    }
-
-    /**
-     * Get Swimmer City
-     *
-     * @return string swimmer city
-     */
-    function getSwimmerCity()
-    {
-        return $this->_swimmer_city ;
-    }
-
-    /**
-     * Set Swimmer State
-     *
-     * @param string swimmer state
-     */
-    function setSwimmerState($txt)
-    {
-        $this->_swimmer_state = $txt ;
-    }
-
-    /**
-     * Get Swimmer State
-     *
-     * @return string swimmer state
-     */
-    function getSwimmerState()
-    {
-        return $this->_swimmer_state ;
-    }
-
-    /**
-     * Set Swimmer Postal Code
-     *
-     * @param string swimmer postal code
-     */
-    function setSwimmerPostalCode($txt)
-    {
-        $this->_swimmer_postal_code = $txt ;
-    }
-
-    /**
-     * Get Swimmer Postal Code
-     *
-     * @return string swimmer postal code
-     */
-    function getSwimmerPostalCode()
-    {
-        return $this->_swimmer_postal_code ;
-    }
-
-    /**
-     * Set Swimmer Country Code
-     *
-     * @param string swimmer country code
-     */
-    function setSwimmerCountryCode($txt)
-    {
-        $this->_swimmer_country_code = $txt ;
-    }
-
-    /**
-     * Get Swimmer Country Code
-     *
-     * @return string swimmer country code
-     */
-    function getSwimmerCountryCode()
-    {
-        return $this->_swimmer_country_code ;
-    }
-
-    /**
-     * Set Answer Code
-     *
-     * @param string answer code
-     */
-    function setAnswerCode($txt)
-    {
-        $this->_answer_code = $txt ;
-    }
-
-    /**
-     * Get Answer Code
-     *
-     * @return string answer code
-     */
-    function getAnswerCode()
-    {
-        return $this->_answer_code ;
-    }
-
-    /**
-     * Set Season Code
-     *
-     * @param string season code
-     */
-    function setSeasonCode($txt)
-    {
-        $this->_season_code = $txt ;
-    }
-
-    /**
-     * Get Season Code
-     *
-     * @return string season code
-     */
-    function getSeasonCode()
-    {
-        return $this->_season_code ;
-    }
-
     /**
      * Parse Record
      */
     function ParseRecord()
     {
-        if (WPST_DEBUG)
-        {
-            $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
-            //print $c->render() ;
-        }
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 8))) ;
-        $this->setTeamCode(trim(substr($this->_hy3_record, 11, 6))) ;
-        $this->setTeamCode5(trim(substr($this->_hy3_record, 17, 1))) ;
-        $this->setSwimmerName(trim(substr($this->_hy3_record, 18, 28))) ;
-        $this->setSwimmerAlternateMailingName(trim(substr($this->_hy3_record, 46, 30))) ;
-        $this->setSwimmerAddress1(trim(substr($this->_hy3_record, 76, 30))) ;
-        $this->setSwimmerCity(trim(substr($this->_hy3_record, 106, 20))) ;
-        $this->setSwimmerState(trim(substr($this->_hy3_record, 126, 2))) ;
-        $this->setSwimmerPostalCode(trim(substr($this->_hy3_record, 140, 10))) ;
-        $this->setSwimmerCountryCode(trim(substr($this->_hy3_record, 150, 3))) ;
-        $this->setRegionCode(trim(substr($this->_hy3_record, 153, 1))) ;
-        $this->setAnswerCode(trim(substr($this->_hy3_record, 154, 1))) ;
-        $this->setSeasonCode(trim(substr($this->_hy3_record, 155, 1))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 156, 4))) ;
+        wp_die('This funtion has not been implemented.') ;
     }
 
     /**
      * Generate Record
      *
-     * @return sting - D2 HY3 record
+     * @return string - D2 HY3 record
      */
     function GenerateRecord()
     {
-        return sprintf(WPST_HYTEK_D2_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
-            $this->getTeamCode(),
-            $this->getTeamCode5(),
-            $this->getSwimmerName(),
-            $this->getSwimmerAlternateMailingName(),
-            $this->getSwimmerAddress1(),
-            $this->getSwimmerCity(),
-            $this->getSwimmerState(),
-            $this->getSwimmerCountryCode(),
-            $this->getSwimmerPostalCode(),
-            $this->getSwimmerCountryCode(),
-            $this->getRegionCode(),
-            $this->getAnswerCode(),
-            $this->getSeasonCode(),
-            $this->getFutureUse2()
+        $hy3 = sprintf(WPST_HY3_D2_RECORD,
+            $this->getPrimaryContactAddress1(),
+            $this->getPrimaryContactAddress2(),
+            $this->getPrimaryContactCity(),
+            WPST_HY3_UNUSED,
+            $this->getPrimaryContactState(),
+            $this->getPrimaryContactPostalCode(),
+            $this->getPrimaryContactCountry(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
         ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
     }
 }
 
@@ -4019,1133 +4393,478 @@ class HY3D2Record extends HY3DxRecord
 class HY3D3Record extends HY3DxRecord
 {
     /**
-     * Ethnicity Code property
-     */
-    var $_ethnicity_code ;
-
-    /**
-     * Junior High School property
-     */
-    var $_junior_high_school ;
-
-    /**
-     * Senior High School property
-     */
-    var $_senior_high_school ;
-
-    /**
-     * YMCA-YWCA property
-     */
-    var $_ymca_ywca ;
-
-    /**
-     * College property
-     */
-    var $_college ;
-
-    /**
-     * Summer Swim League property
-     */
-    var $_summer_swim_league ;
-
-    /**
-     * Masters property
-     */
-    var $_masters ;
-
-    /**
-     * Disabled Sports Organization property
-     */
-    var $_disabled_sports_org ;
-
-    /**
-     * Water Polo property
-     */
-    var $_water_polo ;
-
-    /**
-     * None property
-     */
-    var $_none ;
-
-    /**
-     * Set Ethnicity Code
-     *
-     * @param string ethnicity code
-     */
-    function setEthnicityCode($txt)
-    {
-        $this->_ethnicity_code = $txt ;
-    }
-
-    /**
-     * Get Ethnicity Code
-     *
-     * @return string file code
-     */
-    function getEthnicityCode()
-    {
-        return $this->_ethnicity_code ;
-    }
-
-    /**
-     * Set Junior High School
-     *
-     * @param string junior high school
-     */
-    function setJuniorHighSchool($txt)
-    {
-        $this->_junior_high_school = $txt ;
-    }
-
-    /**
-     * Get Junior High School
-     *
-     * @return string junior high school
-     */
-    function getJuniorHighSchool()
-    {
-        return $this->_junior_high_school ;
-    }
-
-    /**
-     * Set Senior High School
-     *
-     * @param string senior high school
-     */
-    function setSeniorHighSchool($txt)
-    {
-        $this->_senior_high_school = $txt ;
-    }
-
-    /**
-     * Get Senior High School
-     *
-     * @return string senior high school
-     */
-    function getSeniorHighSchool()
-    {
-        return $this->_senior_high_school ;
-    }
-
-    /**
-     * Set YMCAYWCA
-     *
-     * @param string ymca ywca
-     */
-    function setYMCAYWCA($txt)
-    {
-        $this->_ymca_ywca = $txt ;
-    }
-
-    /**
-     * Get YMCAYWCA
-     *
-     * @return string ymca ywca
-     */
-    function getYMCAYWCA()
-    {
-        return $this->_ymca_ywca ;
-    }
-
-    /**
-     * Set College
-     *
-     * @param string college
-     */
-    function setCollege($txt)
-    {
-        $this->_college = $txt ;
-    }
-
-    /**
-     * Get College
-     *
-     * @return string college
-     */
-    function getCollege()
-    {
-        return $this->_college ;
-    }
-
-    /**
-     * Set SummerSwimLeague
-     *
-     * @param string summer swim league
-     */
-    function setSummerSwimLeague($txt)
-    {
-        $this->_summer_swim_league = $txt ;
-    }
-
-    /**
-     * Get SummerSwimLeague
-     *
-     * @return string summer swim league
-     */
-    function getSummerSwimLeague()
-    {
-        return $this->_summer_swim_league ;
-    }
-
-    /**
-     * Set Masters
-     *
-     * @param string masters
-     */
-    function setMasters($txt)
-    {
-        $this->_masters = $txt ;
-    }
-
-    /**
-     * Get Masters
-     *
-     * @return string masters
-     */
-    function getMasters()
-    {
-        return $this->_masters ;
-    }
-
-    /**
-     * Set Disabled Sports Org
-     *
-     * @param string disabled sports org
-     */
-    function setDisabledSportsOrg($txt)
-    {
-        $this->_disabled_sports_org = $txt ;
-    }
-
-    /**
-     * Get Disabled Sports Org
-     *
-     * @return string disabled sports org
-     */
-    function getDisabledSportsOrg()
-    {
-        return $this->_disabled_sports_org ;
-    }
-
-    /**
-     * Set Water Polo
-     *
-     * @param string water polo
-     */
-    function setWaterPolo($txt)
-    {
-        $this->_water_polo = $txt ;
-    }
-
-    /**
-     * Get Water Polo
-     *
-     * @return string water polo
-     */
-    function getWaterPolo()
-    {
-        return $this->_water_polo ;
-    }
-
-    /**
-     * Set None
-     *
-     * @param string none
-     */
-    function setNone($txt)
-    {
-        $this->_none = $txt ;
-    }
-
-    /**
-     * Get None
-     *
-     * @return string none
-     */
-    function getNone()
-    {
-        return $this->_none ;
-    }
-
-    /**
      * Parse Record
      */
     function ParseRecord()
     {
-        if (WPST_DEBUG)
-        {
-            $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
-            print $c->render() ;
-        }
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setUSS(trim(substr($this->_hy3_record, 2, 14))) ;
-        $this->setSwimmerName(trim(substr($this->_hy3_record, 16, 15))) ;
-        $this->setEthnicityCode(trim(substr($this->_hy3_record, 31, 2))) ;
-        $this->setJuniorHighSchool(trim(substr($this->_hy3_record, 33, 1))) ;
-        $this->setSeniorHighSchool(trim(substr($this->_hy3_record, 34, 1))) ;
-        $this->setYMCAYWCA(trim(substr($this->_hy3_record, 35, 1))) ;
-        $this->setCollege(trim(substr($this->_hy3_record, 36, 1))) ;
-        $this->setSummerSwimLeague(trim(substr($this->_hy3_record, 37, 1))) ;
-        $this->setMasters(trim(substr($this->_hy3_record, 38, 1))) ;
-        $this->setDisabledSportsOrg(trim(substr($this->_hy3_record, 39, 1))) ;
-        $this->setWaterPolo(trim(substr($this->_hy3_record, 40, 1))) ;
-        $this->setNone(trim(substr($this->_hy3_record, 41, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 42, 118))) ;
-
-        //  Construct 'new' and 'old' formats of the USS number
-        //  from the name and birthdate fields.
-
-        $this->setUSSNew() ;
-        $this->setUSSOld() ;
+        wp_die('This funtion has not been implemented.') ;
     }
+
     /**
      * Generate Record
      *
-     * @return string HY3 D0 record
+     * @return string - D3 HY3 record
      */
-    function GenerateRecord($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
+    function GenerateRecord()
     {
-        return sprintf(WPST_HYTEK_D3_RECORD,
-            $this->getUSS(),
-            $this->getPreferredFirstName(),
-            $this->getEthnicityCode(),
-            $this->getJuniorHighSchool(),
-            $this->getSeniorHighSchool(),
-            $this->getYMCAYWCA(),
-            $this->getCollege(),
-            $this->getSummerSwimLeague(),
-            $this->getMasters(),
-            $this->getDisabledSportsOrg(),
-            $this->getWaterPolo(),
-            $this->getNone(),
-            $this->getFutureUse1()
+        $hy3 = sprintf(WPST_HY3_D3_RECORD,
+            WPST_HY3_UNUSED,
+            $this->getFathersOfficePhoneNumber(),
+            $this->getPrimaryContactHomePhoneNumber(),
+            $this->getPrimaryContactFaxNumber(),
+            $this->getFathersEmailAddress(),
+            WPST_HY3_UNUSED
         ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
     }
 }
 
 /**
- * HY3 E0 record
+ * HY3 D4 record
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see HY3DxRecord
  */
-class HY3E0Record extends HY3DxRecord
+class HY3D4Record extends HY3DxRecord
 {
-    /**
-     * Relay Team Name property
-     */
-    var $_relay_team_name ;
-
-    /**
-     * Number of F0 records property
-     */
-    var $_number_of_f0_records ;
-
-    /**
-     * Total Age of Athletes property
-     */
-    var $_total_age_of_athletes ;
-
-    /**
-     * Set Relay Team Name
-     *
-     * @param string relay team name
-     */
-    function setRelayTeamName($txt)
-    {
-        $this->_relay_team_name = $txt ;
-    }
-
-    /**
-     * Get Relay Team Name
-     *
-     * @return string relay team name
-     */
-    function getRelayTeamName()
-    {
-        return $this->_relay_team_name ;
-    }
-
-    /**
-     * Set Number of F0 Records
-     *
-     * @param string number of F0 records
-     */
-    function setNumberOfF0Records($txt)
-    {
-        $this->_number_of_f0_records = $txt ;
-    }
-
-    /**
-     * Get Number of F0 Records
-     *
-     * @return string number of F0 records
-     */
-    function getNumberOfF0Records()
-    {
-        return $this->_number_of_f0_records ;
-    }
-
-    /**
-     * Set Total Age of Athletes property
-     *
-     * @param int total age of athletes
-     */
-    function setTotalAgeOfAthletes($txt)
-    {
-        $this->_total_age_of_athletes = $txt ;
-    }
-
-    /**
-     * Get Total Age of Athletes property
-     *
-     * @return int total age of athletes
-     */
-    function getTotalAgeOfAthletes()
-    {
-        return $this->_total_age_of_athletes ;
-    }
-
     /**
      * Parse Record
      */
     function ParseRecord()
     {
-        if (WPST_DEBUG)
-        {
-            $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
-            print $c->render() ;
-        }
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 8))) ;
-        $this->setRelayTeamName(trim(substr($this->_hy3_record, 11, 1))) ;
-        $this->setTeamCode(trim(substr($this->_hy3_record, 12, 6))) ;
-        $this->setNumberOfF0Records(trim(substr($this->_hy3_record, 18, 2))) ;
-        $this->setEventGender(trim(substr($this->_hy3_record, 20, 1))) ;
-        $this->setEventDistance(trim(substr($this->_hy3_record, 21, 4))) ;
-        $this->setStrokeCode(trim(substr($this->_hy3_record, 25, 1))) ;
-        $this->setEventNumber(trim(substr($this->_hy3_record, 26, 4))) ;
-        $this->setEventAgeCode(trim(substr($this->_hy3_record, 30, 4))) ;
-        $this->setSwimTotalAgeOfSwimmers(trim(substr($this->_hy3_record, 34, 3))) ;
-        $this->setSwimDate(trim(substr($this->_hy3_record, 37, 8))) ;
-        $this->setSeedTime(trim(substr($this->_hy3_record, 45, 8))) ;
-        $this->setSeedCourseCode(trim(substr($this->_hy3_record, 53, 1))) ;
-        $this->setPrelimTime(trim(substr($this->_hy3_record, 54, 8))) ;
-        $this->setPrelimCourseCode(trim(substr($this->_hy3_record, 62, 1))) ;
-        $this->setSwimOffTime(trim(substr($this->_hy3_record, 63, 8))) ;
-        $this->setSwimOffCourseCode(trim(substr($this->_hy3_record, 71, 1))) ;
-        $this->setFinalsTime(trim(substr($this->_hy3_record, 72, 8))) ;
-        $this->setFinalsCourseCode(trim(substr($this->_hy3_record, 80, 1))) ;
-        $this->setPrelimHeatNumber(trim(substr($this->_hy3_record, 81, 2))) ;
-        $this->setPrelimLaneNumber(trim(substr($this->_hy3_record, 83, 2))) ;
-        $this->setFinalsHeatNumber(trim(substr($this->_hy3_record, 85, 2))) ;
-        $this->setFinalsLaneNumber(trim(substr($this->_hy3_record, 87, 2))) ;
-        $this->setPrelimPlaceRanking(trim(substr($this->_hy3_record, 89, 3))) ;
-        $this->setFinalsPlaceRanking(trim(substr($this->_hy3_record, 92, 3))) ;
-        $this->setFinalsPoints(trim(substr($this->_hy3_record, 95, 4))) ;
-        $this->setEventTimeClassCode(trim(substr($this->_hy3_record, 99, 2))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 102, 59))) ;
-    }
-    /**
-     * Generate Record
-     *
-     * @return string HY3 E0 record
-     */
-    function GenerateRecord($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        return sprintf(WPST_HYTEK_E0_GENERATE_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
-            $this->getRelayTeamName(),
-            $this->getTeamCode(),
-            $this->getNumberOfF0Records(),
-            $this->getEventGender(),
-            $this->getEventDistance(),
-            $this->getStrokeCode(),
-            $this->getEventNumber(),
-            $this->getEventAgeCode(),
-            $this->getTotalAgeOfAthletes(),
-            $this->getSwimDate(false),
-            $this->getSeedTimeAndCourseCode(),
-            $this->getPrelimTimeAndCourseCode(),
-            $this->getSwimOffTimeAndCourseCode(),
-            $this->getFinalsTimeAndCourseCode(),
-            $this->getPrelimHeatNumber(),
-            $this->getPrelimLaneNumber(),
-            $this->getFinalsHeatNumber(),
-            $this->getFinalsLaneNumber(),
-            $this->getPrelimPlaceRanking(),
-            $this->getFinalsPlaceRanking(),
-            $this->getFinalsPoints(),
-            $this->getEventTimeClassCode(),
-            $this->getFutureUse2()
-        ) ;
-    }
-}
-
-/**
- * HY3 F0 record
- *
- * @author Mike Walsh <mpwalsh8@gmail.com>
- * @access public
- * @see HY3E0Record
- */
-class HY3F0Record extends HY3E0Record
-{
-    /**
-     * Prelim Leg Order Code property
-     */
-    var $_prelim_leg_order_code ;
-
-    /**
-     * Swim Off Leg Order Code property
-     */
-    var $_swim_off_leg_order_code ;
-
-    /**
-     * Finals Leg Order Code property
-     */
-    var $_finals_leg_order_code ;
-
-    /**
-     * Leg Time property
-     */
-    var $_leg_time ;
-
-    /**
-     * Take-off Time property
-     */
-    var $_takeoff_time ;
-
-    /**
-     * Set Prelim Leg Order Code
-     *
-     * @param string prelim leg order code
-     */
-    function setPrelimLegOrderCode($txt)
-    {
-        $this->_prelim_leg_order_code = $txt ;
-    }
-
-    /**
-     * Get Prelim Leg Order Code
-     *
-     * @return string prelim leg order code
-     */
-    function getPrelimLegOrderCode()
-    {
-        return $this->_prelim_leg_order_code ;
-    }
-
-    /**
-     * Set Swim Off Leg Order Code
-     *
-     * @param string swim off leg order code
-     */
-    function setSwimOffLegOrderCode($txt)
-    {
-        $this->_swim_off_leg_order_code = $txt ;
-    }
-
-    /**
-     * Get Swim Off Leg Order Code
-     *
-     * @return string swim off leg order code
-     */
-    function getSwimOffLegOrderCode()
-    {
-        return $this->_swim_off_leg_order_code ;
-    }
-
-    /**
-     * Set Finals Leg Order Code
-     *
-     * @param string finals leg order code
-     */
-    function setFinalsLegOrderCode($txt)
-    {
-        $this->_finals_leg_order_code = $txt ;
-    }
-
-    /**
-     * Get Finals Leg Order Code
-     *
-     * @return string leg time
-     */
-    function getFinalsLegOrderCode()
-    {
-        return $this->_finals_leg_order_code ;
-    }
-
-    /**
-     * Set Leg Time
-     *
-     * @param string leg time
-     */
-    function setLegTime($txt)
-    {
-        $this->_leg_time = $txt ;
-    }
-
-    /**
-     * Get Leg Time
-     *
-     * @return string leg time
-     */
-    function getLegTime()
-    {
-        return $this->_leg_time ;
-    }
-
-    /**
-     * Set TakeOff Time
-     *
-     * @param int total age
-     */
-    function setTakeOffTime($txt)
-    {
-        $this->_total_age = $txt ;
-    }
-
-    /**
-     * Get TakeOff Time
-     *
-     * @return string take-off time
-     */
-    function getTakeOffTime()
-    {
-        return $this->_takeoff_time ;
-    }
-
-    /**
-     * Parse Record
-     */
-    function ParseRecord()
-    {
-        if (WPST_DEBUG)
-        {
-            $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
-            print $c->render() ;
-        }
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 12))) ;
-        $this->setTeamCode(trim(substr($this->_hy3_record, 15, 6))) ;
-        $this->setRelayTeamName(trim(substr($this->_hy3_record, 21, 1))) ;
-        $this->setSwimmerName(trim(substr($this->_hy3_record, 22, 28))) ;
-        $this->setUSS(trim(substr($this->_hy3_record, 50, 12))) ;
-        $this->setCitizenCode(trim(substr($this->_hy3_record, 62, 3))) ;
-        $this->setBirthDate(trim(substr($this->_hy3_record, 65, 8))) ;
-        $this->setAgeOrClass(trim(substr($this->_hy3_record, 73, 2))) ;
-        $this->setGender(trim(substr($this->_hy3_record, 75, 1))) ;
-        $this->setPrelimLegOrderCode(trim(substr($this->_hy3_record, 76, 1))) ;
-        $this->setSwimOffLegOrderCode(trim(substr($this->_hy3_record, 77, 1))) ;
-        $this->setFinalsLegOrderCode(trim(substr($this->_hy3_record, 78, 1))) ;
-        $this->setLegTime(trim(substr($this->_hy3_record, 79, 8))) ;
-        $this->setCourseCode(trim(substr($this->_hy3_record, 87, 1))) ;
-        $this->setTakeoffTime(trim(substr($this->_hy3_record, 88, 4))) ;
-        $this->setUSSNew(trim(substr($this->_hy3_record, 92, 14))) ;
-        $this->setPreferredFirstName(trim(substr($this->_hy3_record, 106, 15))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 121, 29))) ;
-
-        //  Construct 'old' format of the USS number from the name
-        //  and birthdate fields.  It should match USS in column 51.
-
-        $this->setUSSOld() ;
+        wp_die('This funtion has not been implemented.') ;
     }
 
     /**
      * Generate Record
      *
-     * @return string HY3 F0 record
-     */
-    function GenerateRecord($zerotimemode = WPST_HYTEK_USE_BLANKS_VALUE)
-    {
-        return sprintf(WPST_HYTEK_F0_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
-            $this->getTeamCode(),
-            $this->getRelayTeamName(),
-            $this->getSwimmerName(),
-            $this->getUSS(),
-            $this->getCitizenCode(),
-            $this->getBirthDate(false),
-            $this->getAgeOrClass(),
-            $this->getGender(),
-            $this->getPrelimLegOrderCode(),
-            $this->getSwimOffLegOrderCode(),
-            $this->getFinalsLegOrderCode(),
-            $this->getLegTime(),
-            $this->getCourseCode(),
-            $this->getTakeoffTime(),
-            $this->getUSSNew(),
-            $this->getPreferredFirstName(),
-            $this->getFutureUse2()
-        ) ;
-    }
-}
-
-/**
- * HY3 Z0 record
- *
- * @author Mike Walsh <mpwalsh8@gmail.com>
- * @access public
- * @see HY3Record
- */
-class HY3Z0Record extends HY3Record
-{
-    /**
-     * Notes
-     */
-    var $_notes ;
-
-    /**
-     * B record count
-     */
-    var $_b_record_count ;
-
-    /**
-     * Meet Count
-     */
-    var $_meet_count ;
-
-    /**
-     * C record count
-     */
-    var $_c_record_count ;
-
-    /**
-     * Team Count
-     */
-    var $_team_count ;
-
-    /**
-     * D record count
-     */
-    var $_d_record_count ;
-
-    /**
-     * Swimmer Count
-     */
-    var $_swimmer_count ;
-
-    /**
-     * E record count
-     */
-    var $_e_record_count ;
-
-    /**
-     * F record count
-     */
-    var $_f_record_count ;
-
-    /**
-     * G record count
-     */
-    var $_g_record_count ;
-
-    /**
-     * Batch Number
-     */
-    var $_batch_number ;
-
-    /**
-     * New Member Count
-     */
-    var $_new_member_count ;
-
-    /**
-     * Renew Member Count
-     */
-    var $_renew_member_count ;
-
-    /**
-     * Change Member Count
-     */
-    var $_change_member_count ;
-
-    /**
-     * Delete Member Count
-     */
-    var $_delete_member_count ;
-
-    /**
-     * Set Notes
-     *
-     * @param string notes
-     */
-    function setNotes($txt)
-    {
-        $this->_notes = $txt ;
-    }
-
-    /**
-     * Get Notes
-     *
-     * @return string notes
-     */
-    function getNotes()
-    {
-        return $this->_notes ;
-    }
-
-    /**
-     * Set B record count
-     *
-     * @param int number of b records
-     */
-    function setBRecordCount($cnt)
-    {
-        $this->_b_record_count = $cnt ;
-    }
-
-    /**
-     * Get B record count
-     *
-     * @param int number of b records
-     */
-    function getBRecordCount()
-    {
-        return $this->_b_record_count ;
-    }
-
-    /**
-     * Set Meet Count
-     *
-     * @param int number of meets
-     */
-    function setMeetCount($cnt)
-    {
-        $this->_meet_count = $cnt ;
-    }
-
-    /**
-     * Get Meet Count 
-     *
-     * @return int number of meets
-     */
-    function getMeetCount()
-    {
-        return $this->_meet_count ;
-    }
-
-    /**
-     * Set C record count
-     *
-     * @param int number of c records
-     */
-    function setCRecordCount($cnt)
-    {
-        $this->_c_record_count = $cnt ;
-    }
-
-    /**
-     * Get C record count
-     *
-     * @param int number of c records
-     */
-    function getCRecordCount()
-    {
-        return $this->_c_record_count ;
-    }
-
-    /**
-     * Set Team Count
-     *
-     * @param int number of teams
-     */
-    function setTeamCount($cnt)
-    {
-        $this->_team_count = $cnt ;
-    }
-
-    /**
-     * Get Team Count 
-     *
-     * @return int number of teams
-     */
-    function getTeamCount()
-    {
-        return $this->_team_count ;
-    }
-
-    /**
-     * Set D record count
-     *
-     * @param int number of d records
-     */
-    function setDRecordCount($cnt)
-    {
-        $this->_d_record_count = $cnt ;
-    }
-
-    /**
-     * Get D record count
-     *
-     * @param int number of d records
-     */
-    function getDRecordCount()
-    {
-        return $this->_d_record_count ;
-    }
-
-    /**
-     * Set Swimmer Count
-     *
-     * @param int number of swimmers
-     */
-    function setSwimmerCount($cnt)
-    {
-        $this->_swimmer_count = $cnt ;
-    }
-
-    /**
-     * Get Swimmer Count 
-     *
-     * @return int number of swimmers
-     */
-    function getSwimmerCount()
-    {
-        return $this->_swimmer_count ;
-    }
-
-    /**
-     * Set E record count
-     *
-     * @param int number of e records
-     */
-    function setERecordCount($cnt)
-    {
-        $this->_e_record_count = $cnt ;
-    }
-
-    /**
-     * Get E record count
-     *
-     * @param int number of e records
-     */
-    function getERecordCount()
-    {
-        return $this->_e_record_count ;
-    }
-
-    /**
-     * Set F record count
-     *
-     * @param int number of f records
-     */
-    function setFRecordCount($cnt)
-    {
-        $this->_f_record_count = $cnt ;
-    }
-
-    /**
-     * Get F record count
-     *
-     * @param int number of f records
-     */
-    function getFRecordCount()
-    {
-        return $this->_f_record_count ;
-    }
-
-    /**
-     * Set G record count
-     *
-     * @param int number of g records
-     */
-    function setGRecordCount($cnt)
-    {
-        $this->_g_record_count = $cnt ;
-    }
-
-    /**
-     * Get G record count
-     *
-     * @param int number of g records
-     */
-    function getGRecordCount()
-    {
-        return $this->_g_record_count ;
-    }
-
-    /**
-     * Set Batch Number
-     *
-     * @param int number of batches
-     */
-    function setBatchNumber($cnt)
-    {
-        $this->_batch_number = $cnt ;
-    }
-
-    /**
-     * Get Batch Number 
-     *
-     * @return int number of batches
-     */
-    function getBatchNumber()
-    {
-        return $this->_batch_number ;
-    }
-
-    /**
-     * Set New Member Count
-     *
-     * @param int number of new members
-     */
-    function setNewMemberCount($cnt)
-    {
-        $this->_new_member_count = $cnt ;
-    }
-
-    /**
-     * Get New Member Count 
-     *
-     * @return int number of new members
-     */
-    function getNewMemberCount()
-    {
-        return $this->_new_member_count ;
-    }
-
-    /**
-     * Set Renew Member Count
-     *
-     * @param int number of renew members
-     */
-    function setRenewMemberCount($cnt)
-    {
-        $this->_renew_member_count = $cnt ;
-    }
-
-    /**
-     * Get Renew Member Count 
-     *
-     * @return int number of renew members
-     */
-    function getRenewMemberCount()
-    {
-        return $this->_renew_member_count ;
-    }
-
-    /**
-     * Set Change Member Count
-     *
-     * @param int number of change members
-     */
-    function setChangeMemberCount($cnt)
-    {
-        $this->_change_member_count = $cnt ;
-    }
-
-    /**
-     * Get Change Member Count 
-     *
-     * @return int number of change members
-     */
-    function getChangeMemberCount()
-    {
-        return $this->_change_member_count ;
-    }
-
-    /**
-     * Set Delete Member Count
-     *
-     * @param int number of delete members
-     */
-    function setDeleteMemberCount($cnt)
-    {
-        $this->_delete_member_count = $cnt ;
-    }
-
-    /**
-     * Get Delete Member Count 
-     *
-     * @return int number of delete members
-     */
-    function getDeleteMemberCount()
-    {
-        return $this->_delete_member_count ;
-    }
-
-    /**
-     * Parse Record
-     */
-    function ParseRecord()
-    {
-        if (WPST_DEBUG)
-        {
-            $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
-            print $c->render() ;
-        }
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 8))) ;
-        $this->setFileCode(trim(substr($this->_hy3_record, 11, 2))) ;
-        $this->setNotes(trim(substr($this->_hy3_record, 13, 30))) ;
-        $this->setBRecordCount(trim(substr($this->_hy3_record, 43, 3))) ;
-        $this->setMeetCount(trim(substr($this->_hy3_record, 46, 3))) ;
-        $this->setCRecordCount(trim(substr($this->_hy3_record, 49, 4))) ;
-        $this->setTeamCount(trim(substr($this->_hy3_record, 53, 4))) ;
-        $this->setDRecordCount(trim(substr($this->_hy3_record, 57, 6))) ;
-        $this->setSwimmerCount(trim(substr($this->_hy3_record, 63, 6))) ;
-        $this->setERecordCount(trim(substr($this->_hy3_record, 69, 5))) ;
-        $this->setFRecordCount(trim(substr($this->_hy3_record, 74, 6))) ;
-        $this->setGRecordCount(trim(substr($this->_hy3_record, 80, 6))) ;
-        $this->setBatchNumber(trim(substr($this->_hy3_record, 86, 5))) ;
-        $this->setNewMemberCount(trim(substr($this->_hy3_record, 91, 3))) ;
-        $this->setRenewMemberCount(trim(substr($this->_hy3_record, 94, 3))) ;
-        $this->setChangeMemberCount(trim(substr($this->_hy3_record, 97, 3))) ;
-        $this->setDeleteMemberCount(trim(substr($this->_hy3_record, 100, 3))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 103, 57))) ;
-    }
-
-    /**
-     * Generage Record
+     * @return string - D4 HY3 record
      */
     function GenerateRecord()
     {
-        return sprintf(WPST_HYTEK_Z0_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
-            $this->getFileCode(),
-            $this->getNotes(),
-            $this->getBRecordCount(),
-            $this->getMeetCount(),
-            $this->getCRecordCount(),
-            $this->getTeamCount(),
-            $this->getDRecordCount(),
-            $this->getSwimmerCount(),
-            $this->getERecordCount(),
-            $this->getFRecordCount(),
-            $this->getGRecordCount(),
-            $this->getBatchNumber(),
-            $this->getNewMemberCount(),
-            $this->getRenewMemberCount(),
-            $this->getChangeMemberCount(),
-            $this->getDeleteMemberCount(),
-            $this->getFutureUse2()
+        $hy3 = sprintf(WPST_HY3_D4_RECORD,
+            $this->getSecondaryContactMailto(),
+            $this->getSecondaryContactAddress1(),
+            $this->getSecondaryContactCity(),
+            WPST_HY3_UNUSED,
+            $this->getSecondaryContactState(),
+            $this->getSecondaryContactPostalCode(),
+            $this->getSecondaryContactCountry(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
         ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 D5 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3D5Record extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - D5 HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_D5_RECORD,
+            $this->getPrimaryContactMailto(),
+            $this->getSecondaryContactAddress2(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED,
+            $this->getRegistrationDate(),
+            WPST_HY3_UNUSED,
+            substr(sprintf('%-30.30s', $this->getPrimaryContactCity()), 20, 10),
+            substr(sprintf('%-30.30s', $this->getSecondaryContactCity()), 20, 10),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 D6 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3D6Record extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - D6 HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_D6_RECORD,
+            $this->getDoctorsName(),
+            $this->getDoctorsPhoneNumber(),
+            $this->getEmergencyContactName(),
+            $this->getEmergencyContactPhoneNumber(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 D7 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3D7Record extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - D7 HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_D7_RECORD,
+            $this->getSecondaryContactParent1OfficePhoneNumber(),
+            $this->getSecondaryContactHomePhoneNumber(),
+            $this->getSecondaryContactFaxNumber(),
+            $this->getSecondaryContactParent1EmailAddress(),
+            substr(sprintf('%-30.30s', $this->getPrimaryContactCity()), 36, 14),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 D8 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3D8Record extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - D8 HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_D8_RECORD,
+            $this->getMedicalConditionDescription(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 D9 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3D9Record extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - D9 HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_D9_RECORD,
+            $this->getMedicationDescription(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 DA record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3DARecord extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DA HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_DA_RECORD,
+            $this->getCustomField1Name(),
+            $this->getCustomField1Value(),
+            $this->getCustomField2Name(),
+            $this->getCustomField2Value(),
+            $this->getCustomField3Name(),
+            $this->getCustomField3Value(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 DB record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3DBRecord extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DB HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_DB_RECORD,
+            $this->getFathersLastName(),
+            $this->getFathersFirstName(),
+            $this->getMothersFirstName(),
+            $this->getSecondaryContactLastName(),
+            $this->getSecondaryContactParent1Name(),
+            $this->getSecondaryContactParent2Name(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 DC record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3DCRecord extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DC HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_DC_RECORD,
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 DD record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3DDRecord extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DD HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_DD_RECORD,
+            $this->getFathersCellPhoneNumber(),
+            $this->getMothersOfficePhoneNumber(),
+            $this->getMothersCellPhoneNumber(),
+            $this->getSecondaryContactParent1CellPhoneNumber(),
+            $this->getSecondaryContactParent2OfficePhoneNumber(),
+            $this->getSecondaryContactParent2CellPhoneNumber(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 DE record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3DERecord extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DE HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_DE_RECORD,
+            $this->getMothersEmailAddress(),
+            $this->getSecondaryContactParent2EmailAddress(),
+            substr(sprintf('%-50.50s', $this->getMothersEmailAddress()), 36, 14),
+            $this->getMothersLastName(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * HY3 DF record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3DxRecord
+ */
+class HY3DFRecord extends HY3DxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DF HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_DF_RECORD,
+            $this->getAthletesMiddleName(),
+            $this->getAthletesCellPhoneNumber(),
+            $this->getAthletesEmailAddress(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
     }
 }
 
