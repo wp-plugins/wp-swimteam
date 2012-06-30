@@ -3,15 +3,15 @@
 /**
  * Swimmer classes.
  *
- * $Id: swimmers.class.php 909 2012-06-13 17:14:00Z mpwalsh8 $
+ * $Id: swimmers.class.php 925 2012-06-28 22:24:02Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 909 $
- * @lastmodified $Date: 2012-06-13 13:14:00 -0400 (Wed, 13 Jun 2012) $
+ * @version $Revision: 925 $
+ * @lastmodified $Date: 2012-06-28 18:24:02 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1063,18 +1063,21 @@ class SwimTeamSwimmer extends SwimTeamDBI
         //  If the options count is zero or non-existant, don't reference
         //  the meta table because it will result in an empty set being returned.
 
-        if (($options_count === false) || ((int)$options_count === 0))
-        {
-            $query = sprintf('SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s',
-                WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE,
-                WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
-        }
-        else
-        {
-            $query = sprintf('SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s, %s',
-                WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE, WPST_ROSTER_TABLE,
-                WPST_SEASONS_TABLE, WPST_OPTIONS_META_TABLE) ;
-        }
+        //if (($options_count === false) || ((int)$options_count === 0))
+        //{
+        //    $query = sprintf('SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s',
+        //        WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE,
+        //        WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
+        //}
+        //else
+        //{
+        //    $query = sprintf('SELECT DISTINCT %s.id AS swimmerid FROM %s, %s, %s, %s',
+        //        WPST_SWIMMERS_TABLE, WPST_SWIMMERS_TABLE, WPST_ROSTER_TABLE,
+        //        WPST_SEASONS_TABLE, WPST_OPTIONS_META_TABLE) ;
+        //}
+
+        $query = sprintf('SELECT DISTINCT s.id AS swimmerid FROM %s s
+            LEFT JOIN %s m ON (m.swimmerid = s.id)', WPST_SWIMMERS_TABLE, WPST_OPTIONS_META_TABLE) ;
 
         //  Build the filters
 

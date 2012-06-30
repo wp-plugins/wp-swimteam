@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: events.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: events.forms.class.php 921 2012-06-28 22:21:32Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage Events
- * @version $Revision: 849 $
+ * @version $Revision: 921 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2012-06-28 18:21:32 -0400 (Thu, 28 Jun 2012) $
  *
  */
 
@@ -804,8 +804,6 @@ class WpSwimTeamEventDeleteAllForm extends WpSwimTeamEventDeleteForm
 
         if ($meetid != WPST_NULL_ID)
         {
-            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-            //var_dump($meetid, $eventgroupid) ;
             $desc = SwimTeamTextMap::__mapMeetIdToText($meetid) ;
             $desc = sprintf('%s swim meet vs %s on %s', ucwords($desc['location']), $desc['opponent'], $desc['date']) ;
             $eventIds = $event->getAllEventIdsByMeetId($meetid) ;
@@ -1106,8 +1104,6 @@ class WpSwimTeamEventLoadForm extends WpSwimTeamForm
         $eventgroupid = $this->get_element_value('Event Group') ;
 
         $eventIds = $event->getAllEventIdsByEventGroupIdAndMeetId($eventgroupid, WPST_NULL_ID) ;
-        //printf('<h3>%s::%s</h3>', basename(__FILE__), __LINE__) ;
-        //var_dump(count($eventIds)) ;
 
         //  Loop through submitted event ids, copying the standard
         //  event as a new event for the selected meet.
@@ -1764,8 +1760,6 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
         $this->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
         $event->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
         
-        //var_dump($this->getEventGroupId()) ;
-
         //  Hy-tek Meet Event (.hyv) File Format
         //
         //  More details at:
@@ -1862,7 +1856,6 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
                     else
                     {
                         $actionmsgs[] = sprintf('Event Number %s on line %d was not added.', $fields[0], $line_number) ;
-                        //var_dump($event) ;
                     }
                 }
             }
@@ -2443,7 +2436,6 @@ class WpSwimTeamEventReorderBySwimMeetAjaxForm extends WpSwimTeamEventReorderAja
         $this->__event = new SwimTeamEvent() ;
 
         $this->__eventIds = $this->__event->getAllEventIdsByMeetId($meetid) ;
-        //var_dump($eventIds) ;
 
         parent::WpSwimTeamEventReorderAjaxForm() ;
     }
@@ -2468,7 +2460,6 @@ class WpSwimTeamEventReorderByEventGroupAjaxForm extends WpSwimTeamEventReorderA
         $this->__event = new SwimTeamEvent() ;
 
         $this->__eventIds = $this->__event->getAllEventIdsByEventGroupIdAndMeetId($eventgroupid, WPST_NULL_ID) ;
-        //var_dump($this->__eventIds) ;
 
         parent::WpSwimTeamEventReorderAjaxForm() ;
     }

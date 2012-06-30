@@ -3,15 +3,15 @@
 /**
  * Event Groups admin pevent content.
  *
- * $Id: eventgroups.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: eventgroups.php 920 2012-06-28 22:19:07Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @packevent swimteam
  * @subpackevent admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 920 $
+ * @lastmodified $Date: 2012-06-28 18:19:07 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -93,9 +93,6 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
             WPST_ACTION_ADD
         ) ;
 
-        //print '<pre>' ;
-        //print_r($scriptargs) ;
-        //print '</pre>' ;
         //  So, how did we get here?  If $_POST is empty
         //  then it wasn't via a form submission.
 
@@ -229,8 +226,6 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
 
                     //  Leverage the Events tab management code
 
-                    //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-                    //var_dump($eventgroupid) ;
                     require_once('events.php') ;
                     $c = new AdminSwimTeamEventsTabContainer($eventgroupid,
                        SwimTeamTextMap::__mapEventGroupIdToText($eventgroupid)) ;

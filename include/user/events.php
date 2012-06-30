@@ -3,15 +3,15 @@
 /**
  * Events admin page content.
  *
- * $Id: events.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: events.php 920 2012-06-28 22:19:07Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 920 $
+ * @lastmodified $Date: 2012-06-28 18:19:07 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -194,9 +194,6 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
            ,WPST_ACTION_EVENTS_DELETE_ALL
         ) ;
 
-        //print '<pre>' ;
-        //print_r($scriptargs) ;
-        //print '</pre>' ;
         //  The eventid is the argument which must be
         //  dealt with differently for GET and POST operations
 
@@ -246,8 +243,6 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
             $action = null ;
 
         $this->setAction($action) ;
-        //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-        //var_dump($action) ;
 
         //  If one of the GDL controls was selected, then
         //  the action maybe confusing the processor.  Flush
@@ -307,8 +302,6 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
                     
                     $fa .= sprintf('&eventgroupid=%s', $eventgroupid) ;
                     $form = new WpSwimTeamEventLoadForm('Load Events', $fa, '600px') ;
-                    //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-                    //var_dump($this->getSwimMeetId()) ;                    
                     $form->setMeetId($this->getSwiMmeetId()) ;
                     $form->setEventGroupId($eventgroupid) ;
                     $this->setShowFormInstructions() ;
@@ -345,8 +338,6 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
                     $form = new WpSwimTeamEventsImportForm('Import Events',
                         $_SERVER['HTTP_REFERER'], 600) ;
                     $form->setEventGroupId($eventgroupid) ;
-                    //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-                    //var_dump($eventgroupid) ;                    
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader('Import Events') ;
                     break ;
@@ -561,8 +552,6 @@ class AdminSwimMeetEventsTabContainer extends AdminSwimTeamEventsTabContainer
      */
     function __buildGDL()
     {
-        //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-        //var_dump($this->getSwimMeetId()) ;
         $gdl = new SwimMeetEventsAdminGUIDataList('Swim Meet Events',
             '100%', 'eventnumber', false, WPST_EVENTS_DEFAULT_COLUMNS,
             WPST_EVENTS_DEFAULT_TABLES, sprintf('meetid="%s"',
@@ -572,9 +561,6 @@ class AdminSwimMeetEventsTabContainer extends AdminSwimTeamEventsTabContainer
         $gdl->set_show_empty_datalist_actionbar(true) ;
         $gdl->set_save_vars(array('_recorded_action' => $this->getAction(), 'swimmeetid' => $this->getSwimMeetId())) ;
 
-        //print '<pre>' ;
-        //print_r($gdl) ;
-        //print '</pre>' ;
         return $gdl ;
     }
 }

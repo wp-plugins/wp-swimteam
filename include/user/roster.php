@@ -3,15 +3,15 @@
 /**
  * Roster page content.
  *
- * $Id: roster.php 885 2012-05-18 04:53:24Z mpwalsh8 $
+ * $Id: roster.php 920 2012-06-28 22:19:07Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 885 $
- * @lastmodified $Date: 2012-05-18 00:53:24 -0400 (Fri, 18 May 2012) $
+ * @version $Revision: 920 $
+ * @lastmodified $Date: 2012-06-28 18:19:07 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -629,18 +629,6 @@ class AdminRosterTabContainer extends RosterTabContainer
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;
 
-        //  Temporarily turn off search - the SQL gets corrupted.
-        //$gdl->_search_flag = false ;
-
-        /*
-        print '<pre>' ;
-        //print_r($gdl) ;
-        printf('SELECT %s FROM %s WHERE %s', $gdl->__columns, $gdl->__tables, $gdl->__where_clause) ;
-        //print_r($gdl->__columns) ;
-        //print_r($gdl->__tables) ;
-        //print_r($gdl->__where_clause) ;
-        print '</pre>' ;
-         */
         return $gdl ;
     }
 }

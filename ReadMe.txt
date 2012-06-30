@@ -64,6 +64,10 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.32 =
+* New SQL queries for User related operations.  The new SQL addresses serious performance issues when the user count starts to grow.  This was most noticeable on the Job Commitments Report which would appear to time but it was probably running very slowly.
+* Lots of debug code removed throughout the plugin.
+
 = 1.31 =
 * Completed Hy-tek Roster export.  All fields that can be mapped into some sort of logical Hy-tek Team Manager field are now supported.  TM supports up to three custom fields in the roster import file, if optional swimmer fields are enabled, the first three (or fewer) will be mapped into the corresponding TM custom field.
 * Fixed bug where in some instances, the first name would be blank.

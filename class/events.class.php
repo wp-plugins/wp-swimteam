@@ -3,15 +3,15 @@
 /**
  * Events classes.
  *
- * $Id: events.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: events.class.php 921 2012-06-28 22:21:32Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Events
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 921 $
+ * @lastmodified $Date: 2012-06-28 18:21:32 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -614,17 +614,10 @@ class SwimTeamEvent extends SwimTeamDBI
             $query = sprintf('SELECT %s FROM %s WHERE %s',
                 WPST_EXTENDED_EVENTS_COLUMNS, WPST_EXTENDED_EVENTS_TABLES, $where_clause) ;
 
-            //$query = sprintf('SELECT * FROM %s WHERE eventid="%s"',
-            //    WPST_EVENTS_TABLE, $eventid) ;
-
             $this->setQuery($query) ;
             $this->runSelectQuery() ;
 
             $result = $this->getQueryResult() ;
-
-            //print '<pre>' ;
-            //print_r($result) ;
-            //print '</pre>' ;
 
             $this->setEventId($result['eventid']) ;
             $this->setMeetId($result['meetid']) ;
@@ -664,8 +657,6 @@ class SwimTeamEvent extends SwimTeamDBI
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 
-        //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-        //var_dump($query) ;
         return $this->getQueryResults() ;
     }
 

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmers.forms.class.php 855 2012-05-11 02:57:26Z mpwalsh8 $
+ * $Id: swimmers.forms.class.php 921 2012-06-28 22:21:32Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 855 $
+ * @version $Revision: 921 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-10 22:57:26 -0400 (Thu, 10 May 2012) $
+ * @lastmodifiedby $Date: 2012-06-28 18:21:32 -0400 (Thu, 28 Jun 2012) $
  *
  */
 
@@ -1625,7 +1625,6 @@ class WpSwimTeamSwimmerGlobalUpdateForm extends WpSwimTeamForm
         $results_cb = new FECheckbox('Results CheckBox', '') ;
         $this->add_element($results_cb) ;
  
-        //var_dump(basename(__FILE__) . '::' . __LINE__) ;
         //  How many swimmer options does this configuration support?
 
         $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;

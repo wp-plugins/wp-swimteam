@@ -3,15 +3,15 @@
 /**
  * UserProfile classes.
  *
- * $Id: users.class.php 852 2012-05-09 19:43:36Z mpwalsh8 $
+ * $Id: users.class.php 928 2012-06-28 22:25:15Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage UserProfile
- * @version $Revision: 852 $
- * @lastmodified $Date: 2012-05-09 15:43:36 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 928 $
+ * @lastmodified $Date: 2012-06-28 18:25:15 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -689,15 +689,21 @@ class SwimTeamUserProfile extends SwimTeamDBI
         //  If the options count is zero or non-existant, don't reference
         //  the meta table because it will result in an empty set being returned.
 
-        if (($options_count === false) || ((int)$options_count === 0))
-        {
-            $query = sprintf('SELECT DISTINCT ID as userid FROM %s', WPST_USERS_TABLES) ;
-        }
-        else
-        {
-            $query = sprintf('SELECT DISTINCT ID as userid FROM %s, %s',
-                WPST_OPTIONS_META_TABLE, WPST_USERS_TABLES) ;
-        }
+        //if (($options_count === false) || ((int)$options_count === 0))
+        //{
+        //    $query = sprintf('SELECT DISTINCT u.ID as userid FROM %s', WPST_USERS_TABLES) ;
+        //}
+        //else
+        //{
+        //    $query = sprintf('SELECT DISTINCT u.ID as userid FROM %s, %s',
+        //        WPST_OPTIONS_META_TABLE, WPST_USERS_TABLES) ;
+        //}
+
+        $query = sprintf('SELECT DISTINCT u.id AS userid FROM %susers u
+            LEFT JOIN %susermeta m1 ON (m1.user_id = u.ID AND m1.meta_key = \'first_name\')
+            LEFT JOIN %susermeta m2 ON (m2.user_id = u.ID AND m2.meta_key = \'last_name\')
+            LEFT JOIN %s m ON (m.userid = u.id)', WP_DB_BASE_PREFIX, WP_DB_BASE_PREFIX,
+                WP_DB_BASE_PREFIX, WPST_OPTIONS_META_TABLE) ;
 
         //  Filter?
 
@@ -709,19 +715,12 @@ class SwimTeamUserProfile extends SwimTeamDBI
         if ($orderbyusername)
             $orderby = ' ORDER BY user_login' ;
         else if ($orderbylastcommafirst)
-            $orderby = ' ORDER BY lastname, firstname' ;
+            //$orderby = ' ORDER BY lastname, firstname' ;
+            $orderby = ' ORDER BY m2.meta_value, m1.meta_value' ;
         else
             $orderby = ' ORDER BY userid' ;
 
         $query .= $orderby ;
-
-        //print '<pre>' ;
-        //$this->setQuery('SELECT COUNT(ometaid) AS ometaidcount FROM wp_st_options_meta') ;
-        //$this->runSelectQuery() ;
-        //print_r($this->getQueryResults()) ;
-        //print_r($query) ;
-        //print '</pre>' ;
-        //printf('<pre>%s</pre>', print_r($this->_query, true)) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -840,6 +839,8 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
             $this->getTables(), $this->getWhereClause()) ;
+        //  Need this because of our complex query for users and their swimmers
+        $this->_datasource->set_count_column('DISTINCT u.ID') ;
 
         $this->_collapsable_search = true ;
         //  turn on the 'collapsable' search block.
@@ -928,7 +929,7 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
                 break ;
 
             case 'Swimmers' :
-                if ($row_data['swimmers'] == null)
+                if ($row_data['swimmers'] == 'no')
                     $obj = __(ucfirst(WPST_NO)) ;
                 else
                     $obj = __(ucfirst(WPST_YES)) ;

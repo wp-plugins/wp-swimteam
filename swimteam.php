@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.31.918
- * Last Modified:  2012/06/19 14:08:23
+ * Version: 1.32.931
+ * Last Modified:  2012/06/30 17:41:13
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 894 2012-05-30 01:48:30Z mpwalsh8 $
+ * $Id: swimteam.php 922 2012-06-28 22:22:24Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,8 +20,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 894 $
- * @lastmodified $Date: 2012-05-29 21:48:30 -0400 (Tue, 29 May 2012) $
+ * @version $Rev: 922 $
+ * @lastmodified $Date: 2012-06-28 18:22:24 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
  */
@@ -850,31 +850,25 @@ function wpst_login_redirect2($link)
         switch (get_option(WPST_OPTION_LOGIN_REDIRECT))
         {
             case WPST_DASHBOARD_PAGE:
-                //var_dump(WPST_DASHBOARD_PAGE) ;
                 break ;
 
             case WPST_SWIMTEAM_OVERVIEW_PAGE:
-                //var_dump(WPST_SWIMTEAM_OVERVIEW_PAGE) ;
                 break ;
 
             case WPST_HOME_PAGE:
-                //var_dump(WPST_HOME_PAGE) ;
                 break ;
 
             case WPST_PREVIOUS_PAGE:
-                //var_dump(WPST_DASHBOARD_PAGE) ;
                 $link = str_replace( '">', '&amp;redirect_to='
                     . urlencode( $currenturl ) . '">', $link );
                 break ;
 
             default:
-                //var_dump("default") ;
                 break ;
         }
     }
 	else
     {
-        //var_dump(basename(__FILE__) . ":" . __LINE__) ;
         $link = str_replace( '">',
             '?redirect_to=' . urlencode( $currenturl ) . '">', $link );
     }

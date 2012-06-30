@@ -3,15 +3,15 @@
 /**
  * Swim Meets admin page content.
  *
- * $Id: swimmeets.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: swimmeets.php 920 2012-06-28 22:19:07Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 920 $
+ * @lastmodified $Date: 2012-06-28 18:19:07 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -115,10 +115,6 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
             WPST_ACTION_ADD
         ) ;
 
-        //printf('<h3>%s::%s</h3>', basename(__FILE__), __LINE__) ;
-        //print '<pre>' ;
-        //print_r($scriptargs) ;
-        //print '</pre>' ;
         //  The swimmeetid is the argument which must be
         //  dealt with differently for GET and POST operations
 
@@ -132,8 +128,6 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
         else
             $swimmeetid = null ;
 
-        //printf('<h3>%s::%s</h3>', basename(__FILE__), __LINE__) ;
-        //var_dump($swimmeetid) ;
         //  So, how did we get here?  If $_POST is empty
         //  then it wasn't via a form submission.
 
@@ -349,8 +343,6 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     //  Leverage the Events tab management code
 
                     require_once('events.php') ;
-                    //printf('<h3>%s::%s</h3>', basename(__FILE__), __LINE__) ;
-                    //var_dump($swimmeetid) ;
                     $c = new AdminSwimMeetEventsTabContainer($swimmeetid, $desc) ;
 
                     break ;

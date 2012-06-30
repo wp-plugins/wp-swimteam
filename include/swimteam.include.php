@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 901 2012-06-04 01:43:40Z mpwalsh8 $
+ * $Id: swimteam.include.php 923 2012-06-28 22:23:04Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,8 +13,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 901 $
- * @lastmodified $Date: 2012-06-03 21:43:40 -0400 (Sun, 03 Jun 2012) $
+ * @version $Revision: 923 $
+ * @lastmodified $Date: 2012-06-28 18:23:04 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -397,7 +397,7 @@ function wpst_preprint_r()
 
 function wpst_whereami($f, $l)
 {
-    printf('<h2>%s::%s</h2>', basename($f), $l) ;
+    printf('<h2>%s - %s::%s</h2>', date('Y-m-d @ h:m:s'), basename($f), $l) ;
 }
 
 endif ;

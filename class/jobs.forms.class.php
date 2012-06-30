@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: jobs.forms.class.php 874 2012-05-13 01:48:42Z mpwalsh8 $
+ * $Id: jobs.forms.class.php 919 2012-06-28 22:12:39Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Jobs
- * @version $Revision: 874 $
+ * @version $Revision: 919 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-12 21:48:42 -0400 (Sat, 12 May 2012) $
+ * @lastmodifiedby $Date: 2012-06-28 18:12:39 -0400 (Thu, 28 Jun 2012) $
  *
  */
 
@@ -1690,7 +1690,6 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
                 //  Need to account for the use case when a job
                 //  us is unassigned by setting the User to None.
 
-                //printf('<pre>%s</pre>', print_r($ja, true)) ;
                 if ($ja->getUserId() == WPST_NULL_ID)
                 {
                     $msg = "unsassigned" ;

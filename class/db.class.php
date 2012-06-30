@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: db.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: db.class.php 926 2012-06-28 22:24:39Z mpwalsh8 $
  *
  * Form classes.  These classes manage the
  * entry and display of the various forms used
@@ -13,8 +13,8 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage db
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 926 $
+ * @lastmodified $Date: 2012-06-28 18:24:39 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -148,11 +148,6 @@ class SwimTeamDBI
 
         $this->_insertId = $this->wpstdb->insert_id ;
 
-        //print '<pre>' ;
-        //printf('%s::%s - Insert Query', basename(__FILE__), __LINE__) ;
-        //print_r($this->getQuery()) ;
-        //print '</pre>' ;
-
         return $this->_insertId ;
     }
 
@@ -206,11 +201,6 @@ class SwimTeamDBI
         $this->_affectedRows = $this->_wpstWpQuery !== false ? $this->_wpstWpQuery : 0 ;
         //$this->_affectedRows = $this->wpstdb->query($this->getQuery()) ;
 
-        //print '<pre>' ;
-        //printf('%s::%s Query', basename(__FILE__), __LINE__) ;
-        //print_r($this->getQuery()) ;
-        //print '</pre>' ;
-
         return $this->_affectedRows ;
     }
 
@@ -249,11 +239,6 @@ class SwimTeamDBI
             $this->_wpstWpQuery = $this->wpstdb->query($this->getQuery()) ;
             $this->setQueryCount($this->_wpstWpQuery !== false ? $this->_wpstWpQuery : 0) ;
         }
-
-        //print '<pre>' ;
-        //printf('<h3>%s::%s - Select Query</h3>', basename(__FILE__), __LINE__) ;
-        //print_r($this->getQuery()) ;
-        //print '</pre>' ;
 
         return $this->getQueryCount() ;
     }

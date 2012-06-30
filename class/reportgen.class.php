@@ -3,15 +3,15 @@
 /**
  * Reports classes.
  *
- * $Id: reportgen.class.php 914 2012-06-17 22:31:13Z mpwalsh8 $
+ * $Id: reportgen.class.php 927 2012-06-28 22:24:58Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Reports
- * @version $Revision: 914 $
- * @lastmodified $Date: 2012-06-17 18:31:13 -0400 (Sun, 17 Jun 2012) $
+ * @version $Revision: 927 $
+ * @lastmodified $Date: 2012-06-28 18:24:58 -0400 (Thu, 28 Jun 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1949,8 +1949,9 @@ class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGenerator
 
             //  Select the swimmers connected to the user
 
-            $filter = sprintf('(%s.contact1id="%s" OR %s.contact2id="%s")',
-                WPST_SWIMMERS_TABLE, $userid['userid'], WPST_SWIMMERS_TABLE, $userid['userid']) ;
+            //$filter = sprintf('(%s.contact1id="%s" OR %s.contact2id="%s")',
+            //    WPST_SWIMMERS_TABLE, $userid['userid'], WPST_SWIMMERS_TABLE, $userid['userid']) ;
+            $filter = sprintf('(s.contact1id="%s" OR s.contact2id="%s")', $userid['userid'], $userid['userid']) ;
 
             $swimmerids = $swimmer->getAllSwimmerIds($filter) ;
 
