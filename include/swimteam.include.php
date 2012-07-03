@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 923 2012-06-28 22:23:04Z mpwalsh8 $
+ * $Id: swimteam.include.php 947 2012-07-02 21:16:51Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,8 +13,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 923 $
- * @lastmodified $Date: 2012-06-28 18:23:04 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 947 $
+ * @lastmodified $Date: 2012-07-02 17:16:51 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -381,6 +381,14 @@ define('WPST_CLOTHING_SIZE_XL_VALUE', 'XL') ;
 define('WPST_CLOTHING_SIZE_2XL_VALUE', '2XL') ;
 define('WPST_CLOTHING_SIZE_3XL_VALUE', '3XL') ;
 define('WPST_CLOTHING_SIZE_4XL_VALUE', '4XL') ;
+
+define('WPST_FILE_FORMAT_SDIF_SD3_LABEL', 'SDIF') ;
+define('WPST_FILE_FORMAT_SDIF_SD3_VALUE', 'sd3') ;
+define('WPST_FILE_FORMAT_HYTEK_HY3_LABEL', 'Hy-tek HY3') ;
+define('WPST_FILE_FORMAT_HYTEK_HY3_VALUE', 'hy3') ;
+define('WPST_FILE_FORMAT_HYTEK_CL2_LABEL', 'Hy-tek CL2') ;
+define('WPST_FILE_FORMAT_HYTEK_CL2_VALUE', 'cl2') ;
+
 
 if (WPST_DEBUG) :
 /**

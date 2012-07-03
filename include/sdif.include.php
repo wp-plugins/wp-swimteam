@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: sdif.include.php 915 2012-06-19 13:05:27Z mpwalsh8 $
+ * $Id: sdif.include.php 938 2012-07-02 18:18:25Z mpwalsh8 $
  *
  * SDIF includes.  These includes define information used in 
  * the SDIF classes and child classes in the Wp-SwimTeam plugin.
@@ -16,8 +16,8 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage SDIF
- * @version $Revision: 915 $
- * @lastmodified $Date: 2012-06-19 09:05:27 -0400 (Tue, 19 Jun 2012) $
+ * @version $Revision: 938 $
+ * @lastmodified $Date: 2012-07-02 14:18:25 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -45,10 +45,10 @@ define('WPST_SDIF_USE_NT_LABEL', 'Use "NT" Notation') ;
 define('WPST_SDIF_USE_BLANKS_VALUE', 1) ;
 define('WPST_SDIF_USE_ZEROS_VALUE', 2) ;
 define('WPST_SDIF_USE_NT_VALUE', 3) ;
-define('WPST_SDIF_FILE_FORMAT_SDIF_LABEL', 'SDIF') ;
-define('WPST_SDIF_FILE_FORMAT_CL2_LABEL', 'Hy-tek CL2') ;
-define('WPST_SDIF_FILE_FORMAT_SDIF_VALUE', 'sd3') ;
-define('WPST_SDIF_FILE_FORMAT_CL2_VALUE', 'cl2') ;
+//define('WPST_SDIF_FILE_FORMAT_SDIF_LABEL', 'SDIF') ;
+//define('WPST_SDIF_FILE_FORMAT_CL2_LABEL', 'Hy-tek CL2') ;
+//define('WPST_SDIF_FILE_FORMAT_SDIF_VALUE', 'sd3') ;
+//define('WPST_SDIF_FILE_FORMAT_CL2_VALUE', 'cl2') ;
 
 /**
  *  Organization Code

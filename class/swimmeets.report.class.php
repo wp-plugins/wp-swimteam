@@ -3,15 +3,15 @@
 /**
  * Meets classes.
  *
- * $Id: swimmeets.report.class.php 854 2012-05-11 02:56:24Z mpwalsh8 $
+ * $Id: swimmeets.report.class.php 945 2012-07-02 21:14:40Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Meets
- * @version $Revision: 854 $
- * @lastmodified $Date: 2012-05-10 22:56:24 -0400 (Thu, 10 May 2012) $
+ * @version $Revision: 945 $
+ * @lastmodified $Date: 2012-07-02 17:14:40 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -519,6 +519,21 @@ class SwimMeetReport extends SwimMeet
                 get_option(WPST_OPTION_OPT_IN_LABEL) : 
                 get_option(WPST_OPTION_OPT_OUT_LABEL) ;
 
+            //  Calculate particiaption on an age group basis
+
+            $agegroup = new SwimTeamAgeGroup() ;
+            $agegroupsummary = $agegroup->getAgeGroupSummary($this->getActiveSeasonId()) ;
+            $agegroupsummary[$participation] = array() ;
+            $agegroups = &$agegroupsummary['agegroups'] ;
+            $agegroupparticipation = &$agegroupsummary[$participation] ;
+
+            //  Initialize the participation counts for each age group
+
+            foreach ($agegroups as $key => $value)
+                $agegroupparticipation[$key] = 0 ;
+
+            //  Build a description
+
             if ($this->getMeetType() == WPST_DUAL_MEET)
                 $opponent = SwimTeamTextMap::__mapOpponentSwimClubIdToText(
                     $this->getOpponentSwimClubId()) ;
@@ -680,6 +695,12 @@ class SwimMeetReport extends SwimMeet
 
                                 call_user_method_array('add_row', $full, $tr) ;
 
+                                //  Update summary counts
+
+                                $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+                                $ag = $agegroup->getAgeGroupIdByAgeAndGender($swimmer->getAgeGroupAge(), $swimmer->getGender()) ;
+                                $agegroupparticipation[$ag]++ ;
+
                                 $fullrows++ ;
                             }
                             else
@@ -822,6 +843,58 @@ class SwimMeetReport extends SwimMeet
                 }
             }
 
+            $fullsummary = new SwimTeamInfoTable(sprintf('Meet Full %s Summary:  %s %s',
+                $participation, $opponent, $meetdate), '600px') ;
+            $fullsummary->set_alt_color_flag(true) ;
+
+            //  Make sure we have some data
+
+            if ($agegroupsummary['swimmers'] > 0)
+            {
+                $fullsummary->add_row(html_b(__('Age Group')), html_b(__('Swimmers')), html_b(__($participation))) ;
+
+                foreach ($agegroups as $key => $value)
+                {
+                    $agegroup->setId($key) ;
+                    $agegroup->loadAgeGroupById() ;
+
+                    if (empty($agegroupparticipation[$key])) $agegroupparticipation[$key] = 0 ;
+
+                    $fullsummary->add_row(__(ucfirst($agegroup->getGenderLabel() . 's')) . ' ' .
+                        $agegroup->getMinAge() . ' - ' . $agegroup->getMaxAge(),
+                        (string)$value, (string)$agegroupparticipation[$key]) ;
+                }
+
+                foreach ($agegroupsummary as $key => $value)
+                {
+                    switch ($key)
+                    {
+                        case 'swimmers' :
+                            $fullsummary->add_row(html_b(__('Total ' . ucfirst($key))), html_b($value), $fullrows) ;
+                            break ;
+
+                        case WPST_GENDER_MALE:
+                            $label = get_option(WPST_OPTION_GENDER_LABEL_MALE) ;
+                            if ($label === false) $label = WPST_OPTION_GENDER_LABEL_MALE ;
+                            $fullsummary->add_row(html_b(__('Total ' . ucfirst($label) . 's')), html_b($value), _HTML_SPACE) ;
+                            break ;
+
+                        case WPST_GENDER_FEMALE:
+                            $label = get_option(WPST_OPTION_GENDER_LABEL_FEMALE) ;
+                            if ($label === false) $label = WPST_OPTION_GENDER_LABEL_FEMALE ;
+                            $fullsummary->add_row(html_b(__('Total ' . ucfirst($label) . 's')), html_b($value), _HTML_SPACE) ;
+                            break ;
+
+                        default:
+                            break ;
+                    }
+                }
+            }
+            else
+            {
+                $fullsummary->add_row(html_b('No age groups defined.')) ;
+            }
+
             // Which mode is the data in?  Stroke or Event?
 
             if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
@@ -830,9 +903,9 @@ class SwimMeetReport extends SwimMeet
                 $partialmsg = html_h4(sprintf('%d swimmer(s) found.', $partialrows)) ;
 
                 if (empty($c->_content))
-                    $c->add($full, $fullmsg, html_br(2), $partial, $partialmsg) ;
+                    $c->add($fullsummary, html_br(2), $full, $fullmsg, html_br(2), $partial, $partialmsg) ;
                 else
-                    $c->add(html_br(2), $full, $fullmsg, html_br(2), $partial, $partialmsg) ;
+                    $c->add(html_br(2), $fullsummary, html_br(2), $full, $fullmsg, html_br(2), $partial, $partialmsg) ;
             }
             else
             {

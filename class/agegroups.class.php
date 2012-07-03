@@ -3,15 +3,15 @@
 /**
  * AgeGroup classes.
  *
- * $Id: agegroups.class.php 861 2012-05-11 18:45:19Z mpwalsh8 $
+ * $Id: agegroups.class.php 932 2012-07-02 18:12:35Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage AgeGroups
- * @version $Revision: 861 $
- * @lastmodified $Date: 2012-05-11 14:45:19 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 932 $
+ * @lastmodified $Date: 2012-07-02 14:12:35 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -539,16 +539,132 @@ class SwimTeamAgeGroup extends SwimTeamDBI
      *
      * @return - array - array of age group ids
      */
-    function getAgeGroupIds()
+    function getAgeGroupIds($orderby = null)
     {
         //  Select the records for the age groups
 
         $query = sprintf('SELECT id FROM %s', WPST_AGE_GROUP_TABLE) ;
 
+        if (!is_null($orderby))
+            $query .= ' ORDER BY ' . $orderby ;
+
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 
         return $this->getQueryResults() ;
+    }
+
+    /**
+     * Build query select clause
+     *
+     * @return string - where clause for GUIDataList query
+     */
+    function __buildSelectClause()
+    {
+        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
+            get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
+            get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
+
+        $select_clause = sprintf(WPST_ROSTER_COUNT_COLUMNS, 
+            $cutoffdate, $cutoffdate, $cutoffdate) ;
+
+        return $select_clause ;
+    }
+
+    /**
+     * Build query where clause
+     *
+     * @return string - where clause for GUIDataList query
+     */
+    function __buildWhereClause($seasonId = null)
+    {
+        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
+            get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
+            get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
+
+        $season = new SwimTeamSeason() ;
+
+        if ($seasonId == null) 
+            $seasonId = $season->getActiveSeasonId() ;
+
+        //  On the off chance there isn't an active season
+        //  set the season id to an invalid number so the SQL
+        //  won't fail.
+        
+        if ($seasonId == null) $seasonId = -1 ;
+
+        $where_clause = sprintf(WPST_ROSTER_COUNT_WHERE_CLAUSE, $seasonId,
+            $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate,
+            $cutoffdate) ;
+
+        return $where_clause ;
+    }
+
+    /**
+     * construct the InfoTable
+     *
+     */
+    function getAgeGroupSummary($seasonId = null)
+    {
+        //  Count the number of swimmers in each age group
+ 
+        $a = new SwimTeamDBI() ;
+        $a->setQuery(sprintf('SELECT %s FROM %s WHERE %s',
+            $this->__buildSelectClause(), WPST_ROSTER_COUNT_TABLES,
+            $this->__buildWhereClause($seasonId))) ;
+        $a->runSelectQuery() ;
+
+        $agc = $a->getQueryResults() ;
+
+        //  Build a complete age group report for all defined
+        //  age groups.  The prior query only reports age groups
+        //  which contains swimmers - we need to account for the
+        //  age groups which are unpopulated as well.
+ 
+        $agegroups = $this->getAgeGroupIds('minage, maxage, gender') ;
+
+        //  Make sure we have some data
+
+        if (count($agegroups) > 0)
+        {
+            $totals = array(
+                'swimmers' => 0
+               ,WPST_GENDER_MALE => 0
+               ,WPST_GENDER_FEMALE => 0
+               ,'agegroups' => array()
+            ) ;
+
+            $agegrouptotals = &$totals['agegroups'] ;
+
+            foreach ($agegroups as $agegroup)
+            {
+                $this->setId($agegroup['id']) ;
+                $this->loadAgeGroupById() ;
+
+                $agegroupcount = 0 ;
+
+                for ($i = 0 ; $i < count($agc) ; $i++)
+                {
+
+                    if ($agc[$i]['agegroup'] == $this->getGender() . ' ' . $this->getMinAge() . ' - ' . $this->getMaxAge())
+                    {
+                        $agegroupcount = $agc[$i]['agegroupcount'] ;
+                        break ;
+                    }
+                }
+
+                $agegrouptotals[$agegroup['id']] = $agegroupcount ;
+
+                //  Keep a running total of swimmers by gender and total count
+                
+                $totals[$this->getGender()] += $agegroupcount ;
+
+                $totals['swimmers'] += $agegroupcount ;
+            }
+
+        }
+
+        return $totals ;
     }
 }
 
@@ -797,50 +913,6 @@ class SwimTeamAgeGroupsAdminGUIDataList extends SwimTeamAgeGroupsGUIDataList
 class SwimTeamAgeGroupInfoTable extends SwimTeamInfoTable
 {
     /**
-     * Build query select clause
-     *
-     * @return string - where clause for GUIDataList query
-     */
-    function __buildSelectClause()
-    {
-        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
-            get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
-            get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
-
-        $select_clause = sprintf(WPST_ROSTER_COUNT_COLUMNS, 
-            $cutoffdate, $cutoffdate, $cutoffdate) ;
-
-        return $select_clause ;
-    }
-
-    /**
-     * Build query where clause
-     *
-     * @return string - where clause for GUIDataList query
-     */
-    function __buildWhereClause()
-    {
-        $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
-            get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
-            get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
-
-        $season = new SwimTeamSeason() ;
-        $seasonId = $season->getActiveSeasonId() ;
-
-        //  On the off chance there isn't an active season
-        //  set the season id to an invalid number so the SQL
-        //  won't fail.
-        
-        if ($seasonId == null) $seasonId = -1 ;
-
-        $where_clause = sprintf(WPST_ROSTER_COUNT_WHERE_CLAUSE, $seasonId,
-            $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate,
-            $cutoffdate) ;
-
-        return $where_clause ;
-    }
-
-    /**
      * construct the InfoTable
      *
      */
@@ -851,68 +923,50 @@ class SwimTeamAgeGroupInfoTable extends SwimTeamInfoTable
 
         //  Count the number of swimmers in each age group
  
-        $a = new SwimTeamDBI() ;
-        $a->setQuery(sprintf('SELECT %s FROM %s WHERE %s',
-            $this->__buildSelectClause(), WPST_ROSTER_COUNT_TABLES,
-            $this->__buildWhereClause())) ;
-        $a->runSelectQuery() ;
-
-        $agc = $a->getQueryResults() ;
-
-        //  Build a complete age group report for all defined
-        //  age groups.  The prior query only reports age groups
-        //  which contains swimmers - we need to account for the
-        //  age groups which are unpopulated as well.
- 
         $a = new SwimTeamAgeGroup() ;
-
-        $a->setQuery(sprintf('SELECT id FROM %s
-            ORDER BY minage, maxage, gender', WPST_AGE_GROUP_TABLE)) ;
-        $a->runSelectQuery() ;
+        $summary = $a->getAgeGroupSummary() ;
 
         //  Make sure we have some data
 
-        if ($a->getQueryCount() > 0)
+        if ($summary['swimmers'] > 0)
         {
-            $totals = array(__(ucfirst('swimmers')) => 0) ;
-
             $this->add_row(html_b(__('Age Group')), html_b(__('Swimmers'))) ;
 
-            $agegroups = $a->getQueryResults() ;
+            $agegroups = &$summary['agegroups'] ;
 
-            foreach ($agegroups as $agegroup)
+            foreach ($agegroups as $key => $value)
             {
-                $a->setId($agegroup['id']) ;
+                $a->setId($key) ;
                 $a->loadAgeGroupById() ;
 
-                $agegroupcount = 0 ;
-
-                for ($i = 0 ; $i < count($agc) ; $i++)
-                {
-
-                    if ($agc[$i]['agegroup'] == $a->getGender() . ' ' . $a->getMinAge() . ' - ' . $a->getMaxAge())
-                    {
-                        $agegroupcount = $agc[$i]['agegroupcount'] ;
-                        break ;
-                    }
-                }
-
                 $this->add_row(__(ucfirst($a->getGenderLabel() . 's')) . ' ' .
-                    $a->getMinAge() . ' - ' . $a->getMaxAge(),
-                   sprintf('%s', $agegroupcount)) ;
-
-                //  Keep a running total of swimmers by gender and total count
-                
-                if (array_key_exists(__(ucfirst($a->getGenderLabel() . 's')), $totals))
-                    $totals[__(ucfirst($a->getGenderLabel() . 's'))] += $agegroupcount ;
-                else
-                    $totals[__(ucfirst($a->getGenderLabel() . 's'))] = $agegroupcount ;
-
-                $totals[__(ucfirst('swimmers'))] += $agegroupcount ;
+                    $a->getMinAge() . ' - ' . $a->getMaxAge(), sprintf('%s', $value)) ;
             }
 
-            foreach ($totals as $key => $total)
-                $this->add_row(html_b(__('Total ' . $key)), html_b($total)) ;
+            foreach ($summary as $key => $value)
+            {
+                switch ($key)
+                {
+                    case 'swimmers' :
+                        $this->add_row(html_b(__('Total ' . ucfirst($key))), html_b($value)) ;
+                        break ;
+
+                    case WPST_GENDER_MALE:
+                        $label = get_option(WPST_OPTION_GENDER_LABEL_MALE) ;
+                        if ($label === false) $label = WPST_OPTION_GENDER_LABEL_MALE ;
+                        $this->add_row(html_b(__('Total ' . ucfirst($label) . 's')), html_b($value)) ;
+                        break ;
+
+                    case WPST_GENDER_FEMALE:
+                        $label = get_option(WPST_OPTION_GENDER_LABEL_FEMALE) ;
+                        if ($label === false) $label = WPST_OPTION_GENDER_LABEL_FEMALE ;
+                        $this->add_row(html_b(__('Total ' . ucfirst($label) . 's')), html_b($value)) ;
+                        break ;
+
+                    default:
+                        break ;
+                }
+            }
         }
         else
         {

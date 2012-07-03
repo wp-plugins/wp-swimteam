@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmeets.forms.class.php 904 2012-06-05 14:29:21Z mpwalsh8 $
+ * $Id: swimmeets.forms.class.php 943 2012-07-02 21:09:04Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
- * @version $Revision: 904 $
+ * @version $Revision: 943 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-06-05 10:29:21 -0400 (Tue, 05 Jun 2012) $
+ * @lastmodifiedby $Date: 2012-07-02 17:09:04 -0400 (Mon, 02 Jul 2012) $
  *
  */
 
@@ -26,6 +26,7 @@ require_once('swimclubs.class.php') ;
 require_once('swimmers.class.php') ;
 require_once('events.class.php') ;
 require_once('sdif.class.php') ;
+require_once('hy-tek.class.php') ;
 
 /**
  * Construct the base SwimMeet form
@@ -150,24 +151,45 @@ class WpSwimTeamSwimMeetForm extends WpSwimTeamForm
 class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
 {
     /**
-     * SDIF file property
+     * Export file property
      */
-    var $__sdif_file ;
+    var $__export_file ;
 
     /**
-     * Set the SDIF file property
+     * Export file extension property
      */
-    function setSDIFFile($txt)
+    var $__export_file_extension ;
+
+    /**
+     * Set the Export file property
+     */
+    function setExportFile($txt)
     {
-        $this->__sdif_file = $txt ;
+        $this->__export_file = $txt ;
     }
 
     /**
      * Get the SDIF file property
      */
-    function getSDIFFile()
+    function getExportFile()
     {
-        return $this->__sdif_file ;
+        return $this->__export_file ;
+    }
+
+    /**
+     * Set the Export file property
+     */
+    function setExportFileExtension($txt)
+    {
+        $this->__export_file_extension = $txt ;
+    }
+
+    /**
+     * Get the SDIF file property
+     */
+    function getExportFileExtension()
+    {
+        return $this->__export_file_extension ;
     }
 
     /**
@@ -193,7 +215,7 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
         $fileformat = new FERadioGroup('File Format',
             SDIFCodeTableMappings::GetFileFormat(), true, '200px');
         $fileformat->set_br_flag(true) ;
-        $fileformat->set_disabled(true) ;
+        $fileformat->set_readonly(true) ;
         $this->add_element($fileformat) ;
 
         $zerotimemode = new FERadioGroup('Zero Time Format',
@@ -221,7 +243,7 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
             $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
 
         $this->set_hidden_element_value('_action', WPST_ACTION_EXPORT_ENTRIES) ;
-        $this->set_element_value('File Format', WPST_SDIF_FILE_FORMAT_SDIF_VALUE) ;
+        $this->set_element_value('File Format', WPST_FILE_FORMAT_SDIF_SD3_VALUE) ;
         $this->set_element_value('Zero Time Format', WPST_SDIF_USE_BLANKS_VALUE) ;
         $this->set_element_value('Events', $this->getEventIds()) ;
     }
@@ -282,15 +304,37 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
      */
     function form_action()
     {
-        $sdif = new SDIFMeetEntriesPyramid() ;
-        $sdif->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
-        $sdif->setZeroTimeMode($this->get_element_value('Zero Time Format')) ;
-        $sdif->generateSDIF($this->get_element_value('Events')) ;
-        $sdif->generateSDIFFile() ;
+        if ($this->get_element_value('File Format') == WPST_FILE_FORMAT_SDIF_SD3_VALUE)
+        {
+            $sd3 = new SDIFMeetEntriesPyramid() ;
+            $sd3->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
+            $sd3->setZeroTimeMode($this->get_element_value('Zero Time Format')) ;
+            $sd3->generateSDIF($this->get_element_value('Events')) ;
+            $sd3->generateSDIFFile() ;
 
-        $this->setSDIFFile(urlencode($sdif->getSDIFFile())) ;
+            $this->setExportFileExtension('.sd3') ;
+            $this->setExportFile(urlencode($sd3->getSDIFFile())) ;
 
-        $this->set_action_message(sprintf('%s meet entries exported in SDIF format.', $sdif->getSDIFCount())) ;
+            $this->set_action_message(sprintf('%s meet entries exported in SDIF format.', $sd3->getSDIFCount())) ;
+        }
+        else if ($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_HY3_VALUE)
+        {
+            $hy3 = new HY3MeetEntries() ;
+            $hy3->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
+            $hy3->setZeroTimeMode($this->get_element_value('Zero Time Format')) ;
+            $hy3->generateHY3($this->get_element_value('Events')) ;
+            $hy3->generateHY3File() ;
+
+            $this->setExportFileExtension('.hy3') ;
+            $this->setExportFile(urlencode($hy3->getHY3File())) ;
+
+            $this->set_action_message(sprintf('%s meet entries exported in Hy-tek HY3 format.', $hy3->getHY3Count())) ;
+        }
+        else
+        {
+            $this->add_error('File Format', 'Unsupported file format.') ;
+            return false ;
+        }
 
         return true ;
     }
@@ -1177,21 +1221,17 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamSwimMeetForm
         $season = new SwimTeamSeason() ;
         $swimmer = new SwimTeamSwimmer() ;
 
+        $joins = sprintf('LEFT JOIN %s r ON (r.swimmerid=s.id)', WPST_ROSTER_TABLE) ;
+
         if ($admin)
-            $filter = sprintf('%s.seasonid="%s" AND %s.swimmerid=%s.id AND %s.status="%s"',
-                WPST_ROSTER_TABLE, $season->getActiveSeasonId(),
-                WPST_ROSTER_TABLE, WPST_SWIMMERS_TABLE,
-                WPST_ROSTER_TABLE, WPST_ACTIVE) ;
+            $filter = sprintf('r.seasonid="%s" AND r.status="%s"',
+                $season->getActiveSeasonId(), WPST_ACTIVE) ;
         else
             $filter = sprintf('(%s.contact1id = "%s" OR %s.contact2id = "%s") AND
-                %s.seasonid="%s" AND %s.swimmerid=%s.id AND %s.status="%s"',
-                WPST_SWIMMERS_TABLE, $userdata->ID,
-                WPST_SWIMMERS_TABLE, $userdata->ID,
-                WPST_ROSTER_TABLE, $season->getActiveSeasonId(),
-                WPST_ROSTER_TABLE, WPST_SWIMMERS_TABLE,
-                WPST_ROSTER_TABLE, WPST_ACTIVE) ;
+                r.seasonid="%s" AND %s.status="%s"', WPST_SWIMMERS_TABLE, $userdata->ID,
+                WPST_SWIMMERS_TABLE, $userdata->ID, $season->getActiveSeasonId(), WPST_ACTIVE) ;
 
-        $swimmerIds = $swimmer->getAllSwimmerIds($filter) ;
+        $swimmerIds = $swimmer->getAllSwimmerIds($filter, 's.lastname', $joins) ;
 
         if (!empty($swimmerIds))
         {
@@ -2259,7 +2299,7 @@ class WpSwimTeamSwimMeetJobRemindersForm extends WpSwimTeamSwimMeetForm
                 if (array_search($ja->getJobDuration(), $jobs) !== false)
                 {
                     //printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
-                    $ja->sendReminderEmail() ;
+                    $ja->sendReminderEmail($ja->getUserId()) ;
                     $jobdetails = SwimTeamTextMap::__mapJobIdToText($ja->getJobId()) ;
 
                     $u = get_userdata($ja->getUserId()) ;

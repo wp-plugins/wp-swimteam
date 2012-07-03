@@ -3,15 +3,15 @@
 /**
  * Swimmer classes.
  *
- * $Id: swimmers.class.php 925 2012-06-28 22:24:02Z mpwalsh8 $
+ * $Id: swimmers.class.php 944 2012-07-02 21:09:34Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 925 $
- * @lastmodified $Date: 2012-06-28 18:24:02 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 944 $
+ * @lastmodified $Date: 2012-07-02 17:09:34 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1054,7 +1054,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
      * @param - string - optional filter to restrict query
      * @return - array - array of swimmers ids
      */
-    function getAllSwimmerIds($filter = null, $orderby = 'lastname')
+    function getAllSwimmerIds($filter = null, $orderby = 'lastname', $joins = null)
     {
         //  Select the records for the season
 
@@ -1076,8 +1076,12 @@ class SwimTeamSwimmer extends SwimTeamDBI
         //        WPST_SEASONS_TABLE, WPST_OPTIONS_META_TABLE) ;
         //}
 
-        $query = sprintf('SELECT DISTINCT s.id AS swimmerid FROM %s s
-            LEFT JOIN %s m ON (m.swimmerid = s.id)', WPST_SWIMMERS_TABLE, WPST_OPTIONS_META_TABLE) ;
+        if ($joins == null)
+            $query = sprintf('SELECT DISTINCT s.id AS swimmerid FROM %s s
+                LEFT JOIN %s m ON (m.swimmerid = s.id)', WPST_SWIMMERS_TABLE, WPST_OPTIONS_META_TABLE) ;
+        else
+            $query = sprintf('SELECT DISTINCT s.id AS swimmerid FROM %s s %s
+                LEFT JOIN %s m ON (m.swimmerid = s.id)', WPST_SWIMMERS_TABLE, $joins, WPST_OPTIONS_META_TABLE) ;
 
         //  Build the filters
 

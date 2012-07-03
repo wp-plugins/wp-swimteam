@@ -3,15 +3,15 @@
 /**
  * TeamProfile classes.
  *
- * $Id: sdif.class.php 907 2012-06-05 23:01:26Z mpwalsh8 $
+ * $Id: sdif.class.php 934 2012-07-02 18:16:20Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision: 907 $
- * @lastmodified $Date: 2012-06-05 19:01:26 -0400 (Tue, 05 Jun 2012) $
+ * @version $Revision: 934 $
+ * @lastmodified $Date: 2012-07-02 14:16:20 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -6385,8 +6385,8 @@ class SDIFCodeTableMappings
     function GetFileFormat()
     {
         $WPST_FILE_FORMAT = array(
-            WPST_SDIF_FILE_FORMAT_SDIF_LABEL => WPST_SDIF_FILE_FORMAT_SDIF_VALUE
-           ,WPST_SDIF_FILE_FORMAT_CL2_LABEL => WPST_SDIF_FILE_FORMAT_CL2_VALUE
+            WPST_FILE_FORMAT_SDIF_SD3_LABEL => WPST_FILE_FORMAT_SDIF_SD3_VALUE
+           ,WPST_FILE_FORMAT_HYTEK_HY3_LABEL => WPST_FILE_FORMAT_HYTEK_HY3_VALUE
         ) ;
 
         return $WPST_FILE_FORMAT ;

@@ -64,6 +64,13 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.33 =
+* Fixed bug which prevented generating roster report.
+* Fixed bug which prevented scratching swimmers from Meet tab.
+* Added additonal table to Meet Report when operating in Stroke mode which reports number of swimmers Opting In or Opting Out per age group.
+* Completed first phase Meet Entries export in Hy-tek HY3 format.  Not exposed on the GUI yet.
+* Fixed bug which prevented Job Reminder emails from being sent.
+
 = 1.32 =
 * New SQL queries for User related operations.  The new SQL addresses serious performance issues when the user count starts to grow.  This was most noticeable on the Job Commitments Report which would appear to time but it was probably running very slowly.
 * Lots of debug code removed throughout the plugin.

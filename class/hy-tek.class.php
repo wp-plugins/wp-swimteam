@@ -568,7 +568,7 @@ class HY3MeetEntries extends HY3BaseRecord
      *
      * @param string $mode mode setting
      */
-    function setZeroTimeMode($mode = WPST_HYTEK_USE_BLANKS)
+    function setZeroTimeMode($mode = WPST_HY3_USE_BLANKS)
     {
         $this->_zerotimemode = $mode ;
     }
@@ -612,21 +612,22 @@ class HY3MeetEntries extends HY3BaseRecord
 
         $hy3 = array() ;
 
+        //  Need to keep track of unique swimmers and various
+        //  HY3 record counts in order to terminate HY3 file.
+
+        $unique_swimmers = array() ;
+        $hy3_counters = array('b' => 0, 'c' => 0, 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
+
         //  Add debug stuff?  The debug stuff invalidates the HY3
         //  but is useful for ensuring all of the information is in
         //  the proper column.
  
         if ($this->getHY3DebugFlag())
         {
-            $hy3[] = WPST_HYTEK_COLUMN_DEBUG1 ;
-            $hy3[] = WPST_HYTEK_COLUMN_DEBUG2 ;
+            $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
+            $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
+            $hy3[] = WPST_HY3_COLUMN_DEBUG3 ;
         }
-
-        //  Need to keep track of unique swimmers and various
-        //  HY3 record counts in order to terminate HY3 file.
-
-        $unique_swimmers = array() ;
-        $hy3_counters = array('b' => 0, 'c' => 0, 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
 
         //  We'll need a bunch of data from the database ...
 
@@ -637,7 +638,7 @@ class HY3MeetEntries extends HY3BaseRecord
         $roster = new SwimTeamRoster() ;
         $swimclub = new SwimClubProfile() ;
         $swimteam = new SwimTeamProfile() ;
-
+ 
         //  Need Team Profile information from database
         //  along with swim meet and opponent club details.
  
@@ -646,20 +647,20 @@ class HY3MeetEntries extends HY3BaseRecord
         $swimclub->loadSwimClubBySwimClubId($swimmeet->getOpponentSwimClubId()) ;
 
         /**
-         * Build the A0 record
+         * Build the A1 record
          */
-        $a0 = new HY3A0Record() ;
-        $a0->setOrgCode($this->getOrgCode()) ;
-        $a0->setHY3VersionNumber(WPST_HYTEK_VERSION) ;
-        $a0->setFileCode(WPST_HYTEK_FTT_CODE_MEET_REGISTRATIONS_VALUE) ;
-        $a0->setSoftwareName(WPST_HYTEK_SOFTWARE_NAME) ;
-        $a0->setSoftwareVersion(WPST_HYTEK_SOFTWARE_VERSION) ;
-        $a0->setContactName($user->GetFullName()) ;
-        $a0->setContactPhone($user->GetPrimaryPhone()) ;
-        $a0->setFileCreationOrUpdate(date('mdY')) ;
-        $a0->setSubmittedByLSC($this->getLSCCOde()) ;
+        $a1 = new HY3A1Record() ;
+        $a1->setFileCode(WPST_HY3_FTC_MEET_TEAM_ROSTER_VALUE) ;
+        $a1->setFileDescription('Swim Team Roster') ;
+        $a1->setSoftwareVendor(WPST_HY3_SOFTWARE_NAME) ;
+        $a1->setSoftwareName(WPST_HY3_SOFTWARE_VERSION) ;
+        $a1->setFileCreationDate(date('mdY'))  ;
+        $a1->setFileCreationTime(date('g:i A'))  ;
+        $a1->setTeamName($swimteam->getTeamName()) ;
         
-        $hy3[] = $a0->GenerateRecord() ;
+        $hy3[] = $a1->GenerateRecord() ;
+
+        //  Not sure of the format of the B1 and B2 records?  May not work!
 
         /**
          * Build the B1 record
@@ -688,19 +689,19 @@ class HY3MeetEntries extends HY3BaseRecord
         switch ($swimmeet->getMeetType())
         {
             case WPST_DUAL_MEET:
-                $b1->setMeetCode(WPST_HYTEK_MEET_TYPE_DUAL_VALUE) ;
+                $b1->setMeetCode(WPST_HY3_MEET_TYPE_DUAL_VALUE) ;
                 break ;
 
             case WPST_INVITATIONAL:
-                $b1->setMeetCode(WPST_HYTEK_MEET_TYPE_INVITATIONAL_VALUE) ;
+                $b1->setMeetCode(WPST_HY3_MEET_TYPE_INVITATIONAL_VALUE) ;
                 break ;
 
             case WPST_TIME_TRIAL:
-                $b1->setMeetCode(WPST_HYTEK_MEET_TYPE_TIME_TRIALS_VALUE) ;
+                $b1->setMeetCode(WPST_HY3_MEET_TYPE_TIME_TRIALS_VALUE) ;
                 break ;
 
             default:
-                $b1->setMeetCode(WPST_HYTEK_MEET_TYPE_OPEN_VALUE) ;
+                $b1->setMeetCode(WPST_HY3_MEET_TYPE_OPEN_VALUE) ;
                 break ;
         }
 
@@ -735,52 +736,78 @@ class HY3MeetEntries extends HY3BaseRecord
          * Build the C1 record
          */
         $c1 = new HY3C1Record() ;
-        $c1->setOrgCode($this->getOrgCode()) ;
-        $c1->setTeamCode($this->getTeamCode()) ;
-        $c1->setTeamName($swimteam->getClubOrPoolName()) ;
-        $c1->setTeamNameAbrv($swimteam->getTeamName()) ;
-        $c1->setTeamAddress1($swimteam->getStreet1()) ;
-        $c1->setTeamAddress2($swimteam->getStreet2()) ;
-        $c1->setTeamCity($swimteam->getCity()) ;
-        $c1->setTeamState($swimteam->getStateOrProvince()) ;
-        $c1->setTeamPostalCode($swimteam->getPostalCode()) ;
-        $c1->setTeamCountryCode($this->getCountryCode()) ;
-        $c1->setRegionCode($this->getRegionCode()) ;
+        $c1->setTeamNameAbrv($this->getTeamCode()) ;
+        $c1->setTeamFullName($swimteam->getClubOrPoolName()) ;
+        $c1->setTeamName($swimteam->getTeamName()) ;
+        $c1->setTeamLSC($this->getLSCCode()) ;
+        $c1->setTeamType(WPST_HY3_TTC_AGE_GROUP_VALUE) ;
 
         $hy3[] = $c1->GenerateRecord() ;
         $hy3_counters['c']++ ;
 
-        /**
-         * Build the C2 record.  We'll actually build this twice, initially
-         * with placeholder values in the count fields and then it will be
-         * rebuilt later once all of the counts are known.
-         */
         $c2 = new HY3C2Record() ;
-        $c2->setOrgCode($this->getOrgCode()) ;
-        $c2->setTeamCode($this->getTeamCode()) ;
-        if ($swimteam->getCoachUserId() !== WPST_NULL_ID)
-        {
-            $coach = new SwimTeamUserProfile() ;
-            $coach->loadUserProfileByUserId($swimteam->getCoachUserId()) ;
-            $c2->setCoachName($coach->getFullName()) ;
-            $c2->setCoachPhone($coach->getPrimaryPhone()) ;
-        }
-        else
-        {
-            $c2->setCoachName(WPST_NULL_STRING) ;
-            $c2->setCoachPhone(WPST_NULL_STRING) ;
-        }
-
-        $c2->setNumberOfIndividualEntries(0) ;
-        $c2->setNumberOfAthletes(0) ;
-        $c2->setNumberOfRelayEntries(0) ;
-        $c2->setNumberOfRelaySwimmers(0) ;
-        $c2->setNumberOfSplitRecords(0) ;
-        $c2->setTeamNameAbrv($swimteam->getTeamName()) ;
-        $c2->setTeamCode5(WPST_NULL_STRING) ;
+        $c2->setTeamAddress1($swimteam->getStreet1()) ;
+        $c2->setTeamAddress2($swimteam->getStreet2()) ;
+        $c2->setTeamCity($swimteam->getCity()) ;
+        $c2->setTeamState($swimteam->getStateOrProvince()) ;
+        $c2->setTeamPostalCode($swimteam->getPostalCode()) ;
+        $c2->setTeamCountryCode($this->getCountryCode()) ;
+        $c2->setTeamRegistrationCode(WPST_HY3_TRC_USA_SWIMMING_VALUE) ;
 
         $hy3[] = $c2->GenerateRecord() ;
         $hy3_counters['c']++ ;
+
+        $c3 = new HY3C3Record() ;
+        $c3->setPhoneNumber($swimteam->getPrimaryPhone()) ;
+        $c3->setTeamSecondaryPhone($swimteam->getSecondaryPhone()) ;
+        $c3->setTeamFax(WPST_HY3_UNUSED) ;
+        $c3->setTeamEmail($swimteam->getEmailAddress()) ;
+
+        $hy3[] = $c3->GenerateRecord() ;
+        $hy3_counters['c']++ ;
+
+        //  Load information from the database
+        //  to get the list of potential swimmers
+
+        $roster->setSeasonId($season->getActiveSeasonId()) ;
+        $swimmerIds = $roster->getSwimmerIds() ;
+
+        //  Need structures for swimmers and their primary contact
+ 
+        $swimmer = new SwimTeamSwimmer() ;
+        $contact1 = new SwimTeamUserProfile() ;
+        $contact2 = new SwimTeamUserProfile() ;
+        $contact3 = new SwimTeamUserProfile() ;
+
+        //  Need records for the Hy-Tek roster - there are a bunch!
+        //  Hy-Tek team manager defines a number of fields which somewhat
+        //  contradict each other - Primary Contact, Secondary Contact
+        //  Mother's Name, Father's Name, etc.  We'll make our best guess
+        //  at populating as much data as possible with assumptions.  In
+        //  particular, the wp-SwimTeam Contact 1 is assumed to be the
+        //  swimmer's Mother and the wp-SwimTeam Contact 2 is assumed to
+        //  be the swimmer's Father.
+
+        $d1 = new HY3D1Record() ;
+        $d2 = new HY3D2Record() ;
+        $d3 = new HY3D3Record() ;
+        $d4 = new HY3D4Record() ;
+        $d5 = new HY3D5Record() ;
+        $d6 = new HY3D6Record() ;
+        $d7 = new HY3D7Record() ;
+        $d8 = new HY3D8Record() ;
+        $d9 = new HY3D9Record() ;
+        $da = new HY3DARecord() ;
+        $db = new HY3DBRecord() ;
+        $dc = new HY3DCRecord() ;
+        $dd = new HY3DDRecord() ;
+        $de = new HY3DERecord() ;
+        $df = new HY3DFRecord() ;
+
+        //  Records for Hy-tek swimmer entries
+
+        $e1 = new HY3E1Record() ;
+        $f1 = new HY3F1Record() ;
 
         //  Load information from the database
         //  to get the list of potential swimmers
@@ -806,71 +833,21 @@ class HY3MeetEntries extends HY3BaseRecord
             unset($meetEventIds) ;
         }
 
-        //  Initialize the D0 and D3 records, some of it is static for all entries
-        $d0 = new HY3D0Record() ;
-        $d3 = new HY3D3Record() ;
+        //  Fill in the fields which are static across all entries
+        $e1->setEventFee(0) ;
+        $e1->setSeedTime1(WPST_NULL_STRING) ;
+        $e1->setSeedUnit1(WPST_NULL_STRING) ;
+        $e1->setSeedTime2(WPST_NULL_STRING) ;
+        $e1->setSeedUnit2(WPST_NULL_STRING) ;
 
-        $d0->setOrgCode($this->getOrgCode()) ;
-        $d0->setAttachCode(WPST_HYTEK_ATTACHED_CODE_ATTACHED_VALUE) ;
+        $f1->setRelayTeam('A') ;
+        $f1->setTeamAbbr($this->getTeamCode()) ;
 
-        //  May want to add a citizenship field for each swimmer but
-        //  for now, we'll use the country code for the swim team itself
-        $d0->setCitizenCode($this->getCountryCode()) ;
-
-
-        //  The rest of the fields are left empty
-        $d0->setSwimDate($swimmeet->getMeetDateAsMMDDYYYY()) ;
-        $d0->setSeedTime(0.0) ;
-        $d0->setSeedCourseCode(WPST_NULL_STRING) ;
-        $d0->setPrelimTime(0.0) ;
-        $d0->setPrelimCourseCode(WPST_NULL_STRING) ;
-        $d0->setSwimOffTime(0.0) ;
-        $d0->setSwimOffCourseCode(WPST_NULL_STRING) ;
-        $d0->setFinalsTime(0.0) ;
-        $d0->setFinalsCourseCode(WPST_NULL_STRING) ;
-        $d0->setPrelimHeatNumber(0) ;
-        $d0->setPrelimLaneNumber(0) ;
-        $d0->setFinalsHeatNumber(0) ;
-        $d0->setFinalsLaneNumber(0) ;
-        $d0->setPrelimPlaceRanking(WPST_NULL_STRING) ;
-        $d0->setFinalsPlaceRanking(WPST_NULL_STRING) ;
-        $d0->setFinalsPoints(WPST_NULL_STRING) ;
-        $d0->setEventTimeClassCode(WPST_NULL_STRING) ;
-        $d0->setSwimmerFlightStatus(WPST_NULL_STRING) ;
-
-        //  Initialize the E0 and F0 records, some of it is static for all entries
-        $e0 = new HY3E0Record() ;
-        $f0 = new HY3F0Record() ;
-
-        $e0->setOrgCode($this->getOrgCode()) ;
-        $e0->setTeamCode($this->getTeamCode()) ;
-        $e0->setRelayTeamName('A') ;
-
-        $f0->setOrgCode($this->getOrgCode()) ;
-        $f0->setTeamCode($this->getTeamCode()) ;
-        $f0->setRelayTeamName('A') ;
-        $f0->setPrelimLegOrderCode(WPST_HYTEK_RELAY_CODE_NOT_SWIMMING_VALUE) ;
-        $f0->setSwimOffLegOrderCode(WPST_HYTEK_RELAY_CODE_NOT_SWIMMING_VALUE) ;
-        $f0->setFinalsLegOrderCode(WPST_HYTEK_RELAY_CODE_ALTERNAME_VALUE) ;
-
-        //  The rest of the fields are left empty
-        $e0->setSwimDate($swimmeet->getMeetDateAsMMDDYYYY(), false) ;
-        $e0->setSeedTime(0.0) ;
-        $e0->setSeedCourseCode(WPST_NULL_STRING) ;
-        $e0->setPrelimTime(0.0) ;
-        $e0->setPrelimCourseCode(WPST_NULL_STRING) ;
-        $e0->setSwimOffTime(0.0) ;
-        $e0->setSwimOffCourseCode(WPST_NULL_STRING) ;
-        $e0->setFinalsTime(0.0) ;
-        $e0->setFinalsCourseCode(WPST_NULL_STRING) ;
-        $e0->setPrelimHeatNumber(0) ;
-        $e0->setPrelimLaneNumber(0) ;
-        $e0->setFinalsHeatNumber(0) ;
-        $e0->setFinalsLaneNumber(0) ;
-        $e0->setPrelimPlaceRanking(WPST_NULL_STRING) ;
-        $e0->setFinalsPlaceRanking(WPST_NULL_STRING) ;
-        $e0->setFinalsPoints(WPST_NULL_STRING) ;
-        $e0->setEventTimeClassCode(WPST_NULL_STRING) ;
+        $f1->setEventFee(0) ;
+        $f1->setRelaySeedTime1(WPST_NULL_STRING) ;
+        $f1->setRelaySeedUnit1(WPST_NULL_STRING) ;
+        $f1->setRelaySeedTime2(WPST_NULL_STRING) ;
+        $f1->setRelaySeedUnit2(WPST_NULL_STRING) ;
 
         //  Loop through events
 
@@ -931,20 +908,18 @@ class HY3MeetEntries extends HY3BaseRecord
 
             //  Individual or Relay event?
 
-            if (($event->getStroke() == WPST_HYTEK_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE) ||
-                ($event->getStroke() == WPST_HYTEK_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE))
+            if (($event->getStroke() == WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE) ||
+                ($event->getStroke() == WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE))
             {
-                //  Intialize the E0 record fields that are event based
-                $e0->setEventGender($event->getGender()) ;
-                $e0->setEventDistance($event->getDistance()) ;
-                $e0->setCourseCode($event->getCourse()) ;
-                $e0->setStrokeCode($event->getStroke()) ;
-                $e0->setEventNumber($event->getEventNumber()) ;
-                $e0->setEventAgeCode($event->getMinAge(), $event->getMaxAge()) ;
-
-                $f0count = 0 ;
-                $totalage = 0 ;
-                $f0hy3 = array() ;
+/*
+                //  Intialize the F1 record fields that are event based
+                $f1->setRelayGender1($event->getGender()) ;
+                $f1->setRelayGender2($event->getGender()) ;
+                $f1->setRelayDistance($event->getDistance()) ;
+                $f1->setRelayStroke($event->getStroke()) ;
+                $f1->setRelayAgeLower($event->getMinAge()) ;
+                $f1->setRelayAgeUpper($event->getMaxAge()) ;
+                $f1->setEventNumber($event->getEventNumber()) ;
 
                 foreach ($swimmerIds as $key => &$swimmerId)
                 {
@@ -952,77 +927,46 @@ class HY3MeetEntries extends HY3BaseRecord
                     $roster->loadRosterBySeasonIdAndSwimmerId() ;
                     $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
                     
-                    //  Initialize F0 record fields which are swimmer based
-                    $f0->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
-                    $f0->setPreferredFirstName($swimmer->getFirstName($this->getUseNickName())) ;
-                    $f0->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), false) ;
+                    //  Initialize F1 record fields which are swimmer based
+                    $f1->setGender($swimmer->getGender()) ;
 
                     //  How should the Swimmer Id appear in the HY3 file?
-                    if ($this->getSwimmerIdFormat() == WPST_HYTEK_SWIMMER_ID_FORMAT_WPST_ID)
-                        $f0->setUSS($swimmer->getId()) ;
-                    if ($this->getSwimmerIdFormat() == WPST_HYTEK_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
-                        $f0->setUSS($roster->getSwimmerLabel()) ;
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                        $f1->setSwimmerId($swimmer->getId()) ;
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                        $f1->setSwimmerId($roster->getSwimmerLabel()) ;
                     else
-                        $f0->setUSS($swimmer->getUSSNumber()) ;
+                        $f1->setSwimmerId($swimmer->getUSSNumber()) ;
 
-                    $f0->setUSSNew() ;
-    
-                    if ($this->getUseAgeGroupAge() == WPST_NO)
-                    {
-                        $totalage += $swimmer->getAge() ;
-                        $f0->setAgeOrClass($swimmer->getAge()) ;
-                    }
-                    else
-                    {
-                        $totalage += $swimmer->getAgeGroupAge() ;
-                        $f0->setAgeOrClass($swimmer->getAgeGroupAge()) ;
-                    }
+                    $f1->setSwimmerAbbr($swimmer->getLastName()) ;
 
-                    $f0->setGender($swimmer->getGender()) ;
-    
                     if ($this->getHY3DebugFlag())
                     {
-                        $hy3[] = WPST_HYTEK_COLUMN_DEBUG1 ;
-                        $hy3[] = WPST_HYTEK_COLUMN_DEBUG2 ;
+                        $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
+                        $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
                     }
     
-                    $f0hy3[] = $f0->GenerateRecord($this->getZeroTimeMode()) ;
+                    $hy3[] = $f1->GenerateRecord($this->getZeroTimeMode()) ;
     
                     //  Update the various counters
-                    $f0count++ ;
                     $hy3_counters['f']++ ;
     
-                    //  Track uninque swimmers
+                    //  Track unique swimmers
                     if (!in_array($swimmer->getId(), $unique_swimmers))
                         $unique_swimmers[] = $swimmer->getId() ;
                 }
-
-                //  All of the F0 records have been generated,
-                //  need to update the E0 records then add them 
-                //  all to the pile of HY3 records.
-
-                if ($f0count > 0)
-                {
-                    $e0->setTotalAgeOfAthletes($totalage) ;
-                    $e0->setNumberOfF0Records($f0count) ;
-
-                    $hy3[] = $e0->GenerateRecord($this->getZeroTimeMode()) ;
-
-                    //  Append all of the F0 records
-
-                    foreach ($f0hy3 as $key => $value)
-                        $hy3[] = $value ;
-                }
+*/
             }
             else
             {
-                //  Intiialize the D0 record fields that are event based
-                $d0->setEventGender($event->getGender()) ;
-                $d0->setEventDistance($event->getDistance()) ;
-                $d0->setCourseCode($event->getCourse()) ;
-                $d0->setStrokeCode($event->getStroke()) ;
-                $d0->setEventNumber($event->getEventNumber()) ;
-                $d0->setEventAgeCode($event->getMinAge(), $event->getMaxAge()) ;
+                //  Intialize the E1 record fields that are event based
+                $e1->setGender1($event->getGender()) ;
+                $e1->setGender2($event->getGender()) ;
+                $e1->setDistance($event->getDistance()) ;
+                $e1->setStroke($event->getStroke()) ;
+                $e1->setAgeLower($event->getMinAge()) ;
+                $e1->setAgeUpper($event->getMaxAge()) ;
+                $e1->setEventNumber($event->getEventNumber()) ;
 
                 foreach ($swimmerIds as $key => &$swimmerId)
                 {
@@ -1030,93 +974,36 @@ class HY3MeetEntries extends HY3BaseRecord
                     $roster->loadRosterBySeasonIdAndSwimmerId() ;
                     $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
                     
-                    //  Initialize D0 record fields which are swimmer based
-                    $d0->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
-                    $d0->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
-                    $d3->setPreferredFirstName($swimmer->getFirstName($this->getUseNickName())) ;
+                    //  Initialize F1 record fields which are swimmer based
+                    $e1->setGender($swimmer->getGender()) ;
 
                     //  How should the Swimmer Id appear in the HY3 file?
-                    if ($this->getSwimmerIdFormat() == WPST_HYTEK_SWIMMER_ID_FORMAT_WPST_ID)
-                    {
-                        $d0->setUSS($swimmer->getId()) ;
-                        $d3->setUSS($swimmer->getId()) ;
-                    }
-                    if ($this->getSwimmerIdFormat() == WPST_HYTEK_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
-                    {
-                        $d0->setUSS($roster->getSwimmerLabel()) ;
-                        $d3->setUSS($roster->getSwimmerLabel()) ;
-                    }
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                        $e1->setSwimmerId($swimmer->getId()) ;
+                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                        $e1->setSwimmerId($roster->getSwimmerLabel()) ;
                     else
-                    {
-                        $d0->setUSS($swimmer->getUSSNumber()) ;
-                        $d3->setUSS($swimmer->getUSSNumber()) ;
-                    }
-    
-                    if ($this->getUseAgeGroupAge() == WPST_NO)
-                        $d0->setAgeOrClass($swimmer->getAge()) ;
-                    else
-                        $d0->setAgeOrClass($swimmer->getAgeGroupAge()) ;
-                    $d0->setGender($swimmer->getGender()) ;
-    
+                        $e1->setSwimmerId($swimmer->getUSSNumber()) ;
+
+                    $e1->setSwimmerAbbr($swimmer->getLastName()) ;
+
                     if ($this->getHY3DebugFlag())
                     {
-                        $hy3[] = WPST_HYTEK_COLUMN_DEBUG1 ;
-                        $hy3[] = WPST_HYTEK_COLUMN_DEBUG2 ;
+                        $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
+                        $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
                     }
     
-                    //  Generate HY3 and update the various counters
-
-                    $hy3[] = $d0->GenerateRecord($this->getZeroTimeMode()) ;
-                    $hy3_counters['d']++ ;
-
-                    $hy3[] = $d3->GenerateRecord() ;
-                    $hy3_counters['d']++ ;
+                    $hy3[] = $e1->GenerateRecord($this->getZeroTimeMode()) ;
     
-                    //  Track uninque swimmers
+                    //  Update the various counters
+                    $hy3_counters['e']++ ;
+    
+                    //  Track unique swimmers
                     if (!in_array($swimmer->getId(), $unique_swimmers))
                         $unique_swimmers[] = $swimmer->getId() ;
                 }
             }
         }
-
-
-        //  Construct the Z0 file termination record
- 
-        $z0 = new HY3Z0Record() ;
-        $z0->setOrgCode($this->getOrgCode()) ;
-        $z0->setFileCode(WPST_HYTEK_FTT_CODE_MEET_REGISTRATIONS_VALUE) ;
-        $z0->setNotes(sprintf('Created:  %s', date('Y-m-d @ H:i'))) ;
-        $z0->setBRecordCount($hy3_counters['b']) ;
-        $z0->setMeetCount(1) ;
-        $z0->setCRecordCount($hy3_counters['c']) ;
-        $z0->setTeamCount(1) ;
-        $z0->setDRecordCount($hy3_counters['d']) ;
-        $z0->setSwimmerCount(count($unique_swimmers)) ;
-        $z0->setERecordCount($hy3_counters['e']) ;
-        $z0->setFRecordCount($hy3_counters['f']) ;
-        $z0->setGRecordCount($hy3_counters['g']) ;
-        $z0->setBatchNumber(1) ;
-        $z0->setNewMemberCount(0) ;
-        $z0->setRenewMemberCount(0) ;
-        $z0->setChangeMemberCount(0) ;
-        $z0->setDeleteMemberCount(0) ;
-
-        $hy3[] = $z0->GenerateRecord() ;
-
-        //  Need to go back and "update" the C2 record now that the 
-        //  number of entries and types of records are now known.
-
-        $c2->setNumberOfIndividualEntries($hy3_counters['d']) ;
-        $c2->setNumberOfAthletes(count($unique_swimmers)) ;
-        $c2->setNumberOfRelayEntries($hy3_counters['e']) ;
-        $c2->setNumberOfRelaySwimmers($hy3_counters['f']) ;
-        $c2->setNumberOfSplitRecords($hy3_counters['g']) ;
-
-        //  Scan through the HY3 records and update the C2 record
-
-        foreach ($hy3 as $key => $value)
-            if (substr($value, 0, 2) == 'C2')
-                $hy3[$key] = $c2->GenerateRecord() ;
 
         //  Record the count of entries created
 
@@ -1371,8 +1258,8 @@ class HY3A1Record extends HY3Record
     {
         $c = container() ;
         if (WPST_DEBUG)
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1, WPST_HYTEK_COLUMN_DEBUG2,
-                WPST_HYTEK_COLUMN_DEBUG3, $this->_hy3_record)) ;
+            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1, WPST_HY3_COLUMN_DEBUG2,
+                WPST_HY3_COLUMN_DEBUG3, $this->_hy3_record)) ;
 
         //  Extract the data from the HY3 record by substring position
 
@@ -1804,14 +1691,14 @@ class HY3B1Record extends HY3BxRecord
     {
         $c = container() ;
         if (WPST_DEBUG)
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
+            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
+                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
         //print $c->render() ;
 
         //  This doesn't work right and I am not sure why ...
         //  it ends reading data from the wrong character position.
 
-        //$success = sscanf($this->_hy3_record, WPST_HYTEK_B1_RECORD,
+        //$success = sscanf($this->_hy3_record, WPST_HY3_B1_RECORD,
         //    $this->_org_code,
         //    $this->_future_use_1,
         //    $this->_meet_name,
@@ -1857,7 +1744,7 @@ class HY3B1Record extends HY3BxRecord
      */
     function GenerateRecord()
     {
-        return sprintf(WPST_HYTEK_B1_RECORD,
+        return sprintf(WPST_HY3_B1_RECORD,
             $this->getOrgCode(),
             $this->getFutureUse1(),
             $this->getMeetName(),
@@ -1894,14 +1781,14 @@ class HY3B2Record extends HY3BxRecord
     {
         $c = container() ;
         if (WPST_DEBUG)
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
+            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
+                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
         //print $c->render() ;
 
         //  This doesn't work right and I am not sure why ...
         //  it ends reading data from the wrong character position.
 
-        //$success = sscanf($this->_hy3_record, WPST_HYTEK_B1_RECORD,
+        //$success = sscanf($this->_hy3_record, WPST_HY3_B1_RECORD,
         //    $this->_org_code,
         //    $this->_future_use_1,
         //    $this->_meet_name,
@@ -1939,7 +1826,7 @@ class HY3B2Record extends HY3BxRecord
      */
     function GenerateRecord()
     {
-        return sprintf(WPST_HYTEK_B2_RECORD,
+        return sprintf(WPST_HY3_B2_RECORD,
             $this->getOrgCode(),
             $this->getFutureUse1(),
             $this->getMeetName(),
@@ -2097,8 +1984,8 @@ class HY3C1Record extends HY3Record
         if (WPST_DEBUG)
         {
             $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
+            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
+                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
             //print $c->render() ;
         }
 
@@ -2345,8 +2232,8 @@ class HY3C2Record extends HY3Record
         if (WPST_DEBUG)
         {
             $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
+            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
+                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
             //print $c->render() ;
         }
 
@@ -2478,8 +2365,8 @@ class HY3C3Record extends HY3C1Record
         if (WPST_DEBUG)
         {
             $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
+            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
+                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
             //print $c->render() ;
         }
 
@@ -4270,7 +4157,6 @@ class HY3DxRecord extends HY3Record
     {
         return $this->__athletes_email_address ;
     }
-
 }
 
 /**
@@ -4290,8 +4176,8 @@ class HY3D1Record extends HY3DxRecord
         if (WPST_DEBUG)
         {
             $c = container() ;
-            $c->add(html_pre(WPST_HYTEK_COLUMN_DEBUG1,
-                WPST_HYTEK_COLUMN_DEBUG2, $this->_hy3_record)) ;
+            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
+                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
             //print $c->render() ;
         }
 
@@ -4869,6 +4755,1313 @@ class HY3DFRecord extends HY3DxRecord
 }
 
 /**
+ * Class definition H3ExRecord
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see H3Record
+ */
+class HY3ExRecord extends HY3Record
+{
+    /**
+     *   Swimmer Gender property
+     */
+    var $__swimmer_gender ;
+
+    /**
+     *   Swimmer Id property
+     */
+    var $__swimmer_id ;
+
+    /**
+     *   Swimmer Abbr property
+     */
+    var $__swimmer_abbr ;
+
+    /**
+     *   Gender1 property
+     */
+    var $__gender1 ;
+
+    /**
+     *   Gender2 property
+     */
+    var $__gender2 ;
+
+    /**
+     *   Distance property
+     */
+    var $__distance ;
+
+    /**
+     *   Stroke property
+     */
+    var $__stroke ;
+
+    /**
+     *   Age Lower property
+     */
+    var $__age_lower ;
+
+    /**
+     *   Age Upper property
+     */
+    var $__age_upper ;
+
+    /**
+     *   Event Fee property
+     */
+    var $__event_fee ;
+
+    /**
+     *   Event Number property
+     */
+    var $__event_number ;
+
+    /**
+     *   Seed Time 1 property
+     */
+    var $__seed_time_1 ;
+
+    /**
+     *   Seed Unit 1 property
+     */
+    var $__seed_unit_1 ;
+
+    /**
+     *   Seed Time 2 property
+     */
+    var $__seed_time_2 ;
+
+    /**
+     *   Seed Unit 2 property
+     */
+    var $__seed_unit_2 ;
+
+    /**
+     *   Result Type property
+     */
+    var $__result_type ;
+
+    /**
+     *   Time property
+     */
+    var $__time ;
+
+    /**
+     *   Length Unit property
+     */
+    var $__length_unit ;
+
+    /**
+     *   Time Code property
+     */
+    var $__time_code ;
+
+    /**
+     *   Heat property
+     */
+    var $__heat ;
+
+    /**
+     *   Lane property
+     */
+    var $__lane ;
+
+    /**
+     *   Place In Heat property
+     */
+    var $__place_in_heat ;
+
+    /**
+     *   Overall Place property
+     */
+    var $__overall_place ;
+
+    /**
+     *   Day Of Event property
+     */
+    var $__day_of_event ;
+
+    /**
+     *  Set Swimmer Gender property
+     *
+     *  @param string -  swimmer gender
+     */
+    function setSwimmerGender($value = null)
+    {
+        $this->__swimmer_gender = $value ;
+    }
+
+    /**
+     *  Get Swimmer Gender property
+     *
+     *  @return string -  swimmer gender
+     */
+    function getSwimmerGender()
+    {
+        return $this->__swimmer_gender ;
+    }
+
+    /**
+     *  Set Swimmer Id property
+     *
+     *  @param string -  swimmer id
+     */
+    function setSwimmerId($value = null)
+    {
+        $this->__swimmer_id = $value ;
+    }
+
+    /**
+     *  Get Swimmer Id property
+     *
+     *  @return string -  swimmer id
+     */
+    function getSwimmerId()
+    {
+        return $this->__swimmer_id ;
+    }
+
+    /**
+     *  Set Swimmer Abbr property
+     *
+     *  @param string -  swimmer abbr
+     */
+    function setSwimmerAbbr($value = null)
+    {
+        $this->__swimmer_abbr = $value ;
+    }
+
+    /**
+     *  Get Swimmer Abbr property
+     *
+     *  @return string -  swimmer abbr
+     */
+    function getSwimmerAbbr()
+    {
+        return $this->__swimmer_abbr ;
+    }
+
+    /**
+     *  Set Gender1 property
+     *
+     *  @param string -  gender1
+     */
+    function setGender1($value = null)
+    {
+        $this->__gender1 = $value ;
+    }
+
+    /**
+     *  Get Gender1 property
+     *
+     *  @return string -  gender1
+     */
+    function getGender1()
+    {
+        return $this->__gender1 ;
+    }
+
+    /**
+     *  Set Gender2 property
+     *
+     *  @param string -  gender2
+     */
+    function setGender2($value = null)
+    {
+        $this->__gender2 = $value ;
+    }
+
+    /**
+     *  Get Gender2 property
+     *
+     *  @return string -  gender2
+     */
+    function getGender2()
+    {
+        return $this->__gender2 ;
+    }
+
+    /**
+     *  Set Distance property
+     *
+     *  @param string -  distance
+     */
+    function setDistance($value = null)
+    {
+        $this->__distance = $value ;
+    }
+
+    /**
+     *  Get Distance property
+     *
+     *  @return string -  distance
+     */
+    function getDistance()
+    {
+        return $this->__distance ;
+    }
+
+    /**
+     *  Set Stroke property
+     *
+     *  @param string -  stroke
+     */
+    function setStroke($value = null)
+    {
+        $this->__stroke = $value ;
+    }
+
+    /**
+     *  Get Stroke property
+     *
+     *  @return string -  stroke
+     */
+    function getStroke()
+    {
+        return $this->__stroke ;
+    }
+
+    /**
+     *  Set Age Lower property
+     *
+     *  @param string -  age lower
+     */
+    function setAgeLower($value = null)
+    {
+        $this->__age_lower = $value ;
+    }
+
+    /**
+     *  Get Age Lower property
+     *
+     *  @return string -  age lower
+     */
+    function getAgeLower()
+    {
+        return $this->__age_lower ;
+    }
+
+    /**
+     *  Set Age Upper property
+     *
+     *  @param string -  age upper
+     */
+    function setAgeUpper($value = null)
+    {
+        $this->__age_upper = $value ;
+    }
+
+    /**
+     *  Get Age Upper property
+     *
+     *  @return string -  age upper
+     */
+    function getAgeUpper()
+    {
+        return $this->__age_upper ;
+    }
+
+    /**
+     *  Set Event Fee property
+     *
+     *  @param string -  event fee
+     */
+    function setEventFee($value = null)
+    {
+        $this->__event_fee = $value ;
+    }
+
+    /**
+     *  Get Event Fee property
+     *
+     *  @return string -  event fee
+     */
+    function getEventFee()
+    {
+        return $this->__event_fee ;
+    }
+
+    /**
+     *  Set Event Number property
+     *
+     *  @param string -  event number
+     */
+    function setEventNumber($value = null)
+    {
+        $this->__event_number = $value ;
+    }
+
+    /**
+     *  Get Event Number property
+     *
+     *  @return string -  event number
+     */
+    function getEventNumber()
+    {
+        return $this->__event_number ;
+    }
+
+    /**
+     *  Set Seed Time 1 property
+     *
+     *  @param string -  seed time 1
+     */
+    function setSeedTime1($value = null)
+    {
+        $this->__seed_time_1 = $value ;
+    }
+
+    /**
+     *  Get Seed Time 1 property
+     *
+     *  @return string -  seed time 1
+     */
+    function getSeedTime1()
+    {
+        return $this->__seed_time_1 ;
+    }
+
+    /**
+     *  Set Seed Unit 1 property
+     *
+     *  @param string -  seed unit 1
+     */
+    function setSeedUnit1($value = null)
+    {
+        $this->__seed_unit_1 = $value ;
+    }
+
+    /**
+     *  Get Seed Unit 1 property
+     *
+     *  @return string -  seed unit 1
+     */
+    function getSeedUnit1()
+    {
+        return $this->__seed_unit_1 ;
+    }
+
+    /**
+     *  Set Seed Time 2 property
+     *
+     *  @param string -  seed time 2
+     */
+    function setSeedTime2($value = null)
+    {
+        $this->__seed_time_2 = $value ;
+    }
+
+    /**
+     *  Get Seed Time 2 property
+     *
+     *  @return string -  seed time 2
+     */
+    function getSeedTime2()
+    {
+        return $this->__seed_time_2 ;
+    }
+
+    /**
+     *  Set Seed Unit 2 property
+     *
+     *  @param string -  seed unit 2
+     */
+    function setSeedUnit2($value = null)
+    {
+        $this->__seed_unit_2 = $value ;
+    }
+
+    /**
+     *  Get Seed Unit 2 property
+     *
+     *  @return string -  seed unit 2
+     */
+    function getSeedUnit2()
+    {
+        return $this->__seed_unit_2 ;
+    }
+
+    /**
+     *  Set Result Type property
+     *
+     *  @param string -  result type
+     */
+    function setResultType($value = null)
+    {
+        $this->__result_type = $value ;
+    }
+
+    /**
+     *  Get Result Type property
+     *
+     *  @return string -  result type
+     */
+    function getResultType()
+    {
+        return $this->__result_type ;
+    }
+
+    /**
+     *  Set Time property
+     *
+     *  @param string -  time
+     */
+    function setTime($value = null)
+    {
+        $this->__time = $value ;
+    }
+
+    /**
+     *  Get Time property
+     *
+     *  @return string -  time
+     */
+    function getTime()
+    {
+        return $this->__time ;
+    }
+
+    /**
+     *  Set Length Unit property
+     *
+     *  @param string -  length unit
+     */
+    function setLengthUnit($value = null)
+    {
+        $this->__length_unit = $value ;
+    }
+
+    /**
+     *  Get Length Unit property
+     *
+     *  @return string -  length unit
+     */
+    function getLengthUnit()
+    {
+        return $this->__length_unit ;
+    }
+
+    /**
+     *  Set Time Code property
+     *
+     *  @param string -  time code
+     */
+    function setTimeCode($value = null)
+    {
+        $this->__time_code = $value ;
+    }
+
+    /**
+     *  Get Time Code property
+     *
+     *  @return string -  time code
+     */
+    function getTimeCode()
+    {
+        return $this->__time_code ;
+    }
+
+    /**
+     *  Set Heat property
+     *
+     *  @param string -  heat
+     */
+    function setHeat($value = null)
+    {
+        $this->__heat = $value ;
+    }
+
+    /**
+     *  Get Heat property
+     *
+     *  @return string -  heat
+     */
+    function getHeat()
+    {
+        return $this->__heat ;
+    }
+
+    /**
+     *  Set Lane property
+     *
+     *  @param string -  lane
+     */
+    function setLane($value = null)
+    {
+        $this->__lane = $value ;
+    }
+
+    /**
+     *  Get Lane property
+     *
+     *  @return string -  lane
+     */
+    function getLane()
+    {
+        return $this->__lane ;
+    }
+
+    /**
+     *  Set Place In Heat property
+     *
+     *  @param string -  place in heat
+     */
+    function setPlaceInHeat($value = null)
+    {
+        $this->__place_in_heat = $value ;
+    }
+
+    /**
+     *  Get Place In Heat property
+     *
+     *  @return string -  place in heat
+     */
+    function getPlaceInHeat()
+    {
+        return $this->__place_in_heat ;
+    }
+
+    /**
+     *  Set Overall Place property
+     *
+     *  @param string -  overall place
+     */
+    function setOverallPlace($value = null)
+    {
+        $this->__overall_place = $value ;
+    }
+
+    /**
+     *  Get Overall Place property
+     *
+     *  @return string -  overall place
+     */
+    function getOverallPlace()
+    {
+        return $this->__overall_place ;
+    }
+
+    /**
+     *  Set Day Of Event property
+     *
+     *  @param string -  day of event
+     */
+    function setDayOfEvent($value = null)
+    {
+        $this->__day_of_event = $value ;
+    }
+
+    /**
+     *  Get Day Of Event property
+     *
+     *  @return string -  day of event
+     */
+    function getDayOfEvent()
+    {
+        return $this->__day_of_event ;
+    }
+}
+
+/**
+ * HY3 E1 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3ExRecord
+ */
+class HY3E1Record extends HY3ExRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DF HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_E1_RECORD,
+            $this->getSwimmerGender(),
+            $this->getSwimmerId(),
+            $this->getSwimmerAbbr(),
+            $this->getGender1(),
+            $this->getGender2(),
+            $this->getDistance(),
+            $this->getStroke(),
+            $this->getAgeLower(),
+            $this->getAgeUpper(),
+            WPST_HY3_UNUSED,
+            $this->getEventFee(),
+            $this->getEventNumber(),
+            WPST_HY3_UNUSED,
+            $this->getSeedTime1(),
+            $this->getSeedUnit1(),
+            $this->getSeedTime2(),
+            $this->getSeedUnit2(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
+ * Class definition HY3FxRecord
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3Record
+ */
+class HY3FxRecord extends HY3Record
+{
+    /**
+     *   Team Abbr property
+     */
+    var $__team_abbr ;
+
+    /**
+     *   Relay Team property
+     */
+    var $__relay_team ;
+
+    /**
+     *   Relay Gender property
+     */
+    var $__relay_gender ;
+
+    /**
+     *   Relay Gender 1 property
+     */
+    var $__relay_gender_1 ;
+
+    /**
+     *   Relay Gender 2 property
+     */
+    var $__relay_gender_2 ;
+
+    /**
+     *   Relay Distance property
+     */
+    var $__relay_distance ;
+
+    /**
+     *   Relay Stroke property
+     */
+    var $__relay_stroke ;
+
+    /**
+     *   Relay Age Lower property
+     */
+    var $__relay_age_lower ;
+
+    /**
+     *   Relay Age Upper property
+     */
+    var $__relay_age_upper ;
+
+    /**
+     *   Event Fee property
+     */
+    var $__event_fee ;
+
+    /**
+     *   Event Number property
+     */
+    var $__event_number ;
+
+    /**
+     *   Relay Seed Time 1 property
+     */
+    var $__relay_seed_time_1 ;
+
+    /**
+     *   Relay Seed Unit 1 property
+     */
+    var $__relay_seed_unit_1 ;
+
+    /**
+     *   Relay Seed Time 2 property
+     */
+    var $__relay_seed_time_2 ;
+
+    /**
+     *   Relay Seed Unit 2 property
+     */
+    var $__relay_seed_unit_2 ;
+
+    /**
+     *   Result Type property
+     */
+    var $__result_type ;
+
+    /**
+     *   Time property
+     */
+    var $__time ;
+
+    /**
+     *   Length Unit property
+     */
+    var $__length_unit ;
+
+    /**
+     *   Time Code property
+     */
+    var $__time_code ;
+
+    /**
+     *   Heat property
+     */
+    var $__heat ;
+
+    /**
+     *   Lane property
+     */
+    var $__lane ;
+
+    /**
+     *   Place In Heat property
+     */
+    var $__place_in_heat ;
+
+    /**
+     *   Overall Place property
+     */
+    var $__overall_place ;
+
+    /**
+     *   Day Of Event property
+     */
+    var $__day_of_event ;
+
+    /**
+     *  Set Team Abbr property
+     *
+     *  @param string -  team abbr
+     */
+    function setTeamAbbr($value = null)
+    {
+        $this->__team_abbr = $value ;
+    }
+
+    /**
+     *  Get Team Abbr property
+     *
+     *  @return string -  team abbr
+     */
+    function getTeamAbbr()
+    {
+        return $this->__team_abbr ;
+    }
+
+    /**
+     *  Set Relay Team property
+     *
+     *  @param string -  relay team
+     */
+    function setRelayTeam($value = null)
+    {
+        $this->__relay_team = $value ;
+    }
+
+    /**
+     *  Get Relay Team property
+     *
+     *  @return string -  relay team
+     */
+    function getRelayTeam()
+    {
+        return $this->__relay_team ;
+    }
+
+    /**
+     *  Set Relay Gender property
+     *
+     *  @param string -  relay gender
+     */
+    function setRelayGender($value = null)
+    {
+        $this->__relay_gender = $value ;
+    }
+
+    /**
+     *  Get Relay Gender property
+     *
+     *  @return string -  relay gender
+     */
+    function getRelayGender()
+    {
+        return $this->__relay_gender ;
+    }
+
+    /**
+     *  Set Relay Gender 1 property
+     *
+     *  @param string -  relay gender 1
+     */
+    function setRelayGender1($value = null)
+    {
+        $this->__relay_gender_1 = $value ;
+    }
+
+    /**
+     *  Get Relay Gender 1 property
+     *
+     *  @return string -  relay gender 1
+     */
+    function getRelayGender1()
+    {
+        return $this->__relay_gender_1 ;
+    }
+
+    /**
+     *  Set Relay Gender 2 property
+     *
+     *  @param string -  relay gender 2
+     */
+    function setRelayGender2($value = null)
+    {
+        $this->__relay_gender_2 = $value ;
+    }
+
+    /**
+     *  Get Relay Gender 2 property
+     *
+     *  @return string -  relay gender 2
+     */
+    function getRelayGender2()
+    {
+        return $this->__relay_gender_2 ;
+    }
+
+    /**
+     *  Set Relay Distance property
+     *
+     *  @param string -  relay distance
+     */
+    function setRelayDistance($value = null)
+    {
+        $this->__relay_distance = $value ;
+    }
+
+    /**
+     *  Get Relay Distance property
+     *
+     *  @return string -  relay distance
+     */
+    function getRelayDistance()
+    {
+        return $this->__relay_distance ;
+    }
+
+    /**
+     *  Set Relay Stroke property
+     *
+     *  @param string -  relay stroke
+     */
+    function setRelayStroke($value = null)
+    {
+        $this->__relay_stroke = $value ;
+    }
+
+    /**
+     *  Get Relay Stroke property
+     *
+     *  @return string -  relay stroke
+     */
+    function getRelayStroke()
+    {
+        return $this->__relay_stroke ;
+    }
+
+    /**
+     *  Set Relay Age Lower property
+     *
+     *  @param string -  relay age lower
+     */
+    function setRelayAgeLower($value = null)
+    {
+        $this->__relay_age_lower = $value ;
+    }
+
+    /**
+     *  Get Relay Age Lower property
+     *
+     *  @return string -  relay age lower
+     */
+    function getRelayAgeLower()
+    {
+        return $this->__relay_age_lower ;
+    }
+
+    /**
+     *  Set Relay Age Upper property
+     *
+     *  @param string -  relay age upper
+     */
+    function setRelayAgeUpper($value = null)
+    {
+        $this->__relay_age_upper = $value ;
+    }
+
+    /**
+     *  Get Relay Age Upper property
+     *
+     *  @return string -  relay age upper
+     */
+    function getRelayAgeUpper()
+    {
+        return $this->__relay_age_upper ;
+    }
+
+    /**
+     *  Set Event Fee property
+     *
+     *  @param string -  event fee
+     */
+    function setEventFee($value = null)
+    {
+        $this->__event_fee = $value ;
+    }
+
+    /**
+     *  Get Event Fee property
+     *
+     *  @return string -  event fee
+     */
+    function getEventFee()
+    {
+        return $this->__event_fee ;
+    }
+
+    /**
+     *  Set Event Number property
+     *
+     *  @param string -  event number
+     */
+    function setEventNumber($value = null)
+    {
+        $this->__event_number = $value ;
+    }
+
+    /**
+     *  Get Event Number property
+     *
+     *  @return string -  event number
+     */
+    function getEventNumber()
+    {
+        return $this->__event_number ;
+    }
+
+    /**
+     *  Set Relay Seed Time 1 property
+     *
+     *  @param string -  relay seed time 1
+     */
+    function setRelaySeedTime1($value = null)
+    {
+        $this->__relay_seed_time_1 = $value ;
+    }
+
+    /**
+     *  Get Relay Seed Time 1 property
+     *
+     *  @return string -  relay seed time 1
+     */
+    function getRelaySeedTime1()
+    {
+        return $this->__relay_seed_time_1 ;
+    }
+
+    /**
+     *  Set Relay Seed Unit 1 property
+     *
+     *  @param string -  relay seed unit 1
+     */
+    function setRelaySeedUnit1($value = null)
+    {
+        $this->__relay_seed_unit_1 = $value ;
+    }
+
+    /**
+     *  Get Relay Seed Unit 1 property
+     *
+     *  @return string -  relay seed unit 1
+     */
+    function getRelaySeedUnit1()
+    {
+        return $this->__relay_seed_unit_1 ;
+    }
+
+    /**
+     *  Set Relay Seed Time 2 property
+     *
+     *  @param string -  relay seed time 2
+     */
+    function setRelaySeedTime2($value = null)
+    {
+        $this->__relay_seed_time_2 = $value ;
+    }
+
+    /**
+     *  Get Relay Seed Time 2 property
+     *
+     *  @return string -  relay seed time 2
+     */
+    function getRelaySeedTime2()
+    {
+        return $this->__relay_seed_time_2 ;
+    }
+
+    /**
+     *  Set Relay Seed Unit 2 property
+     *
+     *  @param string -  relay seed unit 2
+     */
+    function setRelaySeedUnit2($value = null)
+    {
+        $this->__relay_seed_unit_2 = $value ;
+    }
+
+    /**
+     *  Get Relay Seed Unit 2 property
+     *
+     *  @return string -  relay seed unit 2
+     */
+    function getRelaySeedUnit2()
+    {
+        return $this->__relay_seed_unit_2 ;
+    }
+
+    /**
+     *  Set Result Type property
+     *
+     *  @param string -  result type
+     */
+    function setResultType($value = null)
+    {
+        $this->__result_type = $value ;
+    }
+
+    /**
+     *  Get Result Type property
+     *
+     *  @return string -  result type
+     */
+    function getResultType()
+    {
+        return $this->__result_type ;
+    }
+
+    /**
+     *  Set Time property
+     *
+     *  @param string -  time
+     */
+    function setTime($value = null)
+    {
+        $this->__time = $value ;
+    }
+
+    /**
+     *  Get Time property
+     *
+     *  @return string -  time
+     */
+    function getTime()
+    {
+        return $this->__time ;
+    }
+
+    /**
+     *  Set Length Unit property
+     *
+     *  @param string -  length unit
+     */
+    function setLengthUnit($value = null)
+    {
+        $this->__length_unit = $value ;
+    }
+
+    /**
+     *  Get Length Unit property
+     *
+     *  @return string -  length unit
+     */
+    function getLengthUnit()
+    {
+        return $this->__length_unit ;
+    }
+
+    /**
+     *  Set Time Code property
+     *
+     *  @param string -  time code
+     */
+    function setTimeCode($value = null)
+    {
+        $this->__time_code = $value ;
+    }
+
+    /**
+     *  Get Time Code property
+     *
+     *  @return string -  time code
+     */
+    function getTimeCode()
+    {
+        return $this->__time_code ;
+    }
+
+    /**
+     *  Set Heat property
+     *
+     *  @param string -  heat
+     */
+    function setHeat($value = null)
+    {
+        $this->__heat = $value ;
+    }
+
+    /**
+     *  Get Heat property
+     *
+     *  @return string -  heat
+     */
+    function getHeat()
+    {
+        return $this->__heat ;
+    }
+
+    /**
+     *  Set Lane property
+     *
+     *  @param string -  lane
+     */
+    function setLane($value = null)
+    {
+        $this->__lane = $value ;
+    }
+
+    /**
+     *  Get Lane property
+     *
+     *  @return string -  lane
+     */
+    function getLane()
+    {
+        return $this->__lane ;
+    }
+
+    /**
+     *  Set Place In Heat property
+     *
+     *  @param string -  place in heat
+     */
+    function setPlaceInHeat($value = null)
+    {
+        $this->__place_in_heat = $value ;
+    }
+
+    /**
+     *  Get Place In Heat property
+     *
+     *  @return string -  place in heat
+     */
+    function getPlaceInHeat()
+    {
+        return $this->__place_in_heat ;
+    }
+
+    /**
+     *  Set Overall Place property
+     *
+     *  @param string -  overall place
+     */
+    function setOverallPlace($value = null)
+    {
+        $this->__overall_place = $value ;
+    }
+
+    /**
+     *  Get Overall Place property
+     *
+     *  @return string -  overall place
+     */
+    function getOverallPlace()
+    {
+        return $this->__overall_place ;
+    }
+
+    /**
+     *  Set Day Of Event property
+     *
+     *  @param string -  day of event
+     */
+    function setDayOfEvent($value = null)
+    {
+        $this->__day_of_event = $value ;
+    }
+
+    /**
+     *  Get Day Of Event property
+     *
+     *  @return string -  day of event
+     */
+    function getDayOfEvent()
+    {
+        return $this->__day_of_event ;
+    }
+
+}
+
+/**
+ * HY3 F1 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3FxRecord
+ */
+class HY3F1Record extends HY3FxRecord
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+
+    /**
+     * Generate Record
+     *
+     * @return string - DF HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_DF_RECORD,
+            $this->getAthletesMiddleName(),
+            $this->getAthletesCellPhoneNumber(),
+            $this->getAthletesEmailAddress(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
+}
+
+/**
  * HY3 Code Tables
  *
  * The HY3 specification defines 26 tables that map code
@@ -4892,13 +6085,13 @@ class HY3CodeTables
      */
     function GetGenderCode($code, $invalid = true)
     {
-        $WPST_HYTEK_GENDER_CODES = array(
-            WPST_HYTEK_SWIMMER_SEX_CODE_MALE_VALUE => WPST_HYTEK_SWIMMER_SEX_CODE_MALE_LABEL
-           ,WPST_HYTEK_SWIMMER_SEX_CODE_FEMALE_VALUE => WPST_HYTEK_SWIMMER_SEX_CODE_FEMALE_LABEL
+        $WPST_HY3_GENDER_CODES = array(
+            WPST_HY3_SWIMMER_SEX_CODE_MALE_VALUE => WPST_HY3_SWIMMER_SEX_CODE_MALE_LABEL
+           ,WPST_HY3_SWIMMER_SEX_CODE_FEMALE_VALUE => WPST_HY3_SWIMMER_SEX_CODE_FEMALE_LABEL
         ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_GENDER_CODES))
-            return $WPST_HYTEK_GENDER_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_GENDER_CODES))
+            return $WPST_HY3_GENDER_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -4916,14 +6109,14 @@ class HY3CodeTables
      */
     function GetEventGenderCode($code, $invalid = true)
     {
-        $WPST_HYTEK_EVENT_GENDER_CODES = array(
-            WPST_HYTEK_EVENT_SEX_CODE_MALE_VALUE => WPST_HYTEK_EVENT_SEX_CODE_MALE_LABEL
-           ,WPST_HYTEK_EVENT_SEX_CODE_FEMALE_VALUE => WPST_HYTEK_EVENT_SEX_CODE_FEMALE_LABEL
-           ,WPST_HYTEK_EVENT_SEX_CODE_MIXED_VALUE => WPST_HYTEK_EVENT_SEX_CODE_MIXED_LABEL
+        $WPST_HY3_EVENT_GENDER_CODES = array(
+            WPST_HY3_EVENT_SEX_CODE_MALE_VALUE => WPST_HY3_EVENT_SEX_CODE_MALE_LABEL
+           ,WPST_HY3_EVENT_SEX_CODE_FEMALE_VALUE => WPST_HY3_EVENT_SEX_CODE_FEMALE_LABEL
+           ,WPST_HY3_EVENT_SEX_CODE_MIXED_VALUE => WPST_HY3_EVENT_SEX_CODE_MIXED_LABEL
         ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_EVENT_GENDER_CODES))
-            return $WPST_HYTEK_EVENT_GENDER_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_EVENT_GENDER_CODES))
+            return $WPST_HY3_EVENT_GENDER_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -4941,13 +6134,13 @@ class HY3CodeTables
      */
     function GetAttachedCode($code, $invalid = true)
     {
-        $WPST_HYTEK_ATTACHED_CODES = array(
-            WPST_HYTEK_ATTACHED_CODE_ATTACHED_VALUE => WPST_HYTEK_ATTACHED_CODE_ATTACHED_LABEL
-           ,WPST_HYTEK_ATTACHED_CODE_UNATTACHED_VALUE => WPST_HYTEK_ATTACHED_CODE_UNATTACHED_LABEL
+        $WPST_HY3_ATTACHED_CODES = array(
+            WPST_HY3_ATTACHED_CODE_ATTACHED_VALUE => WPST_HY3_ATTACHED_CODE_ATTACHED_LABEL
+           ,WPST_HY3_ATTACHED_CODE_UNATTACHED_VALUE => WPST_HY3_ATTACHED_CODE_UNATTACHED_LABEL
         ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_ATTACHED_CODES))
-            return $WPST_HYTEK_ATTACHED_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_ATTACHED_CODES))
+            return $WPST_HY3_ATTACHED_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -4965,9 +6158,9 @@ class HY3CodeTables
      */
     function GetCitizenCode($code, $invalid = true)
     {
-        $WPST_HYTEK_CITIZEN_CODES = array(
-            WPST_HYTEK_CITIZENSHIP_CODE_DUAL_VALUE => WPST_HYTEK_CITIZENSHIP_CODE_DUAL_LABEL
-           ,WPST_HYTEK_CITIZENSHIP_CODE_FOREIGN_VALUE => WPST_HYTEK_CITIZENSHIP_CODE_FOREIGN_LABEL
+        $WPST_HY3_CITIZEN_CODES = array(
+            WPST_HY3_CITIZENSHIP_CODE_DUAL_VALUE => WPST_HY3_CITIZENSHIP_CODE_DUAL_LABEL
+           ,WPST_HY3_CITIZENSHIP_CODE_FOREIGN_VALUE => WPST_HY3_CITIZENSHIP_CODE_FOREIGN_LABEL
         ) ;
 
         //  The citizen code can also come from the list of
@@ -4977,8 +6170,8 @@ class HY3CodeTables
 
         if ($cc != '')
             return $cc ;
-        else if (array_key_exists($code, $WPST_HYTEK_CITIZEN_CODES))
-            return $WPST_HYTEK_CITIZEN_CODES[$code] ;
+        else if (array_key_exists($code, $WPST_HY3_CITIZEN_CODES))
+            return $WPST_HY3_CITIZEN_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -4996,20 +6189,20 @@ class HY3CodeTables
      */
     function GetOrgCode($code, $invalid = true)
     {
-        $WPST_HYTEK_ORG_CODES = array(
-            WPST_HYTEK_ORG_CODE_USS_VALUE => WPST_HYTEK_ORG_CODE_USS_LABEL
-           ,WPST_HYTEK_ORG_CODE_MASTERS_VALUE => WPST_HYTEK_ORG_CODE_MASTERS_LABEL
-           ,WPST_HYTEK_ORG_CODE_NCAA_VALUE => WPST_HYTEK_ORG_CODE_NCAA_LABEL
-           ,WPST_HYTEK_ORG_CODE_NCAA_DIV_I_VALUE => WPST_HYTEK_ORG_CODE_NCAA_DIV_I_LABEL
-           ,WPST_HYTEK_ORG_CODE_NCAA_DIV_II_VALUE => WPST_HYTEK_ORG_CODE_NCAA_DIV_II_LABEL
-           ,WPST_HYTEK_ORG_CODE_NCAA_DIV_III_VALUE => WPST_HYTEK_ORG_CODE_NCAA_DIV_III_LABEL
-           ,WPST_HYTEK_ORG_CODE_YMCA_VALUE => WPST_HYTEK_ORG_CODE_YMCA_LABEL
-           ,WPST_HYTEK_ORG_CODE_FINA_VALUE => WPST_HYTEK_ORG_CODE_FINA_LABEL
-           ,WPST_HYTEK_ORG_CODE_HIGH_SCHOOL_VALUE => WPST_HYTEK_ORG_CODE_HIGH_SCHOOL_LABEL
+        $WPST_HY3_ORG_CODES = array(
+            WPST_HY3_ORG_CODE_USS_VALUE => WPST_HY3_ORG_CODE_USS_LABEL
+           ,WPST_HY3_ORG_CODE_MASTERS_VALUE => WPST_HY3_ORG_CODE_MASTERS_LABEL
+           ,WPST_HY3_ORG_CODE_NCAA_VALUE => WPST_HY3_ORG_CODE_NCAA_LABEL
+           ,WPST_HY3_ORG_CODE_NCAA_DIV_I_VALUE => WPST_HY3_ORG_CODE_NCAA_DIV_I_LABEL
+           ,WPST_HY3_ORG_CODE_NCAA_DIV_II_VALUE => WPST_HY3_ORG_CODE_NCAA_DIV_II_LABEL
+           ,WPST_HY3_ORG_CODE_NCAA_DIV_III_VALUE => WPST_HY3_ORG_CODE_NCAA_DIV_III_LABEL
+           ,WPST_HY3_ORG_CODE_YMCA_VALUE => WPST_HY3_ORG_CODE_YMCA_LABEL
+           ,WPST_HY3_ORG_CODE_FINA_VALUE => WPST_HY3_ORG_CODE_FINA_LABEL
+           ,WPST_HY3_ORG_CODE_HIGH_SCHOOL_VALUE => WPST_HY3_ORG_CODE_HIGH_SCHOOL_LABEL
         ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_ORG_CODES))
-            return $WPST_HYTEK_ORG_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_ORG_CODES))
+            return $WPST_HY3_ORG_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -5028,29 +6221,29 @@ class HY3CodeTables
     function GetCourseCode($code, $alt = false, $invalid = true)
     {
         if ($alt)
-            $WPST_HYTEK_COURSE_CODES = array(
-                WPST_HYTEK_COURSE_STATUS_CODE_SCM_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCM_ALT_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_SCY_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCY_ALT_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_LCM_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_LCM_ALT_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_DQ_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_DQ_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_SCM_ALT_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCM_ALT_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_SCY_ALT_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCY_ALT_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_LCM_ALT_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_LCM_ALT_LABEL
+            $WPST_HY3_COURSE_CODES = array(
+                WPST_HY3_COURSE_STATUS_CODE_SCM_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCM_ALT_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_SCY_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCY_ALT_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_LCM_VALUE => WPST_HY3_COURSE_STATUS_CODE_LCM_ALT_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_DQ_VALUE => WPST_HY3_COURSE_STATUS_CODE_DQ_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_SCM_ALT_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCM_ALT_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_SCY_ALT_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCY_ALT_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_LCM_ALT_VALUE => WPST_HY3_COURSE_STATUS_CODE_LCM_ALT_LABEL
             ) ;
 
         else
-            $WPST_HYTEK_COURSE_CODES = array(
-                WPST_HYTEK_COURSE_STATUS_CODE_SCM_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCM_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_SCY_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCY_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_LCM_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_LCM_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_DQ_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_DQ_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_SCM_ALT_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCM_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_SCY_ALT_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_SCY_LABEL
-               ,WPST_HYTEK_COURSE_STATUS_CODE_LCM_ALT_VALUE => WPST_HYTEK_COURSE_STATUS_CODE_LCM_LABEL
+            $WPST_HY3_COURSE_CODES = array(
+                WPST_HY3_COURSE_STATUS_CODE_SCM_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCM_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_SCY_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCY_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_LCM_VALUE => WPST_HY3_COURSE_STATUS_CODE_LCM_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_DQ_VALUE => WPST_HY3_COURSE_STATUS_CODE_DQ_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_SCM_ALT_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCM_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_SCY_ALT_VALUE => WPST_HY3_COURSE_STATUS_CODE_SCY_LABEL
+               ,WPST_HY3_COURSE_STATUS_CODE_LCM_ALT_VALUE => WPST_HY3_COURSE_STATUS_CODE_LCM_LABEL
             ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_COURSE_CODES))
-            return $WPST_HYTEK_COURSE_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_COURSE_CODES))
+            return $WPST_HY3_COURSE_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -5068,18 +6261,18 @@ class HY3CodeTables
      */
     function GetStrokeCode($code, $invalid = true)
     {
-        $WPST_HYTEK_EVENT_STROKE_CODES = array(
-            WPST_HYTEK_EVENT_STROKE_CODE_FREESTYLE_VALUE => WPST_HYTEK_EVENT_STROKE_CODE_FREESTYLE_LABEL
-           ,WPST_HYTEK_EVENT_STROKE_CODE_BACKSTROKE_VALUE => WPST_HYTEK_EVENT_STROKE_CODE_BACKSTROKE_LABEL
-           ,WPST_HYTEK_EVENT_STROKE_CODE_BREASTSTROKE_VALUE => WPST_HYTEK_EVENT_STROKE_CODE_BREASTSTROKE_LABEL
-           ,WPST_HYTEK_EVENT_STROKE_CODE_BUTTERFLY_VALUE => WPST_HYTEK_EVENT_STROKE_CODE_BUTTERFLY_LABEL
-           ,WPST_HYTEK_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_VALUE => WPST_HYTEK_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_LABEL
-           ,WPST_HYTEK_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE => WPST_HYTEK_EVENT_STROKE_CODE_FREESTYLE_RELAY_LABEL
-           ,WPST_HYTEK_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE => WPST_HYTEK_EVENT_STROKE_CODE_MEDLEY_RELAY_LABEL
+        $WPST_HY3_EVENT_STROKE_CODES = array(
+            WPST_HY3_EVENT_STROKE_CODE_FREESTYLE_VALUE => WPST_HY3_EVENT_STROKE_CODE_FREESTYLE_LABEL
+           ,WPST_HY3_EVENT_STROKE_CODE_BACKSTROKE_VALUE => WPST_HY3_EVENT_STROKE_CODE_BACKSTROKE_LABEL
+           ,WPST_HY3_EVENT_STROKE_CODE_BREASTSTROKE_VALUE => WPST_HY3_EVENT_STROKE_CODE_BREASTSTROKE_LABEL
+           ,WPST_HY3_EVENT_STROKE_CODE_BUTTERFLY_VALUE => WPST_HY3_EVENT_STROKE_CODE_BUTTERFLY_LABEL
+           ,WPST_HY3_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_VALUE => WPST_HY3_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_LABEL
+           ,WPST_HY3_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE => WPST_HY3_EVENT_STROKE_CODE_FREESTYLE_RELAY_LABEL
+           ,WPST_HY3_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE => WPST_HY3_EVENT_STROKE_CODE_MEDLEY_RELAY_LABEL
         ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_EVENT_STROKE_CODES))
-            return $WPST_HYTEK_EVENT_STROKE_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_EVENT_STROKE_CODES))
+            return $WPST_HY3_EVENT_STROKE_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -5097,25 +6290,25 @@ class HY3CodeTables
      */
     function GetRegionCode($code, $invalid = true)
     {
-        $WPST_HYTEK_REGION_CODES = array(
-            WPST_HYTEK_REGION_CODE_REGION_1_VALUE => WPST_HYTEK_REGION_CODE_REGION_1_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_2_VALUE => WPST_HYTEK_REGION_CODE_REGION_2_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_3_VALUE => WPST_HYTEK_REGION_CODE_REGION_3_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_4_VALUE => WPST_HYTEK_REGION_CODE_REGION_4_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_5_VALUE => WPST_HYTEK_REGION_CODE_REGION_5_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_6_VALUE => WPST_HYTEK_REGION_CODE_REGION_6_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_7_VALUE => WPST_HYTEK_REGION_CODE_REGION_7_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_8_VALUE => WPST_HYTEK_REGION_CODE_REGION_8_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_9_VALUE => WPST_HYTEK_REGION_CODE_REGION_9_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_10_VALUE => WPST_HYTEK_REGION_CODE_REGION_10_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_11_VALUE => WPST_HYTEK_REGION_CODE_REGION_11_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_12_VALUE => WPST_HYTEK_REGION_CODE_REGION_12_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_13_VALUE => WPST_HYTEK_REGION_CODE_REGION_13_LABEL
-           ,WPST_HYTEK_REGION_CODE_REGION_14_VALUE => WPST_HYTEK_REGION_CODE_REGION_14_LABEL
+        $WPST_HY3_REGION_CODES = array(
+            WPST_HY3_REGION_CODE_REGION_1_VALUE => WPST_HY3_REGION_CODE_REGION_1_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_2_VALUE => WPST_HY3_REGION_CODE_REGION_2_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_3_VALUE => WPST_HY3_REGION_CODE_REGION_3_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_4_VALUE => WPST_HY3_REGION_CODE_REGION_4_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_5_VALUE => WPST_HY3_REGION_CODE_REGION_5_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_6_VALUE => WPST_HY3_REGION_CODE_REGION_6_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_7_VALUE => WPST_HY3_REGION_CODE_REGION_7_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_8_VALUE => WPST_HY3_REGION_CODE_REGION_8_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_9_VALUE => WPST_HY3_REGION_CODE_REGION_9_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_10_VALUE => WPST_HY3_REGION_CODE_REGION_10_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_11_VALUE => WPST_HY3_REGION_CODE_REGION_11_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_12_VALUE => WPST_HY3_REGION_CODE_REGION_12_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_13_VALUE => WPST_HY3_REGION_CODE_REGION_13_LABEL
+           ,WPST_HY3_REGION_CODE_REGION_14_VALUE => WPST_HY3_REGION_CODE_REGION_14_LABEL
         ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_REGION_CODES))
-            return $WPST_HYTEK_REGION_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_REGION_CODES))
+            return $WPST_HY3_REGION_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -5133,24 +6326,24 @@ class HY3CodeTables
      */
     function GetMeetCode($code, $invalid = true)
     {
-        $WPST_HYTEK_MEET_CODES = array(
-            WPST_HYTEK_MEET_TYPE_INVITATIONAL_VALUE => WPST_HYTEK_MEET_TYPE_INVITATIONAL_LABEL
-           ,WPST_HYTEK_MEET_TYPE_REGIONAL_VALUE => WPST_HYTEK_MEET_TYPE_REGIONAL_LABEL
-           ,WPST_HYTEK_MEET_TYPE_LSC_CHAMPIONSHIP_VALUE => WPST_HYTEK_MEET_TYPE_LSC_CHAMPIONSHIP_LABEL
-           ,WPST_HYTEK_MEET_TYPE_ZONE_VALUE => WPST_HYTEK_MEET_TYPE_ZONE_LABEL
-           ,WPST_HYTEK_MEET_TYPE_ZONE_CHAMPIONSHIP_VALUE => WPST_HYTEK_MEET_TYPE_ZONE_CHAMPIONSHIP_LABEL
-           ,WPST_HYTEK_MEET_TYPE_NATIONAL_CHAMPIONSHIP_VALUE => WPST_HYTEK_MEET_TYPE_NATIONAL_CHAMPIONSHIP_LABEL
-           ,WPST_HYTEK_MEET_TYPE_JUNIORS_VALUE => WPST_HYTEK_MEET_TYPE_JUNIORS_LABEL
-           ,WPST_HYTEK_MEET_TYPE_SENIORS_VALUE => WPST_HYTEK_MEET_TYPE_SENIORS_LABEL
-           ,WPST_HYTEK_MEET_TYPE_DUAL_VALUE => WPST_HYTEK_MEET_TYPE_DUAL_LABEL
-           ,WPST_HYTEK_MEET_TYPE_TIME_TRIALS_VALUE => WPST_HYTEK_MEET_TYPE_TIME_TRIALS_LABEL
-           ,WPST_HYTEK_MEET_TYPE_INTERNATIONAL_VALUE => WPST_HYTEK_MEET_TYPE_INTERNATIONAL_LABEL
-           ,WPST_HYTEK_MEET_TYPE_OPEN_VALUE => WPST_HYTEK_MEET_TYPE_OPEN_LABEL
-           ,WPST_HYTEK_MEET_TYPE_LEAGUE_VALUE => WPST_HYTEK_MEET_TYPE_LEAGUE_LABEL
+        $WPST_HY3_MEET_CODES = array(
+            WPST_HY3_MEET_TYPE_INVITATIONAL_VALUE => WPST_HY3_MEET_TYPE_INVITATIONAL_LABEL
+           ,WPST_HY3_MEET_TYPE_REGIONAL_VALUE => WPST_HY3_MEET_TYPE_REGIONAL_LABEL
+           ,WPST_HY3_MEET_TYPE_LSC_CHAMPIONSHIP_VALUE => WPST_HY3_MEET_TYPE_LSC_CHAMPIONSHIP_LABEL
+           ,WPST_HY3_MEET_TYPE_ZONE_VALUE => WPST_HY3_MEET_TYPE_ZONE_LABEL
+           ,WPST_HY3_MEET_TYPE_ZONE_CHAMPIONSHIP_VALUE => WPST_HY3_MEET_TYPE_ZONE_CHAMPIONSHIP_LABEL
+           ,WPST_HY3_MEET_TYPE_NATIONAL_CHAMPIONSHIP_VALUE => WPST_HY3_MEET_TYPE_NATIONAL_CHAMPIONSHIP_LABEL
+           ,WPST_HY3_MEET_TYPE_JUNIORS_VALUE => WPST_HY3_MEET_TYPE_JUNIORS_LABEL
+           ,WPST_HY3_MEET_TYPE_SENIORS_VALUE => WPST_HY3_MEET_TYPE_SENIORS_LABEL
+           ,WPST_HY3_MEET_TYPE_DUAL_VALUE => WPST_HY3_MEET_TYPE_DUAL_LABEL
+           ,WPST_HY3_MEET_TYPE_TIME_TRIALS_VALUE => WPST_HY3_MEET_TYPE_TIME_TRIALS_LABEL
+           ,WPST_HY3_MEET_TYPE_INTERNATIONAL_VALUE => WPST_HY3_MEET_TYPE_INTERNATIONAL_LABEL
+           ,WPST_HY3_MEET_TYPE_OPEN_VALUE => WPST_HY3_MEET_TYPE_OPEN_LABEL
+           ,WPST_HY3_MEET_TYPE_LEAGUE_VALUE => WPST_HY3_MEET_TYPE_LEAGUE_LABEL
         ) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_MEET_CODES))
-            return $WPST_HYTEK_MEET_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_MEET_CODES))
+            return $WPST_HY3_MEET_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -5168,192 +6361,192 @@ class HY3CodeTables
      */
     function GetCountryCode($code, $invalid = true)
     {
-		$WPST_HYTEK_COUNTRY_CODES = array(
-		    WPST_HYTEK_COUNTRY_CODE_AFGHANISTAN_VALUE => WPST_HYTEK_COUNTRY_CODE_AFGHANISTAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ALBANIA_VALUE => WPST_HYTEK_COUNTRY_CODE_ALBANIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ALGERIA_VALUE => WPST_HYTEK_COUNTRY_CODE_ALGERIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_AMERICAN_SAMOA_VALUE => WPST_HYTEK_COUNTRY_CODE_AMERICAN_SAMOA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ANDORRA_VALUE => WPST_HYTEK_COUNTRY_CODE_ANDORRA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ANGOLA_VALUE => WPST_HYTEK_COUNTRY_CODE_ANGOLA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ANTIGUA_VALUE => WPST_HYTEK_COUNTRY_CODE_ANTIGUA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_VALUE => WPST_HYTEK_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_VALUE => WPST_HYTEK_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ARGENTINA_VALUE => WPST_HYTEK_COUNTRY_CODE_ARGENTINA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ARMENIA_VALUE => WPST_HYTEK_COUNTRY_CODE_ARMENIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ARUBA_VALUE => WPST_HYTEK_COUNTRY_CODE_ARUBA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_AUSTRALIA_VALUE => WPST_HYTEK_COUNTRY_CODE_AUSTRALIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_AUSTRIA_VALUE => WPST_HYTEK_COUNTRY_CODE_AUSTRIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_AZERBAIJAN_VALUE => WPST_HYTEK_COUNTRY_CODE_AZERBAIJAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BAHAMAS_VALUE => WPST_HYTEK_COUNTRY_CODE_BAHAMAS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BAHRAIN_VALUE => WPST_HYTEK_COUNTRY_CODE_BAHRAIN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BANGLADESH_VALUE => WPST_HYTEK_COUNTRY_CODE_BANGLADESH_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BARBADOS_VALUE => WPST_HYTEK_COUNTRY_CODE_BARBADOS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BELARUS_VALUE => WPST_HYTEK_COUNTRY_CODE_BELARUS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BELGIUM_VALUE => WPST_HYTEK_COUNTRY_CODE_BELGIUM_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BELIZE_VALUE => WPST_HYTEK_COUNTRY_CODE_BELIZE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BENIN_VALUE => WPST_HYTEK_COUNTRY_CODE_BENIN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BERMUDA_VALUE => WPST_HYTEK_COUNTRY_CODE_BERMUDA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BHUTAN_VALUE => WPST_HYTEK_COUNTRY_CODE_BHUTAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BOLIVIA_VALUE => WPST_HYTEK_COUNTRY_CODE_BOLIVIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BOTSWANA_VALUE => WPST_HYTEK_COUNTRY_CODE_BOTSWANA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BRAZIL_VALUE => WPST_HYTEK_COUNTRY_CODE_BRAZIL_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_VALUE => WPST_HYTEK_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BRUNEI_VALUE => WPST_HYTEK_COUNTRY_CODE_BRUNEI_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BULGARIA_VALUE => WPST_HYTEK_COUNTRY_CODE_BULGARIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_BURKINA_FASO_VALUE => WPST_HYTEK_COUNTRY_CODE_BURKINA_FASO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CAMEROON_VALUE => WPST_HYTEK_COUNTRY_CODE_CAMEROON_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CANADA_VALUE => WPST_HYTEK_COUNTRY_CODE_CANADA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CAYMAN_ISLANDS_VALUE => WPST_HYTEK_COUNTRY_CODE_CAYMAN_ISLANDS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_VALUE => WPST_HYTEK_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CHAD_VALUE => WPST_HYTEK_COUNTRY_CODE_CHAD_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CHILE_VALUE => WPST_HYTEK_COUNTRY_CODE_CHILE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CHINESE_TAIPEI_VALUE => WPST_HYTEK_COUNTRY_CODE_CHINESE_TAIPEI_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_COLUMBIA_VALUE => WPST_HYTEK_COUNTRY_CODE_COLUMBIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_COOK_ISLANDS_VALUE => WPST_HYTEK_COUNTRY_CODE_COOK_ISLANDS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_COSTA_RICA_VALUE => WPST_HYTEK_COUNTRY_CODE_COSTA_RICA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CROATIA_VALUE => WPST_HYTEK_COUNTRY_CODE_CROATIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CUBA_VALUE => WPST_HYTEK_COUNTRY_CODE_CUBA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CYPRUS_VALUE => WPST_HYTEK_COUNTRY_CODE_CYPRUS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_CZECHOSLOVAKIA_VALUE => WPST_HYTEK_COUNTRY_CODE_CZECHOSLOVAKIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_VALUE => WPST_HYTEK_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_DENMARK_VALUE => WPST_HYTEK_COUNTRY_CODE_DENMARK_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_DJIBOUTI_VALUE => WPST_HYTEK_COUNTRY_CODE_DJIBOUTI_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_DOMINICAN_REPUBLIC_VALUE => WPST_HYTEK_COUNTRY_CODE_DOMINICAN_REPUBLIC_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ECUADOR_VALUE => WPST_HYTEK_COUNTRY_CODE_ECUADOR_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_EL_SALVADOR_VALUE => WPST_HYTEK_COUNTRY_CODE_EL_SALVADOR_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_EQUATORIAL_GUINEA_VALUE => WPST_HYTEK_COUNTRY_CODE_EQUATORIAL_GUINEA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ESTONIA_VALUE => WPST_HYTEK_COUNTRY_CODE_ESTONIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ETHIOPIA_VALUE => WPST_HYTEK_COUNTRY_CODE_ETHIOPIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_FIJI_VALUE => WPST_HYTEK_COUNTRY_CODE_FIJI_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_FINLAND_VALUE => WPST_HYTEK_COUNTRY_CODE_FINLAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_FRANCE_VALUE => WPST_HYTEK_COUNTRY_CODE_FRANCE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GABON_VALUE => WPST_HYTEK_COUNTRY_CODE_GABON_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GAMBIA_VALUE => WPST_HYTEK_COUNTRY_CODE_GAMBIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GEORGIA_VALUE => WPST_HYTEK_COUNTRY_CODE_GEORGIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GERMANY_VALUE => WPST_HYTEK_COUNTRY_CODE_GERMANY_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GHANA_VALUE => WPST_HYTEK_COUNTRY_CODE_GHANA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GREAT_BRITAIN_VALUE => WPST_HYTEK_COUNTRY_CODE_GREAT_BRITAIN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GREECE_VALUE => WPST_HYTEK_COUNTRY_CODE_GREECE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GRENADA_VALUE => WPST_HYTEK_COUNTRY_CODE_GRENADA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GUAM_VALUE => WPST_HYTEK_COUNTRY_CODE_GUAM_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GUATEMALA_VALUE => WPST_HYTEK_COUNTRY_CODE_GUATEMALA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GUINEA_VALUE => WPST_HYTEK_COUNTRY_CODE_GUINEA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_GUYANA_VALUE => WPST_HYTEK_COUNTRY_CODE_GUYANA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_HAITI_VALUE => WPST_HYTEK_COUNTRY_CODE_HAITI_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_HONDURAS_VALUE => WPST_HYTEK_COUNTRY_CODE_HONDURAS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_HONG_KONG_VALUE => WPST_HYTEK_COUNTRY_CODE_HONG_KONG_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_HUNGARY_VALUE => WPST_HYTEK_COUNTRY_CODE_HUNGARY_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ICELAND_VALUE => WPST_HYTEK_COUNTRY_CODE_ICELAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_INDIA_VALUE => WPST_HYTEK_COUNTRY_CODE_INDIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_INDONESIA_VALUE => WPST_HYTEK_COUNTRY_CODE_INDONESIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_IRAQ_VALUE => WPST_HYTEK_COUNTRY_CODE_IRAQ_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_IRELAND_VALUE => WPST_HYTEK_COUNTRY_CODE_IRELAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_VALUE => WPST_HYTEK_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ISRAEL_VALUE => WPST_HYTEK_COUNTRY_CODE_ISRAEL_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ITALY_VALUE => WPST_HYTEK_COUNTRY_CODE_ITALY_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_IVORY_COAST_VALUE => WPST_HYTEK_COUNTRY_CODE_IVORY_COAST_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_JAMAICA_VALUE => WPST_HYTEK_COUNTRY_CODE_JAMAICA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_JAPAN_VALUE => WPST_HYTEK_COUNTRY_CODE_JAPAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_JORDAN_VALUE => WPST_HYTEK_COUNTRY_CODE_JORDAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_KAZAKHSTAN_VALUE => WPST_HYTEK_COUNTRY_CODE_KAZAKHSTAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_KENYA_VALUE => WPST_HYTEK_COUNTRY_CODE_KENYA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_KOREA_SOUTH_VALUE => WPST_HYTEK_COUNTRY_CODE_KOREA_SOUTH_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_KUWAIT_VALUE => WPST_HYTEK_COUNTRY_CODE_KUWAIT_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_KYRGHYZSTAN_VALUE => WPST_HYTEK_COUNTRY_CODE_KYRGHYZSTAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LAOS_VALUE => WPST_HYTEK_COUNTRY_CODE_LAOS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LATVIA_VALUE => WPST_HYTEK_COUNTRY_CODE_LATVIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LEBANON_VALUE => WPST_HYTEK_COUNTRY_CODE_LEBANON_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LESOTHO_VALUE => WPST_HYTEK_COUNTRY_CODE_LESOTHO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LIBERIA_VALUE => WPST_HYTEK_COUNTRY_CODE_LIBERIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LIBYA_VALUE => WPST_HYTEK_COUNTRY_CODE_LIBYA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LIECHTENSTEIN_VALUE => WPST_HYTEK_COUNTRY_CODE_LIECHTENSTEIN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LITHUANIA_VALUE => WPST_HYTEK_COUNTRY_CODE_LITHUANIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_LUXEMBOURG_VALUE => WPST_HYTEK_COUNTRY_CODE_LUXEMBOURG_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MADAGASCAR_VALUE => WPST_HYTEK_COUNTRY_CODE_MADAGASCAR_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MALAWI_VALUE => WPST_HYTEK_COUNTRY_CODE_MALAWI_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MALAYSIA_VALUE => WPST_HYTEK_COUNTRY_CODE_MALAYSIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MALDIVES_VALUE => WPST_HYTEK_COUNTRY_CODE_MALDIVES_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MALI_VALUE => WPST_HYTEK_COUNTRY_CODE_MALI_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MALTA_VALUE => WPST_HYTEK_COUNTRY_CODE_MALTA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MAURITANIA_VALUE => WPST_HYTEK_COUNTRY_CODE_MAURITANIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MAURITIUS_VALUE => WPST_HYTEK_COUNTRY_CODE_MAURITIUS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MEXICO_VALUE => WPST_HYTEK_COUNTRY_CODE_MEXICO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MOLDOVA_VALUE => WPST_HYTEK_COUNTRY_CODE_MOLDOVA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MONACO_VALUE => WPST_HYTEK_COUNTRY_CODE_MONACO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MONGOLIA_VALUE => WPST_HYTEK_COUNTRY_CODE_MONGOLIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MOROCCO_VALUE => WPST_HYTEK_COUNTRY_CODE_MOROCCO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_MOZAMBIQUE_VALUE => WPST_HYTEK_COUNTRY_CODE_MOZAMBIQUE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_NAMIBIA_VALUE => WPST_HYTEK_COUNTRY_CODE_NAMIBIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_NEPAL_VALUE => WPST_HYTEK_COUNTRY_CODE_NEPAL_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_NEW_ZEALAND_VALUE => WPST_HYTEK_COUNTRY_CODE_NEW_ZEALAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_NICARAGUA_VALUE => WPST_HYTEK_COUNTRY_CODE_NICARAGUA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_NIGER_VALUE => WPST_HYTEK_COUNTRY_CODE_NIGER_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_NIGERIA_VALUE => WPST_HYTEK_COUNTRY_CODE_NIGERIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_NORWAY_VALUE => WPST_HYTEK_COUNTRY_CODE_NORWAY_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_OMAN_VALUE => WPST_HYTEK_COUNTRY_CODE_OMAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PAKISTAN_VALUE => WPST_HYTEK_COUNTRY_CODE_PAKISTAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PANAMA_VALUE => WPST_HYTEK_COUNTRY_CODE_PANAMA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PAPAU_NEW_GUINEA_VALUE => WPST_HYTEK_COUNTRY_CODE_PAPAU_NEW_GUINEA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PARAGUAY_VALUE => WPST_HYTEK_COUNTRY_CODE_PARAGUAY_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_VALUE => WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_VALUE => WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PERU_VALUE => WPST_HYTEK_COUNTRY_CODE_PERU_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PHILIPPINES_VALUE => WPST_HYTEK_COUNTRY_CODE_PHILIPPINES_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_POLAND_VALUE => WPST_HYTEK_COUNTRY_CODE_POLAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PORTUGAL_VALUE => WPST_HYTEK_COUNTRY_CODE_PORTUGAL_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_PUERTO_RICO_VALUE => WPST_HYTEK_COUNTRY_CODE_PUERTO_RICO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_QATAR_VALUE => WPST_HYTEK_COUNTRY_CODE_QATAR_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ROMANIA_VALUE => WPST_HYTEK_COUNTRY_CODE_ROMANIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_RUSSIA_VALUE => WPST_HYTEK_COUNTRY_CODE_RUSSIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_RWANDA_VALUE => WPST_HYTEK_COUNTRY_CODE_RWANDA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SAN_MARINO_VALUE => WPST_HYTEK_COUNTRY_CODE_SAN_MARINO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SAUDI_ARABIA_VALUE => WPST_HYTEK_COUNTRY_CODE_SAUDI_ARABIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SENEGAL_VALUE => WPST_HYTEK_COUNTRY_CODE_SENEGAL_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SEYCHELLES_VALUE => WPST_HYTEK_COUNTRY_CODE_SEYCHELLES_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SIERRA_LEONE_VALUE => WPST_HYTEK_COUNTRY_CODE_SIERRA_LEONE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SINGAPORE_VALUE => WPST_HYTEK_COUNTRY_CODE_SINGAPORE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SLOVENIA_VALUE => WPST_HYTEK_COUNTRY_CODE_SLOVENIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SOLOMON_ISLANDS_VALUE => WPST_HYTEK_COUNTRY_CODE_SOLOMON_ISLANDS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SOMALIA_VALUE => WPST_HYTEK_COUNTRY_CODE_SOMALIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SOUTH_AFRICA_VALUE => WPST_HYTEK_COUNTRY_CODE_SOUTH_AFRICA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SPAIN_VALUE => WPST_HYTEK_COUNTRY_CODE_SPAIN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SRI_LANKA_VALUE => WPST_HYTEK_COUNTRY_CODE_SRI_LANKA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_VALUE => WPST_HYTEK_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SUDAN_VALUE => WPST_HYTEK_COUNTRY_CODE_SUDAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SURINAM_VALUE => WPST_HYTEK_COUNTRY_CODE_SURINAM_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SWAZILAND_VALUE => WPST_HYTEK_COUNTRY_CODE_SWAZILAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SWEDEN_VALUE => WPST_HYTEK_COUNTRY_CODE_SWEDEN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SWITZERLAND_VALUE => WPST_HYTEK_COUNTRY_CODE_SWITZERLAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_SYRIA_VALUE => WPST_HYTEK_COUNTRY_CODE_SYRIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_TADJIKISTAN_VALUE => WPST_HYTEK_COUNTRY_CODE_TADJIKISTAN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_TANZANIA_VALUE => WPST_HYTEK_COUNTRY_CODE_TANZANIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_THAILAND_VALUE => WPST_HYTEK_COUNTRY_CODE_THAILAND_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_THE_NETHERLANDS_VALUE => WPST_HYTEK_COUNTRY_CODE_THE_NETHERLANDS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_TOGO_VALUE => WPST_HYTEK_COUNTRY_CODE_TOGO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_TONGA_VALUE => WPST_HYTEK_COUNTRY_CODE_TONGA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_VALUE => WPST_HYTEK_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_TUNISIA_VALUE => WPST_HYTEK_COUNTRY_CODE_TUNISIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_TURKEY_VALUE => WPST_HYTEK_COUNTRY_CODE_TURKEY_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_UGANDA_VALUE => WPST_HYTEK_COUNTRY_CODE_UGANDA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_UKRAINE_VALUE => WPST_HYTEK_COUNTRY_CODE_UKRAINE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_UNION_OF_MYANMAR_VALUE => WPST_HYTEK_COUNTRY_CODE_UNION_OF_MYANMAR_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_UNITED_ARAB_EMIRATES_VALUE => WPST_HYTEK_COUNTRY_CODE_UNITED_ARAB_EMIRATES_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE => WPST_HYTEK_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_URUGUAY_VALUE => WPST_HYTEK_COUNTRY_CODE_URUGUAY_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_VANUATU_VALUE => WPST_HYTEK_COUNTRY_CODE_VANUATU_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_VENEZUELA_VALUE => WPST_HYTEK_COUNTRY_CODE_VENEZUELA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_VIETNAM_VALUE => WPST_HYTEK_COUNTRY_CODE_VIETNAM_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_VIRGIN_ISLANDS_VALUE => WPST_HYTEK_COUNTRY_CODE_VIRGIN_ISLANDS_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_WESTERN_SAMOA_VALUE => WPST_HYTEK_COUNTRY_CODE_WESTERN_SAMOA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_YEMEN_VALUE => WPST_HYTEK_COUNTRY_CODE_YEMEN_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_YUGOSLAVIA_VALUE => WPST_HYTEK_COUNTRY_CODE_YUGOSLAVIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ZAIRE_VALUE => WPST_HYTEK_COUNTRY_CODE_ZAIRE_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ZAMBIA_VALUE => WPST_HYTEK_COUNTRY_CODE_ZAMBIA_LABEL
-		   ,WPST_HYTEK_COUNTRY_CODE_ZIMBABWE_VALUE => WPST_HYTEK_COUNTRY_CODE_ZIMBABWE_LABEL
+		$WPST_HY3_COUNTRY_CODES = array(
+		    WPST_HY3_COUNTRY_CODE_AFGHANISTAN_VALUE => WPST_HY3_COUNTRY_CODE_AFGHANISTAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ALBANIA_VALUE => WPST_HY3_COUNTRY_CODE_ALBANIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ALGERIA_VALUE => WPST_HY3_COUNTRY_CODE_ALGERIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_AMERICAN_SAMOA_VALUE => WPST_HY3_COUNTRY_CODE_AMERICAN_SAMOA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ANDORRA_VALUE => WPST_HY3_COUNTRY_CODE_ANDORRA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ANGOLA_VALUE => WPST_HY3_COUNTRY_CODE_ANGOLA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ANTIGUA_VALUE => WPST_HY3_COUNTRY_CODE_ANTIGUA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_VALUE => WPST_HY3_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_VALUE => WPST_HY3_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ARGENTINA_VALUE => WPST_HY3_COUNTRY_CODE_ARGENTINA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ARMENIA_VALUE => WPST_HY3_COUNTRY_CODE_ARMENIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ARUBA_VALUE => WPST_HY3_COUNTRY_CODE_ARUBA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_AUSTRALIA_VALUE => WPST_HY3_COUNTRY_CODE_AUSTRALIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_AUSTRIA_VALUE => WPST_HY3_COUNTRY_CODE_AUSTRIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_AZERBAIJAN_VALUE => WPST_HY3_COUNTRY_CODE_AZERBAIJAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BAHAMAS_VALUE => WPST_HY3_COUNTRY_CODE_BAHAMAS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BAHRAIN_VALUE => WPST_HY3_COUNTRY_CODE_BAHRAIN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BANGLADESH_VALUE => WPST_HY3_COUNTRY_CODE_BANGLADESH_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BARBADOS_VALUE => WPST_HY3_COUNTRY_CODE_BARBADOS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BELARUS_VALUE => WPST_HY3_COUNTRY_CODE_BELARUS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BELGIUM_VALUE => WPST_HY3_COUNTRY_CODE_BELGIUM_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BELIZE_VALUE => WPST_HY3_COUNTRY_CODE_BELIZE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BENIN_VALUE => WPST_HY3_COUNTRY_CODE_BENIN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BERMUDA_VALUE => WPST_HY3_COUNTRY_CODE_BERMUDA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BHUTAN_VALUE => WPST_HY3_COUNTRY_CODE_BHUTAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BOLIVIA_VALUE => WPST_HY3_COUNTRY_CODE_BOLIVIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BOTSWANA_VALUE => WPST_HY3_COUNTRY_CODE_BOTSWANA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BRAZIL_VALUE => WPST_HY3_COUNTRY_CODE_BRAZIL_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_VALUE => WPST_HY3_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BRUNEI_VALUE => WPST_HY3_COUNTRY_CODE_BRUNEI_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BULGARIA_VALUE => WPST_HY3_COUNTRY_CODE_BULGARIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_BURKINA_FASO_VALUE => WPST_HY3_COUNTRY_CODE_BURKINA_FASO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CAMEROON_VALUE => WPST_HY3_COUNTRY_CODE_CAMEROON_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CANADA_VALUE => WPST_HY3_COUNTRY_CODE_CANADA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CAYMAN_ISLANDS_VALUE => WPST_HY3_COUNTRY_CODE_CAYMAN_ISLANDS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_VALUE => WPST_HY3_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CHAD_VALUE => WPST_HY3_COUNTRY_CODE_CHAD_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CHILE_VALUE => WPST_HY3_COUNTRY_CODE_CHILE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CHINESE_TAIPEI_VALUE => WPST_HY3_COUNTRY_CODE_CHINESE_TAIPEI_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_COLUMBIA_VALUE => WPST_HY3_COUNTRY_CODE_COLUMBIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_COOK_ISLANDS_VALUE => WPST_HY3_COUNTRY_CODE_COOK_ISLANDS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_COSTA_RICA_VALUE => WPST_HY3_COUNTRY_CODE_COSTA_RICA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CROATIA_VALUE => WPST_HY3_COUNTRY_CODE_CROATIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CUBA_VALUE => WPST_HY3_COUNTRY_CODE_CUBA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CYPRUS_VALUE => WPST_HY3_COUNTRY_CODE_CYPRUS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_CZECHOSLOVAKIA_VALUE => WPST_HY3_COUNTRY_CODE_CZECHOSLOVAKIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_VALUE => WPST_HY3_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_DENMARK_VALUE => WPST_HY3_COUNTRY_CODE_DENMARK_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_DJIBOUTI_VALUE => WPST_HY3_COUNTRY_CODE_DJIBOUTI_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_DOMINICAN_REPUBLIC_VALUE => WPST_HY3_COUNTRY_CODE_DOMINICAN_REPUBLIC_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ECUADOR_VALUE => WPST_HY3_COUNTRY_CODE_ECUADOR_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_EL_SALVADOR_VALUE => WPST_HY3_COUNTRY_CODE_EL_SALVADOR_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_EQUATORIAL_GUINEA_VALUE => WPST_HY3_COUNTRY_CODE_EQUATORIAL_GUINEA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ESTONIA_VALUE => WPST_HY3_COUNTRY_CODE_ESTONIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ETHIOPIA_VALUE => WPST_HY3_COUNTRY_CODE_ETHIOPIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_FIJI_VALUE => WPST_HY3_COUNTRY_CODE_FIJI_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_FINLAND_VALUE => WPST_HY3_COUNTRY_CODE_FINLAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_FRANCE_VALUE => WPST_HY3_COUNTRY_CODE_FRANCE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GABON_VALUE => WPST_HY3_COUNTRY_CODE_GABON_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GAMBIA_VALUE => WPST_HY3_COUNTRY_CODE_GAMBIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GEORGIA_VALUE => WPST_HY3_COUNTRY_CODE_GEORGIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GERMANY_VALUE => WPST_HY3_COUNTRY_CODE_GERMANY_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GHANA_VALUE => WPST_HY3_COUNTRY_CODE_GHANA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GREAT_BRITAIN_VALUE => WPST_HY3_COUNTRY_CODE_GREAT_BRITAIN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GREECE_VALUE => WPST_HY3_COUNTRY_CODE_GREECE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GRENADA_VALUE => WPST_HY3_COUNTRY_CODE_GRENADA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GUAM_VALUE => WPST_HY3_COUNTRY_CODE_GUAM_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GUATEMALA_VALUE => WPST_HY3_COUNTRY_CODE_GUATEMALA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GUINEA_VALUE => WPST_HY3_COUNTRY_CODE_GUINEA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_GUYANA_VALUE => WPST_HY3_COUNTRY_CODE_GUYANA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_HAITI_VALUE => WPST_HY3_COUNTRY_CODE_HAITI_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_HONDURAS_VALUE => WPST_HY3_COUNTRY_CODE_HONDURAS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_HONG_KONG_VALUE => WPST_HY3_COUNTRY_CODE_HONG_KONG_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_HUNGARY_VALUE => WPST_HY3_COUNTRY_CODE_HUNGARY_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ICELAND_VALUE => WPST_HY3_COUNTRY_CODE_ICELAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_INDIA_VALUE => WPST_HY3_COUNTRY_CODE_INDIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_INDONESIA_VALUE => WPST_HY3_COUNTRY_CODE_INDONESIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_IRAQ_VALUE => WPST_HY3_COUNTRY_CODE_IRAQ_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_IRELAND_VALUE => WPST_HY3_COUNTRY_CODE_IRELAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_VALUE => WPST_HY3_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ISRAEL_VALUE => WPST_HY3_COUNTRY_CODE_ISRAEL_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ITALY_VALUE => WPST_HY3_COUNTRY_CODE_ITALY_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_IVORY_COAST_VALUE => WPST_HY3_COUNTRY_CODE_IVORY_COAST_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_JAMAICA_VALUE => WPST_HY3_COUNTRY_CODE_JAMAICA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_JAPAN_VALUE => WPST_HY3_COUNTRY_CODE_JAPAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_JORDAN_VALUE => WPST_HY3_COUNTRY_CODE_JORDAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_KAZAKHSTAN_VALUE => WPST_HY3_COUNTRY_CODE_KAZAKHSTAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_KENYA_VALUE => WPST_HY3_COUNTRY_CODE_KENYA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_KOREA_SOUTH_VALUE => WPST_HY3_COUNTRY_CODE_KOREA_SOUTH_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_KUWAIT_VALUE => WPST_HY3_COUNTRY_CODE_KUWAIT_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_KYRGHYZSTAN_VALUE => WPST_HY3_COUNTRY_CODE_KYRGHYZSTAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LAOS_VALUE => WPST_HY3_COUNTRY_CODE_LAOS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LATVIA_VALUE => WPST_HY3_COUNTRY_CODE_LATVIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LEBANON_VALUE => WPST_HY3_COUNTRY_CODE_LEBANON_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LESOTHO_VALUE => WPST_HY3_COUNTRY_CODE_LESOTHO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LIBERIA_VALUE => WPST_HY3_COUNTRY_CODE_LIBERIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LIBYA_VALUE => WPST_HY3_COUNTRY_CODE_LIBYA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LIECHTENSTEIN_VALUE => WPST_HY3_COUNTRY_CODE_LIECHTENSTEIN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LITHUANIA_VALUE => WPST_HY3_COUNTRY_CODE_LITHUANIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_LUXEMBOURG_VALUE => WPST_HY3_COUNTRY_CODE_LUXEMBOURG_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MADAGASCAR_VALUE => WPST_HY3_COUNTRY_CODE_MADAGASCAR_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MALAWI_VALUE => WPST_HY3_COUNTRY_CODE_MALAWI_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MALAYSIA_VALUE => WPST_HY3_COUNTRY_CODE_MALAYSIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MALDIVES_VALUE => WPST_HY3_COUNTRY_CODE_MALDIVES_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MALI_VALUE => WPST_HY3_COUNTRY_CODE_MALI_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MALTA_VALUE => WPST_HY3_COUNTRY_CODE_MALTA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MAURITANIA_VALUE => WPST_HY3_COUNTRY_CODE_MAURITANIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MAURITIUS_VALUE => WPST_HY3_COUNTRY_CODE_MAURITIUS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MEXICO_VALUE => WPST_HY3_COUNTRY_CODE_MEXICO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MOLDOVA_VALUE => WPST_HY3_COUNTRY_CODE_MOLDOVA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MONACO_VALUE => WPST_HY3_COUNTRY_CODE_MONACO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MONGOLIA_VALUE => WPST_HY3_COUNTRY_CODE_MONGOLIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MOROCCO_VALUE => WPST_HY3_COUNTRY_CODE_MOROCCO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_MOZAMBIQUE_VALUE => WPST_HY3_COUNTRY_CODE_MOZAMBIQUE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_NAMIBIA_VALUE => WPST_HY3_COUNTRY_CODE_NAMIBIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_NEPAL_VALUE => WPST_HY3_COUNTRY_CODE_NEPAL_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_NEW_ZEALAND_VALUE => WPST_HY3_COUNTRY_CODE_NEW_ZEALAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_NICARAGUA_VALUE => WPST_HY3_COUNTRY_CODE_NICARAGUA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_NIGER_VALUE => WPST_HY3_COUNTRY_CODE_NIGER_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_NIGERIA_VALUE => WPST_HY3_COUNTRY_CODE_NIGERIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_NORWAY_VALUE => WPST_HY3_COUNTRY_CODE_NORWAY_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_OMAN_VALUE => WPST_HY3_COUNTRY_CODE_OMAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PAKISTAN_VALUE => WPST_HY3_COUNTRY_CODE_PAKISTAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PANAMA_VALUE => WPST_HY3_COUNTRY_CODE_PANAMA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PAPAU_NEW_GUINEA_VALUE => WPST_HY3_COUNTRY_CODE_PAPAU_NEW_GUINEA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PARAGUAY_VALUE => WPST_HY3_COUNTRY_CODE_PARAGUAY_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_VALUE => WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_VALUE => WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PERU_VALUE => WPST_HY3_COUNTRY_CODE_PERU_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PHILIPPINES_VALUE => WPST_HY3_COUNTRY_CODE_PHILIPPINES_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_POLAND_VALUE => WPST_HY3_COUNTRY_CODE_POLAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PORTUGAL_VALUE => WPST_HY3_COUNTRY_CODE_PORTUGAL_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_PUERTO_RICO_VALUE => WPST_HY3_COUNTRY_CODE_PUERTO_RICO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_QATAR_VALUE => WPST_HY3_COUNTRY_CODE_QATAR_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ROMANIA_VALUE => WPST_HY3_COUNTRY_CODE_ROMANIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_RUSSIA_VALUE => WPST_HY3_COUNTRY_CODE_RUSSIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_RWANDA_VALUE => WPST_HY3_COUNTRY_CODE_RWANDA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SAN_MARINO_VALUE => WPST_HY3_COUNTRY_CODE_SAN_MARINO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SAUDI_ARABIA_VALUE => WPST_HY3_COUNTRY_CODE_SAUDI_ARABIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SENEGAL_VALUE => WPST_HY3_COUNTRY_CODE_SENEGAL_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SEYCHELLES_VALUE => WPST_HY3_COUNTRY_CODE_SEYCHELLES_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SIERRA_LEONE_VALUE => WPST_HY3_COUNTRY_CODE_SIERRA_LEONE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SINGAPORE_VALUE => WPST_HY3_COUNTRY_CODE_SINGAPORE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SLOVENIA_VALUE => WPST_HY3_COUNTRY_CODE_SLOVENIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SOLOMON_ISLANDS_VALUE => WPST_HY3_COUNTRY_CODE_SOLOMON_ISLANDS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SOMALIA_VALUE => WPST_HY3_COUNTRY_CODE_SOMALIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SOUTH_AFRICA_VALUE => WPST_HY3_COUNTRY_CODE_SOUTH_AFRICA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SPAIN_VALUE => WPST_HY3_COUNTRY_CODE_SPAIN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SRI_LANKA_VALUE => WPST_HY3_COUNTRY_CODE_SRI_LANKA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_VALUE => WPST_HY3_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SUDAN_VALUE => WPST_HY3_COUNTRY_CODE_SUDAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SURINAM_VALUE => WPST_HY3_COUNTRY_CODE_SURINAM_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SWAZILAND_VALUE => WPST_HY3_COUNTRY_CODE_SWAZILAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SWEDEN_VALUE => WPST_HY3_COUNTRY_CODE_SWEDEN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SWITZERLAND_VALUE => WPST_HY3_COUNTRY_CODE_SWITZERLAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_SYRIA_VALUE => WPST_HY3_COUNTRY_CODE_SYRIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_TADJIKISTAN_VALUE => WPST_HY3_COUNTRY_CODE_TADJIKISTAN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_TANZANIA_VALUE => WPST_HY3_COUNTRY_CODE_TANZANIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_THAILAND_VALUE => WPST_HY3_COUNTRY_CODE_THAILAND_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_THE_NETHERLANDS_VALUE => WPST_HY3_COUNTRY_CODE_THE_NETHERLANDS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_TOGO_VALUE => WPST_HY3_COUNTRY_CODE_TOGO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_TONGA_VALUE => WPST_HY3_COUNTRY_CODE_TONGA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_VALUE => WPST_HY3_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_TUNISIA_VALUE => WPST_HY3_COUNTRY_CODE_TUNISIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_TURKEY_VALUE => WPST_HY3_COUNTRY_CODE_TURKEY_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_UGANDA_VALUE => WPST_HY3_COUNTRY_CODE_UGANDA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_UKRAINE_VALUE => WPST_HY3_COUNTRY_CODE_UKRAINE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_UNION_OF_MYANMAR_VALUE => WPST_HY3_COUNTRY_CODE_UNION_OF_MYANMAR_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_UNITED_ARAB_EMIRATES_VALUE => WPST_HY3_COUNTRY_CODE_UNITED_ARAB_EMIRATES_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE => WPST_HY3_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_URUGUAY_VALUE => WPST_HY3_COUNTRY_CODE_URUGUAY_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_VANUATU_VALUE => WPST_HY3_COUNTRY_CODE_VANUATU_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_VENEZUELA_VALUE => WPST_HY3_COUNTRY_CODE_VENEZUELA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_VIETNAM_VALUE => WPST_HY3_COUNTRY_CODE_VIETNAM_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_VIRGIN_ISLANDS_VALUE => WPST_HY3_COUNTRY_CODE_VIRGIN_ISLANDS_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_WESTERN_SAMOA_VALUE => WPST_HY3_COUNTRY_CODE_WESTERN_SAMOA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_YEMEN_VALUE => WPST_HY3_COUNTRY_CODE_YEMEN_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_YUGOSLAVIA_VALUE => WPST_HY3_COUNTRY_CODE_YUGOSLAVIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ZAIRE_VALUE => WPST_HY3_COUNTRY_CODE_ZAIRE_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ZAMBIA_VALUE => WPST_HY3_COUNTRY_CODE_ZAMBIA_LABEL
+		   ,WPST_HY3_COUNTRY_CODE_ZIMBABWE_VALUE => WPST_HY3_COUNTRY_CODE_ZIMBABWE_LABEL
 		) ;
 
-        if (array_key_exists($code, $WPST_HYTEK_COUNTRY_CODES))
-            return $WPST_HYTEK_COUNTRY_CODES[$code] ;
+        if (array_key_exists($code, $WPST_HY3_COUNTRY_CODES))
+            return $WPST_HY3_COUNTRY_CODES[$code] ;
         else if ($invalid)
             return 'Invalid' ;
         else
@@ -5382,8 +6575,8 @@ class HY3CodeTableMappings
     function GetFileFormat()
     {
         $WPST_FILE_FORMAT = array(
-            WPST_HYTEK_FILE_FORMAT_HYTEK_LABEL => WPST_HYTEK_FILE_FORMAT_HYTEK_VALUE
-           ,WPST_HYTEK_FILE_FORMAT_CL2_LABEL => WPST_HYTEK_FILE_FORMAT_CL2_VALUE
+            WPST_HY3_FILE_FORMAT_HY3_LABEL => WPST_HY3_FILE_FORMAT_HY3_VALUE
+           ,WPST_HY3_FILE_FORMAT_CL2_LABEL => WPST_HY3_FILE_FORMAT_CL2_VALUE
         ) ;
 
         return $WPST_FILE_FORMAT ;
@@ -5397,13 +6590,13 @@ class HY3CodeTableMappings
     function GetCourseCode($units = WPST_METERS, $length = 25)
     {
         if (($units == WPST_YARDS) && ($length == 25))
-            return WPST_HYTEK_COURSE_STATUS_CODE_SCY_VALUE ;
+            return WPST_HY3_COURSE_STATUS_CODE_SCY_VALUE ;
         else if (($units == WPST_METERS) && ($length == 25))
-            return WPST_HYTEK_COURSE_STATUS_CODE_SCM_VALUE ;
+            return WPST_HY3_COURSE_STATUS_CODE_SCM_VALUE ;
         else if (($units == WPST_METERS) && ($length == 50))
-            return WPST_HYTEK_COURSE_STATUS_CODE_LCM_VALUE  ;
+            return WPST_HY3_COURSE_STATUS_CODE_LCM_VALUE  ;
         else
-            return WPST_HYTEK_COURSE_STATUS_CODE_DQ_VALUE ;
+            return WPST_HY3_COURSE_STATUS_CODE_DQ_VALUE ;
     }
 
     /**
@@ -5429,9 +6622,9 @@ class HY3CodeTableMappings
     function GetZeroTimeMode()
     {
         $WPST_ZERO_TIME_MODES = array(
-            WPST_HYTEK_USE_BLANKS_LABEL => WPST_HYTEK_USE_BLANKS_VALUE
-           ,WPST_HYTEK_USE_ZEROS_LABEL => WPST_HYTEK_USE_ZEROS_VALUE
-           ,WPST_HYTEK_USE_NT_LABEL => WPST_HYTEK_USE_NT_VALUE
+            WPST_HY3_USE_BLANKS_LABEL => WPST_HY3_USE_BLANKS_VALUE
+           ,WPST_HY3_USE_ZEROS_LABEL => WPST_HY3_USE_ZEROS_VALUE
+           ,WPST_HY3_USE_NT_LABEL => WPST_HY3_USE_NT_VALUE
         ) ;
 
         return $WPST_ZERO_TIME_MODES ;
@@ -5444,20 +6637,20 @@ class HY3CodeTableMappings
      */
     function GetOrgCodes()
     {
-        $WPST_HYTEK_ORG_CODES = array(
+        $WPST_HY3_ORG_CODES = array(
             'Select Organization' => WPST_NULL_STRING
-           ,WPST_HYTEK_ORG_CODE_USS_LABEL => WPST_HYTEK_ORG_CODE_USS_VALUE
-           ,WPST_HYTEK_ORG_CODE_MASTERS_LABEL => WPST_HYTEK_ORG_CODE_MASTERS_VALUE
-           ,WPST_HYTEK_ORG_CODE_NCAA_LABEL => WPST_HYTEK_ORG_CODE_NCAA_VALUE
-           ,WPST_HYTEK_ORG_CODE_NCAA_DIV_I_LABEL => WPST_HYTEK_ORG_CODE_NCAA_DIV_I_VALUE
-           ,WPST_HYTEK_ORG_CODE_NCAA_DIV_II_LABEL => WPST_HYTEK_ORG_CODE_NCAA_DIV_II_VALUE
-           ,WPST_HYTEK_ORG_CODE_NCAA_DIV_III_LABEL => WPST_HYTEK_ORG_CODE_NCAA_DIV_III_VALUE
-           ,WPST_HYTEK_ORG_CODE_YMCA_LABEL => WPST_HYTEK_ORG_CODE_YMCA_VALUE
-           ,WPST_HYTEK_ORG_CODE_FINA_LABEL => WPST_HYTEK_ORG_CODE_FINA_VALUE
-           ,WPST_HYTEK_ORG_CODE_HIGH_SCHOOL_LABEL => WPST_HYTEK_ORG_CODE_HIGH_SCHOOL_VALUE
+           ,WPST_HY3_ORG_CODE_USS_LABEL => WPST_HY3_ORG_CODE_USS_VALUE
+           ,WPST_HY3_ORG_CODE_MASTERS_LABEL => WPST_HY3_ORG_CODE_MASTERS_VALUE
+           ,WPST_HY3_ORG_CODE_NCAA_LABEL => WPST_HY3_ORG_CODE_NCAA_VALUE
+           ,WPST_HY3_ORG_CODE_NCAA_DIV_I_LABEL => WPST_HY3_ORG_CODE_NCAA_DIV_I_VALUE
+           ,WPST_HY3_ORG_CODE_NCAA_DIV_II_LABEL => WPST_HY3_ORG_CODE_NCAA_DIV_II_VALUE
+           ,WPST_HY3_ORG_CODE_NCAA_DIV_III_LABEL => WPST_HY3_ORG_CODE_NCAA_DIV_III_VALUE
+           ,WPST_HY3_ORG_CODE_YMCA_LABEL => WPST_HY3_ORG_CODE_YMCA_VALUE
+           ,WPST_HY3_ORG_CODE_FINA_LABEL => WPST_HY3_ORG_CODE_FINA_VALUE
+           ,WPST_HY3_ORG_CODE_HIGH_SCHOOL_LABEL => WPST_HY3_ORG_CODE_HIGH_SCHOOL_VALUE
         ) ;
 
-        return $WPST_HYTEK_ORG_CODES ;
+        return $WPST_HY3_ORG_CODES ;
     }
 
     /**
@@ -5467,20 +6660,20 @@ class HY3CodeTableMappings
      */
     function GetCourseCodes($dq = false)
     {
-        $WPST_HYTEK_COURSE_CODES = array(
+        $WPST_HY3_COURSE_CODES = array(
             'Select Course' => WPST_NULL_STRING
-           ,WPST_HYTEK_COURSE_STATUS_CODE_SCM_LABEL => WPST_HYTEK_COURSE_STATUS_CODE_SCM_VALUE
-           ,WPST_HYTEK_COURSE_STATUS_CODE_SCY_LABEL => WPST_HYTEK_COURSE_STATUS_CODE_SCY_VALUE
-           ,WPST_HYTEK_COURSE_STATUS_CODE_LCM_LABEL => WPST_HYTEK_COURSE_STATUS_CODE_LCM_VALUE
+           ,WPST_HY3_COURSE_STATUS_CODE_SCM_LABEL => WPST_HY3_COURSE_STATUS_CODE_SCM_VALUE
+           ,WPST_HY3_COURSE_STATUS_CODE_SCY_LABEL => WPST_HY3_COURSE_STATUS_CODE_SCY_VALUE
+           ,WPST_HY3_COURSE_STATUS_CODE_LCM_LABEL => WPST_HY3_COURSE_STATUS_CODE_LCM_VALUE
         ) ;
 
         //  Include the DQ option?  Not included by default.
 
         if ($dq)
-            $WPST_HYTEK_COURSE_CODES[
-                WPST_HYTEK_COURSE_STATUS_CODE_DQ_LABEL] = WPST_HYTEK_COURSE_STATUS_CODE_DQ_VALUE ;
+            $WPST_HY3_COURSE_CODES[
+                WPST_HY3_COURSE_STATUS_CODE_DQ_LABEL] = WPST_HY3_COURSE_STATUS_CODE_DQ_VALUE ;
  
-        return $WPST_HYTEK_COURSE_CODES ;
+        return $WPST_HY3_COURSE_CODES ;
     }
 
     /**
@@ -5490,25 +6683,25 @@ class HY3CodeTableMappings
      */
     function GetRegionCodes()
     {
-        $WPST_HYTEK_REGION_CODES = array(
+        $WPST_HY3_REGION_CODES = array(
             'Select Region' => WPST_NULL_STRING
-           ,WPST_HYTEK_REGION_CODE_REGION_1_LABEL => WPST_HYTEK_REGION_CODE_REGION_1_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_2_LABEL => WPST_HYTEK_REGION_CODE_REGION_2_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_3_LABEL => WPST_HYTEK_REGION_CODE_REGION_3_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_4_LABEL => WPST_HYTEK_REGION_CODE_REGION_4_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_5_LABEL => WPST_HYTEK_REGION_CODE_REGION_5_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_6_LABEL => WPST_HYTEK_REGION_CODE_REGION_6_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_7_LABEL => WPST_HYTEK_REGION_CODE_REGION_7_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_8_LABEL => WPST_HYTEK_REGION_CODE_REGION_8_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_9_LABEL => WPST_HYTEK_REGION_CODE_REGION_9_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_10_LABEL => WPST_HYTEK_REGION_CODE_REGION_10_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_11_LABEL => WPST_HYTEK_REGION_CODE_REGION_11_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_12_LABEL => WPST_HYTEK_REGION_CODE_REGION_12_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_13_LABEL => WPST_HYTEK_REGION_CODE_REGION_13_VALUE
-           ,WPST_HYTEK_REGION_CODE_REGION_14_LABEL => WPST_HYTEK_REGION_CODE_REGION_14_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_1_LABEL => WPST_HY3_REGION_CODE_REGION_1_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_2_LABEL => WPST_HY3_REGION_CODE_REGION_2_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_3_LABEL => WPST_HY3_REGION_CODE_REGION_3_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_4_LABEL => WPST_HY3_REGION_CODE_REGION_4_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_5_LABEL => WPST_HY3_REGION_CODE_REGION_5_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_6_LABEL => WPST_HY3_REGION_CODE_REGION_6_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_7_LABEL => WPST_HY3_REGION_CODE_REGION_7_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_8_LABEL => WPST_HY3_REGION_CODE_REGION_8_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_9_LABEL => WPST_HY3_REGION_CODE_REGION_9_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_10_LABEL => WPST_HY3_REGION_CODE_REGION_10_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_11_LABEL => WPST_HY3_REGION_CODE_REGION_11_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_12_LABEL => WPST_HY3_REGION_CODE_REGION_12_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_13_LABEL => WPST_HY3_REGION_CODE_REGION_13_VALUE
+           ,WPST_HY3_REGION_CODE_REGION_14_LABEL => WPST_HY3_REGION_CODE_REGION_14_VALUE
         ) ;
 
-        return $WPST_HYTEK_REGION_CODES ;
+        return $WPST_HY3_REGION_CODES ;
     }
 
     /**
@@ -5518,24 +6711,24 @@ class HY3CodeTableMappings
      */
     function GetMeetCodes()
     {
-        $WPST_HYTEK_MEET_CODES = array(
+        $WPST_HY3_MEET_CODES = array(
             'Select Meet' => WPST_NULL_STRING
-           ,WPST_HYTEK_MEET_TYPE_INVITATIONAL_LABEL => WPST_HYTEK_MEET_TYPE_INVITATIONAL_VALUE
-           ,WPST_HYTEK_MEET_TYPE_REGIONAL_LABEL => WPST_HYTEK_MEET_TYPE_REGIONAL_VALUE
-           ,WPST_HYTEK_MEET_TYPE_LSC_CHAMPIONSHIP_LABEL => WPST_HYTEK_MEET_TYPE_LSC_CHAMPIONSHIP_VALUE
-           ,WPST_HYTEK_MEET_TYPE_ZONE_LABEL => WPST_HYTEK_MEET_TYPE_ZONE_VALUE
-           ,WPST_HYTEK_MEET_TYPE_ZONE_CHAMPIONSHIP_LABEL => WPST_HYTEK_MEET_TYPE_ZONE_CHAMPIONSHIP_VALUE
-           ,WPST_HYTEK_MEET_TYPE_NATIONAL_CHAMPIONSHIP_LABEL => WPST_HYTEK_MEET_TYPE_NATIONAL_CHAMPIONSHIP_VALUE
-           ,WPST_HYTEK_MEET_TYPE_JUNIORS_LABEL => WPST_HYTEK_MEET_TYPE_JUNIORS_VALUE
-           ,WPST_HYTEK_MEET_TYPE_SENIORS_LABEL => WPST_HYTEK_MEET_TYPE_SENIORS_VALUE
-           ,WPST_HYTEK_MEET_TYPE_DUAL_LABEL => WPST_HYTEK_MEET_TYPE_DUAL_VALUE
-           ,WPST_HYTEK_MEET_TYPE_TIME_TRIALS_LABEL => WPST_HYTEK_MEET_TYPE_TIME_TRIALS_VALUE
-           ,WPST_HYTEK_MEET_TYPE_INTERNATIONAL_LABEL => WPST_HYTEK_MEET_TYPE_INTERNATIONAL_VALUE
-           ,WPST_HYTEK_MEET_TYPE_OPEN_LABEL => WPST_HYTEK_MEET_TYPE_OPEN_VALUE
-           ,WPST_HYTEK_MEET_TYPE_LEAGUE_LABEL => WPST_HYTEK_MEET_TYPE_LEAGUE_VALUE
+           ,WPST_HY3_MEET_TYPE_INVITATIONAL_LABEL => WPST_HY3_MEET_TYPE_INVITATIONAL_VALUE
+           ,WPST_HY3_MEET_TYPE_REGIONAL_LABEL => WPST_HY3_MEET_TYPE_REGIONAL_VALUE
+           ,WPST_HY3_MEET_TYPE_LSC_CHAMPIONSHIP_LABEL => WPST_HY3_MEET_TYPE_LSC_CHAMPIONSHIP_VALUE
+           ,WPST_HY3_MEET_TYPE_ZONE_LABEL => WPST_HY3_MEET_TYPE_ZONE_VALUE
+           ,WPST_HY3_MEET_TYPE_ZONE_CHAMPIONSHIP_LABEL => WPST_HY3_MEET_TYPE_ZONE_CHAMPIONSHIP_VALUE
+           ,WPST_HY3_MEET_TYPE_NATIONAL_CHAMPIONSHIP_LABEL => WPST_HY3_MEET_TYPE_NATIONAL_CHAMPIONSHIP_VALUE
+           ,WPST_HY3_MEET_TYPE_JUNIORS_LABEL => WPST_HY3_MEET_TYPE_JUNIORS_VALUE
+           ,WPST_HY3_MEET_TYPE_SENIORS_LABEL => WPST_HY3_MEET_TYPE_SENIORS_VALUE
+           ,WPST_HY3_MEET_TYPE_DUAL_LABEL => WPST_HY3_MEET_TYPE_DUAL_VALUE
+           ,WPST_HY3_MEET_TYPE_TIME_TRIALS_LABEL => WPST_HY3_MEET_TYPE_TIME_TRIALS_VALUE
+           ,WPST_HY3_MEET_TYPE_INTERNATIONAL_LABEL => WPST_HY3_MEET_TYPE_INTERNATIONAL_VALUE
+           ,WPST_HY3_MEET_TYPE_OPEN_LABEL => WPST_HY3_MEET_TYPE_OPEN_VALUE
+           ,WPST_HY3_MEET_TYPE_LEAGUE_LABEL => WPST_HY3_MEET_TYPE_LEAGUE_VALUE
         ) ;
 
-        return $WPST_HYTEK_MEET_CODES ;
+        return $WPST_HY3_MEET_CODES ;
     }
 
     /**
@@ -5545,192 +6738,192 @@ class HY3CodeTableMappings
      */
     function GetCountryCodes()
     {
-		$WPST_HYTEK_COUNTRY_CODES = array(
+		$WPST_HY3_COUNTRY_CODES = array(
             'Select Country' => WPST_NULL_STRING
-		   ,WPST_HYTEK_COUNTRY_CODE_AFGHANISTAN_LABEL => WPST_HYTEK_COUNTRY_CODE_AFGHANISTAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ALBANIA_LABEL => WPST_HYTEK_COUNTRY_CODE_ALBANIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ALGERIA_LABEL => WPST_HYTEK_COUNTRY_CODE_ALGERIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_AMERICAN_SAMOA_LABEL => WPST_HYTEK_COUNTRY_CODE_AMERICAN_SAMOA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ANDORRA_LABEL => WPST_HYTEK_COUNTRY_CODE_ANDORRA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ANGOLA_LABEL => WPST_HYTEK_COUNTRY_CODE_ANGOLA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ANTIGUA_LABEL => WPST_HYTEK_COUNTRY_CODE_ANTIGUA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_LABEL => WPST_HYTEK_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_LABEL => WPST_HYTEK_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ARGENTINA_LABEL => WPST_HYTEK_COUNTRY_CODE_ARGENTINA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ARMENIA_LABEL => WPST_HYTEK_COUNTRY_CODE_ARMENIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ARUBA_LABEL => WPST_HYTEK_COUNTRY_CODE_ARUBA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_AUSTRALIA_LABEL => WPST_HYTEK_COUNTRY_CODE_AUSTRALIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_AUSTRIA_LABEL => WPST_HYTEK_COUNTRY_CODE_AUSTRIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_AZERBAIJAN_LABEL => WPST_HYTEK_COUNTRY_CODE_AZERBAIJAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BAHAMAS_LABEL => WPST_HYTEK_COUNTRY_CODE_BAHAMAS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BAHRAIN_LABEL => WPST_HYTEK_COUNTRY_CODE_BAHRAIN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BANGLADESH_LABEL => WPST_HYTEK_COUNTRY_CODE_BANGLADESH_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BARBADOS_LABEL => WPST_HYTEK_COUNTRY_CODE_BARBADOS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BELARUS_LABEL => WPST_HYTEK_COUNTRY_CODE_BELARUS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BELGIUM_LABEL => WPST_HYTEK_COUNTRY_CODE_BELGIUM_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BELIZE_LABEL => WPST_HYTEK_COUNTRY_CODE_BELIZE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BENIN_LABEL => WPST_HYTEK_COUNTRY_CODE_BENIN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BERMUDA_LABEL => WPST_HYTEK_COUNTRY_CODE_BERMUDA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BHUTAN_LABEL => WPST_HYTEK_COUNTRY_CODE_BHUTAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BOLIVIA_LABEL => WPST_HYTEK_COUNTRY_CODE_BOLIVIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BOTSWANA_LABEL => WPST_HYTEK_COUNTRY_CODE_BOTSWANA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BRAZIL_LABEL => WPST_HYTEK_COUNTRY_CODE_BRAZIL_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_LABEL => WPST_HYTEK_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BRUNEI_LABEL => WPST_HYTEK_COUNTRY_CODE_BRUNEI_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BULGARIA_LABEL => WPST_HYTEK_COUNTRY_CODE_BULGARIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_BURKINA_FASO_LABEL => WPST_HYTEK_COUNTRY_CODE_BURKINA_FASO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CAMEROON_LABEL => WPST_HYTEK_COUNTRY_CODE_CAMEROON_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CANADA_LABEL => WPST_HYTEK_COUNTRY_CODE_CANADA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CAYMAN_ISLANDS_LABEL => WPST_HYTEK_COUNTRY_CODE_CAYMAN_ISLANDS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_LABEL => WPST_HYTEK_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CHAD_LABEL => WPST_HYTEK_COUNTRY_CODE_CHAD_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CHILE_LABEL => WPST_HYTEK_COUNTRY_CODE_CHILE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CHINESE_TAIPEI_LABEL => WPST_HYTEK_COUNTRY_CODE_CHINESE_TAIPEI_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_COLUMBIA_LABEL => WPST_HYTEK_COUNTRY_CODE_COLUMBIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_COOK_ISLANDS_LABEL => WPST_HYTEK_COUNTRY_CODE_COOK_ISLANDS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_COSTA_RICA_LABEL => WPST_HYTEK_COUNTRY_CODE_COSTA_RICA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CROATIA_LABEL => WPST_HYTEK_COUNTRY_CODE_CROATIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CUBA_LABEL => WPST_HYTEK_COUNTRY_CODE_CUBA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CYPRUS_LABEL => WPST_HYTEK_COUNTRY_CODE_CYPRUS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_CZECHOSLOVAKIA_LABEL => WPST_HYTEK_COUNTRY_CODE_CZECHOSLOVAKIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_LABEL => WPST_HYTEK_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_DENMARK_LABEL => WPST_HYTEK_COUNTRY_CODE_DENMARK_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_DJIBOUTI_LABEL => WPST_HYTEK_COUNTRY_CODE_DJIBOUTI_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_DOMINICAN_REPUBLIC_LABEL => WPST_HYTEK_COUNTRY_CODE_DOMINICAN_REPUBLIC_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ECUADOR_LABEL => WPST_HYTEK_COUNTRY_CODE_ECUADOR_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_EL_SALVADOR_LABEL => WPST_HYTEK_COUNTRY_CODE_EL_SALVADOR_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_EQUATORIAL_GUINEA_LABEL => WPST_HYTEK_COUNTRY_CODE_EQUATORIAL_GUINEA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ESTONIA_LABEL => WPST_HYTEK_COUNTRY_CODE_ESTONIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ETHIOPIA_LABEL => WPST_HYTEK_COUNTRY_CODE_ETHIOPIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_FIJI_LABEL => WPST_HYTEK_COUNTRY_CODE_FIJI_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_FINLAND_LABEL => WPST_HYTEK_COUNTRY_CODE_FINLAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_FRANCE_LABEL => WPST_HYTEK_COUNTRY_CODE_FRANCE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GABON_LABEL => WPST_HYTEK_COUNTRY_CODE_GABON_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GAMBIA_LABEL => WPST_HYTEK_COUNTRY_CODE_GAMBIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GEORGIA_LABEL => WPST_HYTEK_COUNTRY_CODE_GEORGIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GERMANY_LABEL => WPST_HYTEK_COUNTRY_CODE_GERMANY_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GHANA_LABEL => WPST_HYTEK_COUNTRY_CODE_GHANA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GREAT_BRITAIN_LABEL => WPST_HYTEK_COUNTRY_CODE_GREAT_BRITAIN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GREECE_LABEL => WPST_HYTEK_COUNTRY_CODE_GREECE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GRENADA_LABEL => WPST_HYTEK_COUNTRY_CODE_GRENADA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GUAM_LABEL => WPST_HYTEK_COUNTRY_CODE_GUAM_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GUATEMALA_LABEL => WPST_HYTEK_COUNTRY_CODE_GUATEMALA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GUINEA_LABEL => WPST_HYTEK_COUNTRY_CODE_GUINEA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_GUYANA_LABEL => WPST_HYTEK_COUNTRY_CODE_GUYANA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_HAITI_LABEL => WPST_HYTEK_COUNTRY_CODE_HAITI_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_HONDURAS_LABEL => WPST_HYTEK_COUNTRY_CODE_HONDURAS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_HONG_KONG_LABEL => WPST_HYTEK_COUNTRY_CODE_HONG_KONG_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_HUNGARY_LABEL => WPST_HYTEK_COUNTRY_CODE_HUNGARY_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ICELAND_LABEL => WPST_HYTEK_COUNTRY_CODE_ICELAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_INDIA_LABEL => WPST_HYTEK_COUNTRY_CODE_INDIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_INDONESIA_LABEL => WPST_HYTEK_COUNTRY_CODE_INDONESIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_IRAQ_LABEL => WPST_HYTEK_COUNTRY_CODE_IRAQ_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_IRELAND_LABEL => WPST_HYTEK_COUNTRY_CODE_IRELAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_LABEL => WPST_HYTEK_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ISRAEL_LABEL => WPST_HYTEK_COUNTRY_CODE_ISRAEL_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ITALY_LABEL => WPST_HYTEK_COUNTRY_CODE_ITALY_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_IVORY_COAST_LABEL => WPST_HYTEK_COUNTRY_CODE_IVORY_COAST_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_JAMAICA_LABEL => WPST_HYTEK_COUNTRY_CODE_JAMAICA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_JAPAN_LABEL => WPST_HYTEK_COUNTRY_CODE_JAPAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_JORDAN_LABEL => WPST_HYTEK_COUNTRY_CODE_JORDAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_KAZAKHSTAN_LABEL => WPST_HYTEK_COUNTRY_CODE_KAZAKHSTAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_KENYA_LABEL => WPST_HYTEK_COUNTRY_CODE_KENYA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_KOREA_SOUTH_LABEL => WPST_HYTEK_COUNTRY_CODE_KOREA_SOUTH_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_KUWAIT_LABEL => WPST_HYTEK_COUNTRY_CODE_KUWAIT_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_KYRGHYZSTAN_LABEL => WPST_HYTEK_COUNTRY_CODE_KYRGHYZSTAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LAOS_LABEL => WPST_HYTEK_COUNTRY_CODE_LAOS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LATVIA_LABEL => WPST_HYTEK_COUNTRY_CODE_LATVIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LEBANON_LABEL => WPST_HYTEK_COUNTRY_CODE_LEBANON_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LESOTHO_LABEL => WPST_HYTEK_COUNTRY_CODE_LESOTHO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LIBERIA_LABEL => WPST_HYTEK_COUNTRY_CODE_LIBERIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LIBYA_LABEL => WPST_HYTEK_COUNTRY_CODE_LIBYA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LIECHTENSTEIN_LABEL => WPST_HYTEK_COUNTRY_CODE_LIECHTENSTEIN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LITHUANIA_LABEL => WPST_HYTEK_COUNTRY_CODE_LITHUANIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_LUXEMBOURG_LABEL => WPST_HYTEK_COUNTRY_CODE_LUXEMBOURG_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MADAGASCAR_LABEL => WPST_HYTEK_COUNTRY_CODE_MADAGASCAR_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MALAWI_LABEL => WPST_HYTEK_COUNTRY_CODE_MALAWI_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MALAYSIA_LABEL => WPST_HYTEK_COUNTRY_CODE_MALAYSIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MALDIVES_LABEL => WPST_HYTEK_COUNTRY_CODE_MALDIVES_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MALI_LABEL => WPST_HYTEK_COUNTRY_CODE_MALI_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MALTA_LABEL => WPST_HYTEK_COUNTRY_CODE_MALTA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MAURITANIA_LABEL => WPST_HYTEK_COUNTRY_CODE_MAURITANIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MAURITIUS_LABEL => WPST_HYTEK_COUNTRY_CODE_MAURITIUS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MEXICO_LABEL => WPST_HYTEK_COUNTRY_CODE_MEXICO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MOLDOVA_LABEL => WPST_HYTEK_COUNTRY_CODE_MOLDOVA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MONACO_LABEL => WPST_HYTEK_COUNTRY_CODE_MONACO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MONGOLIA_LABEL => WPST_HYTEK_COUNTRY_CODE_MONGOLIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MOROCCO_LABEL => WPST_HYTEK_COUNTRY_CODE_MOROCCO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_MOZAMBIQUE_LABEL => WPST_HYTEK_COUNTRY_CODE_MOZAMBIQUE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_NAMIBIA_LABEL => WPST_HYTEK_COUNTRY_CODE_NAMIBIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_NEPAL_LABEL => WPST_HYTEK_COUNTRY_CODE_NEPAL_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_NEW_ZEALAND_LABEL => WPST_HYTEK_COUNTRY_CODE_NEW_ZEALAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_NICARAGUA_LABEL => WPST_HYTEK_COUNTRY_CODE_NICARAGUA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_NIGER_LABEL => WPST_HYTEK_COUNTRY_CODE_NIGER_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_NIGERIA_LABEL => WPST_HYTEK_COUNTRY_CODE_NIGERIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_NORWAY_LABEL => WPST_HYTEK_COUNTRY_CODE_NORWAY_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_OMAN_LABEL => WPST_HYTEK_COUNTRY_CODE_OMAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PAKISTAN_LABEL => WPST_HYTEK_COUNTRY_CODE_PAKISTAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PANAMA_LABEL => WPST_HYTEK_COUNTRY_CODE_PANAMA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PAPAU_NEW_GUINEA_LABEL => WPST_HYTEK_COUNTRY_CODE_PAPAU_NEW_GUINEA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PARAGUAY_LABEL => WPST_HYTEK_COUNTRY_CODE_PARAGUAY_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_LABEL => WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_LABEL => WPST_HYTEK_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PERU_LABEL => WPST_HYTEK_COUNTRY_CODE_PERU_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PHILIPPINES_LABEL => WPST_HYTEK_COUNTRY_CODE_PHILIPPINES_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_POLAND_LABEL => WPST_HYTEK_COUNTRY_CODE_POLAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PORTUGAL_LABEL => WPST_HYTEK_COUNTRY_CODE_PORTUGAL_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_PUERTO_RICO_LABEL => WPST_HYTEK_COUNTRY_CODE_PUERTO_RICO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_QATAR_LABEL => WPST_HYTEK_COUNTRY_CODE_QATAR_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ROMANIA_LABEL => WPST_HYTEK_COUNTRY_CODE_ROMANIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_RUSSIA_LABEL => WPST_HYTEK_COUNTRY_CODE_RUSSIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_RWANDA_LABEL => WPST_HYTEK_COUNTRY_CODE_RWANDA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SAN_MARINO_LABEL => WPST_HYTEK_COUNTRY_CODE_SAN_MARINO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SAUDI_ARABIA_LABEL => WPST_HYTEK_COUNTRY_CODE_SAUDI_ARABIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SENEGAL_LABEL => WPST_HYTEK_COUNTRY_CODE_SENEGAL_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SEYCHELLES_LABEL => WPST_HYTEK_COUNTRY_CODE_SEYCHELLES_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SIERRA_LEONE_LABEL => WPST_HYTEK_COUNTRY_CODE_SIERRA_LEONE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SINGAPORE_LABEL => WPST_HYTEK_COUNTRY_CODE_SINGAPORE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SLOVENIA_LABEL => WPST_HYTEK_COUNTRY_CODE_SLOVENIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SOLOMON_ISLANDS_LABEL => WPST_HYTEK_COUNTRY_CODE_SOLOMON_ISLANDS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SOMALIA_LABEL => WPST_HYTEK_COUNTRY_CODE_SOMALIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SOUTH_AFRICA_LABEL => WPST_HYTEK_COUNTRY_CODE_SOUTH_AFRICA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SPAIN_LABEL => WPST_HYTEK_COUNTRY_CODE_SPAIN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SRI_LANKA_LABEL => WPST_HYTEK_COUNTRY_CODE_SRI_LANKA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_LABEL => WPST_HYTEK_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SUDAN_LABEL => WPST_HYTEK_COUNTRY_CODE_SUDAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SURINAM_LABEL => WPST_HYTEK_COUNTRY_CODE_SURINAM_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SWAZILAND_LABEL => WPST_HYTEK_COUNTRY_CODE_SWAZILAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SWEDEN_LABEL => WPST_HYTEK_COUNTRY_CODE_SWEDEN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SWITZERLAND_LABEL => WPST_HYTEK_COUNTRY_CODE_SWITZERLAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_SYRIA_LABEL => WPST_HYTEK_COUNTRY_CODE_SYRIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_TADJIKISTAN_LABEL => WPST_HYTEK_COUNTRY_CODE_TADJIKISTAN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_TANZANIA_LABEL => WPST_HYTEK_COUNTRY_CODE_TANZANIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_THAILAND_LABEL => WPST_HYTEK_COUNTRY_CODE_THAILAND_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_THE_NETHERLANDS_LABEL => WPST_HYTEK_COUNTRY_CODE_THE_NETHERLANDS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_TOGO_LABEL => WPST_HYTEK_COUNTRY_CODE_TOGO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_TONGA_LABEL => WPST_HYTEK_COUNTRY_CODE_TONGA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_LABEL => WPST_HYTEK_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_TUNISIA_LABEL => WPST_HYTEK_COUNTRY_CODE_TUNISIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_TURKEY_LABEL => WPST_HYTEK_COUNTRY_CODE_TURKEY_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_UGANDA_LABEL => WPST_HYTEK_COUNTRY_CODE_UGANDA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_UKRAINE_LABEL => WPST_HYTEK_COUNTRY_CODE_UKRAINE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_UNION_OF_MYANMAR_LABEL => WPST_HYTEK_COUNTRY_CODE_UNION_OF_MYANMAR_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_UNITED_ARAB_EMIRATES_LABEL => WPST_HYTEK_COUNTRY_CODE_UNITED_ARAB_EMIRATES_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_LABEL => WPST_HYTEK_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_URUGUAY_LABEL => WPST_HYTEK_COUNTRY_CODE_URUGUAY_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_VANUATU_LABEL => WPST_HYTEK_COUNTRY_CODE_VANUATU_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_VENEZUELA_LABEL => WPST_HYTEK_COUNTRY_CODE_VENEZUELA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_VIETNAM_LABEL => WPST_HYTEK_COUNTRY_CODE_VIETNAM_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_VIRGIN_ISLANDS_LABEL => WPST_HYTEK_COUNTRY_CODE_VIRGIN_ISLANDS_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_WESTERN_SAMOA_LABEL => WPST_HYTEK_COUNTRY_CODE_WESTERN_SAMOA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_YEMEN_LABEL => WPST_HYTEK_COUNTRY_CODE_YEMEN_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_YUGOSLAVIA_LABEL => WPST_HYTEK_COUNTRY_CODE_YUGOSLAVIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ZAIRE_LABEL => WPST_HYTEK_COUNTRY_CODE_ZAIRE_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ZAMBIA_LABEL => WPST_HYTEK_COUNTRY_CODE_ZAMBIA_VALUE
-		   ,WPST_HYTEK_COUNTRY_CODE_ZIMBABWE_LABEL => WPST_HYTEK_COUNTRY_CODE_ZIMBABWE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_AFGHANISTAN_LABEL => WPST_HY3_COUNTRY_CODE_AFGHANISTAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ALBANIA_LABEL => WPST_HY3_COUNTRY_CODE_ALBANIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ALGERIA_LABEL => WPST_HY3_COUNTRY_CODE_ALGERIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_AMERICAN_SAMOA_LABEL => WPST_HY3_COUNTRY_CODE_AMERICAN_SAMOA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ANDORRA_LABEL => WPST_HY3_COUNTRY_CODE_ANDORRA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ANGOLA_LABEL => WPST_HY3_COUNTRY_CODE_ANGOLA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ANTIGUA_LABEL => WPST_HY3_COUNTRY_CODE_ANTIGUA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_LABEL => WPST_HY3_COUNTRY_CODE_ANTILLES_NETHERLANDS_DUTCH_WEST_INDIES_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_LABEL => WPST_HY3_COUNTRY_CODE_ARAB_REPUBLIC_OF_EGYPT_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ARGENTINA_LABEL => WPST_HY3_COUNTRY_CODE_ARGENTINA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ARMENIA_LABEL => WPST_HY3_COUNTRY_CODE_ARMENIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ARUBA_LABEL => WPST_HY3_COUNTRY_CODE_ARUBA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_AUSTRALIA_LABEL => WPST_HY3_COUNTRY_CODE_AUSTRALIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_AUSTRIA_LABEL => WPST_HY3_COUNTRY_CODE_AUSTRIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_AZERBAIJAN_LABEL => WPST_HY3_COUNTRY_CODE_AZERBAIJAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BAHAMAS_LABEL => WPST_HY3_COUNTRY_CODE_BAHAMAS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BAHRAIN_LABEL => WPST_HY3_COUNTRY_CODE_BAHRAIN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BANGLADESH_LABEL => WPST_HY3_COUNTRY_CODE_BANGLADESH_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BARBADOS_LABEL => WPST_HY3_COUNTRY_CODE_BARBADOS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BELARUS_LABEL => WPST_HY3_COUNTRY_CODE_BELARUS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BELGIUM_LABEL => WPST_HY3_COUNTRY_CODE_BELGIUM_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BELIZE_LABEL => WPST_HY3_COUNTRY_CODE_BELIZE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BENIN_LABEL => WPST_HY3_COUNTRY_CODE_BENIN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BERMUDA_LABEL => WPST_HY3_COUNTRY_CODE_BERMUDA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BHUTAN_LABEL => WPST_HY3_COUNTRY_CODE_BHUTAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BOLIVIA_LABEL => WPST_HY3_COUNTRY_CODE_BOLIVIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BOTSWANA_LABEL => WPST_HY3_COUNTRY_CODE_BOTSWANA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BRAZIL_LABEL => WPST_HY3_COUNTRY_CODE_BRAZIL_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_LABEL => WPST_HY3_COUNTRY_CODE_BRITISH_VIRGIN_ISLANDS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BRUNEI_LABEL => WPST_HY3_COUNTRY_CODE_BRUNEI_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BULGARIA_LABEL => WPST_HY3_COUNTRY_CODE_BULGARIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_BURKINA_FASO_LABEL => WPST_HY3_COUNTRY_CODE_BURKINA_FASO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CAMEROON_LABEL => WPST_HY3_COUNTRY_CODE_CAMEROON_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CANADA_LABEL => WPST_HY3_COUNTRY_CODE_CANADA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CAYMAN_ISLANDS_LABEL => WPST_HY3_COUNTRY_CODE_CAYMAN_ISLANDS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_LABEL => WPST_HY3_COUNTRY_CODE_CENTRAL_AFRICAN_REPUBLIC_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CHAD_LABEL => WPST_HY3_COUNTRY_CODE_CHAD_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CHILE_LABEL => WPST_HY3_COUNTRY_CODE_CHILE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CHINESE_TAIPEI_LABEL => WPST_HY3_COUNTRY_CODE_CHINESE_TAIPEI_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_COLUMBIA_LABEL => WPST_HY3_COUNTRY_CODE_COLUMBIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_COOK_ISLANDS_LABEL => WPST_HY3_COUNTRY_CODE_COOK_ISLANDS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_COSTA_RICA_LABEL => WPST_HY3_COUNTRY_CODE_COSTA_RICA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CROATIA_LABEL => WPST_HY3_COUNTRY_CODE_CROATIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CUBA_LABEL => WPST_HY3_COUNTRY_CODE_CUBA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CYPRUS_LABEL => WPST_HY3_COUNTRY_CODE_CYPRUS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_CZECHOSLOVAKIA_LABEL => WPST_HY3_COUNTRY_CODE_CZECHOSLOVAKIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_LABEL => WPST_HY3_COUNTRY_CODE_DEMOCRATIC_PEOPLES_REP_OF_KOREA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_DENMARK_LABEL => WPST_HY3_COUNTRY_CODE_DENMARK_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_DJIBOUTI_LABEL => WPST_HY3_COUNTRY_CODE_DJIBOUTI_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_DOMINICAN_REPUBLIC_LABEL => WPST_HY3_COUNTRY_CODE_DOMINICAN_REPUBLIC_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ECUADOR_LABEL => WPST_HY3_COUNTRY_CODE_ECUADOR_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_EL_SALVADOR_LABEL => WPST_HY3_COUNTRY_CODE_EL_SALVADOR_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_EQUATORIAL_GUINEA_LABEL => WPST_HY3_COUNTRY_CODE_EQUATORIAL_GUINEA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ESTONIA_LABEL => WPST_HY3_COUNTRY_CODE_ESTONIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ETHIOPIA_LABEL => WPST_HY3_COUNTRY_CODE_ETHIOPIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_FIJI_LABEL => WPST_HY3_COUNTRY_CODE_FIJI_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_FINLAND_LABEL => WPST_HY3_COUNTRY_CODE_FINLAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_FRANCE_LABEL => WPST_HY3_COUNTRY_CODE_FRANCE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GABON_LABEL => WPST_HY3_COUNTRY_CODE_GABON_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GAMBIA_LABEL => WPST_HY3_COUNTRY_CODE_GAMBIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GEORGIA_LABEL => WPST_HY3_COUNTRY_CODE_GEORGIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GERMANY_LABEL => WPST_HY3_COUNTRY_CODE_GERMANY_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GHANA_LABEL => WPST_HY3_COUNTRY_CODE_GHANA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GREAT_BRITAIN_LABEL => WPST_HY3_COUNTRY_CODE_GREAT_BRITAIN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GREECE_LABEL => WPST_HY3_COUNTRY_CODE_GREECE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GRENADA_LABEL => WPST_HY3_COUNTRY_CODE_GRENADA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GUAM_LABEL => WPST_HY3_COUNTRY_CODE_GUAM_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GUATEMALA_LABEL => WPST_HY3_COUNTRY_CODE_GUATEMALA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GUINEA_LABEL => WPST_HY3_COUNTRY_CODE_GUINEA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_GUYANA_LABEL => WPST_HY3_COUNTRY_CODE_GUYANA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_HAITI_LABEL => WPST_HY3_COUNTRY_CODE_HAITI_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_HONDURAS_LABEL => WPST_HY3_COUNTRY_CODE_HONDURAS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_HONG_KONG_LABEL => WPST_HY3_COUNTRY_CODE_HONG_KONG_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_HUNGARY_LABEL => WPST_HY3_COUNTRY_CODE_HUNGARY_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ICELAND_LABEL => WPST_HY3_COUNTRY_CODE_ICELAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_INDIA_LABEL => WPST_HY3_COUNTRY_CODE_INDIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_INDONESIA_LABEL => WPST_HY3_COUNTRY_CODE_INDONESIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_IRAQ_LABEL => WPST_HY3_COUNTRY_CODE_IRAQ_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_IRELAND_LABEL => WPST_HY3_COUNTRY_CODE_IRELAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_LABEL => WPST_HY3_COUNTRY_CODE_ISLAMIC_REP_OF_IRAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ISRAEL_LABEL => WPST_HY3_COUNTRY_CODE_ISRAEL_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ITALY_LABEL => WPST_HY3_COUNTRY_CODE_ITALY_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_IVORY_COAST_LABEL => WPST_HY3_COUNTRY_CODE_IVORY_COAST_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_JAMAICA_LABEL => WPST_HY3_COUNTRY_CODE_JAMAICA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_JAPAN_LABEL => WPST_HY3_COUNTRY_CODE_JAPAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_JORDAN_LABEL => WPST_HY3_COUNTRY_CODE_JORDAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_KAZAKHSTAN_LABEL => WPST_HY3_COUNTRY_CODE_KAZAKHSTAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_KENYA_LABEL => WPST_HY3_COUNTRY_CODE_KENYA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_KOREA_SOUTH_LABEL => WPST_HY3_COUNTRY_CODE_KOREA_SOUTH_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_KUWAIT_LABEL => WPST_HY3_COUNTRY_CODE_KUWAIT_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_KYRGHYZSTAN_LABEL => WPST_HY3_COUNTRY_CODE_KYRGHYZSTAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LAOS_LABEL => WPST_HY3_COUNTRY_CODE_LAOS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LATVIA_LABEL => WPST_HY3_COUNTRY_CODE_LATVIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LEBANON_LABEL => WPST_HY3_COUNTRY_CODE_LEBANON_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LESOTHO_LABEL => WPST_HY3_COUNTRY_CODE_LESOTHO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LIBERIA_LABEL => WPST_HY3_COUNTRY_CODE_LIBERIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LIBYA_LABEL => WPST_HY3_COUNTRY_CODE_LIBYA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LIECHTENSTEIN_LABEL => WPST_HY3_COUNTRY_CODE_LIECHTENSTEIN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LITHUANIA_LABEL => WPST_HY3_COUNTRY_CODE_LITHUANIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_LUXEMBOURG_LABEL => WPST_HY3_COUNTRY_CODE_LUXEMBOURG_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MADAGASCAR_LABEL => WPST_HY3_COUNTRY_CODE_MADAGASCAR_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MALAWI_LABEL => WPST_HY3_COUNTRY_CODE_MALAWI_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MALAYSIA_LABEL => WPST_HY3_COUNTRY_CODE_MALAYSIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MALDIVES_LABEL => WPST_HY3_COUNTRY_CODE_MALDIVES_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MALI_LABEL => WPST_HY3_COUNTRY_CODE_MALI_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MALTA_LABEL => WPST_HY3_COUNTRY_CODE_MALTA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MAURITANIA_LABEL => WPST_HY3_COUNTRY_CODE_MAURITANIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MAURITIUS_LABEL => WPST_HY3_COUNTRY_CODE_MAURITIUS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MEXICO_LABEL => WPST_HY3_COUNTRY_CODE_MEXICO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MOLDOVA_LABEL => WPST_HY3_COUNTRY_CODE_MOLDOVA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MONACO_LABEL => WPST_HY3_COUNTRY_CODE_MONACO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MONGOLIA_LABEL => WPST_HY3_COUNTRY_CODE_MONGOLIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MOROCCO_LABEL => WPST_HY3_COUNTRY_CODE_MOROCCO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_MOZAMBIQUE_LABEL => WPST_HY3_COUNTRY_CODE_MOZAMBIQUE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_NAMIBIA_LABEL => WPST_HY3_COUNTRY_CODE_NAMIBIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_NEPAL_LABEL => WPST_HY3_COUNTRY_CODE_NEPAL_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_NEW_ZEALAND_LABEL => WPST_HY3_COUNTRY_CODE_NEW_ZEALAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_NICARAGUA_LABEL => WPST_HY3_COUNTRY_CODE_NICARAGUA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_NIGER_LABEL => WPST_HY3_COUNTRY_CODE_NIGER_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_NIGERIA_LABEL => WPST_HY3_COUNTRY_CODE_NIGERIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_NORWAY_LABEL => WPST_HY3_COUNTRY_CODE_NORWAY_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_OMAN_LABEL => WPST_HY3_COUNTRY_CODE_OMAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PAKISTAN_LABEL => WPST_HY3_COUNTRY_CODE_PAKISTAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PANAMA_LABEL => WPST_HY3_COUNTRY_CODE_PANAMA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PAPAU_NEW_GUINEA_LABEL => WPST_HY3_COUNTRY_CODE_PAPAU_NEW_GUINEA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PARAGUAY_LABEL => WPST_HY3_COUNTRY_CODE_PARAGUAY_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_LABEL => WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CHINA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_LABEL => WPST_HY3_COUNTRY_CODE_PEOPLES_REP_OF_CONGO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PERU_LABEL => WPST_HY3_COUNTRY_CODE_PERU_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PHILIPPINES_LABEL => WPST_HY3_COUNTRY_CODE_PHILIPPINES_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_POLAND_LABEL => WPST_HY3_COUNTRY_CODE_POLAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PORTUGAL_LABEL => WPST_HY3_COUNTRY_CODE_PORTUGAL_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_PUERTO_RICO_LABEL => WPST_HY3_COUNTRY_CODE_PUERTO_RICO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_QATAR_LABEL => WPST_HY3_COUNTRY_CODE_QATAR_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ROMANIA_LABEL => WPST_HY3_COUNTRY_CODE_ROMANIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_RUSSIA_LABEL => WPST_HY3_COUNTRY_CODE_RUSSIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_RWANDA_LABEL => WPST_HY3_COUNTRY_CODE_RWANDA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SAN_MARINO_LABEL => WPST_HY3_COUNTRY_CODE_SAN_MARINO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SAUDI_ARABIA_LABEL => WPST_HY3_COUNTRY_CODE_SAUDI_ARABIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SENEGAL_LABEL => WPST_HY3_COUNTRY_CODE_SENEGAL_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SEYCHELLES_LABEL => WPST_HY3_COUNTRY_CODE_SEYCHELLES_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SIERRA_LEONE_LABEL => WPST_HY3_COUNTRY_CODE_SIERRA_LEONE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SINGAPORE_LABEL => WPST_HY3_COUNTRY_CODE_SINGAPORE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SLOVENIA_LABEL => WPST_HY3_COUNTRY_CODE_SLOVENIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SOLOMON_ISLANDS_LABEL => WPST_HY3_COUNTRY_CODE_SOLOMON_ISLANDS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SOMALIA_LABEL => WPST_HY3_COUNTRY_CODE_SOMALIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SOUTH_AFRICA_LABEL => WPST_HY3_COUNTRY_CODE_SOUTH_AFRICA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SPAIN_LABEL => WPST_HY3_COUNTRY_CODE_SPAIN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SRI_LANKA_LABEL => WPST_HY3_COUNTRY_CODE_SRI_LANKA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_LABEL => WPST_HY3_COUNTRY_CODE_ST_VINCENT_AND_THE_GRENADINES_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SUDAN_LABEL => WPST_HY3_COUNTRY_CODE_SUDAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SURINAM_LABEL => WPST_HY3_COUNTRY_CODE_SURINAM_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SWAZILAND_LABEL => WPST_HY3_COUNTRY_CODE_SWAZILAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SWEDEN_LABEL => WPST_HY3_COUNTRY_CODE_SWEDEN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SWITZERLAND_LABEL => WPST_HY3_COUNTRY_CODE_SWITZERLAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_SYRIA_LABEL => WPST_HY3_COUNTRY_CODE_SYRIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_TADJIKISTAN_LABEL => WPST_HY3_COUNTRY_CODE_TADJIKISTAN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_TANZANIA_LABEL => WPST_HY3_COUNTRY_CODE_TANZANIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_THAILAND_LABEL => WPST_HY3_COUNTRY_CODE_THAILAND_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_THE_NETHERLANDS_LABEL => WPST_HY3_COUNTRY_CODE_THE_NETHERLANDS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_TOGO_LABEL => WPST_HY3_COUNTRY_CODE_TOGO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_TONGA_LABEL => WPST_HY3_COUNTRY_CODE_TONGA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_LABEL => WPST_HY3_COUNTRY_CODE_TRINIDAD_AND_TOBAGO_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_TUNISIA_LABEL => WPST_HY3_COUNTRY_CODE_TUNISIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_TURKEY_LABEL => WPST_HY3_COUNTRY_CODE_TURKEY_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_UGANDA_LABEL => WPST_HY3_COUNTRY_CODE_UGANDA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_UKRAINE_LABEL => WPST_HY3_COUNTRY_CODE_UKRAINE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_UNION_OF_MYANMAR_LABEL => WPST_HY3_COUNTRY_CODE_UNION_OF_MYANMAR_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_UNITED_ARAB_EMIRATES_LABEL => WPST_HY3_COUNTRY_CODE_UNITED_ARAB_EMIRATES_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_LABEL => WPST_HY3_COUNTRY_CODE_UNITED_STATES_OF_AMERICA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_URUGUAY_LABEL => WPST_HY3_COUNTRY_CODE_URUGUAY_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_VANUATU_LABEL => WPST_HY3_COUNTRY_CODE_VANUATU_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_VENEZUELA_LABEL => WPST_HY3_COUNTRY_CODE_VENEZUELA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_VIETNAM_LABEL => WPST_HY3_COUNTRY_CODE_VIETNAM_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_VIRGIN_ISLANDS_LABEL => WPST_HY3_COUNTRY_CODE_VIRGIN_ISLANDS_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_WESTERN_SAMOA_LABEL => WPST_HY3_COUNTRY_CODE_WESTERN_SAMOA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_YEMEN_LABEL => WPST_HY3_COUNTRY_CODE_YEMEN_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_YUGOSLAVIA_LABEL => WPST_HY3_COUNTRY_CODE_YUGOSLAVIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ZAIRE_LABEL => WPST_HY3_COUNTRY_CODE_ZAIRE_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ZAMBIA_LABEL => WPST_HY3_COUNTRY_CODE_ZAMBIA_VALUE
+		   ,WPST_HY3_COUNTRY_CODE_ZIMBABWE_LABEL => WPST_HY3_COUNTRY_CODE_ZIMBABWE_VALUE
 		) ;
 
-        return $WPST_HYTEK_COUNTRY_CODES ;
+        return $WPST_HY3_COUNTRY_CODES ;
     }
 }
 ?>

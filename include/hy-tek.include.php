@@ -132,6 +132,82 @@ define('WPST_HY3_TRC_SOUTH_AFRICA_VALUE', 'SSA') ;
 define('WPST_HY3_TRC_UNITED_KINGDOM_VALUE', 'UK') ;
 define('WPST_HY3_TRC_USA_SWIMMING_VALUE', 'USS') ;
 
+//  Define the values used in the records
+define('WPST_HY3_STROKE_CODE_FREESTYLE_LABEL', 'Freestyle') ;
+define('WPST_HY3_STROKE_CODE_BACKSTROKE_LABEL', 'Backstroke') ;
+define('WPST_HY3_STROKE_CODE_BREASTSTROKE_LABEL', 'Breaststroke') ;
+define('WPST_HY3_STROKE_CODE_BUTTERFLY_LABEL', 'Butterfly') ;
+define('WPST_HY3_STROKE_CODE_MEDLEY_LABEL', 'Medley') ;
+define('WPST_HY3_STROKE_CODE_FREESTYLE_VALUE', 'A') ;
+define('WPST_HY3_STROKE_CODE_BACKSTROKE_VALUE', 'B') ;
+define('WPST_HY3_STROKE_CODE_BREASTSTROKE_VALUE', 'C') ;
+define('WPST_HY3_STROKE_CODE_BUTTERFLY_VALUE', 'D') ;
+define('WPST_HY3_STROKE_CODE_MEDLEY_VALUE', 'E') ;
+
+//  Define the labels used in the GUI
+define('WPST_HY3_MEET_TYPE_INVITATIONAL_LABEL', 'Invitational') ;
+define('WPST_HY3_MEET_TYPE_REGIONAL_LABEL', 'Regional') ;
+define('WPST_HY3_MEET_TYPE_LSC_CHAMPIONSHIP_LABEL', 'LSC Championship') ;
+define('WPST_HY3_MEET_TYPE_ZONE_LABEL', 'Zone') ;
+define('WPST_HY3_MEET_TYPE_ZONE_CHAMPIONSHIP_LABEL', 'Zone Championship') ;
+define('WPST_HY3_MEET_TYPE_NATIONAL_CHAMPIONSHIP_LABEL', 'National Championship') ;
+define('WPST_HY3_MEET_TYPE_JUNIORS_LABEL', 'Juniors') ;
+define('WPST_HY3_MEET_TYPE_SENIORS_LABEL', 'Seniors') ;
+define('WPST_HY3_MEET_TYPE_DUAL_LABEL', 'Dual') ;
+define('WPST_HY3_MEET_TYPE_TIME_TRIALS_LABEL', 'Time Trials') ;
+define('WPST_HY3_MEET_TYPE_INTERNATIONAL_LABEL', 'International') ;
+define('WPST_HY3_MEET_TYPE_OPEN_LABEL', 'Open') ;
+define('WPST_HY3_MEET_TYPE_LEAGUE_LABEL', 'League') ;
+
+//  Define the values used in the records
+define('WPST_HY3_MEET_TYPE_INVITATIONAL_VALUE', '1') ;
+define('WPST_HY3_MEET_TYPE_REGIONAL_VALUE', '2') ;
+define('WPST_HY3_MEET_TYPE_LSC_CHAMPIONSHIP_VALUE', '3') ;
+define('WPST_HY3_MEET_TYPE_ZONE_VALUE', '4') ;
+define('WPST_HY3_MEET_TYPE_ZONE_CHAMPIONSHIP_VALUE', '5') ;
+define('WPST_HY3_MEET_TYPE_NATIONAL_CHAMPIONSHIP_VALUE', '6') ;
+define('WPST_HY3_MEET_TYPE_JUNIORS_VALUE', '7') ;
+define('WPST_HY3_MEET_TYPE_SENIORS_VALUE', '8') ;
+define('WPST_HY3_MEET_TYPE_DUAL_VALUE', '9') ;
+define('WPST_HY3_MEET_TYPE_TIME_TRIALS_VALUE', '0') ;
+define('WPST_HY3_MEET_TYPE_INTERNATIONAL_VALUE', 'A') ;
+define('WPST_HY3_MEET_TYPE_OPEN_VALUE', 'B') ;
+define('WPST_HY3_MEET_TYPE_LEAGUE_VALUE', 'C') ;
+
+/**
+ * Course/Status Code
+ *
+ * COURSE Code 013   Course/Status code
+ *      Please note that there are alternatives for the three types
+ *      of pools.  The alpha characters make the file more readable.
+ *      Either may be used.
+ *      1 or S   Short Course Meters
+ *      2 or Y   Short Course Yards
+ *      3 or L   Long Course Meters
+ *      X        Disqualified
+ *
+ * NOTE:  This implementation only uses alpha characters for output
+ *        but can accomodate the numeric values for input.
+ */
+
+//  Define the labels used in the GUI
+define('WPST_HY3_COURSE_STATUS_CODE_SCM_LABEL', 'Short Course Meters') ;
+define('WPST_HY3_COURSE_STATUS_CODE_SCY_LABEL', 'Short Course Yards') ;
+define('WPST_HY3_COURSE_STATUS_CODE_LCM_LABEL', 'Long Course Meters') ;
+define('WPST_HY3_COURSE_STATUS_CODE_SCM_ALT_LABEL', 'SC Meters') ;
+define('WPST_HY3_COURSE_STATUS_CODE_SCY_ALT_LABEL', 'SC Yards') ;
+define('WPST_HY3_COURSE_STATUS_CODE_LCM_ALT_LABEL', 'LC Meters') ;
+define('WPST_HY3_COURSE_STATUS_CODE_DQ_LABEL', 'Disqualified') ;
+
+//  Define the values used in the records
+define('WPST_HY3_COURSE_STATUS_CODE_SCM_VALUE', 'S') ;
+define('WPST_HY3_COURSE_STATUS_CODE_SCY_VALUE', 'Y') ;
+define('WPST_HY3_COURSE_STATUS_CODE_LCM_VALUE', 'L') ;
+define('WPST_HY3_COURSE_STATUS_CODE_DQ_VALUE', 'X') ;
+define('WPST_HY3_COURSE_STATUS_CODE_SCM_ALT_VALUE', '1') ;
+define('WPST_HY3_COURSE_STATUS_CODE_SCY_ALT_VALUE', '2') ;
+define('WPST_HY3_COURSE_STATUS_CODE_LCM_ALT_VALUE', '3') ;
+
 //  Define Debug Column Record - used to make sure things are
 //  in the correct column - kind of like the old FORTRAN days!
 //  Hy-tek HY3 records are always 130 columns with the record 
@@ -209,5 +285,8 @@ define('WPST_HY3_DE_RECORD', 'DE%-36.36s%-50.50s%-14.14s%-20.20s%6.6s%-2.2s') ;
 
 //  Define HY3 DF record
 define('WPST_HY3_DF_RECORD', 'DF%-20.20s%-20.20s%-50.50s%6.6s%-2.2s') ;
+
+//  Define HY3 E1 record
+define('WPST_HY3_E1_RECORD', 'E1%1.1s%5.5s%-6.6s%1.1s%1.1s%-6.6s%1.1s%3.3s%3.3s%4.4s%5.5s%2.2s%8.8s%1.1s%8.8s%1.1s%69.69s%-2.2s') ;
 
 ?>

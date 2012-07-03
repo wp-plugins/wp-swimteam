@@ -3,15 +3,15 @@
 /**
  * Swim Meets admin page content.
  *
- * $Id: swimmeets.php 920 2012-06-28 22:19:07Z mpwalsh8 $
+ * $Id: swimmeets.php 939 2012-07-02 18:19:10Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 920 $
- * @lastmodified $Date: 2012-06-28 18:19:07 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 939 $
+ * @lastmodified $Date: 2012-07-02 14:19:10 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -445,9 +445,12 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                         $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
 
                         $c = container() ;
-                        $if = html_iframe(sprintf('%s/include/user/swimmeet_entries_SDIF.php?file=%s',
-                            WPST_PLUGIN_URL, $form->getSDIFFile())) ;
+                        $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($form->getExportFile()),
+                            urlencode('SwimMeetEntries-' . date('Y-m-d') . $form->getExportFileExtension()), urlencode('txt')) ;
+
+                        $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                         $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+
                         $c->add($if) ;
                         $div->add($c) ;
                     }

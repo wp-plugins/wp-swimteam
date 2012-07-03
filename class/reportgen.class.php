@@ -3,15 +3,15 @@
 /**
  * Reports classes.
  *
- * $Id: reportgen.class.php 927 2012-06-28 22:24:58Z mpwalsh8 $
+ * $Id: reportgen.class.php 942 2012-07-02 21:08:28Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Reports
- * @version $Revision: 927 $
- * @lastmodified $Date: 2012-06-28 18:24:58 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 942 $
+ * @lastmodified $Date: 2012-07-02 17:08:28 -0400 (Mon, 02 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -2722,10 +2722,8 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
             {
                 if ($this->getOptionalFieldFilter($oconst))
                 {
-                    $filter .=
-                        sprintf('%s%s.ometakey="%s" AND %s.ometavalue="%s"',
-                        ($filter == '' ? '' : ' AND '), WPST_OPTIONS_META_TABLE,
-                        $oconst, WPST_OPTIONS_META_TABLE,
+                    $filter .= sprintf('%sm.ometakey="%s" AND m.ometavalue="%s"',
+                        ($filter == '' ? '' : ' AND '), $oconst, 
                         $this->getOptionalFieldFilterValue($oconst)) ;
                 }
             }
@@ -2737,8 +2735,9 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
 
         if (!empty($filter))
         {
-            $filter .= sprintf(' AND %s.swimmerid = %s.id',
-                WPST_OPTIONS_META_TABLE, WPST_SWIMMERS_TABLE) ;
+            //$filter .= sprintf(' AND %s.swimmerid = %s.id',
+                //WPST_OPTIONS_META_TABLE, WPST_SWIMMERS_TABLE) ;
+            $filter .= ' AND m.swimmerid=s.id' ;
         }
 
         //  Construct filters
@@ -2748,13 +2747,8 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
                 ($filter == '' ? '' : ' AND '), $this->getGenderFilterValue()) ;
 
         if ($this->getStatusFilter())
-            $filter .= sprintf('%s%s.swimmerid = %s.id AND
-                %s.seasonid = %s.id AND %s.season_status = "%s" AND
-                %s.status ="%s"',
-                ($filter == '' ? '' : ' AND '), WPST_ROSTER_TABLE,
-                WPST_SWIMMERS_TABLE, WPST_ROSTER_TABLE, WPST_SEASONS_TABLE,
-                WPST_SEASONS_TABLE, WPST_ACTIVE, WPST_ROSTER_TABLE,
-                $this->getStatusFilterValue()) ;
+            $filter .= sprintf('%ss2.season_status = "%s" AND r.status ="%s"',
+                ($filter == '' ? '' : ' AND '), WPST_ACTIVE, $this->getStatusFilterValue()) ;
 
         if ($this->getResultsFilter())
             $filter .= sprintf('%sresults="%s"',
@@ -2936,8 +2930,11 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
         $swimmer = new SwimTeamSwimmer() ;
         $ometa = new SwimTeamOptionMeta() ;
 
+        $joins = sprintf('LEFT JOIN %s r ON (r.swimmerid=s.id)
+            LEFT JOIN %s s2 ON (s2.id=r.seasonid)', WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
+
         if (is_null($swimmerid))
-            $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
+            $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter(), 'lastname', $joins) ;
         else
             $swimmerIds = array(array('swimmerid' => $swimmerid)) ;
 
@@ -3361,8 +3358,11 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
 
         //  Get all the swimmer ids using the appropriate filter
 
+        $joins = sprintf('LEFT JOIN %s r ON (r.swimmerid=s.id)
+            LEFT JOIN %s s2 ON (s2.id=r.seasonid)', WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
+
         if (is_null($swimmerid))
-            $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
+            $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter(), 'lastname', $joins) ;
         else
             $swimmerIds = array(array('swimmerid' => $swimmerid)) ;
 
