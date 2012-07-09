@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmeets.forms.class.php 943 2012-07-02 21:09:04Z mpwalsh8 $
+ * $Id: swimmeets.forms.class.php 951 2012-07-06 19:49:12Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
- * @version $Revision: 943 $
+ * @version $Revision: 951 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-07-02 17:09:04 -0400 (Mon, 02 Jul 2012) $
+ * @lastmodifiedby $Date: 2012-07-06 15:49:12 -0400 (Fri, 06 Jul 2012) $
  *
  */
 
@@ -215,7 +215,7 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
         $fileformat = new FERadioGroup('File Format',
             SDIFCodeTableMappings::GetFileFormat(), true, '200px');
         $fileformat->set_br_flag(true) ;
-        $fileformat->set_readonly(true) ;
+        //$fileformat->set_readonly(true) ;
         $this->add_element($fileformat) ;
 
         $zerotimemode = new FERadioGroup('Zero Time Format',
@@ -317,9 +317,11 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
 
             $this->set_action_message(sprintf('%s meet entries exported in SDIF format.', $sd3->getSDIFCount())) ;
         }
-        else if ($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_HY3_VALUE)
+        else if (($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE) ||
+                 ($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_MM_HY3_VALUE))
         {
             $hy3 = new HY3MeetEntries() ;
+            $hy3->setHY3Mode($this->get_element_value('File Format')) ;
             $hy3->setSwimMeetId($this->get_hidden_element_value('_swimmeetid')) ;
             $hy3->setZeroTimeMode($this->get_element_value('Zero Time Format')) ;
             $hy3->generateHY3($this->get_element_value('Events')) ;

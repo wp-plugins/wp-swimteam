@@ -3,15 +3,15 @@
 /**
  * UserProfile classes.
  *
- * $Id: users.class.php 928 2012-06-28 22:25:15Z mpwalsh8 $
+ * $Id: users.class.php 961 2012-07-09 21:00:26Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage UserProfile
- * @version $Revision: 928 $
- * @lastmodified $Date: 2012-06-28 18:25:15 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 961 $
+ * @lastmodified $Date: 2012-07-09 17:00:26 -0400 (Mon, 09 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -416,7 +416,7 @@ class SwimTeamUserProfile extends SwimTeamDBI
     {
         $u = get_userdata($this->getUserId()) ;
 
-        return $u->first_name ;
+        return ($u !== false) ? $u->first_name : null ;
     }
 
     /**
@@ -428,7 +428,7 @@ class SwimTeamUserProfile extends SwimTeamDBI
     {
         $u = get_userdata($this->getUserId()) ;
 
-        return $u->last_name ;
+        return ($u !== false) ? $u->last_name : null ;
     }
 
     /**
@@ -440,7 +440,7 @@ class SwimTeamUserProfile extends SwimTeamDBI
     {
         $u = get_userdata($this->getUserId()) ;
 
-        return $u->user_login ;
+        return ($u !== false) ? $u->user_login : null ;
     }
 
     /**
@@ -452,7 +452,7 @@ class SwimTeamUserProfile extends SwimTeamDBI
     {
         $u = get_userdata($this->getUserId()) ;
 
-        return $u->first_name . ' ' . $u->last_name ;
+        return ($u !== false) ? $u->first_name . ' ' . $u->last_name : null ;
     }
 
     /**
@@ -464,7 +464,7 @@ class SwimTeamUserProfile extends SwimTeamDBI
     {
         $u = get_userdata($this->getUserId()) ;
 
-        return $u->user_email ;
+        return ($u !== false) ? $u->user_email : null ;
     }
 
     /**
@@ -816,26 +816,17 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
 	    //     	    '200', 'id', SORTABLE, SEARCHABLE, 'left') ;
 
   	  	$this->add_header_item('First Name',
-	         	    '200', 'firstname', SORTABLE, SEARCHABLE, 'left') ;
+	         	    '200', 'm1.meta_value', SORTABLE, SEARCHABLE, 'left') ;
 
 	  	$this->add_header_item('Last Name',
-	         	    '200', 'lastname', SORTABLE, SEARCHABLE, 'left') ;
+	         	    '200', 'm2.meta_value', SORTABLE, SEARCHABLE, 'left') ;
 
 	  	$this->add_header_item('Username',
-	         	    '200', 'username', SORTABLE, SEARCHABLE, 'left') ;
+	         	    '200', 'user_login', SORTABLE, SEARCHABLE, 'left') ;
 
 	  	$this->add_header_item('Swimmers',
 	         	    '200', 'swimmers', SORTABLE, NOT_SEARCHABLE, 'left') ;
-
-/*	  	$this->add_header_item('Date of Birth',
-	         	    '250', 'birthdate', SORTABLE, SEARCHABLE, 'left') ;
-
-	  	$this->add_header_item('Results',
-	         	    '200', 'results', SORTABLE, SEARCHABLE, 'left') ;
-
-		$this->add_header_item('Status',
-	       	    '200', 'status', SORTABLE, SEARCHABLE, 'left') ;
- */
+ 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
             $this->getTables(), $this->getWhereClause()) ;

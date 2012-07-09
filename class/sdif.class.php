@@ -3,15 +3,15 @@
 /**
  * TeamProfile classes.
  *
- * $Id: sdif.class.php 934 2012-07-02 18:16:20Z mpwalsh8 $
+ * $Id: sdif.class.php 957 2012-07-07 04:39:17Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision: 934 $
- * @lastmodified $Date: 2012-07-02 14:16:20 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 957 $
+ * @lastmodified $Date: 2012-07-07 00:39:17 -0400 (Sat, 07 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -641,9 +641,9 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
 
         foreach ($swimmerIds as $key => &$swimmerId)
         {
-            $roster->setSwimmerId($swimmerId['swimmerid']) ;
+            $roster->setSwimmerId($swimmerId) ;
             $roster->loadRosterBySeasonIdAndSwimmerId() ;
-            $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+            $swimmer->loadSwimmerById($swimmerId) ;
             $contact->loadUserProfileByUserId($swimmer->getContact1Id()) ;
                     
             //  Initialize D1 record fields which are swimmer based
@@ -6386,7 +6386,8 @@ class SDIFCodeTableMappings
     {
         $WPST_FILE_FORMAT = array(
             WPST_FILE_FORMAT_SDIF_SD3_LABEL => WPST_FILE_FORMAT_SDIF_SD3_VALUE
-           ,WPST_FILE_FORMAT_HYTEK_HY3_LABEL => WPST_FILE_FORMAT_HYTEK_HY3_VALUE
+           ,WPST_FILE_FORMAT_HYTEK_TM_HY3_LABEL => WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE
+           //,WPST_FILE_FORMAT_HYTEK_MM_HY3_LABEL => WPST_FILE_FORMAT_HYTEK_MM_HY3_VALUE
         ) ;
 
         return $WPST_FILE_FORMAT ;

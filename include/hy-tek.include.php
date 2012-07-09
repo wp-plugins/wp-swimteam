@@ -71,6 +71,7 @@ define('WPST_HY3_FTC_MEET_ENTRIES_LABEL', 'Meet Entries') ;
 define('WPST_HY3_FTC_MEET_RESULTS_MM_TO_TM_LABEL', 'Meet Results (MM to TM)') ;
 
 //  Define the values used in the records
+define('WPST_HY3_FTC_MERGE_MEET_ENTRIES_VALUE', '01') ;
 define('WPST_HY3_FTC_MEET_ENTRIES_VALUE', '02') ;
 define('WPST_HY3_FTC_MEET_TEAM_ROSTER_VALUE', '03') ;
 define('WPST_HY3_FTC_MEET_RESULTS_MM_TO_TM_VALUE', '07') ;
@@ -227,10 +228,10 @@ define('WPST_HY3_CHECKSUM_RECORD', '%-128.128s%01.1d%01.1d') ;
 define('WPST_HY3_A1_RECORD', 'A1%2.2s%-25.25s%-15.15s%-14.14s%-8.8s%-1.1s%8.8s%-52.52s%-2.2s') ;
 
 //  Define B1 record
-define('WPST_HY3_B1_RECORD', 'B1%1.1s%8.8s%-30.30s%-22.22s%-22.22s%-20.20s%2.2s%-10.10s%3.3s%1.1s%8.8s%8.8s%4.4s%8.8s%1.1s%10.10s') ;
+define('WPST_HY3_B1_RECORD', 'B1%-45.45s%-45.45s%8.8s%8.8s%8.8s%4.4s%8.8s%-2.2s') ;
 
 //  Define B2 record
-define('WPST_HY3_B2_RECORD', 'B2%1.1s%8.8s%-30.30s%-22.22s%-22.22s%-20.20s%2.2s%-10.10s%3.3s%12.12s%28.28s') ;
+define('WPST_HY3_B2_RECORD', 'B2%92.92s%2.2s%2.2s%1.1s%8.8s%1.1s%22.22s%-2.2s') ;
 
 //  Define C1 record
 define('WPST_HY3_C1_RECORD', 'C1%-5.5s%-30.30s%-16.16s%-63.63s%-3.3s%-6.6s%-2.2s') ;
@@ -242,7 +243,7 @@ define('WPST_HY3_C2_RECORD', 'C2%-30.30s%-30.30s%-30.30s%-2.2s%-10.10s%-3.3s%-1.
 define('WPST_HY3_C3_RECORD', 'C3%-30.30s%-20.20s%-20.20s%-20.20s%-36.36s%-2.2s') ;
 
 //  Define D1 record
-define('WPST_HY3_D1_RECORD', 'D1%1.1s%-5.5s%-20.20s%-20.20s%-20.20s%1.1s%-14.14s%-5.5s%8.8s%1.1s%2.2s%1.1s%4.4s%3.3s%3.3s%1.1s%3.3s%1.1s%3.3s%3.3s%6.6s%-2.2s') ;
+define('WPST_HY3_D1_RECORD', 'D1%1.1s%5.5s%-20.20s%-20.20s%-20.20s%1.1s%-14.14s%-5.5s%8.8s%1.1s%2.2s%1.1s%4.4s%3.3s%3.3s%1.1s%3.3s%1.1s%3.3s%3.3s%6.6s%-2.2s') ;
 
 //  Define HY3 D2 record
 define('WPST_HY3_D2_RECORD', 'D2%-30.30s%-30.30s%-20.20s%10.10s%-2.2s%-10.10s%3.3s%21.21s%-2.2s') ;
@@ -287,6 +288,19 @@ define('WPST_HY3_DE_RECORD', 'DE%-36.36s%-50.50s%-14.14s%-20.20s%6.6s%-2.2s') ;
 define('WPST_HY3_DF_RECORD', 'DF%-20.20s%-20.20s%-50.50s%6.6s%-2.2s') ;
 
 //  Define HY3 E1 record
-define('WPST_HY3_E1_RECORD', 'E1%1.1s%5.5s%-6.6s%1.1s%1.1s%-6.6s%1.1s%3.3s%3.3s%4.4s%5.5s%2.2s%8.8s%1.1s%8.8s%1.1s%69.69s%-2.2s') ;
+define('WPST_HY3_E1_RECORD', 'E1%1.1s%5.5s%-5.5s%1.1s%1.1s%6.6s%1.1s%3.3s%3.3s%4.4s%6.2f%4.4s%8.8s%1.1s%8.8s%1.1s%8.8s%1.1s%7.7s%1.1s%4.4s%15.15s%1.1s%31.31s%-2.2s') ;
+define('WPST_HY3_E1_UNKNOWN_1', '01') ;
+define('WPST_HY3_E1_UNKNOWN_2', '0NN') ;
+define('WPST_HY3_E1_UNKNOWN_3', 'N') ;
+
+define('WPST_HY3_E1_DEBUG_RECORD', 'E1F    1DEBUGFG    50A 11 12  01  0.00  18    0.00     0.00     0.00    0.00  0NN               N                               08') ;
+
+define('WPST_HY3_F1_RECORD', 'F1%5.5s%1.1s%4.4s%1.1s%1.1s%1.1s%6.6s%1.1s%3.3s%3.3s%4.4s%6.6s%3.3s%1.1s%8.8s%1.1s%8.8s%1.1s%49.49s%-2.2s') ;
+define('WPST_HY3_F1_DEBUG_RECORD', 'F1DEBUGB   0FFF   200A 15 18      7.00 64        0Y    0.00Y                                                                    26') ;
+
+define('WPST_HY3_F3_RECORD', 'F3%1.1s%5.5s%-5.5s%1.1s%1.1s%1.1s%5.5s%-5.5s%1.1s%1.1s%1.1s%5.5s%-5.5s%1.1s%1.1s%1.1s%5.5s%-5.5s%1.1s%1.1s%76.76s%-2.2s') ;
+
+define('WPST_HY3_F3_DEBUG_RECORD', 'F3F   64Self F1F   60AdamsF2F   63ArensF3F   65VoltzF4                                                                          63') ;
+
 
 ?>

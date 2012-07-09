@@ -3,15 +3,15 @@
 /**
  * Swimmer classes.
  *
- * $Id: swimmers.class.php 944 2012-07-02 21:09:34Z mpwalsh8 $
+ * $Id: swimmers.class.php 956 2012-07-07 04:38:51Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 944 $
- * @lastmodified $Date: 2012-07-02 17:09:34 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 956 $
+ * @lastmodified $Date: 2012-07-07 00:38:51 -0400 (Sat, 07 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1230,7 +1230,7 @@ class SwimTeamSwimmersGUIDataList extends SwimTeamGUIDataList
 	        '250', 'birthdate', SORTABLE, SEARCHABLE, 'left') ;
 
 	  	$this->add_header_item('Age',
-	        '150', 'age', SORTABLE, SEARCHABLE, 'left') ;
+	        '150', 'age', SORTABLE, NOT_SEARCHABLE, 'left') ;
 
 	  	$this->add_header_item('Results',
 	        '150', 'results', SORTABLE, SEARCHABLE, 'left') ;

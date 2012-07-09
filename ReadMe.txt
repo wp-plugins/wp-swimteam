@@ -64,6 +64,14 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.34 =
+* Second phase of Hy-tek Meet Entries Export completed.  Meet entries can be exported to Hy-tek Team Manager in HY3 format.
+* Fixed bug on Swimmers tab when searching by Age - Age doesn't support search so it is disabled from the search list.
+* Fixed bug preventing export of a single swimmer in HY3 format from the roster.
+* Fixed bug preventing export of a single swimmer in SDIF format from the roster.
+* Fixed bugs on User list which prevented searching for users based on first name, last name or user login.
+* Fixed warning resulting from searching on fields which aren't searchable on Roster, User, and Swimmer lists.
+
 = 1.33 =
 * Fixed bug which prevented generating roster report.
 * Fixed bug which prevented scratching swimmers from Meet tab.

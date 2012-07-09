@@ -177,7 +177,7 @@ class HY3Roster extends HY3BaseRecord
      *
      * @return string - HY3 content
      */
-    function generateHY3()
+    function generateHY3($swimmerIds = array())
     {
         global $current_user ;
 
@@ -270,7 +270,22 @@ class HY3Roster extends HY3BaseRecord
         //  to get the list of potential swimmers
 
         $roster->setSeasonId($season->getActiveSeasonId()) ;
-        $swimmerIds = $roster->getSwimmerIds() ;
+
+        //  If no swimmers are specified, pull the whole roster
+        //  and clean up the array so it as expected.
+
+        if (empty($swimmerIds))
+        {
+            $swimmerIds = array() ;
+            $allSwimmerIds = $roster->getSwimmerIds() ;
+
+            foreach ($allSwimmerIds as $swimmerId)
+                $swimmerIds[] = $swimmerId['swimmerid'] ;
+        }
+        else if (!is_array($swimmerIds))
+        {
+            $swimmerIds = array($swimmerIds) ;
+        }
 
         //  Need structures for swimmers and their primary contact
  
@@ -308,9 +323,9 @@ class HY3Roster extends HY3BaseRecord
 
         foreach ($swimmerIds as $key => &$swimmerId)
         {
-            $roster->setSwimmerId($swimmerId['swimmerid']) ;
+            $roster->setSwimmerId($swimmerId) ;
             $roster->loadRosterBySeasonIdAndSwimmerId() ;
-            $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
+            $swimmer->loadSwimmerById($swimmerId) ;
             $contact1->loadUserProfileByUserId($swimmer->getContact1Id()) ;
             $contact2->loadUserProfileByUserId($swimmer->getContact2Id()) ;
             $contact3->loadUserProfileByUserId($swimmer->getWpUserId()) ;
@@ -543,6 +558,11 @@ class HY3MeetEntries extends HY3BaseRecord
     var $_zerotimemode ;
 
     /**
+     * Hy-tek HY3 mode property
+     */
+    var $_hy3mode = WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE ;
+
+    /**
      * Set the Swim Meet Id
      *
      * @param int $id swim meet id
@@ -585,6 +605,30 @@ class HY3MeetEntries extends HY3BaseRecord
     }
 
     /**
+     * Set the HY3  Mode to specify
+     * differences between MM and TM
+     * should be handled.
+     *
+     * @param string $mode mode setting
+     */
+    function setHY3Mode($mode = WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE)
+    {
+        $this->_hy3mode = $mode ;
+    }
+
+    /**
+     * Get the HY3  Mode to specify
+     * differences between MM and TM
+     * should be handled.
+     *
+     * @return string $mode mode setting
+     */
+    function getHY3Mode()
+    {
+        return $this->_hy3mode ;
+    }
+
+    /**
      * Consturctor
      *
      */
@@ -618,6 +662,12 @@ class HY3MeetEntries extends HY3BaseRecord
         $unique_swimmers = array() ;
         $hy3_counters = array('b' => 0, 'c' => 0, 'd' => 0, 'e' => 0, 'f' => 0, 'g' => 0) ;
 
+        //  The Hy-tek entries file needs an ID number for each swimmer
+        //  to connect various records together.  The numbers must be unique.
+        $hy3_swimmer_id = 0 ;
+        $hy3_swimmer_ids = array() ;
+
+
         //  Add debug stuff?  The debug stuff invalidates the HY3
         //  but is useful for ensuring all of the information is in
         //  the proper column.
@@ -650,8 +700,18 @@ class HY3MeetEntries extends HY3BaseRecord
          * Build the A1 record
          */
         $a1 = new HY3A1Record() ;
-        $a1->setFileCode(WPST_HY3_FTC_MEET_TEAM_ROSTER_VALUE) ;
-        $a1->setFileDescription('Swim Team Roster') ;
+
+        if ($this->getHY3Mode() == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE)
+        {
+            $a1->setFileCode(WPST_HY3_FTC_MEET_ENTRIES_VALUE) ;
+            $a1->setFileDescription('Meet Entries') ;
+        }
+        else
+        {
+            $a1->setFileCode(WPST_HY3_FTC_MERGE_MEET_ENTRIES_VALUE) ;
+            $a1->setFileDescription('Merge Meet Entries') ;
+        }
+
         $a1->setSoftwareVendor(WPST_HY3_SOFTWARE_NAME) ;
         $a1->setSoftwareName(WPST_HY3_SOFTWARE_VERSION) ;
         $a1->setFileCreationDate(date('mdY'))  ;
@@ -666,8 +726,6 @@ class HY3MeetEntries extends HY3BaseRecord
          * Build the B1 record
          */
         $b1 = new HY3B1Record() ;
-        $b1->setOrgCode($this->getOrgCode()) ;
-        $b1->setTeamCode($this->getTeamCode()) ;
         $b1->setMeetName(sprintf('%s vs %s', $swimteam->getTeamName(), $swimclub->getTeamName())) ;
 
         //  Meet address depends on meet location, 'Home' or 'Away'
@@ -679,6 +737,7 @@ class HY3MeetEntries extends HY3BaseRecord
         else
             $st = &$swimteam ;
 
+        $b1->setMeetFacility($st->getClubOrPoolName()) ;
         $b1->setMeetAddress1($st->getStreet1()) ;
         $b1->setMeetAddress2($st->getStreet2()) ;
         $b1->setMeetCity($st->getCity()) ;
@@ -707,7 +766,8 @@ class HY3MeetEntries extends HY3BaseRecord
 
         $b1->setMeetStart($swimmeet->getMeetDateAsMMDDYYYY()) ;
         $b1->setMeetEnd($swimmeet->getMeetDateAsMMDDYYYY()) ;
-        $b1->setPoolAltitude(0) ;
+        $b1->setMeetEntryDeadline($swimmeet->getMeetDateAsMMDDYYYY()) ;
+        $b1->setPoolAltitude(99999) ;
         $b1->setCourseCode(HY3CodeTableMappings::GetCourseCode(
             $st->getPoolMeasurementUnits(), $st->getPoolLength())) ;
 
@@ -718,16 +778,12 @@ class HY3MeetEntries extends HY3BaseRecord
          * Build the B2 record
          */
         $b2 = new HY3B2Record() ;
-        $b2->setOrgCode($this->getOrgCode()) ;
-        $b2->setTeamCode($this->getTeamCode()) ;
-        $b2->setMeetName($user->getFullName()) ;
-        $b2->setMeetAddress1($st->getStreet1()) ;
-        $b2->setMeetAddress2($st->getStreet2()) ;
-        $b2->setMeetCity($st->getCity()) ;
-        $b2->setMeetState($st->getStateOrProvince()) ;
-        $b2->setMeetPostalCode($st->getPostalCode()) ;
-        $b2->setMeetCountryCode($this->getCountryCode()) ;
-        $b2->setMeetHostPhone($user->getPrimaryPhone()) ;
+        $b2->setMasters(WPST_NULL_STRING) ;
+        $b2->setMeetType('AG') ;
+        $b2->setCourseCode1(HY3CodeTableMappings::GetCourseCode(
+            $st->getPoolMeasurementUnits(), $st->getPoolLength())) ;
+        $b2->setCourseCode2(HY3CodeTableMappings::GetCourseCode(
+            $st->getPoolMeasurementUnits(), $st->getPoolLength())) ;
 
         $hy3[] = $b2->GenerateRecord() ;
         $hy3_counters['b']++ ;
@@ -808,6 +864,7 @@ class HY3MeetEntries extends HY3BaseRecord
 
         $e1 = new HY3E1Record() ;
         $f1 = new HY3F1Record() ;
+        $f3 = new HY3F3Record() ;
 
         //  Load information from the database
         //  to get the list of potential swimmers
@@ -834,31 +891,56 @@ class HY3MeetEntries extends HY3BaseRecord
         }
 
         //  Fill in the fields which are static across all entries
+
+        switch ($this->getZeroTimeMode())
+        {
+            case WPST_HY_TEK_USE_ZEROS_VALUE :
+                $seedtime = '0.00' ;
+
+                if ($this->getHY3Mode() == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE)
+                    $seedcourse = $b1->getCourseCode() ;
+                else
+                    $seedcourse = WPST_NULL_STRING ;
+                break ;
+
+            case WPST_HY_TEK_USE_NT_VALUE :
+                $seedtime =  'NT' ;
+                $seedcourse = $b1->getCourseCode() ;
+                break ;
+
+            case WPST_HY_TEK_USE_BLANKS_VALUE :
+            default:
+                $seedtime = WPST_NULL_STRING ;
+                $seedcourse = WPST_NULL_STRING ;
+                break ;
+        }
+
         $e1->setEventFee(0) ;
-        $e1->setSeedTime1(WPST_NULL_STRING) ;
-        $e1->setSeedUnit1(WPST_NULL_STRING) ;
+        $e1->setSeedTime1($seedtime) ;
+        $e1->setSeedCourse1($seedcourse) ;
         $e1->setSeedTime2(WPST_NULL_STRING) ;
-        $e1->setSeedUnit2(WPST_NULL_STRING) ;
+        $e1->setSeedCourse2(WPST_NULL_STRING) ;
 
         $f1->setRelayTeam('A') ;
         $f1->setTeamAbbr($this->getTeamCode()) ;
 
         $f1->setEventFee(0) ;
-        $f1->setRelaySeedTime1(WPST_NULL_STRING) ;
-        $f1->setRelaySeedUnit1(WPST_NULL_STRING) ;
+        $f1->setRelaySeedTime1($seedtime) ;
+        $f1->setRelaySeedCourse1($seedcourse) ;
         $f1->setRelaySeedTime2(WPST_NULL_STRING) ;
-        $f1->setRelaySeedUnit2(WPST_NULL_STRING) ;
+        $f1->setRelaySeedCourse2(WPST_NULL_STRING) ;
 
-        //  Loop through events
+        //  Loop through events - need to figure out which swimmer is
+        //  swimming in which event.  HY3 is slightly different than SDIF
+        //  in that it is swimmer based and not event based.  This means
+        //  we need to know the list of unique swimmers AND the events
+        //  they're swimming in and then generate HY3 records on a swimmer
+        //  basis.
+
+        $events = array() ;
 
         foreach ($eventIds as $eventId)
         {
-            //  Debug code, take this out!!!
-            //if ($eventId['eventid'] != 1411) continue ;
-//            if ((($eventId['eventid'] < 1462) || ($eventId['eventid'] > 1465)) &&
-//                (($eventId['eventid'] < 1474) || ($eventId['eventid'] > 1476))) continue ;
-
-            //$event->loadSwimMeetEventByEventId($eventId['eventid']) ;
             $event->loadSwimMeetEventByEventId($eventId) ;
 
             // Get all swimmers eligible for the age group
@@ -868,16 +950,13 @@ class HY3MeetEntries extends HY3BaseRecord
             //  Need to tidy up the list of swimmers based on meet participation
             //  Is the meet set up as opt-in or opt-out?  Adjust the list accordingly.
 
-            //foreach ($swimmerIds as $swimmerId)
             foreach ($swimmerIds as $key => &$swimmerId)
             {
-                //printf('<h4>Swimmer Id:  %s<br>Event Number %s</h4>', $swimmerId['swimmerid'], $event->getEventNumber()) ;
                 //  Has swimmer entered or scratched this event?
                 //  Which mode is the data ingetDateOfBirthAsMMDDYYYY?  Stroke or Event?
 
                 if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
                 {
-                    printf('<h5>Stroke Mode</h5>') ;
                     $optinoptout = $meta->getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
                         $swimmeet->getMeetId(), $swimmeet->getParticipation()) ;
 
@@ -904,103 +983,244 @@ class HY3MeetEntries extends HY3BaseRecord
                 if (!$swimming) unset($swimmerIds[$key]) ;
             }
 
-            //  Now we know the swimmers and the events, time to generate records!
+            //  Save the list of swimmer Ids swimming in each and create
+            //  a unique "id" number within the HY3 file for each swimmer
+            //  in order to connect the D1, E1, and F1 records.
+
+            foreach ($swimmerIds as $key => &$swimmerId)
+            {
+                $events[$eventId][] = $swimmerId['swimmerid'] ;
+
+                if (!array_key_exists($swimmerId['swimmerid'], $hy3_swimmer_ids))
+                    $hy3_swimmer_ids[$swimmerId['swimmerid']] = ++$hy3_swimmer_id ;
+
+                if (!in_array($swimmerId['swimmerid'], $unique_swimmers))
+                    $unique_swimmers[] = $swimmerId['swimmerid'] ;
+            }
+        }
+
+        //  Now we need to loop through the swimmers and generate their
+        //  D and E records which is the swimmer information and their
+        //  individual event entries.  Relays are handled later at once
+        //  all of the individual entries are accounted for.
+
+        foreach ($hy3_swimmer_ids as $swimmerKey => $swimmerValue)
+        {
+            $roster->setSwimmerId($swimmerKey) ;
+            $roster->loadRosterBySeasonIdAndSwimmerId() ;
+            $swimmer->loadSwimmerById($swimmerKey) ;
+                    
+            //  Initialize D1 record fields which are swimmer based
+
+            if ($this->getHY3Mode() == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE)
+                $d1->setDatabaseId1($swimmerKey) ;
+            else
+                $d1->setDatabaseId1($swimmerValue) ;
+
+            $d1->setDatabaseId2(WPST_HY3_UNUSED) ;
+
+            $d1->setAthleteLastName($swimmer->getLastName()) ;
+            $d1->setAthleteFirstName($swimmer->getFirstName()) ;
+            $d1->setAthleteMiddleInitial(substr($swimmer->getMiddleName(), 0, 1)) ;
+
+            if ($swimmer->getNickname() != '')
+                $d1->setAthleteNickname($swimmer->getNickname()) ;
+            else
+                $d1->setAthleteNickname($swimmer->getFirstName()) ;
+
+            $d1->setAthleteBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
+
+            //  How should the Swimmer Id appear in the HY3 file?
+            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                $d1->setAthleteId($swimmer->getId()) ;
+            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                $d1->setAthleteId($roster->getSwimmerLabel()) ;
+            else
+                $d1->setAthleteId($swimmer->getUSSNumber()) ;
+
+            if ($this->getUseAgeGroupAge() == WPST_NO)
+                $d1->setAthleteAge($swimmer->getAge()) ;
+            else
+                $d1->setAthleteAge($swimmer->getAgeGroupAge()) ;
+
+            $d1->setGender(ucwords($swimmer->getGender())) ;
+            $d1->setRegistrationCountry($this->getCountryCode()) ;
+
+            //  Fill in the unused fields
+            $d1->setAthleteSchoolYear(WPST_HY3_UNUSED) ;
+            $d1->setGroup(WPST_HY3_UNUSED) ;
+            $d1->setSubgroup(WPST_HY3_UNUSED) ;
+            $d1->setInactive(WPST_HY3_UNUSED) ;
+            $d1->setWmGroup(WPST_HY3_UNUSED) ;
+            $d1->setWmSubgroup(WPST_HY3_UNUSED) ;
+
+            //  Generate the D1 record
+            $hy3[] = $d1->GenerateRecord() ;
+
+            //  Generate E1 records for the swimmer!
+            //  Which events is the swimmer swimming in?
+
+            foreach ($events as $eventKey => $eventValue)
+            {
+                //  Is the swimmer swimming in this event?
+
+                if (in_array($swimmerKey, $eventValue))
+                {
+                    $event->loadSwimMeetEventByEventId($eventKey) ;
+
+                    //  Individual or Relay event?
+                    //  We're only worried about individual events at this stage.
+
+                    if (($event->getStroke() != WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE) &&
+                        ($event->getStroke() != WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE))
+                    {
+                        //  Intialize the E1 record fields that are event based
+                        $e1->setGender1(ucwords($event->getGender())) ;
+                        $e1->setGender2(ucwords($event->getGender())) ;
+                        $e1->setDistance($event->getDistance()) ;
+                        $e1->setStroke($event->getStroke()) ;
+                        $e1->setAgeLower($event->getMinAge()) ;
+                        $e1->setAgeUpper($event->getMaxAge()) ;
+                        $e1->setEventNumber($event->getEventNumber()) ;
+
+                        //  Initialize E1 record fields which are swimmer based
+
+                        if ($this->getHY3Mode() == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE)
+                            $e1->setSwimmerId($swimmerKey) ;
+                        else
+                            $e1->setSwimmerId($swimmerValue) ;
+
+                        $e1->setGender(ucwords($swimmer->getGender())) ;
+                        $e1->setSwimmerAbbr($swimmer->getLastName()) ;
+
+                        if ($this->getHY3DebugFlag())
+                        {
+                            $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
+                            $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
+                        }
+    
+                        //$hy3[] = WPST_HY3_E1_DEBUG_RECORD ;
+                        $hy3[] = $e1->GenerateRecord($this->getZeroTimeMode()) ;
+    
+                        //  Update the various counters
+                        $hy3_counters['e']++ ;
+                    }
+                }
+            }
+        }
+
+        //  Now that individual events are done, time to generate the relay records
+        //  Generate F1 records for the swimmer!
+        //  Which relay events is the swimmer swimming in?
+
+        foreach ($events as $eventKey => $eventValue)
+        {
+            $event->loadSwimMeetEventByEventId($eventKey) ;
 
             //  Individual or Relay event?
+            //  We're only worried about relay events this time through.
 
             if (($event->getStroke() == WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE) ||
                 ($event->getStroke() == WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE))
             {
-/*
+                $relay_team = 65 ; //  ASCII 'A'
+                $relay_swimmer = 0 ;
+
                 //  Intialize the F1 record fields that are event based
-                $f1->setRelayGender1($event->getGender()) ;
-                $f1->setRelayGender2($event->getGender()) ;
+                //
+                $f1->setRelayGender(ucwords($event->getGender())) ;
+                $f1->setRelayGender1(ucwords($event->getGender())) ;
+                $f1->setRelayGender2(ucwords($event->getGender())) ;
                 $f1->setRelayDistance($event->getDistance()) ;
                 $f1->setRelayStroke($event->getStroke()) ;
                 $f1->setRelayAgeLower($event->getMinAge()) ;
                 $f1->setRelayAgeUpper($event->getMaxAge()) ;
                 $f1->setEventNumber($event->getEventNumber()) ;
 
-                foreach ($swimmerIds as $key => &$swimmerId)
+                if ($this->getHY3DebugFlag())
                 {
-                    $roster->setSwimmerId($swimmerId['swimmerid']) ;
-                    $roster->loadRosterBySeasonIdAndSwimmerId() ;
-                    $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
-                    
-                    //  Initialize F1 record fields which are swimmer based
-                    $f1->setGender($swimmer->getGender()) ;
-
-                    //  How should the Swimmer Id appear in the HY3 file?
-                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
-                        $f1->setSwimmerId($swimmer->getId()) ;
-                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
-                        $f1->setSwimmerId($roster->getSwimmerLabel()) ;
-                    else
-                        $f1->setSwimmerId($swimmer->getUSSNumber()) ;
-
-                    $f1->setSwimmerAbbr($swimmer->getLastName()) ;
-
-                    if ($this->getHY3DebugFlag())
-                    {
-                        $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
-                        $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
-                    }
-    
-                    $hy3[] = $f1->GenerateRecord($this->getZeroTimeMode()) ;
-    
-                    //  Update the various counters
-                    $hy3_counters['f']++ ;
-    
-                    //  Track unique swimmers
-                    if (!in_array($swimmer->getId(), $unique_swimmers))
-                        $unique_swimmers[] = $swimmer->getId() ;
+                    $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
+                    $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
                 }
-*/
-            }
-            else
-            {
-                //  Intialize the E1 record fields that are event based
-                $e1->setGender1($event->getGender()) ;
-                $e1->setGender2($event->getGender()) ;
-                $e1->setDistance($event->getDistance()) ;
-                $e1->setStroke($event->getStroke()) ;
-                $e1->setAgeLower($event->getMinAge()) ;
-                $e1->setAgeUpper($event->getMaxAge()) ;
-                $e1->setEventNumber($event->getEventNumber()) ;
 
-                foreach ($swimmerIds as $key => &$swimmerId)
+
+                //  Generate an F3 record for each swimmer in the relay
+
+                foreach ($eventValue as $swimmerKey => $swimmerValue)
                 {
-                    $roster->setSwimmerId($swimmerId['swimmerid']) ;
-                    $roster->loadRosterBySeasonIdAndSwimmerId() ;
-                    $swimmer->loadSwimmerById($swimmerId['swimmerid']) ;
-                    
-                    //  Initialize F1 record fields which are swimmer based
-                    $e1->setGender($swimmer->getGender()) ;
+                    //  Clean up any previous values in the case of
+                    //  an incomplete relay (ie less than four swimmers)
 
-                    //  How should the Swimmer Id appear in the HY3 file?
-                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
-                        $e1->setSwimmerId($swimmer->getId()) ;
-                    if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
-                        $e1->setSwimmerId($roster->getSwimmerLabel()) ;
-                    else
-                        $e1->setSwimmerId($swimmer->getUSSNumber()) ;
-
-                    $e1->setSwimmerAbbr($swimmer->getLastName()) ;
-
-                    if ($this->getHY3DebugFlag())
+                    if ($relay_swimmer == 0)
                     {
-                        $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
-                        $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
+                        //  Generate the F1 record for the relay team
+                        //$hy3[] = WPST_HY3_F1_DEBUG_RECORD ;
+                        $f1->setRelayTeam(chr($relay_team)) ;
+                        $hy3[] = $f1->GenerateRecord($this->getZeroTimeMode()) ;
+
+                        //  Update the various counters
+                        $hy3_counters['f']++ ;
+
+                        for ($i = 1 ; $i <= 4 ; $i++)
+                        {
+                            $method = sprintf('setSwimmer%dId', $i) ;
+                            $f3->$method(WPST_NULL_STRING) ;
+                            $method = sprintf('setSwimmer%dGender', $i) ;
+                            $f3->$method(WPST_NULL_STRING) ;
+                            $method = sprintf('setSwimmer%dAbbr', $i) ;
+                            $f3->$method(WPST_NULL_STRING) ;
+                            $method = sprintf('setSwimmer%dGender1', $i) ;
+                            $f3->$method(WPST_NULL_STRING) ;
+                            $method = sprintf('setSwimmer%dRelayLeg', $i) ;
+                            $f3->$method(WPST_NULL_STRING) ;
+                        }
                     }
-    
-                    $hy3[] = $e1->GenerateRecord($this->getZeroTimeMode()) ;
-    
+
+                    $relay_swimmer++ ;
+
+                    $swimmer->loadSwimmerById($swimmerValue) ;
+
+                    //  Initialize F3 record fields which are swimmer based
+
+                    $method = sprintf('setSwimmer%dId', $relay_swimmer) ;
+                    if ($this->getHY3Mode() == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE)
+                        $f3->$method($swimmerValue) ;
+                    else
+                        $f3->$method($hy3_swimmer_ids[$swimmerValue]) ;
+
+
+                    $method = sprintf('setSwimmer%dGender', $relay_swimmer) ;
+                    $f3->$method(ucwords($swimmer->getGender())) ;
+                    $method = sprintf('setSwimmer%dAbbr', $relay_swimmer) ;
+                    $f3->$method($swimmer->getLastName()) ;
+                    $method = sprintf('setSwimmer%dGender1', $relay_swimmer) ;
+                    $f3->$method(ucwords($swimmer->getGender())) ;
+                    $method = sprintf('setSwimmer%dRelayLeg', $relay_swimmer) ;
+                    $f3->$method($relay_swimmer) ;
+
                     //  Update the various counters
-                    $hy3_counters['e']++ ;
-    
-                    //  Track unique swimmers
-                    if (!in_array($swimmer->getId(), $unique_swimmers))
-                        $unique_swimmers[] = $swimmer->getId() ;
+
+                    $hy3_counters['f']++ ;
+
+                    //   Relay full?  If so, generate the record and prepare a new team
+
+                    if ($relay_swimmer == 4)
+                    {
+                        //$hy3[] = WPST_HY3_F3_DEBUG_RECORD ;
+                        $hy3[] = $f3->GenerateRecord($this->getZeroTimeMode()) ;
+
+                        $relay_swimmer = 0 ;
+                        $relay_team++ ;
+                    }
+                }
+
+                //  Coming out of the loop, there may be a partial relay team
+                //  that hasn't been output yet - need to account for that scenario.
+
+                if ($relay_swimmer > 0)
+                {
+                    //$hy3[] = WPST_HY3_F3_DEBUG_RECORD ;
+                    $hy3[] = $f3->GenerateRecord($this->getZeroTimeMode()) ;
                 }
             }
         }
@@ -1310,6 +1530,11 @@ class HY3BxRecord extends HY3Record
     var $_meet_name ;
 
     /**
+     * Meet Facility
+     */
+    var $_meet_facility ;
+
+    /**
      * Meet Address Line 1
      */
     var $_meet_address_1 ;
@@ -1370,9 +1595,39 @@ class HY3BxRecord extends HY3Record
     var $_meet_end_db ;
 
     /**
+     * Meet Entry Deadline
+     */
+    var $_meet_entry_deadline ;
+
+    /**
+     * Meet Entry Deadline for database
+     */
+    var $_meet_entry_deadline_db ;
+
+    /**
      * Pool Altitude
      */
     var $_pool_altitude ;
+
+    /**
+     *   Masters property
+     */
+    var $__masters ;
+
+    /**
+     *   Meet Type property
+     */
+    var $__meet_type ;
+
+    /**
+     *   Course Code 1 property
+     */
+    var $__course_code_1 ;
+
+    /**
+     *   Course Code 2 property
+     */
+    var $__course_code_2 ;
 
     /**
      * Set Meet Name
@@ -1392,6 +1647,26 @@ class HY3BxRecord extends HY3Record
     function getMeetName()
     {
         return $this->_meet_name ;
+    }
+
+    /**
+     * Set Meet Facility
+     *
+     * @param string meet facility
+     */
+    function setMeetFacility($txt)
+    {
+        $this->_meet_facility = $txt ;
+    }
+
+    /**
+     * Get Meet Facility
+     *
+     * @return string meet facility
+     */
+    function getMeetFacility()
+    {
+        return $this->_meet_facility ;
     }
 
     /**
@@ -1655,6 +1930,56 @@ class HY3BxRecord extends HY3Record
     }
 
     /**
+     * Set Meet Entry Deadline
+     *
+     * @param string meet entry deadline
+     * @param boolean date provided in database format
+     */
+    function setMeetEntryDeadline($txt, $db = false)
+    {
+        if ($db)
+        {
+            $this->_meet_entry_deadline_db = $txt ;
+ 
+            //  The meet entry deadline date is stored in YYYY-MM-DD in the database but
+            //  HY3 B1 record expects it in MMDDYYYY format so the dates are
+            //  reformatted appropriately.
+
+            $date = &$this->_meet_entry_deadline_db ;
+
+            $this->_meet_entry_deadline = sprintf('%02s%02s%04s',
+                substr($date, 5, 2), substr($date, 8, 2), substr($date, 0, 4)) ;
+        }
+        else
+        {
+            $this->_meet_entry_deadline = $txt ;
+ 
+            //  The meet entry deadline date is stored in MMDDYYYY format in the HY3 B1
+            //  record.  The database needs dates in YYYY-MM-DD format so the
+            //  dates are reformatted appropriately.
+
+            $date = &$this->_meet_entry_deadline ;
+
+            $this->_meet_entry_deadline_db = sprintf('%04s-%02s-%02s',
+                substr($date, 4, 4), substr($date, 0, 2), substr($date, 2, 2)) ;
+        }
+    }
+
+    /**
+     * Get Meet Entry Deadline
+     *
+     * @param boolean date returned in database format
+     * @return string meet entry deadline
+     */
+    function getMeetEntryDeadline($db = true)
+    {
+        if ($db)
+            return $this->_meet_entry_deadline_db ;
+        else
+            return $this->_meet_entry_deadline ;
+    }
+
+    /**
      * Set Pool Altitude
      *
      * @param string pool altitude
@@ -1673,6 +1998,94 @@ class HY3BxRecord extends HY3Record
     {
         return $this->_pool_altitude ;
     }
+
+    /**
+     *  Set Masters property
+     *
+     *  @param string -  masters
+     */
+    function setMasters($value = null)
+    {
+        $this->__masters = $value ;
+    }
+
+    /**
+     *  Get Masters property
+     *
+     *  @return string -  masters
+     */
+    function getMasters()
+    {
+        return $this->__masters ;
+    }
+
+    /**
+     *  Set Meet Type property
+     *
+     *  @param string -  meet type
+     */
+    function setMeetType($value = null)
+    {
+        $this->__meet_type = $value ;
+    }
+
+    /**
+     *  Get Meet Type property
+     *
+     *  @return string -  meet type
+     */
+    function getMeetType()
+    {
+        return $this->__meet_type ;
+    }
+
+    /**
+     *  Set Course Code 1 property
+     *
+     *  @param string -  course code 1
+     */
+    function setCourseCode1($value = null)
+    {
+        $this->__course_code_1 = $value ;
+    }
+
+    /**
+     *  Get Course Code 1 property
+     *
+     *  @return string -  course code 1
+     */
+    function getCourseCode1()
+    {
+        return $this->__course_code_1 ;
+    }
+
+    /**
+     *  Set Course Code 2 property
+     *
+     *  @param string -  course code 2
+     */
+    function setCourseCode2($value = null)
+    {
+        $this->__course_code_2 = $value ;
+    }
+
+    /**
+     *  Get Course Code 2 property
+     *
+     *  @return string -  course code 2
+     */
+    function getCourseCode2()
+    {
+        return $this->__course_code_2 ;
+    }
+
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
 }
 
 /**
@@ -1685,83 +2098,22 @@ class HY3BxRecord extends HY3Record
 class HY3B1Record extends HY3BxRecord
 {
     /**
-     * Parse Record
-     */
-    function ParseRecord()
-    {
-        $c = container() ;
-        if (WPST_DEBUG)
-            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
-                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
-        //print $c->render() ;
-
-        //  This doesn't work right and I am not sure why ...
-        //  it ends reading data from the wrong character position.
-
-        //$success = sscanf($this->_hy3_record, WPST_HY3_B1_RECORD,
-        //    $this->_org_code,
-        //    $this->_future_use_1,
-        //    $this->_meet_name,
-        //    $this->_meet_address_1,
-        //    $this->_meet_address_2,
-        //    $this->_meet_city,
-        //    $this->_meet_state,
-        //    $this->_meet_postal_code,
-        //    $this->_meet_country_code,
-        //    $this->_meet_code,
-        //    $this->_meet_start,
-        //    $this->_meet_end,
-        //    $this->_pool_altitude,
-        //    $this->_future_use_2,
-        //    $this->_course_code,
-        //    $this->_future_use_3) ;
-        /**
-         * Build the B1 record
-         */
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 8))) ;
-        $this->setMeetName(trim(substr($this->_hy3_record, 11, 30))) ;
-        $this->setMeetAddress1(trim(substr($this->_hy3_record, 41, 22))) ;
-        $this->setMeetAddress2(trim(substr($this->_hy3_record, 63, 22))) ;
-        $this->setMeetCity(trim(substr($this->_hy3_record, 85, 20))) ;
-        $this->setMeetState(trim(substr($this->_hy3_record, 105, 2))) ;
-        $this->setMeetPostalCode(trim(substr($this->_hy3_record, 107, 10))) ;
-        $this->setMeetCountryCode(trim(substr($this->_hy3_record, 117, 3))) ;
-        $this->setMeetCode(trim(substr($this->_hy3_record, 120, 1))) ;
-        $this->setMeetStart(trim(substr($this->_hy3_record, 121, 8)), false) ;
-        $this->setMeetEnd(trim(substr($this->_hy3_record, 129, 8)), false) ;
-        $this->setPoolAltitude(trim(substr($this->_hy3_record, 137, 4))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 141, 8))) ;
-        $this->setCourseCode(trim(substr($this->_hy3_record, 149, 1))) ;
-        $this->setFutureUse3(trim(substr($this->_hy3_record, 150, 10))) ;
-    }
-
-    /**
      * Generate Record
      */
     function GenerateRecord()
     {
-        return sprintf(WPST_HY3_B1_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
+        $hy3 = sprintf(WPST_HY3_B1_RECORD,
             $this->getMeetName(),
-            $this->getMeetAddress1(),
-            $this->getMeetAddress2(),
-            $this->getMeetCity(),
-            $this->getMeetState(),
-            $this->getMeetPostalCode(),
-            $this->getMeetCountryCode(),
-            $this->getMeetCode(),
+            $this->getMeetFacility(),
             $this->getMeetStart(false),
             $this->getMeetEnd(false),
+            $this->getMeetEntryDeadline(false),
             $this->getPoolAltitude(),
-            $this->getFutureUse2(),
-            $this->getCourseCode(),
-            $this->getFutureUse3()
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
         ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
     }
 }
 
@@ -1775,70 +2127,22 @@ class HY3B1Record extends HY3BxRecord
 class HY3B2Record extends HY3BxRecord
 {
     /**
-     * Parse Record
-     */
-    function ParseRecord()
-    {
-        $c = container() ;
-        if (WPST_DEBUG)
-            $c->add(html_pre(WPST_HY3_COLUMN_DEBUG1,
-                WPST_HY3_COLUMN_DEBUG2, $this->_hy3_record)) ;
-        //print $c->render() ;
-
-        //  This doesn't work right and I am not sure why ...
-        //  it ends reading data from the wrong character position.
-
-        //$success = sscanf($this->_hy3_record, WPST_HY3_B1_RECORD,
-        //    $this->_org_code,
-        //    $this->_future_use_1,
-        //    $this->_meet_name,
-        //    $this->_meet_address_1,
-        //    $this->_meet_address_2,
-        //    $this->_meet_city,
-        //    $this->_meet_state,
-        //    $this->_meet_postal_code,
-        //    $this->_meet_country_code,
-        //    $this->_meet_code,
-        //    $this->_meet_start,
-        //    $this->_meet_end,
-        //    $this->_pool_altitude,
-        //    $this->_future_use_2,
-        //    $this->_course_code,
-        //    $this->_future_use_3) ;
-
-        //  Extract the data from the HY3 record by substring position
-
-        $this->setOrgCode(trim(substr($this->_hy3_record, 2, 1))) ;
-        $this->setFutureUse1(trim(substr($this->_hy3_record, 3, 8))) ;
-        $this->setMeetName(trim(substr($this->_hy3_record, 11, 30))) ;
-        $this->setMeetAddress1(trim(substr($this->_hy3_record, 41, 22))) ;
-        $this->setMeetAddress2(trim(substr($this->_hy3_record, 63, 22))) ;
-        $this->setMeetCity(trim(substr($this->_hy3_record, 85, 20))) ;
-        $this->setMeetState(trim(substr($this->_hy3_record, 105, 2))) ;
-        $this->setMeetPostalCode(trim(substr($this->_hy3_record, 107, 10))) ;
-        $this->setMeetCountryCode(trim(substr($this->_hy3_record, 117, 3))) ;
-        $this->setMeetHostPhone(trim(substr($this->_hy3_record, 120, 1))) ;
-        $this->setFutureUse2(trim(substr($this->_hy3_record, 141, 8))) ;
-    }
-
-    /**
      * Generate Record
      */
     function GenerateRecord()
     {
-        return sprintf(WPST_HY3_B2_RECORD,
-            $this->getOrgCode(),
-            $this->getFutureUse1(),
-            $this->getMeetName(),
-            $this->getMeetAddress1(),
-            $this->getMeetAddress2(),
-            $this->getMeetCity(),
-            $this->getMeetState(),
-            $this->getMeetPostalCode(),
-            $this->getMeetCountryCode(),
-            $this->getMeetHostPhone(),
-            $this->getFutureUse2()
+        $hy3 = sprintf(WPST_HY3_B2_RECORD,
+            WPST_HY3_UNUSED,
+            $this->getMasters(),
+            $this->getMeetType(),
+            $this->getCourseCode1(),
+            WPST_HY3_UNUSED,
+            $this->getCourseCode2(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
         ) ;
+
+        return $this->CalculateHy3Checksum($hy3) ;
     }
 }
 
@@ -4970,7 +5274,12 @@ class HY3ExRecord extends HY3Record
      */
     function setGender2($value = null)
     {
-        $this->__gender2 = $value ;
+        if ($value == 'M')
+            $this->__gender2 = 'B' ;
+        else if ($value == 'F')
+            $this->__gender2 = 'G' ;
+        else
+            $this->__gender2 = $value ;
     }
 
     /**
@@ -5010,7 +5319,25 @@ class HY3ExRecord extends HY3Record
      */
     function setStroke($value = null)
     {
-        $this->__stroke = $value ;
+        //  Map strokes from SDIF to HY3 if necessary
+
+        $hy3strokes = array(
+            WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE => WPST_HY3_STROKE_CODE_FREESTYLE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_VALUE => WPST_HY3_STROKE_CODE_BACKSTROKE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_BREASTSTROKE_VALUE => WPST_HY3_STROKE_CODE_BREASTSTROKE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_BUTTERFLY_VALUE => WPST_HY3_STROKE_CODE_BUTTERFLY_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_VALUE => WPST_HY3_STROKE_CODE_MEDLEY_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE => WPST_HY3_STROKE_CODE_FREESTYLE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE => WPST_HY3_STROKE_CODE_MEDLEY_VALUE
+        ) ;
+
+        if (in_array($value, $hy3strokes)) {
+            $this->__stroke = $value ;
+        } else if (array_key_exists($value, $hy3strokes)) {
+            $this->__stroke = $hy3strokes[$value] ;
+        } else {
+            $this->__stroke = null ;
+        }
     }
 
     /**
@@ -5128,7 +5455,7 @@ class HY3ExRecord extends HY3Record
      *
      *  @param string -  seed unit 1
      */
-    function setSeedUnit1($value = null)
+    function setSeedCourse1($value = null)
     {
         $this->__seed_unit_1 = $value ;
     }
@@ -5138,7 +5465,7 @@ class HY3ExRecord extends HY3Record
      *
      *  @return string -  seed unit 1
      */
-    function getSeedUnit1()
+    function getSeedCourse1()
     {
         return $this->__seed_unit_1 ;
     }
@@ -5168,7 +5495,7 @@ class HY3ExRecord extends HY3Record
      *
      *  @param string -  seed unit 2
      */
-    function setSeedUnit2($value = null)
+    function setSeedCourse2($value = null)
     {
         $this->__seed_unit_2 = $value ;
     }
@@ -5178,7 +5505,7 @@ class HY3ExRecord extends HY3Record
      *
      *  @return string -  seed unit 2
      */
-    function getSeedUnit2()
+    function getSeedCourse2()
     {
         return $this->__seed_unit_2 ;
     }
@@ -5384,12 +5711,12 @@ class HY3E1Record extends HY3ExRecord
     /**
      * Generate Record
      *
-     * @return string - DF HY3 record
+     * @return string - E1 HY3 record
      */
     function GenerateRecord()
     {
         $hy3 = sprintf(WPST_HY3_E1_RECORD,
-            $this->getSwimmerGender(),
+            $this->getGender(),
             $this->getSwimmerId(),
             $this->getSwimmerAbbr(),
             $this->getGender1(),
@@ -5401,11 +5728,17 @@ class HY3E1Record extends HY3ExRecord
             WPST_HY3_UNUSED,
             $this->getEventFee(),
             $this->getEventNumber(),
-            WPST_HY3_UNUSED,
             $this->getSeedTime1(),
-            $this->getSeedUnit1(),
+            $this->getSeedCourse1(),
+            $this->getSeedTime1(),
+            $this->getSeedCourse1(),
             $this->getSeedTime2(),
-            $this->getSeedUnit2(),
+            $this->getSeedCourse2(),
+            $this->getSeedTime2(),
+            $this->getSeedCourse2(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED,
             WPST_HY3_UNUSED,
             WPST_HY3_UNUSED
         ) ;
@@ -5422,6 +5755,24 @@ class HY3E1Record extends HY3ExRecord
  * @see HY3Record
  */
 class HY3FxRecord extends HY3Record
+{
+    /**
+     * Parse Record
+     */
+    function ParseRecord()
+    {
+        wp_die('This funtion has not been implemented.') ;
+    }
+}
+
+/**
+ * HY3 F1 record
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see HY3FxRecord
+ */
+class HY3F1Record extends HY3FxRecord
 {
     /**
      *   Team Abbr property
@@ -5670,7 +6021,25 @@ class HY3FxRecord extends HY3Record
      */
     function setRelayStroke($value = null)
     {
-        $this->__relay_stroke = $value ;
+        //  Map strokes from SDIF to HY3 if necessary
+
+        $hy3strokes = array(
+            WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_VALUE => WPST_HY3_STROKE_CODE_FREESTYLE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_BACKSTROKE_VALUE => WPST_HY3_STROKE_CODE_BACKSTROKE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_BREASTSTROKE_VALUE => WPST_HY3_STROKE_CODE_BREASTSTROKE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_BUTTERFLY_VALUE => WPST_HY3_STROKE_CODE_BUTTERFLY_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_INDIVIDUAL_MEDLEY_VALUE => WPST_HY3_STROKE_CODE_MEDLEY_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE => WPST_HY3_STROKE_CODE_FREESTYLE_VALUE,
+            WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE => WPST_HY3_STROKE_CODE_MEDLEY_VALUE
+        ) ;
+
+        if (in_array($value, $hy3strokes)) {
+            $this->__relay_stroke = $value ;
+        } else if (array_key_exists($value, $hy3strokes)) {
+            $this->__relay_stroke = $hy3strokes[$value] ;
+        } else {
+            $this->__relay_stroke = null ;
+        }
     }
 
     /**
@@ -5788,7 +6157,7 @@ class HY3FxRecord extends HY3Record
      *
      *  @param string -  relay seed unit 1
      */
-    function setRelaySeedUnit1($value = null)
+    function setRelaySeedCourse1($value = null)
     {
         $this->__relay_seed_unit_1 = $value ;
     }
@@ -5798,7 +6167,7 @@ class HY3FxRecord extends HY3Record
      *
      *  @return string -  relay seed unit 1
      */
-    function getRelaySeedUnit1()
+    function getRelaySeedCourse1()
     {
         return $this->__relay_seed_unit_1 ;
     }
@@ -5828,7 +6197,7 @@ class HY3FxRecord extends HY3Record
      *
      *  @param string -  relay seed unit 2
      */
-    function setRelaySeedUnit2($value = null)
+    function setRelaySeedCourse2($value = null)
     {
         $this->__relay_seed_unit_2 = $value ;
     }
@@ -5838,7 +6207,7 @@ class HY3FxRecord extends HY3Record
      *
      *  @return string -  relay seed unit 2
      */
-    function getRelaySeedUnit2()
+    function getRelaySeedCourse2()
     {
         return $this->__relay_seed_unit_2 ;
     }
@@ -6022,37 +6391,577 @@ class HY3FxRecord extends HY3Record
     {
         return $this->__day_of_event ;
     }
+    /**
+     * Generate Record
+     *
+     * @return string - F1 HY3 record
+     */
+    function GenerateRecord()
+    {
+        $hy3 = sprintf(WPST_HY3_F1_RECORD,
+            $this->getTeamAbbr(),
+            $this->getRelayTeam(),
+            WPST_HY3_UNUSED,
+            $this->getRelayGender(),
+            $this->getRelayGender1(),
+            $this->getRelayGender2(),
+            $this->getRelayDistance(),
+            $this->getRelayStroke(),
+            $this->getRelayAgeLower(),
+            $this->getRelayAgeUpper(),
+            WPST_HY3_UNUSED,
+            $this->getEventFee(),
+            $this->getEventNumber(),
+            WPST_HY3_UNUSED,
+            $this->getRelaySeedTime1(),
+            $this->getRelaySeedCourse1(),
+            $this->getRelaySeedTime2(),
+            $this->getRelaySeedCourse2(),
+            WPST_HY3_UNUSED,
+            WPST_HY3_UNUSED
+        ) ;
 
+        return $this->CalculateHy3Checksum($hy3) ;
+    }
 }
 
 /**
- * HY3 F1 record
+ * HY3 F3 record
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see HY3FxRecord
  */
-class HY3F1Record extends HY3FxRecord
+class HY3F3Record extends HY3FxRecord
 {
     /**
-     * Parse Record
+     *   Swimmer 1 Gender property
      */
-    function ParseRecord()
+    var $__swimmer_1_gender ;
+
+    /**
+     *   Swimmer 1 Id property
+     */
+    var $__swimmer_1_id ;
+
+    /**
+     *   Swimmer 1 Abbr property
+     */
+    var $__swimmer_1_abbr ;
+
+    /**
+     *   Swimmer 1 Gender 1 property
+     */
+    var $__swimmer_1_gender_1 ;
+
+    /**
+     *   Swimmer 1 Relay Leg property
+     */
+    var $__swimmer_1_relay_leg ;
+
+    /**
+     *   Swimmer 2 Gender property
+     */
+    var $__swimmer_2_gender ;
+
+    /**
+     *   Swimmer 2 Id property
+     */
+    var $__swimmer_2_id ;
+
+    /**
+     *   Swimmer 2 Abbr property
+     */
+    var $__swimmer_2_abbr ;
+
+    /**
+     *   Swimmer 2 Gender 1 property
+     */
+    var $__swimmer_2_gender_1 ;
+
+    /**
+     *   Swimmer 2 Relay Leg property
+     */
+    var $__swimmer_2_relay_leg ;
+
+    /**
+     *   Swimmer 3 Gender property
+     */
+    var $__swimmer_3_gender ;
+
+    /**
+     *   Swimmer 3 Id property
+     */
+    var $__swimmer_3_id ;
+
+    /**
+     *   Swimmer 3 Abbr property
+     */
+    var $__swimmer_3_abbr ;
+
+    /**
+     *   Swimmer 3 Gender 1 property
+     */
+    var $__swimmer_3_gender_1 ;
+
+    /**
+     *   Swimmer 3 Relay Leg property
+     */
+    var $__swimmer_3_relay_leg ;
+
+    /**
+     *   Swimmer 4 Gender property
+     */
+    var $__swimmer_4_gender ;
+
+    /**
+     *   Swimmer 4 Id property
+     */
+    var $__swimmer_4_id ;
+
+    /**
+     *   Swimmer 4 Abbr property
+     */
+    var $__swimmer_4_abbr ;
+
+    /**
+     *   Swimmer 4 Gender 1 property
+     */
+    var $__swimmer_4_gender_1 ;
+
+    /**
+     *   Swimmer 4 Relay Leg property
+     */
+    var $__swimmer_4_relay_leg ;
+
+    /**
+     *  Set Swimmer 1 Gender property
+     *
+     *  @param string -  swimmer 1 gender
+     */
+    function setSwimmer1Gender($value = null)
     {
-        wp_die('This funtion has not been implemented.') ;
+        $this->__swimmer_1_gender = $value ;
+    }
+
+    /**
+     *  Get Swimmer 1 Gender property
+     *
+     *  @return string -  swimmer 1 gender
+     */
+    function getSwimmer1Gender()
+    {
+        return $this->__swimmer_1_gender ;
+    }
+
+    /**
+     *  Set Swimmer 1 Id property
+     *
+     *  @param string -  swimmer 1 id
+     */
+    function setSwimmer1Id($value = null)
+    {
+        $this->__swimmer_1_id = $value ;
+    }
+
+    /**
+     *  Get Swimmer 1 Id property
+     *
+     *  @return string -  swimmer 1 id
+     */
+    function getSwimmer1Id()
+    {
+        return $this->__swimmer_1_id ;
+    }
+
+    /**
+     *  Set Swimmer 1 Abbr property
+     *
+     *  @param string -  swimmer 1 abbr
+     */
+    function setSwimmer1Abbr($value = null)
+    {
+        $this->__swimmer_1_abbr = $value ;
+    }
+
+    /**
+     *  Get Swimmer 1 Abbr property
+     *
+     *  @return string -  swimmer 1 abbr
+     */
+    function getSwimmer1Abbr()
+    {
+        return $this->__swimmer_1_abbr ;
+    }
+
+    /**
+     *  Set Swimmer 1 Gender 1 property
+     *
+     *  @param string -  swimmer 1 gender 1
+     */
+    function setSwimmer1Gender1($value = null)
+    {
+        $this->__swimmer_1_gender_1 = $value ;
+    }
+
+    /**
+     *  Get Swimmer 1 Gender 1 property
+     *
+     *  @return string -  swimmer 1 gender 1
+     */
+    function getSwimmer1Gender1()
+    {
+        return $this->__swimmer_1_gender_1 ;
+    }
+
+    /**
+     *  Set Swimmer 1 Relay Leg property
+     *
+     *  @param string -  swimmer 1 relay leg
+     */
+    function setSwimmer1RelayLeg($value = null)
+    {
+        $this->__swimmer_1_relay_leg = $value ;
+    }
+
+    /**
+     *  Get Swimmer 1 Relay Leg property
+     *
+     *  @return string -  swimmer 1 relay leg
+     */
+    function getSwimmer1RelayLeg()
+    {
+        return $this->__swimmer_1_relay_leg ;
+    }
+
+    /**
+     *  Set Swimmer 2 Gender property
+     *
+     *  @param string -  swimmer 2 gender
+     */
+    function setSwimmer2Gender($value = null)
+    {
+        $this->__swimmer_2_gender = $value ;
+    }
+
+    /**
+     *  Get Swimmer 2 Gender property
+     *
+     *  @return string -  swimmer 2 gender
+     */
+    function getSwimmer2Gender()
+    {
+        return $this->__swimmer_2_gender ;
+    }
+
+    /**
+     *  Set Swimmer 2 Id property
+     *
+     *  @param string -  swimmer 2 id
+     */
+    function setSwimmer2Id($value = null)
+    {
+        $this->__swimmer_2_id = $value ;
+    }
+
+    /**
+     *  Get Swimmer 2 Id property
+     *
+     *  @return string -  swimmer 2 id
+     */
+    function getSwimmer2Id()
+    {
+        return $this->__swimmer_2_id ;
+    }
+
+    /**
+     *  Set Swimmer 2 Abbr property
+     *
+     *  @param string -  swimmer 2 abbr
+     */
+    function setSwimmer2Abbr($value = null)
+    {
+        $this->__swimmer_2_abbr = $value ;
+    }
+
+    /**
+     *  Get Swimmer 2 Abbr property
+     *
+     *  @return string -  swimmer 2 abbr
+     */
+    function getSwimmer2Abbr()
+    {
+        return $this->__swimmer_2_abbr ;
+    }
+
+    /**
+     *  Set Swimmer 2 Gender 1 property
+     *
+     *  @param string -  swimmer 2 gender 1
+     */
+    function setSwimmer2Gender1($value = null)
+    {
+        $this->__swimmer_2_gender_1 = $value ;
+    }
+
+    /**
+     *  Get Swimmer 2 Gender 1 property
+     *
+     *  @return string -  swimmer 2 gender 1
+     */
+    function getSwimmer2Gender1()
+    {
+        return $this->__swimmer_2_gender_1 ;
+    }
+
+    /**
+     *  Set Swimmer 2 Relay Leg property
+     *
+     *  @param string -  swimmer 2 relay leg
+     */
+    function setSwimmer2RelayLeg($value = null)
+    {
+        $this->__swimmer_2_relay_leg = $value ;
+    }
+
+    /**
+     *  Get Swimmer 2 Relay Leg property
+     *
+     *  @return string -  swimmer 2 relay leg
+     */
+    function getSwimmer2RelayLeg()
+    {
+        return $this->__swimmer_2_relay_leg ;
+    }
+
+    /**
+     *  Set Swimmer 3 Gender property
+     *
+     *  @param string -  swimmer 3 gender
+     */
+    function setSwimmer3Gender($value = null)
+    {
+        $this->__swimmer_3_gender = $value ;
+    }
+
+    /**
+     *  Get Swimmer 3 Gender property
+     *
+     *  @return string -  swimmer 3 gender
+     */
+    function getSwimmer3Gender()
+    {
+        return $this->__swimmer_3_gender ;
+    }
+
+    /**
+     *  Set Swimmer 3 Id property
+     *
+     *  @param string -  swimmer 3 id
+     */
+    function setSwimmer3Id($value = null)
+    {
+        $this->__swimmer_3_id = $value ;
+    }
+
+    /**
+     *  Get Swimmer 3 Id property
+     *
+     *  @return string -  swimmer 3 id
+     */
+    function getSwimmer3Id()
+    {
+        return $this->__swimmer_3_id ;
+    }
+
+    /**
+     *  Set Swimmer 3 Abbr property
+     *
+     *  @param string -  swimmer 3 abbr
+     */
+    function setSwimmer3Abbr($value = null)
+    {
+        $this->__swimmer_3_abbr = $value ;
+    }
+
+    /**
+     *  Get Swimmer 3 Abbr property
+     *
+     *  @return string -  swimmer 3 abbr
+     */
+    function getSwimmer3Abbr()
+    {
+        return $this->__swimmer_3_abbr ;
+    }
+
+    /**
+     *  Set Swimmer 3 Gender 1 property
+     *
+     *  @param string -  swimmer 3 gender 1
+     */
+    function setSwimmer3Gender1($value = null)
+    {
+        $this->__swimmer_3_gender_1 = $value ;
+    }
+
+    /**
+     *  Get Swimmer 3 Gender 1 property
+     *
+     *  @return string -  swimmer 3 gender 1
+     */
+    function getSwimmer3Gender1()
+    {
+        return $this->__swimmer_3_gender_1 ;
+    }
+
+    /**
+     *  Set Swimmer 3 Relay Leg property
+     *
+     *  @param string -  swimmer 3 relay leg
+     */
+    function setSwimmer3RelayLeg($value = null)
+    {
+        $this->__swimmer_3_relay_leg = $value ;
+    }
+
+    /**
+     *  Get Swimmer 3 Relay Leg property
+     *
+     *  @return string -  swimmer 3 relay leg
+     */
+    function getSwimmer3RelayLeg()
+    {
+        return $this->__swimmer_3_relay_leg ;
+    }
+
+    /**
+     *  Set Swimmer 4 Gender property
+     *
+     *  @param string -  swimmer 4 gender
+     */
+    function setSwimmer4Gender($value = null)
+    {
+        $this->__swimmer_4_gender = $value ;
+    }
+
+    /**
+     *  Get Swimmer 4 Gender property
+     *
+     *  @return string -  swimmer 4 gender
+     */
+    function getSwimmer4Gender()
+    {
+        return $this->__swimmer_4_gender ;
+    }
+
+    /**
+     *  Set Swimmer 4 Id property
+     *
+     *  @param string -  swimmer 4 id
+     */
+    function setSwimmer4Id($value = null)
+    {
+        $this->__swimmer_4_id = $value ;
+    }
+
+    /**
+     *  Get Swimmer 4 Id property
+     *
+     *  @return string -  swimmer 4 id
+     */
+    function getSwimmer4Id()
+    {
+        return $this->__swimmer_4_id ;
+    }
+
+    /**
+     *  Set Swimmer 4 Abbr property
+     *
+     *  @param string -  swimmer 4 abbr
+     */
+    function setSwimmer4Abbr($value = null)
+    {
+        $this->__swimmer_4_abbr = $value ;
+    }
+
+    /**
+     *  Get Swimmer 4 Abbr property
+     *
+     *  @return string -  swimmer 4 abbr
+     */
+    function getSwimmer4Abbr()
+    {
+        return $this->__swimmer_4_abbr ;
+    }
+
+    /**
+     *  Set Swimmer 4 Gender 1 property
+     *
+     *  @param string -  swimmer 4 gender 1
+     */
+    function setSwimmer4Gender1($value = null)
+    {
+        $this->__swimmer_4_gender_1 = $value ;
+    }
+
+    /**
+     *  Get Swimmer 4 Gender 1 property
+     *
+     *  @return string -  swimmer 4 gender 1
+     */
+    function getSwimmer4Gender1()
+    {
+        return $this->__swimmer_4_gender_1 ;
+    }
+
+    /**
+     *  Set Swimmer 4 Relay Leg property
+     *
+     *  @param string -  swimmer 4 relay leg
+     */
+    function setSwimmer4RelayLeg($value = null)
+    {
+        $this->__swimmer_4_relay_leg = $value ;
+    }
+
+    /**
+     *  Get Swimmer 4 Relay Leg property
+     *
+     *  @return string -  swimmer 4 relay leg
+     */
+    function getSwimmer4RelayLeg()
+    {
+        return $this->__swimmer_4_relay_leg ;
     }
 
     /**
      * Generate Record
      *
-     * @return string - DF HY3 record
+     * @return string - F3 HY3 record
      */
     function GenerateRecord()
     {
-        $hy3 = sprintf(WPST_HY3_DF_RECORD,
-            $this->getAthletesMiddleName(),
-            $this->getAthletesCellPhoneNumber(),
-            $this->getAthletesEmailAddress(),
+        $hy3 = sprintf(WPST_HY3_F3_RECORD,
+            $this->getSwimmer1Gender(),
+            $this->getSwimmer1Id(),
+            $this->getSwimmer1Abbr(),
+            $this->getSwimmer1Gender1(),
+            $this->getSwimmer1RelayLeg(),
+            $this->getSwimmer2Gender(),
+            $this->getSwimmer2Id(),
+            $this->getSwimmer2Abbr(),
+            $this->getSwimmer2Gender1(),
+            $this->getSwimmer2RelayLeg(),
+            $this->getSwimmer3Gender(),
+            $this->getSwimmer3Id(),
+            $this->getSwimmer3Abbr(),
+            $this->getSwimmer3Gender1(),
+            $this->getSwimmer3RelayLeg(),
+            $this->getSwimmer4Gender(),
+            $this->getSwimmer4Id(),
+            $this->getSwimmer4Abbr(),
+            $this->getSwimmer4Gender1(),
+            $this->getSwimmer4RelayLeg(),
             WPST_HY3_UNUSED,
             WPST_HY3_UNUSED
         ) ;

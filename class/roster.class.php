@@ -3,15 +3,15 @@
 /**
  * Season classes.
  *
- * $Id: roster.class.php 910 2012-06-13 17:14:48Z mpwalsh8 $
+ * $Id: roster.class.php 960 2012-07-09 20:59:28Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Roster
- * @version $Revision: 910 $
- * @lastmodified $Date: 2012-06-13 13:14:48 -0400 (Wed, 13 Jun 2012) $
+ * @version $Revision: 960 $
+ * @lastmodified $Date: 2012-07-09 16:59:28 -0400 (Mon, 09 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1125,10 +1125,10 @@ class SwimTeamRosterGUIDataList extends SwimTeamGUIDataList
 	         	    "200", "lastname", SORTABLE, SEARCHABLE, "left") ;
 
 	  	$this->add_header_item("Age",
-	         	    "100", "age", SORTABLE, SEARCHABLE, "left") ;
+	         	    "100", "age", SORTABLE, NOT_SEARCHABLE, "left") ;
 
 	  	$this->add_header_item("Age Group",
-	         	    "300", "agegroup", SORTABLE, SEARCHABLE, "left") ;
+	         	    "300", "agegroup", SORTABLE, NOT_SEARCHABLE, "left") ;
 
 	  	$this->add_header_item("Swimmer Label",
 	         	    "200", "swimmerlabel", SORTABLE, SEARCHABLE, "left") ;

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 947 2012-07-02 21:16:51Z mpwalsh8 $
+ * $Id: swimteam.include.php 951 2012-07-06 19:49:12Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,15 +13,15 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 947 $
- * @lastmodified $Date: 2012-07-02 17:16:51 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 951 $
+ * @lastmodified $Date: 2012-07-06 15:49:12 -0400 (Fri, 06 Jul 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
 require_once('version.include.php') ;
 
-define('WPST_DEBUG', false) ;
+define('WPST_DEBUG', true) ;
 
 /**
  * Constants used across the plugin
@@ -384,8 +384,10 @@ define('WPST_CLOTHING_SIZE_4XL_VALUE', '4XL') ;
 
 define('WPST_FILE_FORMAT_SDIF_SD3_LABEL', 'SDIF') ;
 define('WPST_FILE_FORMAT_SDIF_SD3_VALUE', 'sd3') ;
-define('WPST_FILE_FORMAT_HYTEK_HY3_LABEL', 'Hy-tek HY3') ;
-define('WPST_FILE_FORMAT_HYTEK_HY3_VALUE', 'hy3') ;
+define('WPST_FILE_FORMAT_HYTEK_TM_HY3_LABEL', 'Hy-tek Team Manager') ;
+define('WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE', '.tm.hy3') ;
+define('WPST_FILE_FORMAT_HYTEK_MM_HY3_LABEL', 'Hy-tek Meet Manager') ;
+define('WPST_FILE_FORMAT_HYTEK_MM_HY3_VALUE', '.mm.hy3') ;
 define('WPST_FILE_FORMAT_HYTEK_CL2_LABEL', 'Hy-tek CL2') ;
 define('WPST_FILE_FORMAT_HYTEK_CL2_VALUE', 'cl2') ;
 
