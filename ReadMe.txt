@@ -3,7 +3,7 @@ Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
 Requires at least: 3.1
-Tested up to: 3.3.1
+Tested up to: 3.4.1
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -27,10 +27,12 @@ features include:
 * Report Generator
 * CSV Export for Reports and Roster
 * SDIF (SD3) Export for Roster
+* SDIF (SD3) Export for Meet Entries
+* Hy-tek (HY3) Export for Roster
+* Hy-tek (HY3) Export for Meet Entries
 * Short Code for Google Maps
 * Short Code for Opponent Profiles
 * Short Code for Meet Schedule
-* Short Code for Flickr Photo Gallery
 * Volunteer Signup and Management
 * Opt-In/Opt-Out System for Meet Participation
 * Volunteer registration and reporting
@@ -63,6 +65,10 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.35 =
+* Included full swimmer profile in HTML version of Registration Email so it will pick up all of the optional swimmer fields.  The Plain Text email remains very simple.
+* Fixed bug which appeared in Rosters and/or My Swimmers when zero swimmers were present in the system (aka new installation).
 
 = 1.34 =
 * Second phase of Hy-tek Meet Entries Export completed.  Meet entries can be exported to Hy-tek Team Manager in HY3 format.

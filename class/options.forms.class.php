@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: options.forms.class.php 896 2012-06-04 01:39:57Z mpwalsh8 $
+ * $Id: options.forms.class.php 967 2012-08-03 03:31:54Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Options
- * @version $Revision: 896 $
+ * @version $Revision: 967 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-06-03 21:39:57 -0400 (Sun, 03 Jun 2012) $
+ * @lastmodifiedby $Date: 2012-08-02 23:31:54 -0400 (Thu, 02 Aug 2012) $
  *
  */
 
@@ -433,6 +433,9 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
 
         $swimmeroptionalfields = new FENumberInRange('Swimmer Optional Fields', true, '100px');
         $this->add_element($swimmeroptionalfields) ;
+
+        //$emailswimmeroptionalfields = new FEYesNoListBox('Email Swimmer Optional Fields', true, '75px') ;
+        //$this->add_element($emailswimmeroptionalfields) ;
     }
 
     /**
@@ -459,6 +462,7 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         $this->set_element_value('Registration Fee Policy URL', $options->getRegistrationFeePolicyURL()) ;
         $this->set_element_value('User Optional Fields', $options->getUserOptionalFields()) ;
         $this->set_element_value('Swimmer Optional Fields', $options->getSwimmerOptionalFields()) ;
+        //$this->set_element_value('Email Swimmer Optional Fields', $options->getEmailSwimmerOptionalFields()) ;
     }
 
 
@@ -509,6 +513,9 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         $table->add_row($this->element_label('Swimmer Optional Fields'),
             $this->element_form('Swimmer Optional Fields')) ;
 
+        //$table->add_row($this->element_label('Email Swimmer Optional Fields'),
+            //$this->element_form('Email Swimmer Optional Fields')) ;
+
         $this->add_form_block(null, $table) ;
     }
 
@@ -547,6 +554,7 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
         $options->setRegistrationFeePolicyURL($this->get_element_value('Registration Fee Policy URL')) ;
         $options->setUserOptionalFields($this->get_element_value('User Optional Fields')) ;
         $options->setSwimmerOptionalFields($this->get_element_value('Swimmer Optional Fields')) ;
+        //$options->setEmailSwimmerOptionalFields($this->get_element_value('Email Swimmer Optional Fields')) ;
         $options->updateOptions() ;
 
         $this->set_action_message('Swim Team options updated.') ; 

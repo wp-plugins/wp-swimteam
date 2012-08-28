@@ -3,15 +3,15 @@
 /**
  * AgeGroup classes.
  *
- * $Id: agegroups.class.php 932 2012-07-02 18:12:35Z mpwalsh8 $
+ * $Id: agegroups.class.php 970 2012-08-28 18:39:22Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage AgeGroups
- * @version $Revision: 932 $
- * @lastmodified $Date: 2012-07-02 14:12:35 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 970 $
+ * @lastmodified $Date: 2012-08-28 14:39:22 -0400 (Tue, 28 Aug 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -625,15 +625,15 @@ class SwimTeamAgeGroup extends SwimTeamDBI
 
         //  Make sure we have some data
 
+        $totals = array(
+            'swimmers' => 0
+           ,WPST_GENDER_MALE => 0
+           ,WPST_GENDER_FEMALE => 0
+           ,'agegroups' => array()
+        ) ;
+
         if (count($agegroups) > 0)
         {
-            $totals = array(
-                'swimmers' => 0
-               ,WPST_GENDER_MALE => 0
-               ,WPST_GENDER_FEMALE => 0
-               ,'agegroups' => array()
-            ) ;
-
             $agegrouptotals = &$totals['agegroups'] ;
 
             foreach ($agegroups as $agegroup)

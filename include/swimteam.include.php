@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 951 2012-07-06 19:49:12Z mpwalsh8 $
+ * $Id: swimteam.include.php 964 2012-08-03 02:44:00Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,8 +13,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 951 $
- * @lastmodified $Date: 2012-07-06 15:49:12 -0400 (Fri, 06 Jul 2012) $
+ * @version $Revision: 964 $
+ * @lastmodified $Date: 2012-08-02 22:44:00 -0400 (Thu, 02 Aug 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -219,6 +219,7 @@ define('WPST_DEFAULT_USER_OPTION_LABEL', 'Optional Field #') ;
 define('WPST_DEFAULT_SWIMMER_OPTION_COUNT', 5) ;
 define('WPST_DEFAULT_SWIMMER_OPTION', WPST_DISABLED) ;
 define('WPST_DEFAULT_SWIMMER_OPTION_LABEL', 'Optional Field #') ;
+define('WPST_DEFAULT_EMAIL_SWIMMER_OPTIONAL_FIELDS', WPST_NO) ;
 define('WPST_DEFAULT_REG_PREFIX_LABEL', WPST_NULL_STRING) ;
 define('WPST_DEFAULT_REG_FEE_LABEL', 'Registation Fee') ;
 define('WPST_DEFAULT_REG_FEE_CURRENCY_LABEL', '$') ;
@@ -304,6 +305,7 @@ define('WPST_OPTION_SWIMMER_USONLY', WPST_OPTION_PREFIX . 'usonly') ;
 //define('WPST_OPTION_SWIMMER_STATE_OR_PROVINCE_LABEL', WPST_OPTION_PREFIX . 'swimmer_stateorprovince_label') ;
 //define('WPST_OPTION_SWIMMER_POSTAL_CODE_LABEL', WPST_OPTION_PREFIX . 'swimmer_postalcode_label') ;
 define('WPST_OPTION_SWIMMER_OPTION_COUNT', WPST_OPTION_PREFIX . 'swimmer_option_count') ;
+define('WPST_OPTION_EMAIL_SWIMMER_OPTIONAL_FIELDS', WPST_OPTION_PREFIX . 'email_swimmer_optional_fields') ;
 
 //  Define the swimmer options - how many?
 //  Define constants based on default or WordPress option.

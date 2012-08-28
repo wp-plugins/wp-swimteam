@@ -3,15 +3,15 @@
 /**
  * Season classes.
  *
- * $Id: roster.class.php 960 2012-07-09 20:59:28Z mpwalsh8 $
+ * $Id: roster.class.php 968 2012-08-03 03:32:34Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Roster
- * @version $Revision: 960 $
- * @lastmodified $Date: 2012-07-09 16:59:28 -0400 (Mon, 09 Jul 2012) $
+ * @version $Revision: 968 $
+ * @lastmodified $Date: 2012-08-02 23:32:34 -0400 (Thu, 02 Aug 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -460,6 +460,8 @@ class SwimTeamRoster extends SwimTeamDBI
         $headers .= sprintf("Reply-To: %s", get_bloginfo('admin_email')) . "\r\n" ;
         $headers .= sprintf("X-Mailer: PHP/%s", phpversion()) ;
 
+        //  HTML Mode?
+
         if ($mode == WPST_HTML)
         {
             $html = '
@@ -475,11 +477,6 @@ class SwimTeamRoster extends SwimTeamDBI
                 You have successfully %sregistered %s %s swim team.
                 </p>
                 <h3>Swimmer Information</h3>
-                Name:  %s<br/>
-                Birthdate:  %s<br/>
-                Age:  %s<br/>
-                Age Group:  %s<br/>
-                <h3>Parent Contact Information</h3>
                 <p>%s</p>
                 <p>
                 <h3>Important Swim Team Links</h3>
@@ -499,10 +496,9 @@ class SwimTeamRoster extends SwimTeamDBI
                 </html>
                 ' ;
 
-            $profile = new SwimTeamUserProfileInfoTable("") ;
-            //$profile->setId($userdata->ID) ;
-            $profile->setId($swimmer->getContact1Id()) ;
-            $profile->buildProfile() ;
+            $profile = new SwimTeamSwimmerProfileInfoTable("") ;
+            $profile->setId($this->getSwimmerId()) ;
+            $profile->constructSwimmerProfile() ;
 
             $message = sprintf($html,
                 get_bloginfo('url'),
@@ -510,10 +506,6 @@ class SwimTeamRoster extends SwimTeamDBI
                 ($action == WPST_ACTION_REGISTER) ? $regprefix : "un",
                 $swimmer->getFirstName() . " " . $swimmer->getLastName(),
                 ($action == WPST_ACTION_REGISTER) ? "for" : "from",
-                $swimmer->getFirstName() . " " . $swimmer->getLastName(),
-                $swimmer->getDateOfBirthAsDate(),
-                $swimmer->getAge(),
-                $swimmer->getAgeGroupText(),
                 $profile->render(),
                 get_bloginfo('url'),
                 get_bloginfo('url'),
@@ -564,6 +556,7 @@ class SwimTeamRoster extends SwimTeamDBI
             $swimmer->getFirstName() . " " . $swimmer->getLastName()) ;
 
         $status = wp_mail($to, $subject, $message, $headers) ;
+        //$status = wpst_preprint_r($to, $subject, $message, $headers) ;
 
         return $status ;
     }

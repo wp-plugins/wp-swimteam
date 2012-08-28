@@ -3,15 +3,15 @@
 /**
  * Options classes.
  *
- * $Id: options.class.php 896 2012-06-04 01:39:57Z mpwalsh8 $
+ * $Id: options.class.php 965 2012-08-03 02:45:17Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Options
- * @version $Revision: 896 $
- * @lastmodified $Date: 2012-06-03 21:39:57 -0400 (Sun, 03 Jun 2012) $
+ * @version $Revision: 965 $
+ * @lastmodified $Date: 2012-08-02 22:45:17 -0400 (Thu, 02 Aug 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -274,6 +274,11 @@ class SwimTeamOptions extends SwimTeamDBI
      * swimmer optional fields
      */
     var $__swimmer_optional_fields ;
+
+    /**
+     * email swimmer optional fields
+     */
+    var $__email_swimmer_optional_fields ;
 
     /**
      * Set the usonly property - true or false
@@ -1259,6 +1264,26 @@ class SwimTeamOptions extends SwimTeamDBI
     }
 
     /**
+     * Set the number of swimmer optional fields
+     *
+     * @param - string - email swimmer optional fields state
+     */
+    function setEmailSwimmerOptionalFields($state)
+    {
+        $this->__email_swimmer_optional_fields = $state ;
+    }
+
+    /**
+     * Get the number of swimmer optional fields
+     *
+     * @return - string - email swimmer optional fields state
+     */
+    function getEmailSwimmerOptionalFields()
+    {
+        return ($this->__email_swimmer_optional_fields) ;
+    }
+
+    /**
      * load Options
      *
      * Load the option values from the WordPress database.
@@ -1939,6 +1964,20 @@ class SwimTeamOptions extends SwimTeamDBI
             } 
         }
 
+        //  Email Swimmer Optional Fields
+        $option = get_option(WPST_OPTION_EMAIL_SWIMMER_OPTIONAL_FIELDS) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setEmailSwimmerOptionalFields($option) ;
+        }
+        else
+        {
+            $this->setEmailSwimmerOptionalFields(WPST_DEFAULT_EMAIL_SWIMMER_OPTIONAL_FIELDS) ;
+            update_option(WPST_OPTION_EMAIL_SWIMMER_OPTIONAL_FIELDS, WPST_DEFAULT_EMAIL_SWIMMER_OPTIONAL_FIELDS) ;
+        }
+
         //  opt in label
         $option = get_option(WPST_OPTION_OPT_IN_LABEL) ;
 
@@ -2102,6 +2141,7 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_REG_FEE_URL, $this->getRegistrationFeePolicyURL()) ;
         update_option(WPST_OPTION_USER_OPTION_COUNT, $this->getUserOptionalFields()) ;
         update_option(WPST_OPTION_SWIMMER_OPTION_COUNT, $this->getSwimmerOptionalFields()) ;
+        update_option(WPST_OPTION_EMAIL_SWIMMER_OPTIONAL_FIELDS, $this->getEmailSwimmerOptionalFields()) ;
 
         //  How many user options does this configuration support?
 
