@@ -66,6 +66,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.36 =
+* Fixed bug on Jobs tab which prevented Users from signing up for jobs.
+
 = 1.35 =
 * Included full swimmer profile in HTML version of Registration Email so it will pick up all of the optional swimmer fields.  The Plain Text email remains very simple.
 * Fixed bug which appeared in Rosters and/or My Swimmers when zero swimmers were present in the system (aka new installation).

@@ -3,24 +3,24 @@
 /**
  * Job classes.
  *
- * $Id: jobs.class.php 941 2012-07-02 21:07:26Z mpwalsh8 $
+ * $Id: jobs.class.php 973 2012-08-29 13:37:57Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Jobs
- * @version $Revision: 941 $
- * @lastmodified $Date: 2012-07-02 17:07:26 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 973 $
+ * @lastmodified $Date: 2012-08-29 09:37:57 -0400 (Wed, 29 Aug 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once("db.class.php") ;
-require_once("jobs.include.php") ;
-require_once("users.class.php") ;
-require_once("table.class.php") ;
-require_once("widgets.class.php") ;
+require_once('db.class.php') ;
+require_once('jobs.include.php') ;
+require_once('users.class.php') ;
+require_once('table.class.php') ;
+require_once('widgets.class.php') ;
 
 /**
  * Class definition of the jobs
@@ -293,11 +293,11 @@ class SwimTeamJob extends SwimTeamDBI
     function jobExistByPosition($jobid = null)
     {
         if (is_null($jobid))
-            $query = sprintf("SELECT jobposition FROM %s WHERE
-                jobposition=\"%s\"", WPST_JOBS_TABLE, $this->getJobPosition()) ;
+            $query = sprintf('SELECT jobposition FROM %s WHERE
+                jobposition="%s"', WPST_JOBS_TABLE, $this->getJobPosition()) ;
         else
-            $query = sprintf("SELECT jobposition FROM %s WHERE
-            jobid=\"%s\" AND jobposition=\"%s\"", WPST_JOBS_TABLE,
+            $query = sprintf('SELECT jobposition FROM %s WHERE
+            jobid="%s" AND jobposition="%s"', WPST_JOBS_TABLE,
             $jobid, $this->getJobPosition()) ;
 
 	    //  Is position already in the database?
@@ -326,7 +326,7 @@ class SwimTeamJob extends SwimTeamDBI
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT jobid FROM %s WHERE jobid = \"%s\"",
+        $query = sprintf('SELECT jobid FROM %s WHERE jobid = "%s"',
             WPST_JOBS_TABLE, $id) ;
 
         $this->setQuery($query) ;
@@ -352,15 +352,15 @@ class SwimTeamJob extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET
-                jobposition=\"%s\",
-                jobdescription=\"%s\",
-                jobnotes=\"%s\",
-                jobduration=\"%s\",
-                jobtype=\"%s\",
-                joblocation=\"%s\",
-                jobcredits=\"%s\",
-                jobstatus=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET
+                jobposition="%s",
+                jobdescription="%s",
+                jobnotes="%s",
+                jobduration="%s",
+                jobtype="%s",
+                joblocation="%s",
+                jobcredits="%s",
+                jobstatus="%s"',
                 WPST_JOBS_TABLE,
                 $this->getJobPosition(),
                 $this->getJobDescription(),
@@ -390,16 +390,16 @@ class SwimTeamJob extends SwimTeamDBI
         {
             //  Construct the insert query
  
-            $query = sprintf("UPDATE %s SET
-                jobposition=\"%s\",
-                jobdescription=\"%s\",
-                jobnotes=\"%s\",
-                jobduration=\"%s\",
-                jobtype=\"%s\",
-                joblocation=\"%s\",
-                jobcredits=\"%s\",
-                jobstatus=\"%s\"
-                WHERE jobid=\"%s\"",
+            $query = sprintf('UPDATE %s SET
+                jobposition="%s",
+                jobdescription="%s",
+                jobnotes="%s",
+                jobduration="%s",
+                jobtype="%s",
+                joblocation="%s",
+                jobcredits="%s",
+                jobstatus="%s"
+                WHERE jobid="%s"',
                 WPST_JOBS_TABLE,
                 $this->getJobPosition(),
                 $this->getJobDescription(),
@@ -416,7 +416,7 @@ class SwimTeamJob extends SwimTeamDBI
         }
         else
         {
-            wp_die("Unable to update job record.") ;
+            wp_die('Unable to update job record.') ;
         }
 
         return $success ;
@@ -451,14 +451,14 @@ class SwimTeamJob extends SwimTeamDBI
 
             foreach ($jaids as $jaid)
             {
-                $ja->setJobAllocationId($jaid["joballocationid"]) ;
-                $ja->loadJobAllocationByJobAllocationId($jaid["joballocationid"]) ;
+                $ja->setJobAllocationId($jaid['joballocationid']) ;
+                $ja->loadJobAllocationByJobAllocationId($jaid['joballocationid']) ;
                 $ja->deallocateJob() ;
             }
 
             //  Construct the delete query and update the allocation
  
-            $query = sprintf("DELETE FROM %s WHERE jobid=\"%s\"",
+            $query = sprintf('DELETE FROM %s WHERE jobid="%s"',
                 WPST_JOBS_TABLE, $this->getJobId()) ;
 
             $this->setQuery($query) ;
@@ -490,7 +490,7 @@ class SwimTeamJob extends SwimTeamDBI
         //  Make sure it is a legal job id
         if ($this->jobExistById())
         {
-            $query = sprintf("SELECT * FROM %s WHERE jobid = \"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE jobid = "%s"',
                 WPST_JOBS_TABLE, $id) ;
 
             $this->setQuery($query) ;
@@ -525,16 +525,16 @@ class SwimTeamJob extends SwimTeamDBI
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT %s.jobid FROM %s",
+        $query = sprintf('SELECT %s.jobid FROM %s',
                 WPST_JOBS_TABLE, WPST_JOBS_TABLE) ;
 
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        if (is_null($orderby) || ($orderby == ""))
-            $orderby = sprintf("%s.%s", WPST_JOBS_TABLE, "jobposition") ;
+        if (is_null($orderby) || ($orderby == ''))
+            $orderby = sprintf('%s.%s', WPST_JOBS_TABLE, 'jobposition') ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -568,14 +568,6 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
     ) ;
 
     /**
-     * Property to store the possible actions - used to build buttons
-     */
-    //var $__actions = array(
-    //     WPST_ACTION_PROFILE => WPST_ACTION_PROFILE
-    //    //,WPST_ACTION_SIGN_UP => WPST_ACTION_SIGN_UP
-    //) ;
-
-    /**
      * The constructor
      *
      * @param string - the title of the data list
@@ -586,7 +578,7 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimTeamJobsGUIDataList($title, $width = "100%",
+    function SwimTeamJobsGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_JOBS_DEFAULT_COLUMNS,
         $tables = WPST_JOBS_DEFAULT_TABLES,
@@ -604,7 +596,7 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
 
         if ((current_user_can('edit_posts') || get_option(WPST_OPTION_JOB_SIGN_UP) == WPST_USER))
         {
-            $this->__actions[WPST_ACTION_SIGN_UP] = WPST_ACTION_SIGN_UP ;
+            $this->__normal_actions[WPST_ACTION_SIGN_UP] = WPST_ACTION_SIGN_UP ;
         }
 
     }
@@ -624,17 +616,17 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
 		//add the columns in the display that you want to view.
 		//The API is :
 		//Title, width, DB column name, field SORTABLE?, field SEARCHABLE?, align
-		$this->add_header_item("Position",
-	       	    "225", "jobposition", SORTABLE, SEARCHABLE, "left") ;
+		$this->add_header_item('Position',
+	       	    '225', 'jobposition', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Location",
-	         	    "75", "joblocation", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Location',
+	         	    '75', 'joblocation', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Duration",
-	         	    "100", "jobduration", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Duration',
+	         	    '100', 'jobduration', SORTABLE, SEARCHABLE, 'left') ;
 
-	  	$this->add_header_item("Credits",
-	         	    "75", "jobcredits", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Credits',
+	         	    '75', 'jobcredits', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
  
@@ -653,7 +645,7 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
 
         //  The unique item is the second column.
 
-	    $this->add_action_column('radio', 'FIRST', "jobid") ;
+	    $this->add_action_column('radio', 'FIRST', 'jobid') ;
 
         //  we have to be in POST mode, or we could run out
         //  of space in the http request with the saved
@@ -685,35 +677,35 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
 		switch ($col_name)
         {
                 /*
-            case "Updated" :
-                $obj = strftime("%Y-%m-%d @ %T", (int)$row_data["updated"]) ;
+            case 'Updated' :
+                $obj = strftime('%Y-%m-%d @ %T', (int)$row_data['updated']) ;
                 break ;
                 */
 
-            case "Type" :
-                $obj = ucwords($row_data["jobtype"]) ;
+            case 'Type' :
+                $obj = ucwords($row_data['jobtype']) ;
                 break ;
 
-            case "Location" :
-                if ($row_data["joblocation"] == WPST_NA)
-                    $obj = strtoupper($row_data["joblocation"]) ;
+            case 'Location' :
+                if ($row_data['joblocation'] == WPST_NA)
+                    $obj = strtoupper($row_data['joblocation']) ;
                 else
-                    $obj = ucwords($row_data["joblocation"]) ;
+                    $obj = ucwords($row_data['joblocation']) ;
                 break ;
 
-            case "Duration" :
-                $obj = ucwords($row_data["jobduration"]) ;
+            case 'Duration' :
+                $obj = ucwords($row_data['jobduration']) ;
                 break ;
 
-            case "Status" :
-                $obj = ucwords($row_data["jobstatus"]) ;
+            case 'Status' :
+                $obj = ucwords($row_data['jobstatus']) ;
                 break ;
 
-            case "Credits" :
-                if ($row_data["jobtype"] == WPST_JOB_TYPE_PAID)
+            case 'Credits' :
+                if ($row_data['jobtype'] == WPST_JOB_TYPE_PAID)
                     $obj = __(strtoupper(WPST_NA)) ;
                 else
-                    $obj = $row_data["jobcredits"] ;
+                    $obj = $row_data['jobcredits'] ;
                 break ;
 
 		    default:
@@ -767,7 +759,7 @@ class SwimTeamJobsAdminGUIDataList extends SwimTeamJobsGUIDataList
      * @param string - tables to query from database
      * @param string - where clause for database query
      */
-    function SwimTeamJobsAdminGUIDataList($title, $width = "100%",
+    function SwimTeamJobsAdminGUIDataList($title, $width = '100%',
         $default_orderby='', $default_reverseorder=FALSE,
         $columns = WPST_JOBS_DEFAULT_COLUMNS,
         $tables = WPST_JOBS_DEFAULT_TABLES,
@@ -780,10 +772,10 @@ class SwimTeamJobsAdminGUIDataList extends SwimTeamJobsGUIDataList
         //  declaration.
 
         /*
-        $this->__actions[WPST_ACTION_ALLOCATE_JOBS_SEASON] = WPST_ACTION_ALLOCATE . " (" . WPST_SEASON . ")" ;
-        $this->__actions[WPST_ACTION_ALLOCATE_JOBS_SWIMMEET] = WPST_ACTION_ALLOCATE . " (" . WPST_SWIMMEET . ")" ;
-        $this->__actions[WPST_ACTION_ASSIGN_JOBS_SEASON] = WPST_ACTION_ASSIGN . " (" . WPST_SEASON . ")" ;
-        $this->__actions[WPST_ACTION_ASSIGN_JOBS_SWIMMEET] = WPST_ACTION_ASSIGN . " (" . WPST_SWIMMEET . ")" ;
+        $this->__actions[WPST_ACTION_ALLOCATE_JOBS_SEASON] = WPST_ACTION_ALLOCATE . " (' . WPST_SEASON . ')' ;
+        $this->__actions[WPST_ACTION_ALLOCATE_JOBS_SWIMMEET] = WPST_ACTION_ALLOCATE . ' (' . WPST_SWIMMEET . ')' ;
+        $this->__actions[WPST_ACTION_ASSIGN_JOBS_SEASON] = WPST_ACTION_ASSIGN . ' (' . WPST_SEASON . ')' ;
+        $this->__actions[WPST_ACTION_ASSIGN_JOBS_SWIMMEET] = WPST_ACTION_ASSIGN . ' (' . WPST_SWIMMEET . ')' ;
          */
     }
 
@@ -802,8 +794,8 @@ class SwimTeamJobsAdminGUIDataList extends SwimTeamJobsGUIDataList
     {
         parent::user_setup() ;
 
-	  	$this->add_header_item("Status",
-	         	    "100", "jobstatus", SORTABLE, SEARCHABLE, "left") ;
+	  	$this->add_header_item('Status',
+	         	    '100', 'jobstatus', SORTABLE, SEARCHABLE, 'left') ;
     }
 }
 
@@ -852,7 +844,7 @@ class SwimTeamJobProfileInfoTable extends SwimTeamInfoTable
 
         if (is_null($jobid))
         {
-            $this->add_row("No data.") ;
+            $this->add_row('No data.') ;
         }
         else
         {
@@ -862,13 +854,13 @@ class SwimTeamJobProfileInfoTable extends SwimTeamInfoTable
             $job = new SwimTeamJob() ;
             $job->loadJobByJobId($jobid) ;
 
-            $this->add_row("Position", $job->getJobPosition()) ;
-            $this->add_row("Description", $job->getJobDescription()) ;
-            $this->add_row("Duration", ucwords($job->getJobDuration())) ;
-            $this->add_row("Type", ucwords($job->getJobType())) ;
-            $this->add_row("Location", ucwords($job->getJobLocation())) ;
-            $this->add_row("Credits", $job->getJobCredits()) ;
-            $this->add_row("Status", ucwords($job->getJobStatus())) ;
+            $this->add_row('Position', $job->getJobPosition()) ;
+            $this->add_row('Description', $job->getJobDescription()) ;
+            $this->add_row('Duration', ucwords($job->getJobDuration())) ;
+            $this->add_row('Type', ucwords($job->getJobType())) ;
+            $this->add_row('Location', ucwords($job->getJobLocation())) ;
+            $this->add_row('Credits', $job->getJobCredits()) ;
+            $this->add_row('Status', ucwords($job->getJobStatus())) ;
         }
     }
 }
@@ -995,7 +987,7 @@ class SwimTeamJobAllocation extends SwimTeamJob
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT joballocationid FROM %s WHERE joballocationid=\"%s\"",
+        $query = sprintf('SELECT joballocationid FROM %s WHERE joballocationid="%s"',
             WPST_JOB_ALLOCATIONS_TABLE, $id) ;
 
         $this->setQuery($query) ;
@@ -1018,8 +1010,8 @@ class SwimTeamJobAllocation extends SwimTeamJob
     {
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT joballocationid FROM %s WHERE jobid=\"%s\"
-            AND meetid=\"%s\"", WPST_JOB_ALLOCATIONS_TABLE, $this->getJobId(),
+        $query = sprintf('SELECT joballocationid FROM %s WHERE jobid="%s"
+            AND meetid="%s"', WPST_JOB_ALLOCATIONS_TABLE, $this->getJobId(),
             $this->getMeetId()) ;
 
         $this->setQuery($query) ;
@@ -1042,8 +1034,8 @@ class SwimTeamJobAllocation extends SwimTeamJob
     {
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT joballocationid FROM %s WHERE jobid=\"%s\"
-            AND seasonid=\"%s\" AND meetid=\"%s\"", WPST_JOB_ALLOCATIONS_TABLE,
+        $query = sprintf('SELECT joballocationid FROM %s WHERE jobid="%s"
+            AND seasonid="%s" AND meetid="%s"', WPST_JOB_ALLOCATIONS_TABLE,
             $this->getJobId(), $this->getSeasonId(), $this->getMeetId()) ;
 
         $this->setQuery($query) ;
@@ -1070,11 +1062,11 @@ class SwimTeamJobAllocation extends SwimTeamJob
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET
-                jobid=\"%s\",
-                jobquantity=\"%s\",
-                seasonid=\"%s\",
-                meetid=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET
+                jobid="%s",
+                jobquantity="%s",
+                seasonid="%s",
+                meetid="%s"',
                 WPST_JOB_ALLOCATIONS_TABLE,
                 $this->getJobId(),
                 $this->getJobQuantity(),
@@ -1117,11 +1109,11 @@ class SwimTeamJobAllocation extends SwimTeamJob
         {
             //  Construct the update query
  
-            $query = sprintf("UPDATE %s
-                SET jobquantity=\"%s\"
-                WHERE jobid=\"%s\"
-                AND seasonid=\"%s\"
-                AND meetid=\"%s\"",
+            $query = sprintf('UPDATE %s
+                SET jobquantity="%s"
+                WHERE jobid="%s"
+                AND seasonid="%s"
+                AND meetid="%s"',
                 WPST_JOB_ALLOCATIONS_TABLE,
                 $this->getJobQuantity(),
                 $this->getJobId(),
@@ -1166,7 +1158,7 @@ class SwimTeamJobAllocation extends SwimTeamJob
                     {
                         if ($i++ < (count($jaids) - $desired))
                         {
-                            $ja->setJobAssignmentId($jaid["jobassignmentid"]) ;
+                            $ja->setJobAssignmentId($jaid['jobassignmentid']) ;
                             $ja->deleteJobAssignment() ;
                         }
                         else
@@ -1215,14 +1207,14 @@ class SwimTeamJobAllocation extends SwimTeamJob
 
             foreach ($jaids as $jaid)
             {
-                $ja->setJobAssignmentId($jaid["jobassignmentid"]) ;
+                $ja->setJobAssignmentId($jaid['jobassignmentid']) ;
                 $ja->deleteJobAssignment() ;
             }
 
             //  Construct the delete query and update the allocation
  
-            $query = sprintf("DELETE FROM %s
-                WHERE joballocationid=\"%s\"",
+            $query = sprintf('DELETE FROM %s
+                WHERE joballocationid="%s"',
                 WPST_JOB_ALLOCATIONS_TABLE,
                 $this->getJobAllocationId()) ;
 
@@ -1232,7 +1224,7 @@ class SwimTeamJobAllocation extends SwimTeamJob
         /*
         else if ($this->jobAllocationExistById())
         {
-            die("here") ;
+            die('here') ;
             //  Need the full record before deleting it
 
             $this->loadJobAllocationByJobAllocationId() ;
@@ -1250,14 +1242,14 @@ class SwimTeamJobAllocation extends SwimTeamJob
 
             foreach ($jaids as $jaid)
             {
-                $ja->setJobAssignmentId($jaid["jobassignmentid"]) ;
+                $ja->setJobAssignmentId($jaid['jobassignmentid']) ;
                 $ja->deleteJobAssignment() ;
             }
 
             //  Construct the delete query and update the allocation
  
-            $query = sprintf("DELETE FROM %s
-                WHERE joballocationid=\"%s\"",
+            $query = sprintf('DELETE FROM %s
+                WHERE joballocationid="%s"',
                 WPST_JOB_ALLOCATIONS_TABLE,
                 $this->getJobAllocationId()) ;
 
@@ -1290,7 +1282,7 @@ class SwimTeamJobAllocation extends SwimTeamJob
         //  Make sure it is a legal job id
         if ($this->jobAllocationExistById())
         {
-            $query = sprintf("SELECT * FROM %s WHERE joballocationid = \"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE joballocationid = "%s"',
                 WPST_JOB_ALLOCATIONS_TABLE, $id) ;
 
             $this->setQuery($query) ;
@@ -1330,7 +1322,7 @@ class SwimTeamJobAllocation extends SwimTeamJob
         //  Make sure it is a legal job id
         if ($this->jobAllocationExistByJobIdAndMeetId())
         {
-            $query = sprintf("SELECT * FROM %s WHERE jobid=\"%s\" AND meetid=\"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE jobid="%s" AND meetid="%s"',
                 WPST_JOB_ALLOCATIONS_TABLE, $jobid, $meetid) ;
 
             $this->setQuery($query) ;
@@ -1373,8 +1365,8 @@ class SwimTeamJobAllocation extends SwimTeamJob
         //  Make sure it is a legal job id
         if ($this->jobAllocationExistByJobIdSeasonIdAndMeetId())
         {
-            $query = sprintf("SELECT * FROM %s WHERE
-                jobid=\"%s\" AND seasonid = \"%s\" AND meetid=\"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE
+                jobid="%s" AND seasonid="%s" AND meetid="%s"',
                 WPST_JOB_ALLOCATIONS_TABLE, $jobid, $seasonid, $meetid) ;
 
             $this->setQuery($query) ;
@@ -1406,8 +1398,8 @@ class SwimTeamJobAllocation extends SwimTeamJob
 
         //  Select the records for the meet
 
-        $query = sprintf("SELECT %s.jobid FROM %s, %s WHERE %s.meetid=\"%s\"
-            AND %s.jobid = %s.jobid ORDER BY %s.jobposition",
+        $query = sprintf('SELECT %s.jobid FROM %s, %s WHERE %s.meetid="%s"
+            AND %s.jobid = %s.jobid ORDER BY %s.jobposition',
             WPST_JOB_ALLOCATIONS_TABLE, WPST_JOBS_TABLE,
             WPST_JOB_ALLOCATIONS_TABLE, WPST_JOB_ALLOCATIONS_TABLE, $id,
             WPST_JOB_ALLOCATIONS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE) ;
@@ -1430,16 +1422,16 @@ class SwimTeamJobAllocation extends SwimTeamJob
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT %s.joballocationid FROM %s",
+        $query = sprintf('SELECT %s.joballocationid FROM %s',
                 WPST_JOB_ALLOCATIONS_TABLE, WPST_JOB_ALLOCATIONS_TABLE) ;
 
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        if (is_null($orderby) || ($orderby == ""))
-            $orderby = sprintf("%s.%s", WPST_JOB_ALLOCATIONS_TABLE, "joballocationid") ;
+        if (is_null($orderby) || ($orderby == ''))
+            $orderby = sprintf('%s.%s', WPST_JOB_ALLOCATIONS_TABLE, 'joballocationid') ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -1459,10 +1451,10 @@ class SwimTeamJobAllocation extends SwimTeamJob
     {
         if (is_null($id)) $id = $this->getJobId() ;
 
-        if (is_null($id)) wp_die("Null Job Id") ;
+        if (is_null($id)) wp_die('Null Job Id') ;
 
-        $filter = sprintf("%s.%s = \"%s\"",
-            WPST_JOB_ALLOCATIONS_TABLE, "jobid", $id) ;
+        $filter = sprintf('%s.%s = "%s"',
+            WPST_JOB_ALLOCATIONS_TABLE, 'jobid', $id) ;
 
         return $this->getAllJobAllocationIds($filter) ;
     }
@@ -1590,7 +1582,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT jobassignmentid FROM %s WHERE jobassignmentid=\"%s\"",
+        $query = sprintf('SELECT jobassignmentid FROM %s WHERE jobassignmentid="%s"',
             WPST_JOB_ASSIGNMENTS_TABLE, $id) ;
 
         $this->setQuery($query) ;
@@ -1616,7 +1608,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT jobassignmentid FROM %s WHERE joballocationid=\"%s\"",
+        $query = sprintf('SELECT jobassignmentid FROM %s WHERE joballocationid="%s"',
             WPST_JOB_ASSIGNMENTS_TABLE, $id) ;
 
         $this->setQuery($query) ;
@@ -1639,8 +1631,8 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
     {
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT jobassignmentid FROM %s WHERE jobid=\"%s\"
-            AND meetid=\"%s\"", WPST_JOB_ASSIGNMENTS_TABLE, $this->getJobId(),
+        $query = sprintf('SELECT jobassignmentid FROM %s WHERE jobid="%s"
+            AND meetid="%s"', WPST_JOB_ASSIGNMENTS_TABLE, $this->getJobId(),
             $this->getMeetId()) ;
 
         $this->setQuery($query) ;
@@ -1663,8 +1655,8 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
     {
 	    //  Is id already in the database?
 
-        $query = sprintf("SELECT jobassignmentid FROM %s WHERE jobid=\"%s\"
-            AND seasonid=\"%s\" AND meetid=\"%s\"", WPST_JOB_ASSIGNMENTS_TABLE,
+        $query = sprintf('SELECT jobassignmentid FROM %s WHERE jobid="%s"
+            AND seasonid="%s" AND meetid="%s"', WPST_JOB_ASSIGNMENTS_TABLE,
             $this->getJobId(), $this->getSeasonId(), $this->getMeetId()) ;
 
         $this->setQuery($query) ;
@@ -1692,19 +1684,19 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         {
             //  Construct the insert query
  
-            $query = sprintf("INSERT INTO %s SET
-                jobid=\"%s\",
-                userid=\"%s\",
-                seasonid=\"%s\",
-                meetid=\"%s\",
-                committed=\"%s\",
-                joballocationid=\"%s\"",
+            $query = sprintf('INSERT INTO %s SET
+                jobid="%s",
+                userid="%s",
+                seasonid="%s",
+                meetid="%s",
+                committed="%s",
+                joballocationid="%s"',
                 WPST_JOB_ASSIGNMENTS_TABLE,
                 $this->getJobId(),
                 $this->getUserId(),
                 $this->getSeasonId(),
                 $this->getMeetId(),
-                date("Y-m-d H:m"),
+                date('Y-m-d H:m'),
                 $this->getJobAllocationId()) ;
 
             $this->setQuery($query) ;
@@ -1736,9 +1728,9 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
             //  Construct the update query
  
-            $query = sprintf("UPDATE %s
-                SET userid=\"%s\"
-                WHERE jobassignmentid=\"%s\"", WPST_JOB_ASSIGNMENTS_TABLE,
+            $query = sprintf('UPDATE %s
+                SET userid="%s"
+                WHERE jobassignmentid="%s"', WPST_JOB_ASSIGNMENTS_TABLE,
                 $userid, $this->getJobAssignmentId()) ;
 
             $this->setQuery($query) ;
@@ -1783,8 +1775,8 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         {
             //  Construct the update query
  
-            $query = sprintf("DELETE FROM %s
-                WHERE jobassignmentid=\"%s\"",
+            $query = sprintf('DELETE FROM %s
+                WHERE jobassignmentid="%s"',
                 WPST_JOB_ASSIGNMENTS_TABLE,
                 $this->getJobAssignmentId()) ;
 
@@ -1816,7 +1808,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Make sure it is a legal job id
         if ($this->jobAssignmentExistByJobAssignmentId())
         {
-            $query = sprintf("SELECT * FROM %s WHERE jobassignmentid = \"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE jobassignmentid = "%s"',
                 WPST_JOB_ASSIGNMENTS_TABLE, $id) ;
 
             $this->setQuery($query) ;
@@ -1857,7 +1849,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Make sure it is a legal job id
         if ($this->jobAssignmentExistByJobIdAndMeetId())
         {
-            $query = sprintf("SELECT * FROM %s WHERE jobid=\"%s\" AND meetid=\"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE jobid="%s" AND meetid="%s"',
                 WPST_JOB_ASSIGNMENTS_TABLE, $jobid, $meetid) ;
 
             $this->setQuery($query) ;
@@ -1901,8 +1893,8 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Make sure it is a legal job id
         if ($this->jobAssignmentExistByJobIdSeasonIdAndMeetId())
         {
-            $query = sprintf("SELECT * FROM %s WHERE
-                jobid=\"%s\" AND seasonid=\"%s\" AND meetid=\"%s\"",
+            $query = sprintf('SELECT * FROM %s WHERE
+                jobid="%s" AND seasonid="%s" AND meetid="%s"',
                 WPST_JOB_ASSIGNMENTS_TABLE, $jobid, $seasonid, $meetid) ;
 
             $this->setQuery($query) ;
@@ -1935,8 +1927,8 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
         //  Select the records for the meet
 
-        $query = sprintf("SELECT %s.jobid FROM %s, %s WHERE %s.meetid=\"%s\"
-            AND %s.jobid = %s.jobid ORDER BY %s.jobposition",
+        $query = sprintf('SELECT %s.jobid FROM %s, %s WHERE %s.meetid="%s"
+            AND %s.jobid = %s.jobid ORDER BY %s.jobposition',
             WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
             WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
             WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE) ;
@@ -1960,18 +1952,18 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Select the records for the meet
 
         if ($fullseasonjobs)
-            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
-                %s.meetid=\"%s\" AND %s.jobid = %s.jobid
-                ORDER BY %s.jobposition, %s.jobassignmentid",
+            $query = sprintf('SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.meetid="%s" AND %s.jobid = %s.jobid
+                ORDER BY %s.jobposition, %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE) ;
         else
-            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
-                %s.meetid=\"%s\" AND %s.jobid = %s.jobid AND
-                %s.jobduration != \"%s\" ORDER BY %s.jobposition,
-                %s.jobassignmentid",
+            $query = sprintf('SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.meetid="%s" AND %s.jobid = %s.jobid AND
+                %s.jobduration != "%s" ORDER BY %s.jobposition,
+                %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
@@ -1998,18 +1990,18 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Select the records for the meet
 
         if ($fullseasonjobs)
-            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
-                %s.userid=\"%s\" AND %s.meetid=\"%s\" AND %s.jobid = %s.jobid
-                ORDER BY %s.jobposition, %s.jobassignmentid",
+            $query = sprintf('SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid="%s" AND %s.meetid="%s" AND %s.jobid = %s.jobid
+                ORDER BY %s.jobposition, %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, $userid, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE) ;
         else
-            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
-                %s.userid=\"%s\" AND %s.meetid=\"%s\" AND %s.jobid = %s.jobid AND
-                %s.jobduration != \"%s\" ORDER BY %s.jobposition,
-                %s.jobassignmentid",
+            $query = sprintf('SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid="%s" AND %s.meetid="%s" AND %s.jobid = %s.jobid AND
+                %s.jobduration != "%s" ORDER BY %s.jobposition,
+                %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, $userid, WPST_JOB_ASSIGNMENTS_TABLE, $meetid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
@@ -2035,18 +2027,18 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Select the records for the meet
 
         if ($fullseasonjobs)
-            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
-                %s.userid=\"%s\" AND %s.jobid = %s.jobid
-                ORDER BY %s.jobposition, %s.jobassignmentid",
+            $query = sprintf('SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid="%s" AND %s.jobid = %s.jobid
+                ORDER BY %s.jobposition, %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE) ;
         else
-            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
-                %s.userid=\"%s\" AND %s.jobid = %s.jobid AND
-                %s.jobduration != \"%s\" ORDER BY %s.jobposition,
-                %s.jobassignmentid",
+            $query = sprintf('SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.userid="%s" AND %s.jobid = %s.jobid AND
+                %s.jobduration != "%s" ORDER BY %s.jobposition,
+                %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
@@ -2071,9 +2063,9 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
         if (is_null($seasonid)) $seasonid = $this->getSeasonId() ;
 
-        if (is_null($jobid) || is_null($seasonid)) wp_die("Invalid query.") ;
+        if (is_null($jobid) || is_null($seasonid)) wp_die('Invalid query.') ;
 
-        $filter = sprintf("%s.seasonid = \"%s\" AND %s.jobid = \"%s\"",
+        $filter = sprintf('%s.seasonid = "%s" AND %s.jobid = "%s"',
             WPST_JOB_ASSIGNMENTS_TABLE, $seasonid,
             WPST_JOB_ASSIGNMENTS_TABLE, $jobid) ;
 
@@ -2093,19 +2085,19 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Select the records for the meet
 
         if ($fullseason)
-            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
-                %s.seasonid=\"%s\" AND %s.jobid=%s.jobid AND
-                %s.meetid=\"%s\" ORDER BY %s.jobposition,
-                %s.jobassignmentid",
+            $query = sprintf('SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.seasonid="%s" AND %s.jobid=%s.jobid AND
+                %s.meetid="%s" ORDER BY %s.jobposition,
+                %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_NULL_ID, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE) ;
         else
-            $query = sprintf("SELECT %s.jobassignmentid FROM %s, %s WHERE
-                %s.seasonid=\"%s\" AND %s.jobid = %s.jobid
-                ORDER BY %s.jobposition, %s.jobassignmentid",
+            $query = sprintf('SELECT %s.jobassignmentid FROM %s, %s WHERE
+                %s.seasonid="%s" AND %s.jobid = %s.jobid
+                ORDER BY %s.jobposition, %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $id,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOBS_TABLE,
@@ -2132,19 +2124,19 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
         //  Select the records for the meet
 
         if ($fullseason)
-            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
-                %s.seasonid=\"%s\" AND %s.jobid=%s.jobid AND
-                %s.meetid=\"%s\" AND %s.userid=\"%s\" ORDER BY %s.jobposition,
-                %s.jobassignmentid",
+            $query = sprintf('SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.seasonid="%s" AND %s.jobid=%s.jobid AND
+                %s.meetid="%s" AND %s.userid="%s" ORDER BY %s.jobposition,
+                %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $seasonid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_NULL_ID, WPST_JOB_ASSIGNMENTS_TABLE,
                 $userid, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE) ;
         else
-            $query = sprintf("SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
-                %s.seasonid=\"%s\" AND %s.jobid = %s.jobid AND %s.userid=\"%s\"
-                ORDER BY %s.jobposition, %s.jobassignmentid",
+            $query = sprintf('SELECT DISTINCT %s.jobassignmentid FROM %s, %s WHERE
+                %s.seasonid="%s" AND %s.jobid = %s.jobid AND %s.userid="%s"
+                ORDER BY %s.jobposition, %s.jobassignmentid',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE, $seasonid,
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOBS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE,
@@ -2168,16 +2160,16 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
     {
         //  Select the records for the season
 
-        $query = sprintf("SELECT %s.jobassignmentid FROM %s",
+        $query = sprintf('SELECT %s.jobassignmentid FROM %s',
                 WPST_JOB_ASSIGNMENTS_TABLE, WPST_JOB_ASSIGNMENTS_TABLE) ;
 
-        if (!is_null($filter) && ($filter != ""))
-            $query .= sprintf(" WHERE %s", $filter) ;
+        if (!is_null($filter) && ($filter != ''))
+            $query .= sprintf(' WHERE %s', $filter) ;
 
-        if (is_null($orderby) || ($orderby == ""))
-            $orderby = sprintf("%s.%s", WPST_JOB_ASSIGNMENTS_TABLE, "jobassignmentid") ;
+        if (is_null($orderby) || ($orderby == ''))
+            $orderby = sprintf('%s.%s', WPST_JOB_ASSIGNMENTS_TABLE, 'jobassignmentid') ;
 
-        $query .= sprintf(" ORDER BY %s", $orderby) ;
+        $query .= sprintf(' ORDER BY %s', $orderby) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -2197,10 +2189,10 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
     {
         if (is_null($id)) $id = $this->getJobAllocationId() ;
 
-        if (is_null($id)) wp_die("Null Job Allocation Id") ;
+        if (is_null($id)) wp_die('Null Job Allocation Id') ;
 
-        $filter = sprintf("%s.%s = \"%s\"",
-            WPST_JOB_ASSIGNMENTS_TABLE, "joballocationid", $id) ;
+        $filter = sprintf('%s.%s = "%s"',
+            WPST_JOB_ASSIGNMENTS_TABLE, 'joballocationid', $id) ;
 
         return $this->getAllJobAssignmentIds($filter) ;
     }
@@ -2236,14 +2228,14 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $actionmsgs[] = sprintf('Name:  %s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
             $actionmsgs[] = sprintf('Job:  %s', $jobdetails) ;
             $actionmsgs[] = sprintf('Swim Season:  %s - %s - %s',
-                $seasondetails["label"], $seasondetails["start"], $seasondetails["end"]) ;
+                $seasondetails['label'], $seasondetails['start'], $seasondetails['end']) ;
         }
         else
         {
             $actionmsgs[] = sprintf('Name:  %s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
             $actionmsgs[] = sprintf('Job:  %s', $jobdetails) ;
             $actionmsgs[] = sprintf('Swim Meet:  %s - %s - %s',
-                $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
+                $meetdetails['opponent'], $meetdetails['date'], $meetdetails['location']) ;
         }
 
         $c1data = get_userdata($userid) ;
@@ -2307,13 +2299,13 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $htmlbody = '' ;
 
             foreach ($actionmsgs as $actionmsg)
-                $htmlbody .= sprintf("<li>%s</li>", $actionmsg) ;
+                $htmlbody .= sprintf('<li>%s</li>', $actionmsg) ;
 
             $message = sprintf($htmlhdr,
                 get_bloginfo('url'),
                 $c1data->user_firstname,
                 $action,
-                $c1data->user_firstname . " " . $c1data->user_lastname) ;
+                $c1data->user_firstname . ' ' . $c1data->user_lastname) ;
 
             $message .= $htmlbody ;
 
@@ -2341,18 +2333,18 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $message = sprintf($plain,
                 $c1data->user_firstname,
                 $action,
-                $c1data->user_firstname . " " . $c1data->user_lastname,
+                $c1data->user_firstname . ' ' . $c1data->user_lastname,
                 get_option(WPST_OPTION_JOB_EXPECTATIONS_URL),
                 get_bloginfo('name'),
                 get_bloginfo('url'),
                 get_bloginfo('url')) ;
         }
 
-        $to = sprintf("%s %s <%s>", $c1data->user_firstname,
+        $to = sprintf('%s %s <%s>', $c1data->user_firstname,
             $c1data->user_lastname, $c1data->user_email) ;
 
-        $subject = sprintf("Job %s for %s",
-            $action, $c1data->user_firstname . " " . $c1data->user_lastname) ;
+        $subject = sprintf('Job %s for %s',
+            $action, $c1data->user_firstname . ' ' . $c1data->user_lastname) ;
 
         $status = wp_mail($to, $subject, $message, $headers) ;
 
@@ -2382,14 +2374,14 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $actionmsgs[] = sprintf('Name:  %s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
             $actionmsgs[] = sprintf('Job:  %s', $jobdetails) ;
             $actionmsgs[] = sprintf('Swim Season:  %s - %s - %s',
-                $seasondetails["label"], $seasondetails["start"], $seasondetails["end"]) ;
+                $seasondetails['label'], $seasondetails['start'], $seasondetails['end']) ;
         }
         else
         {
             $actionmsgs[] = sprintf('Name:  %s %s (%s)', $u->first_name, $u->last_name, $u->user_login) ;
             $actionmsgs[] = sprintf('Job:  %s', $jobdetails) ;
             $actionmsgs[] = sprintf('Swim Meet:  %s - %s - %s',
-                $meetdetails["opponent"], $meetdetails["date"], $meetdetails["location"]) ;
+                $meetdetails['opponent'], $meetdetails['date'], $meetdetails['location']) ;
         }
 
         $c1data = get_userdata($this->getUserId()) ;
@@ -2451,12 +2443,12 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
             $htmlbody = '' ;
 
             foreach ($actionmsgs as $actionmsg)
-                $htmlbody .= sprintf("<li>%s</li>", $actionmsg) ;
+                $htmlbody .= sprintf('<li>%s</li>', $actionmsg) ;
 
             $message = sprintf($htmlhdr,
                 get_bloginfo('url'),
                 $u->user_firstname,
-                $u->user_firstname . " " . $u->user_lastname) ;
+                $u->user_firstname . ' ' . $u->user_lastname) ;
 
             $message .= $htmlbody ;
 
@@ -2484,18 +2476,18 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
 
             $message = sprintf($plain,
                 $u->user_firstname,
-                $u->user_firstname . " " . $u->user_lastname,
+                $u->user_firstname . ' ' . $u->user_lastname,
                 get_option(WPST_OPTION_JOB_EXPECTATIONS_URL),
                 get_bloginfo('name'),
                 get_bloginfo('url'),
                 get_bloginfo('url')) ;
         }
 
-        $to = sprintf("%s %s <%s>", $u->user_firstname,
+        $to = sprintf('%s %s <%s>', $u->user_firstname,
             $u->user_lastname, $u->user_email) ;
 
-        $subject = sprintf("Job Assignment Reminder for %s",
-            $u->user_firstname . " " . $u->user_lastname) ;
+        $subject = sprintf('Job Assignment Reminder for %s',
+            $u->user_firstname . ' ' . $u->user_lastname) ;
 
         $status = wp_mail($to, $subject, $message, $headers) ;
 
@@ -2696,13 +2688,13 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
     {
         //  Need swim meet classes to build the table
 
-        require_once("swimmeets.class.php") ;
+        require_once('swimmeets.class.php') ;
 
         if (is_null($meetid)) $meetid = $this->getMeetId() ;
 
         if (is_null($meetid))
         {
-            $this->add_row("No data.") ;
+            $this->add_row('No data.') ;
         }
         else
         {
@@ -2730,21 +2722,21 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
             if (empty($jaids))
             {
                 $jaids = array() ;
-                $this->add_row("No job assignments.") ;
+                $this->add_row('No job assignments.') ;
             }
             else
             {
                 //  Construct the header
-                $row = array(html_b("Position"), html_b("Name")) ;
+                $row = array(html_b('Position'), html_b('Name')) ;
 
                 if ($this->getShowEmail())
-                    $row[] = html_b("Email Address") ;
+                    $row[] = html_b('Email Address') ;
 
                 if ($this->getShowPhone())
-                    $row[] = html_b("Phone Number(s)") ;
+                    $row[] = html_b('Phone Number(s)') ;
 
                 if ($this->getShowNotes())
-                    $row[] = html_b("Notes") ;
+                    $row[] = html_b('Notes') ;
 
                 call_user_func_array(array(&$this, 'add_row'), $row) ;
 
@@ -2753,7 +2745,7 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
                 foreach ($jaids as $jaid)
                 {
                     $row = array() ;
-                    $key = &$jaid["jobassignmentid"] ;
+                    $key = &$jaid['jobassignmentid'] ;
 
                     $ja->loadJobAssignmentByJobAssignmentId($key) ;
                     $job->loadJobByJobId($ja->getJobId()) ;
@@ -2774,25 +2766,25 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
                         if ($ja->getUserId() != WPST_NULL_ID)
                         {
                             $name = ($this->getShowFirstInitial() ?
-                                substr($u->first_name, 0, 1) . "." : $u->first_name) ;
+                                substr($u->first_name, 0, 1) . '.' : $u->first_name) ;
     
-                            $name .= " " . ($this->getShowLastInitial() ?
-                                substr($u->last_name, 0, 1) . "." : $u->last_name) ;
+                            $name .= ' ' . ($this->getShowLastInitial() ?
+                                substr($u->last_name, 0, 1) . '.' : $u->last_name) ;
     
                             if ($this->getShowUsername())
-                                $name .= " (" . $u->user_login . ")" ;
+                                $name .= ' (' . $u->user_login . ')' ;
     
                             $row[] = $name ;
                         }
                         else
                         {
-                           $row[] = __("None") ;
+                           $row[] = __('None') ;
                         }
     
                         if ($this->getShowEmail())
                         {
                             if ($ja->getUserId() != WPST_NULL_ID)
-                                $row[] = html_a(sprintf("mailto:%s",
+                                $row[] = html_a(sprintf('mailto:%s',
                                     $u->user_email), $u->user_email) ;
                             else
                                 $row[] = _HTML_SPACE ;
@@ -2804,7 +2796,7 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
                             {
                                 $user->loadUserProfileByUserId($ja->getUserId()) ;
                                 $row[] = $user->getPrimaryPhone() .
-                                    " / " .  $user->getSecondaryPhone() ;
+                                    ' / ' .  $user->getSecondaryPhone() ;
                             }
                             else
                                 $row[] = _HTML_SPACE ;
@@ -2870,60 +2862,60 @@ class SwimTeamJobDescriptionsInfoTable extends SwimTeamInfoTable
 
         if (empty($jobids))
         {
-            $this->add_row("No jobs defined.") ;
+            $this->add_row('No jobs defined.') ;
         }
         else
         {
             $this->set_alt_color_flag(true) ;
             $this->set_show_cellborders(true) ;
 
-            $attrs = array("width" => "25%", "align" => "right",
-                "valign" => "top", "style" => "padding-right: 5px") ;
+            $attrs = array('width' => '25%', 'align' => 'right',
+                'valign' => 'top', 'style' => 'padding-right: 5px') ;
 
             //  Add the job descriptions, one per row.
  
             foreach ($jobids as $jobid)
             {
-                $job->loadJobByJobId($jobid["jobid"]) ;
+                $job->loadJobByJobId($jobid['jobid']) ;
 
                 $table = html_table() ;
-                $table->set_tag_attributes(array("style" => "padding: 7px")) ;
+                $table->set_tag_attributes(array('style' => 'padding: 7px')) ;
 
-                $th = html_th("Position:") ;
+                $th = html_th('Position:') ;
                 $th->set_tag_attributes($attrs) ;
                 $table->add_row($th,
                     html_td(null, null, $job->getJobPosition())) ;
 
-                $th = html_th("Description:") ;
+                $th = html_th('Description:') ;
                 $th->set_tag_attributes($attrs) ;
                 $table->add_row($th,
                    html_td(null, null, $job->getJobDescription())) ;
 
-                $th = html_th("Duration:") ;
+                $th = html_th('Duration:') ;
                 $th->set_tag_attributes($attrs) ;
                 $table->add_row($th,
                    html_td(null, null, ucwords($job->getJobDuration()))) ;
 
-                $th = html_th("Type:") ;
+                $th = html_th('Type:') ;
                 $th->set_tag_attributes($attrs) ;
                 $table->add_row($th,
                    html_td(null, null, ucwords($job->getJobType()))) ;
 
-                $th = html_th("Location:") ;
+                $th = html_th('Location:') ;
                 $th->set_tag_attributes($attrs) ;
                 if ($job->getJobLocation() == WPST_BOTH)
                     $table->add_row($th, html_td(null, null,
-                        ucwords(WPST_HOME) . " and " . ucwords(WPST_AWAY))) ;
+                        ucwords(WPST_HOME) . ' and ' . ucwords(WPST_AWAY))) ;
                 else
                     $table->add_row($th,
                        html_td(null, null, ucwords($job->getJobLocation()))) ;
 
-                $th = html_th("Credits:") ;
+                $th = html_th('Credits:') ;
                 $th->set_tag_attributes($attrs) ;
                 $table->add_row($th,
                    html_td(null, null, $job->getJobCredits())) ;
 
-                $th = html_th("Status:") ;
+                $th = html_th('Status:') ;
                 $th->set_tag_attributes($attrs) ;
                 $table->add_row($th,
                    html_td(null, null, ucwords($job->getJobStatus()))) ;
@@ -3032,8 +3024,8 @@ class SwimTeamUserJobsInfoTable extends SwimTeamInfoTable
         $this->set_alt_color_flag(true) ;
         $this->set_show_cellborders(true) ;
 
-        $attrs = array("width" => "25%", "align" => "right",
-            "valign" => "top", "style" => "padding-right: 5px") ;
+        $attrs = array('width' => '25%', 'align' => 'right',
+            'valign' => 'top', 'style' => 'padding-right: 5px') ;
 
         $this->add_column_header('Date', '10%', 'left') ;
         $this->add_column_header('Position', '40%', 'left') ;
