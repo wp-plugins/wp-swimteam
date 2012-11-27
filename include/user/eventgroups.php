@@ -3,15 +3,15 @@
 /**
  * Event Groups admin pevent content.
  *
- * $Id: eventgroups.php 920 2012-06-28 22:19:07Z mpwalsh8 $
+ * $Id: eventgroups.php 974 2012-11-27 12:39:26Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @packevent swimteam
  * @subpackevent admin
- * @version $Revision: 920 $
- * @lastmodified $Date: 2012-06-28 18:19:07 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 974 $
+ * @lastmodified $Date: 2012-11-27 07:39:26 -0500 (Tue, 27 Nov 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -152,6 +152,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
         }
         else  //  Crank up the form processing process
         {
+            $div->add(html_h3('Swim Team Event Groups')) ;
             switch ($action)
             {
                 case WPST_ACTION_ADD:
@@ -272,23 +273,23 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
 
                     $div->add($gdl) ;
 
-	                $div->add(html_br(2), $form->form_success()) ;
+	                $div->add(html_br(), $form->form_success()) ;
                     $this->setShowActionSummary() ;
                     $this->setActionSummaryHeader('Event Groups Action Summary') ;
                 }
                 else
                 {
-	                $div->add(html_br(2), $fp) ;
+	                $div->add(html_br(), $fp) ;
                 }
             }
             else if (isset($c))
             {
-                $div->add(html_br(2), $c) ;
+                $div->add(html_br(), $c) ;
                 $div->add(SwimTeamGUIButtons::getButton('Return to Event Groups')) ;
             }
             else
             {
-                $div->add(html_br(2), html_h4('No content to display.')) ;
+                $div->add(html_br(), html_h4('No content to display.')) ;
             }
 
         }

@@ -3,15 +3,15 @@
 /**
  * Events classes.
  *
- * $Id: events.class.php 921 2012-06-28 22:21:32Z mpwalsh8 $
+ * $Id: events.class.php 975 2012-11-27 12:40:52Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Events
- * @version $Revision: 921 $
- * @lastmodified $Date: 2012-06-28 18:21:32 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 975 $
+ * @lastmodified $Date: 2012-11-27 07:40:52 -0500 (Tue, 27 Nov 2012) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -967,7 +967,7 @@ class SwimTeamEventGroup extends SwimTeamDBI
         {
             //  Need the full record before deleting it
 
-            $this->loadEventGroupByEventGroupId() ;
+            $this->loadEventGroupById() ;
 
             //  Before deleting the allocation record, need
             //  to delete all of the event records which are
@@ -983,9 +983,9 @@ class SwimTeamEventGroup extends SwimTeamDBI
 
             foreach ($eventids as $eventid)
             {
-                $event->loadEventById($eventid) ;
+                $event->loadSwimTeamEventByEventId($eventid['eventid']) ;
                 $event->setEventGroupId(WPST_NONE) ;
-                $event->updateEvent() ;
+                $event->updateSwimTeamEvent() ;
             }
 
             //  Construct the delete query and update the allocation
