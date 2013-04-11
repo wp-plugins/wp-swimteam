@@ -3,15 +3,15 @@
 /**
  * Swim Meets admin page content.
  *
- * $Id: swimmeets.php 939 2012-07-02 18:19:10Z mpwalsh8 $
+ * $Id: swimmeets.php 977 2013-04-11 21:20:41Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 939 $
- * @lastmodified $Date: 2012-07-02 14:19:10 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 977 $
+ * @lastmodified $Date: 2013-04-11 17:20:41 -0400 (Thu, 11 Apr 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -182,6 +182,18 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
         }
         else  //  Crank up the form processing process
         {
+            //  Is the selected meet in the active season?
+            //  If not, disabled all the form elements.
+
+            $swimmeet = new SwimMeet() ;
+            $swimmeet->loadSwimMeetByMeetId($swimmeetid) ;
+
+            if (!$swimmeet->isSwimMeetSeasonActiveSeason())
+            {
+                $div->add(html_div('updated fade',
+                    html_h4('The selected swim meet does not occur during the active season.'))) ;
+            }
+        
             switch ($action)
             {
                 case WPST_ACTION_DETAILS:

@@ -3,15 +3,15 @@
 /**
  * Meets classes.
  *
- * $Id: swimmeets.class.php 869 2012-05-12 03:55:47Z mpwalsh8 $
+ * $Id: swimmeets.class.php 981 2013-04-11 21:22:59Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Meets
- * @version $Revision: 869 $
- * @lastmodified $Date: 2012-05-11 23:55:47 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 981 $
+ * @lastmodified $Date: 2013-04-11 17:22:59 -0400 (Thu, 11 Apr 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -20,6 +20,7 @@
 require_once('db.class.php') ;
 require_once('swimteam.include.php') ;
 require_once('swimmeets.include.php') ;
+require_once('seasons.class.php') ;
 require_once('swimclubs.class.php') ;
 require_once('widgets.class.php') ;
 
@@ -645,6 +646,19 @@ class SwimMeet extends SwimTeamDBI
         $this->runSelectQuery() ;
 
         return $this->getQueryResults() ;
+    }
+
+    /**
+     * Check to see if Swim Meet's season is
+     * the same as the currently active season.
+     *
+     * @return - boolean - true if seasons match, false otherwise
+     */
+    function isSwimMeetSeasonActiveSeason()
+    {
+        $season = new SwimTeamSeason() ;
+
+        return ($season->getActiveSeasonId() == $this->getSeasonId()) ;
     }
 }
 

@@ -3,15 +3,15 @@
 /**
  * Options classes.
  *
- * $Id: options.class.php 965 2012-08-03 02:45:17Z mpwalsh8 $
+ * $Id: options.class.php 982 2013-04-11 21:23:38Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Options
- * @version $Revision: 965 $
- * @lastmodified $Date: 2012-08-02 22:45:17 -0400 (Thu, 02 Aug 2012) $
+ * @version $Revision: 982 $
+ * @lastmodified $Date: 2013-04-11 17:23:38 -0400 (Thu, 11 Apr 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -20,6 +20,7 @@
 
 require_once("db.class.php") ;
 require_once("swimteam.include.php") ;
+require_once("options.include.php") ;
 
 /**
  * Class definition of the agegroups

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmeets.forms.class.php 951 2012-07-06 19:49:12Z mpwalsh8 $
+ * $Id: swimmeets.forms.class.php 980 2013-04-11 21:22:40Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
- * @version $Revision: 951 $
+ * @version $Revision: 980 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-07-06 15:49:12 -0400 (Fri, 06 Jul 2012) $
+ * @lastmodifiedby $Date: 2013-04-11 17:22:40 -0400 (Thu, 11 Apr 2013) $
  *
  */
 
@@ -1229,9 +1229,9 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamSwimMeetForm
             $filter = sprintf('r.seasonid="%s" AND r.status="%s"',
                 $season->getActiveSeasonId(), WPST_ACTIVE) ;
         else
-            $filter = sprintf('(%s.contact1id = "%s" OR %s.contact2id = "%s") AND
-                r.seasonid="%s" AND %s.status="%s"', WPST_SWIMMERS_TABLE, $userdata->ID,
-                WPST_SWIMMERS_TABLE, $userdata->ID, $season->getActiveSeasonId(), WPST_ACTIVE) ;
+            $filter = sprintf('(s.contact1id = "%s" OR s.contact2id = "%s") AND
+                r.seasonid="%s" AND r.status="%s"', $userdata->ID,
+                $userdata->ID, $season->getActiveSeasonId(), WPST_ACTIVE) ;
 
         $swimmerIds = $swimmer->getAllSwimmerIds($filter, 's.lastname', $joins) ;
 
@@ -1330,6 +1330,21 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamSwimMeetForm
         $partialstrokes->set_list_data($this->_strokeSelections()) ;
         $partialstrokes->enable_checkall(true) ;
         $this->add_element($partialstrokes) ;
+
+        //  Is the selected meet in the active season?
+        //  If not, disabled all the form elements.
+
+        $swimmeet = new SwimMeet() ;
+        $swimmeet->loadSwimMeetByMeetId($this->getMeetId()) ;
+
+        if (!$swimmeet->isSwimMeetSeasonActiveSeason())
+        {
+            $swimmers->set_disabled(true) ;
+            $swimmers->enable_checkall(false) ;
+            $fullstrokes->set_disabled(true) ;
+            $partialstrokes->set_disabled(true) ;
+            $this->__strokes->set_disabled(true) ;
+        }
     }
 
     /**
@@ -1462,6 +1477,8 @@ class WpSwimTeamSwimMeetOptInOutForm extends WpSwimTeamSwimMeetForm
             $strokes = $this->_strokeSelections() ;
 
         $swimmerIds = $this->get_element_value('Swimmers') ;
+
+        if (is_null($swimmerIds)) $swimmerIds = array() ;
 
         $meetid = $this->get_hidden_element_value('_swimmeetid') ;
         $action = $this->get_hidden_element_value('_action') ;

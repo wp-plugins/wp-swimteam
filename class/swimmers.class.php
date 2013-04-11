@@ -3,15 +3,15 @@
 /**
  * Swimmer classes.
  *
- * $Id: swimmers.class.php 956 2012-07-07 04:38:51Z mpwalsh8 $
+ * $Id: swimmers.class.php 980 2013-04-11 21:22:40Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 956 $
- * @lastmodified $Date: 2012-07-07 00:38:51 -0400 (Sat, 07 Jul 2012) $
+ * @version $Revision: 980 $
+ * @lastmodified $Date: 2013-04-11 17:22:40 -0400 (Thu, 11 Apr 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -1090,7 +1090,6 @@ class SwimTeamSwimmer extends SwimTeamDBI
 
         $query .= sprintf(' ORDER BY %s', $orderby) ;
 
-        
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 

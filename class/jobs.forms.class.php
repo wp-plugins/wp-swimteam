@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: jobs.forms.class.php 919 2012-06-28 22:12:39Z mpwalsh8 $
+ * $Id: jobs.forms.class.php 979 2013-04-11 21:22:18Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package Wp-SwimTeam
  * @subpackage Jobs
- * @version $Revision: 919 $
+ * @version $Revision: 979 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-06-28 18:12:39 -0400 (Thu, 28 Jun 2012) $
+ * @lastmodifiedby $Date: 2013-04-11 17:22:18 -0400 (Thu, 11 Apr 2013) $
  *
  */
 
@@ -1277,26 +1277,6 @@ class WpSwimTeamJobsDeallocateForm extends WpSwimTeamJobsReallocateForm
         $this->set_action_message($actionmsg) ;
 
         return true ;
-    }
-}
-
-/**
- * Construct the Swimmer OptInOut form
- *
- * @author Mike Walsh <mike_walsh@mindspring.com>
- * @access public
- * @see WpSwimTeamForm
- */
-class WpSwimTeamJobsAllocateAdminForm extends WpSwimTeamJobsAllocateForm
-{
-    /**
-     * Get the array of swimmer key and value pairs
-     *
-     * @return mixed - array of swimmer key value pairs
-     */
-    function _swimmerSelections()
-    {
-        return parent::_swimmerSelections(true) ;
     }
 }
 

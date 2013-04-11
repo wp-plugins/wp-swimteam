@@ -66,6 +66,11 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.38 =
+* Fixed bug in Hy-tek entries generation which caused a PHP warning but no loss of data.
+* Fixed bug which caused parents/guardians to see all swimmers instead of just their swimmers when opting in or out of a swim meet.
+* Added checking and a warning message when the selected meet occurs outside of the active season.  Some operations makes sense, however some do not (e.g. opt-in or opt-out).
+
 = 1.37 =
 * Fixed bug preventing deletion of Event Groups.
 * Fixed float problem with several dialog boxes on the Manage->Events tab.

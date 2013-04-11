@@ -436,7 +436,7 @@ class HY3Roster extends HY3BaseRecord
             if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
 
             $ometa = new SwimTeamOptionMeta() ;
-            $ometa->setSwimmerId($swimmerId['swimmerid']) ;
+            $ometa->setSwimmerId($swimmerId) ;
 
             //  Load the swimmer options
 
@@ -448,7 +448,7 @@ class HY3Roster extends HY3BaseRecord
                 if (get_option($oconst) != WPST_DISABLED)
                 {
                     $label = get_option($lconst) ;
-                    $ometa->loadOptionMetaBySwimmerIdAndKey($swimmerId['swimmerid'], $oconst) ;
+                    $ometa->loadOptionMetaBySwimmerIdAndKey($swimmerId, $oconst) ;
 
                     switch ($oc)
                     {
