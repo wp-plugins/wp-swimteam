@@ -3,15 +3,15 @@
 /**
  * Plugin shortcodes.
  *
- * $Id: shortcodes.include.php 879 2012-05-13 15:39:10Z mpwalsh8 $
+ * $Id: shortcodes.include.php 984 2013-06-08 14:45:39Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage shortcodes
- * @version $Revision: 879 $
- * @lastmodified $Date: 2012-05-13 11:39:10 -0400 (Sun, 13 May 2012) $
+ * @version $Revision: 984 $
+ * @lastmodified $Date: 2013-06-08 10:45:39 -0400 (Sat, 08 Jun 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -267,6 +267,8 @@ function wpst_club_profile_sc_handler($atts)
         if (get_option(WPST_OPTION_ENABLE_GOOGLE_MAPS) == WPST_YES)
         {
             $map = new GoogleMapDIVtag() ;
+            $map->set_id('wpst-googlemap-' . $clubid) ;
+            $map->set_class('wpst-google-map') ;
             $map->set_style('border: 3px solid #afb5ff') ;
 
             $map->setAddress(preg_replace('/<.*?>/', ', ', $address)) ;

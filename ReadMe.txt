@@ -3,7 +3,7 @@ Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
 Requires at least: 3.1
-Tested up to: 3.4.2
+Tested up to: 3.5.1
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -65,6 +65,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.39 =
+* Added CSS class and element ID to DIV which wraps Google Maps.  This allows sites to add CSS easily to address an unusual situation where the map won't show in FireFox or IE due to a max-width promperty on the IMG element.
 
 = 1.38 =
 * Fixed bug in Hy-tek entries generation which caused a PHP warning but no loss of data.
