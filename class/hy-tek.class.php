@@ -74,6 +74,11 @@ class HY3BaseRecord extends HY3Profile
     var $__hy3DebugFlag = false ;
 
     /**
+     * gender
+     */
+    var $__gender = WPST_GENDER_BOTH ;
+
+    /**
      * Get HY3 Debug Flag
      *
      * @return boolean - state of HY3 debug flag
@@ -91,6 +96,26 @@ class HY3BaseRecord extends HY3Profile
     function setHY3DebugFlag($flag = true)
     {
         $this->__hy3DebugFlag = $flag ;
+    }
+
+    /**
+     * Get Gender
+     *
+     * @return string - gender to limit HY3 data
+     */
+    function getGender()
+    {
+        return $this->__gender;
+    }
+
+    /**
+     * Set Gender
+     *
+     * @param string - gender to limit HY3 data
+     */
+    function setGender($gender = WPST_GENDER_BOTH)
+    {
+        $this->__gender = $gender ;
     }
 
     /**
@@ -323,212 +348,219 @@ class HY3Roster extends HY3BaseRecord
 
         foreach ($swimmerIds as $key => &$swimmerId)
         {
+            //  Make sure we only generate records for the requested gender
+
             $roster->setSwimmerId($swimmerId) ;
             $roster->loadRosterBySeasonIdAndSwimmerId() ;
             $swimmer->loadSwimmerById($swimmerId) ;
-            $contact1->loadUserProfileByUserId($swimmer->getContact1Id()) ;
-            $contact2->loadUserProfileByUserId($swimmer->getContact2Id()) ;
-            $contact3->loadUserProfileByUserId($swimmer->getWpUserId()) ;
-                    
-            //  Initialize D1 record fields which are swimmer based
-            $d1->setAthleteLastName($swimmer->getLastName()) ;
-            $d1->setAthleteFirstName($swimmer->getFirstName()) ;
-            $d1->setAthleteMiddleInitial(substr($swimmer->getMiddleName(), 0, 1)) ;
 
-            if ($swimmer->getNickname() != '')
-                $d1->setAthleteNickname($swimmer->getNickname()) ;
-            else
-                $d1->setAthleteNickname($swimmer->getFirstName()) ;
-
-            $d1->setAthleteBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
-
-            //  How should the Swimmer Id appear in the HY3 file?
-            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
-                $d1->setAthleteId($swimmer->getId()) ;
-            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
-                $d1->setAthleteId($roster->getSwimmerLabel()) ;
-            else
-                $d1->setAthleteId($swimmer->getUSSNumber()) ;
-
-            if ($this->getUseAgeGroupAge() == WPST_NO)
-                $d1->setAthleteAge($swimmer->getAge()) ;
-            else
-                $d1->setAthleteAge($swimmer->getAgeGroupAge()) ;
-
-            $d1->setGender(ucwords($swimmer->getGender())) ;
-            $d1->setRegistrationCountry($this->getCountryCode()) ;
-
-            //  Fill in the unused fields
-            $d1->setDatabaseId1(WPST_HY3_UNUSED) ;
-            $d1->setDatabaseId2(WPST_HY3_UNUSED) ;
-            $d1->setAthleteSchoolYear(WPST_HY3_UNUSED) ;
-            $d1->setGroup(WPST_HY3_UNUSED) ;
-            $d1->setSubgroup(WPST_HY3_UNUSED) ;
-            $d1->setInactive(WPST_HY3_UNUSED) ;
-            $d1->setWmGroup(WPST_HY3_UNUSED) ;
-            $d1->setWmSubgroup(WPST_HY3_UNUSED) ;
-    
-            //  Build D2 record
-            $d2->setPrimaryContactAddress1($contact1->getStreet1()) ;
-            $d2->setPrimaryContactAddress2($contact1->getStreet2()) ;
-            $d2->setPrimaryContactCity($contact1->getCity()) ;
-            $d2->setPrimaryContactState($contact1->getStateOrProvince()) ;
-            $d2->setPrimaryContactPostalCode($contact1->getPostalCode()) ;
-            $d2->setPrimaryContactCountry($contact1->getCountry()) ;
-
-            //  Build D3 record
-            $d3->setFathersOfficePhoneNumber($contact2->getSecondaryPhone()) ;
-            $d3->setPrimaryContactHomePhoneNumber($contact1->getPrimaryPhone()) ;
-            $d3->setPrimaryContactFaxNumber($contact1->getSecondaryPhone()) ;
-            $d3->setFathersEmailAddress($contact2->getEmailAddress()) ;
-    
-            //  Build D4 record
-            $d4->setSecondaryContactMailto($swimmer->getFirstAndLastNames() .
-                ' c/o ' . $contact2->getFullName()) ;
-            $d4->setSecondaryContactAddress1($contact2->getStreet1()) ;
-            $d4->setSecondaryContactCity($contact2->getCity()) ;
-            $d4->setSecondaryContactState($contact2->getStateOrProvince()) ;
-            $d4->setSecondaryContactPostalCode($contact2->getPostalCode()) ;
-            $d4->setSecondaryContactCountry($contact2->getCountry()) ;
-
-            //  Build D5 record
-            $d5->setPrimaryContactMailto($swimmer->getFirstAndLastNames() .
-                ' c/o ' . $contact1->getFullName()) ;
-            $d5->setSecondaryContactAddress2($contact2->getStreet2()) ;
-            $d5->setRegistrationDate($roster->getRegistrationDateAsMMDDYYYY()) ;
-            $d5->setPrimaryContactCity($contact1->getCity()) ;
-            $d5->setSecondaryContactCity($contact2->getCity()) ;
-
-            //  Build D6 record
-            $d6->setDoctorsName(WPST_HY3_UNUSED) ;
-            $d6->setDoctorsPhoneNumber(WPST_HY3_UNUSED) ;
-            $d6->setEmergencyContactName(WPST_HY3_UNUSED) ;
-            $d6->setEmergencyContactPhoneNumber(WPST_HY3_UNUSED) ;
-
-            //  Build D7 record
-            $d7->setDoctorsName(WPST_HY3_UNUSED) ;
-            $d7->setSecondaryContactParent1OfficePhoneNumber($contact1->getSecondaryPhone()) ;
-            $d7->setSecondaryContactHomePhoneNumber($contact2->getPrimaryPhone()) ;
-            $d7->setSecondaryContactFaxNumber($contact2->getSecondaryPhone()) ;
-            $d7->setSecondaryContactParent1EmailAddress($contact1->getEmailAddress()) ;
-            $d7->setFathersEmailAddress($contact2->getEmailAddress()) ;
-
-            //  Build D8 record
-            $d8->setMedicalConditionDescription(WPST_HY3_UNUSED) ;
-
-            //  Build D9 record
-            $d9->setMedicationDescription(WPST_HY3_UNUSED) ;
-
-            //  Build DA record
-            $da->setCustomField1Name(WPST_HY3_UNUSED) ;
-            $da->setCustomField1Value(WPST_HY3_UNUSED) ;
-            $da->setCustomField2Name(WPST_HY3_UNUSED) ;
-            $da->setCustomField2Value(WPST_HY3_UNUSED) ;
-            $da->setCustomField3Name(WPST_HY3_UNUSED) ;
-            $da->setCustomField3Value(WPST_HY3_UNUSED) ;
-
-            //  The Hy-tek HY3 file supports 3 custom fields so if swimmer
-            //  fileds are enabled, we'll map up to three of theme into the
-            //  Hy-tek custom fields.
-
-            $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
-
-            if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
-
-            $ometa = new SwimTeamOptionMeta() ;
-            $ometa->setSwimmerId($swimmerId) ;
-
-            //  Load the swimmer options
-
-            for ($oc = 1 ; $oc <= $options ; $oc++)
+            if (($this->getGender() == WPST_GENDER_BOTH) ||
+                ($this->getGender() == $swimmer->getGender()))
             {
-                $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
-                $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
-                
-                if (get_option($oconst) != WPST_DISABLED)
+                $contact1->loadUserProfileByUserId($swimmer->getContact1Id()) ;
+                $contact2->loadUserProfileByUserId($swimmer->getContact2Id()) ;
+                $contact3->loadUserProfileByUserId($swimmer->getWpUserId()) ;
+                        
+                //  Initialize D1 record fields which are swimmer based
+                $d1->setAthleteLastName($swimmer->getLastName()) ;
+                $d1->setAthleteFirstName($swimmer->getFirstName()) ;
+                $d1->setAthleteMiddleInitial(substr($swimmer->getMiddleName(), 0, 1)) ;
+    
+                if ($swimmer->getNickname() != '')
+                    $d1->setAthleteNickname($swimmer->getNickname()) ;
+                else
+                    $d1->setAthleteNickname($swimmer->getFirstName()) ;
+    
+                $d1->setAthleteBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
+    
+                //  How should the Swimmer Id appear in the HY3 file?
+                if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                    $d1->setAthleteId($swimmer->getId()) ;
+                if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                    $d1->setAthleteId($roster->getSwimmerLabel()) ;
+                else
+                    $d1->setAthleteId($swimmer->getUSSNumber()) ;
+    
+                if ($this->getUseAgeGroupAge() == WPST_NO)
+                    $d1->setAthleteAge($swimmer->getAge()) ;
+                else
+                    $d1->setAthleteAge($swimmer->getAgeGroupAge()) ;
+    
+                $d1->setGender(ucwords($swimmer->getGender())) ;
+                $d1->setRegistrationCountry($this->getCountryCode()) ;
+    
+                //  Fill in the unused fields
+                $d1->setDatabaseId1(WPST_HY3_UNUSED) ;
+                $d1->setDatabaseId2(WPST_HY3_UNUSED) ;
+                $d1->setAthleteSchoolYear(WPST_HY3_UNUSED) ;
+                $d1->setGroup(WPST_HY3_UNUSED) ;
+                $d1->setSubgroup(WPST_HY3_UNUSED) ;
+                $d1->setInactive(WPST_HY3_UNUSED) ;
+                $d1->setWmGroup(WPST_HY3_UNUSED) ;
+                $d1->setWmSubgroup(WPST_HY3_UNUSED) ;
+        
+                //  Build D2 record
+                $d2->setPrimaryContactAddress1($contact1->getStreet1()) ;
+                $d2->setPrimaryContactAddress2($contact1->getStreet2()) ;
+                $d2->setPrimaryContactCity($contact1->getCity()) ;
+                $d2->setPrimaryContactState($contact1->getStateOrProvince()) ;
+                $d2->setPrimaryContactPostalCode($contact1->getPostalCode()) ;
+                $d2->setPrimaryContactCountry($contact1->getCountry()) ;
+    
+                //  Build D3 record
+                $d3->setFathersOfficePhoneNumber($contact2->getSecondaryPhone()) ;
+                $d3->setPrimaryContactHomePhoneNumber($contact1->getPrimaryPhone()) ;
+                $d3->setPrimaryContactFaxNumber($contact1->getSecondaryPhone()) ;
+                $d3->setFathersEmailAddress($contact2->getEmailAddress()) ;
+        
+                //  Build D4 record
+                $d4->setSecondaryContactMailto($swimmer->getFirstAndLastNames() .
+                    ' c/o ' . $contact2->getFullName()) ;
+                $d4->setSecondaryContactAddress1($contact2->getStreet1()) ;
+                $d4->setSecondaryContactCity($contact2->getCity()) ;
+                $d4->setSecondaryContactState($contact2->getStateOrProvince()) ;
+                $d4->setSecondaryContactPostalCode($contact2->getPostalCode()) ;
+                $d4->setSecondaryContactCountry($contact2->getCountry()) ;
+    
+                //  Build D5 record
+                $d5->setPrimaryContactMailto($swimmer->getFirstAndLastNames() .
+                    ' c/o ' . $contact1->getFullName()) ;
+                $d5->setSecondaryContactAddress2($contact2->getStreet2()) ;
+                $d5->setRegistrationDate($roster->getRegistrationDateAsMMDDYYYY()) ;
+                $d5->setPrimaryContactCity($contact1->getCity()) ;
+                $d5->setSecondaryContactCity($contact2->getCity()) ;
+    
+                //  Build D6 record
+                $d6->setDoctorsName(WPST_HY3_UNUSED) ;
+                $d6->setDoctorsPhoneNumber(WPST_HY3_UNUSED) ;
+                $d6->setEmergencyContactName(WPST_HY3_UNUSED) ;
+                $d6->setEmergencyContactPhoneNumber(WPST_HY3_UNUSED) ;
+    
+                //  Build D7 record
+                $d7->setDoctorsName(WPST_HY3_UNUSED) ;
+                $d7->setSecondaryContactParent1OfficePhoneNumber($contact1->getSecondaryPhone()) ;
+                $d7->setSecondaryContactHomePhoneNumber($contact2->getPrimaryPhone()) ;
+                $d7->setSecondaryContactFaxNumber($contact2->getSecondaryPhone()) ;
+                $d7->setSecondaryContactParent1EmailAddress($contact1->getEmailAddress()) ;
+                $d7->setFathersEmailAddress($contact2->getEmailAddress()) ;
+    
+                //  Build D8 record
+                $d8->setMedicalConditionDescription(WPST_HY3_UNUSED) ;
+    
+                //  Build D9 record
+                $d9->setMedicationDescription(WPST_HY3_UNUSED) ;
+    
+                //  Build DA record
+                $da->setCustomField1Name(WPST_HY3_UNUSED) ;
+                $da->setCustomField1Value(WPST_HY3_UNUSED) ;
+                $da->setCustomField2Name(WPST_HY3_UNUSED) ;
+                $da->setCustomField2Value(WPST_HY3_UNUSED) ;
+                $da->setCustomField3Name(WPST_HY3_UNUSED) ;
+                $da->setCustomField3Value(WPST_HY3_UNUSED) ;
+    
+                //  The Hy-tek HY3 file supports 3 custom fields so if swimmer
+                //  fileds are enabled, we'll map up to three of theme into the
+                //  Hy-tek custom fields.
+    
+                $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
+    
+                if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+    
+                $ometa = new SwimTeamOptionMeta() ;
+                $ometa->setSwimmerId($swimmerId) ;
+    
+                //  Load the swimmer options
+    
+                for ($oc = 1 ; $oc <= $options ; $oc++)
                 {
-                    $label = get_option($lconst) ;
-                    $ometa->loadOptionMetaBySwimmerIdAndKey($swimmerId, $oconst) ;
-
-                    switch ($oc)
+                    $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+                    $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
+                    
+                    if (get_option($oconst) != WPST_DISABLED)
                     {
-                        case 1:
-                            $da->setCustomField1Name($label) ;
-                            $da->setCustomField1Value($ometa->getOptionMetaValue()) ;
-                            break ;
-
-                        case 2:
-                            $da->setCustomField2Name($label) ;
-                            $da->setCustomField2Value($ometa->getOptionMetaValue()) ;
-                            break ;
-
-                        case 3:
-                            $da->setCustomField3Name($label) ;
-                            $da->setCustomField3Value($ometa->getOptionMetaValue()) ;
-                            break ;
-
-                        default:
-                            break ;
+                        $label = get_option($lconst) ;
+                        $ometa->loadOptionMetaBySwimmerIdAndKey($swimmerId, $oconst) ;
+    
+                        switch ($oc)
+                        {
+                            case 1:
+                                $da->setCustomField1Name($label) ;
+                                $da->setCustomField1Value($ometa->getOptionMetaValue()) ;
+                                break ;
+    
+                            case 2:
+                                $da->setCustomField2Name($label) ;
+                                $da->setCustomField2Value($ometa->getOptionMetaValue()) ;
+                                break ;
+    
+                            case 3:
+                                $da->setCustomField3Name($label) ;
+                                $da->setCustomField3Value($ometa->getOptionMetaValue()) ;
+                                break ;
+    
+                            default:
+                                break ;
+                        }
                     }
                 }
-            }
-
-            //  Build DB record
-            $db->setFathersLastName($contact2->getLastName()) ;
-            $db->setFathersFirstName($contact2->getFirstName()) ;
-            $db->setMothersFirstName($contact1->getFirstName()) ;
-            $db->setSecondaryContactLastName($contact2->getLastName()) ;
-            $db->setSecondaryContactParent1Name($contact1->getFullName()) ;
-            $db->setSecondaryContactParent2Name($contact2->getFullName()) ;
-
-            //  Build DD record
-            $dd->setFathersCellPhoneNumber($contact2->getSecondaryPhone()) ;
-            $dd->setMothersOfficePhoneNumber($contact1->getSecondaryPhone()) ;
-            $dd->setMothersCellPhoneNumber($contact1->getSecondaryPhone()) ;
-            $dd->setSecondaryContactParent1CellPhoneNumber($contact1->getSecondaryPhone()) ;
-            $dd->setSecondaryContactParent2OfficePhoneNumber($contact2->getSecondaryPhone()) ;
-            $dd->setSecondaryContactParent2CellPhoneNumber($contact2->getSecondaryPhone()) ;
-
-            //  Build DE record
-            $de->setMothersEmailAddress($contact1->getEmailAddress()) ;
-            $de->setSecondaryContactParent2EmailAddress($contact2->getEmailAddress()) ;
-            $de->setMothersLastName($contact1->getLastName()) ;
- 
-            //  Build DF record
-            $df->setAthletesMiddleName($swimmer->getMiddleName()) ;
-            $df->setAthletesCellPhoneNumber($contact3->getPrimaryPhone()) ;
-            $df->setAthletesEmailAddress($contact3->getEmailAddress()) ;
-
-            if ($this->getHY3DebugFlag())
-            {
-                $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
-                $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
-                $hy3[] = WPST_HY3_COLUMN_DEBUG3 ;
-            }
     
-            $hy3[] = $d1->GenerateRecord() ;
-            $hy3[] = $d2->GenerateRecord() ;
-            $hy3[] = $d3->GenerateRecord() ;
-            $hy3[] = $d4->GenerateRecord() ;
-            $hy3[] = $d5->GenerateRecord() ;
-            $hy3[] = $d6->GenerateRecord() ;
-            $hy3[] = $d7->GenerateRecord() ;
-            $hy3[] = $d8->GenerateRecord() ;
-            $hy3[] = $d9->GenerateRecord() ;
-            $hy3[] = $da->GenerateRecord() ;
-            $hy3[] = $db->GenerateRecord() ;
-            $hy3[] = $dc->GenerateRecord() ;
-            $hy3[] = $dd->GenerateRecord() ;
-            $hy3[] = $de->GenerateRecord() ;
-            $hy3[] = $df->GenerateRecord() ;
-
-            $hy3_counters['d']++ ;
-
-            //  Update the various counters
+                //  Build DB record
+                $db->setFathersLastName($contact2->getLastName()) ;
+                $db->setFathersFirstName($contact2->getFirstName()) ;
+                $db->setMothersFirstName($contact1->getFirstName()) ;
+                $db->setSecondaryContactLastName($contact2->getLastName()) ;
+                $db->setSecondaryContactParent1Name($contact1->getFullName()) ;
+                $db->setSecondaryContactParent2Name($contact2->getFullName()) ;
     
-            //  Track uninque swimmers
-            if (!in_array($swimmer->getId(), $unique_swimmers))
-                $unique_swimmers[] = $swimmer->getId() ;
+                //  Build DD record
+                $dd->setFathersCellPhoneNumber($contact2->getSecondaryPhone()) ;
+                $dd->setMothersOfficePhoneNumber($contact1->getSecondaryPhone()) ;
+                $dd->setMothersCellPhoneNumber($contact1->getSecondaryPhone()) ;
+                $dd->setSecondaryContactParent1CellPhoneNumber($contact1->getSecondaryPhone()) ;
+                $dd->setSecondaryContactParent2OfficePhoneNumber($contact2->getSecondaryPhone()) ;
+                $dd->setSecondaryContactParent2CellPhoneNumber($contact2->getSecondaryPhone()) ;
+    
+                //  Build DE record
+                $de->setMothersEmailAddress($contact1->getEmailAddress()) ;
+                $de->setSecondaryContactParent2EmailAddress($contact2->getEmailAddress()) ;
+                $de->setMothersLastName($contact1->getLastName()) ;
+     
+                //  Build DF record
+                $df->setAthletesMiddleName($swimmer->getMiddleName()) ;
+                $df->setAthletesCellPhoneNumber($contact3->getPrimaryPhone()) ;
+                $df->setAthletesEmailAddress($contact3->getEmailAddress()) ;
+    
+                if ($this->getHY3DebugFlag())
+                {
+                    $hy3[] = WPST_HY3_COLUMN_DEBUG1 ;
+                    $hy3[] = WPST_HY3_COLUMN_DEBUG2 ;
+                    $hy3[] = WPST_HY3_COLUMN_DEBUG3 ;
+                }
+        
+                $hy3[] = $d1->GenerateRecord() ;
+                $hy3[] = $d2->GenerateRecord() ;
+                $hy3[] = $d3->GenerateRecord() ;
+                $hy3[] = $d4->GenerateRecord() ;
+                $hy3[] = $d5->GenerateRecord() ;
+                $hy3[] = $d6->GenerateRecord() ;
+                $hy3[] = $d7->GenerateRecord() ;
+                $hy3[] = $d8->GenerateRecord() ;
+                $hy3[] = $d9->GenerateRecord() ;
+                $hy3[] = $da->GenerateRecord() ;
+                $hy3[] = $db->GenerateRecord() ;
+                $hy3[] = $dc->GenerateRecord() ;
+                $hy3[] = $dd->GenerateRecord() ;
+                $hy3[] = $de->GenerateRecord() ;
+                $hy3[] = $df->GenerateRecord() ;
+    
+                $hy3_counters['d']++ ;
+    
+                //  Update the various counters
+        
+                //  Track uninque swimmers
+                if (!in_array($swimmer->getId(), $unique_swimmers))
+                    $unique_swimmers[] = $swimmer->getId() ;
+            }
         }
 
         //  Record the count of entries created
@@ -953,14 +985,21 @@ class HY3MeetEntries extends HY3BaseRecord
             foreach ($swimmerIds as $key => &$swimmerId)
             {
                 //  Has swimmer entered or scratched this event?
-                //  Which mode is the data ingetDateOfBirthAsMMDDYYYY?  Stroke or Event?
+                //  Which mode is the data in?  Stroke or Event?
 
                 if (get_option(WPST_OPTION_OPT_IN_OPT_OUT_USAGE_MODEL) == WPST_STROKE)
                 {
-                    $optinoptout = $meta->getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
+                    $strokecodes = $meta->getStrokeCodesBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
                         $swimmeet->getMeetId(), $swimmeet->getParticipation()) ;
 
-                    if (!empty($optinoptout)) $optinoptout = $optinoptout[0] ;
+                    //  Clean up array so it is easier to work with
+
+                    $optinoptout = array() ;
+                    if (!empty($strokecodes))
+                    {
+                        foreach ($strokecodes as $strokecode)
+                            $optinoptout[] = $strokecode['strokecode'] ;
+                    }
 
                     $swimming = ($swimmeet->getParticipation() == WPST_OPT_IN) ?
                         in_array($event->getStroke(), $optinoptout) :
@@ -968,10 +1007,17 @@ class HY3MeetEntries extends HY3BaseRecord
                 }
                 else
                 {
-                    $optinoptout = $meta->getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
+                    $eventids = $meta->getEventIdsBySwimmerIdsAndMeetIdAndParticipation($swimmerId['swimmerid'],
                         $swimmeet->getMeetId(), $swimmeet->getParticipation()) ;
 
-                    if (!empty($optinoptout)) $optinoptout = $optinoptout[0] ;
+                    //  Clean up array so it is easier to work with
+
+                    $optinoptout = array() ;
+                    if (!empty($eventids))
+                    {
+                        foreach ($eventids as $eventid)
+                            $optinoptout[] = $eventid['eventid'] ;
+                    }
 
                     $swimming = ($swimmeet->getParticipation() == WPST_OPT_IN) ?
                         in_array($event->getEventId(), $optinoptout) :
@@ -1074,9 +1120,31 @@ class HY3MeetEntries extends HY3BaseRecord
                     if (($event->getStroke() != WPST_SDIF_EVENT_STROKE_CODE_MEDLEY_RELAY_VALUE) &&
                         ($event->getStroke() != WPST_SDIF_EVENT_STROKE_CODE_FREESTYLE_RELAY_VALUE))
                     {
+                        switch ($event->getGender())
+                        {
+                            case WPST_GENDER_MIXED:
+                            case WPST_SDIF_EVENT_SEX_CODE_MIXED_VALUE:
+                                $gender = WPST_SDIF_EVENT_SEX_CODE_MIXED_VALUE ;
+                                break ;
+
+                            case WPST_GENDER_MALE:
+                            case WPST_SDIF_EVENT_SEX_CODE_MALE_VALUE:
+                                $gender = WPST_SDIF_EVENT_SEX_CODE_MALE_VALUE ;
+                                break ;
+
+                            case WPST_GENDER_FEMALE:
+                            case WPST_SDIF_EVENT_SEX_CODE_FEMALE_VALUE:
+                                $gender = WPST_SDIF_EVENT_SEX_CODE_FEMALE_VALUE ;
+                                break ;
+
+                            default:
+                                $gender = WPST_NULL_STRING ;
+                                break ;
+                        }
+
                         //  Intialize the E1 record fields that are event based
-                        $e1->setGender1(ucwords($event->getGender())) ;
-                        $e1->setGender2(ucwords($event->getGender())) ;
+                        $e1->setGender1($gender) ;
+                        $e1->setGender2($gender) ;
                         $e1->setDistance($event->getDistance()) ;
                         $e1->setStroke($event->getStroke()) ;
                         $e1->setAgeLower($event->getMinAge()) ;
@@ -1126,11 +1194,33 @@ class HY3MeetEntries extends HY3BaseRecord
                 $relay_team = 65 ; //  ASCII 'A'
                 $relay_swimmer = 0 ;
 
+                switch ($event->getGender())
+                {
+                    case WPST_GENDER_MIXED:
+                    case WPST_SDIF_EVENT_SEX_CODE_MIXED_VALUE:
+                        $gender = WPST_SDIF_EVENT_SEX_CODE_MIXED_VALUE ;
+                        break ;
+
+                    case WPST_GENDER_MALE:
+                    case WPST_SDIF_EVENT_SEX_CODE_MALE_VALUE:
+                        $gender = WPST_SDIF_EVENT_SEX_CODE_MALE_VALUE ;
+                        break ;
+
+                    case WPST_GENDER_FEMALE:
+                    case WPST_SDIF_EVENT_SEX_CODE_FEMALE_VALUE:
+                        $gender = WPST_SDIF_EVENT_SEX_CODE_FEMALE_VALUE ;
+                        break ;
+
+                    default:
+                        $gender = WPST_NULL_STRING ;
+                        break ;
+                }
+
                 //  Intialize the F1 record fields that are event based
-                //
-                $f1->setRelayGender(ucwords($event->getGender())) ;
-                $f1->setRelayGender1(ucwords($event->getGender())) ;
-                $f1->setRelayGender2(ucwords($event->getGender())) ;
+
+                $f1->setRelayGender($gender) ;
+                $f1->setRelayGender1($gender) ;
+                $f1->setRelayGender2($gender) ;
                 $f1->setRelayDistance($event->getDistance()) ;
                 $f1->setRelayStroke($event->getStroke()) ;
                 $f1->setRelayAgeLower($event->getMinAge()) ;

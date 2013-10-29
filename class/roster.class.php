@@ -3,15 +3,15 @@
 /**
  * Season classes.
  *
- * $Id: roster.class.php 968 2012-08-03 03:32:34Z mpwalsh8 $
+ * $Id: roster.class.php 1032 2013-10-25 16:09:03Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Roster
- * @version $Revision: 968 $
- * @lastmodified $Date: 2012-08-02 23:32:34 -0400 (Thu, 02 Aug 2012) $
+ * @version $Revision: 1032 $
+ * @lastmodified $Date: 2013-10-25 12:09:03 -0400 (Fri, 25 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -883,7 +883,7 @@ class SwimTeamRoster extends SwimTeamDBI
 
         $where_clause = sprintf(WPST_ROSTER_WHERE_CLAUSE,
             $this->getSeasonId(), $cutoffdate, $cutoffdate,
-            $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate) ;
+            $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate, "%") ;
 
         $query = sprintf('SELECT %s FROM %s WHERE %s AND %s.id="%s"',
             $select_clause, WPST_ROSTER_TABLES, $where_clause,
@@ -1246,10 +1246,11 @@ class SwimTeamRosterAdminGUIDataList extends SwimTeamRosterGUIDataList
         ,WPST_ACTION_UNREGISTER => WPST_ACTION_UNREGISTER
         ,WPST_ACTION_ASSIGN_LABEL => WPST_ACTION_ASSIGN_LABEL
         ,WPST_ACTION_ASSIGN_LABELS => WPST_ACTION_ASSIGN_LABELS
-        ,WPST_ACTION_EXPORT_SDIF => WPST_ACTION_EXPORT_SDIF
-        ,WPST_ACTION_EXPORT_CSV => WPST_ACTION_EXPORT_CSV
-        ,WPST_ACTION_EXPORT_HY3 => WPST_ACTION_EXPORT_HY3
-        ,WPST_ACTION_EXPORT_MMRE => WPST_ACTION_EXPORT_MMRE
+        //,WPST_ACTION_EXPORT_SDIF => WPST_ACTION_EXPORT_SDIF
+        //,WPST_ACTION_EXPORT_CSV => WPST_ACTION_EXPORT_CSV
+        //,WPST_ACTION_EXPORT_HY3 => WPST_ACTION_EXPORT_HY3
+        //,WPST_ACTION_EXPORT_MMRE => WPST_ACTION_EXPORT_MMRE
+        ,WPST_ACTION_EXPORT_ROSTER => WPST_ACTION_EXPORT_ROSTER
     ) ;
 
     /**

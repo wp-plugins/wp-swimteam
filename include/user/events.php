@@ -3,15 +3,15 @@
 /**
  * Events admin page content.
  *
- * $Id: events.php 974 2012-11-27 12:39:26Z mpwalsh8 $
+ * $Id: events.php 988 2013-06-24 15:32:58Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 974 $
- * @lastmodified $Date: 2012-11-27 07:39:26 -0500 (Tue, 27 Nov 2012) $
+ * @version $Revision: 988 $
+ * @lastmodified $Date: 2013-06-24 11:32:58 -0400 (Mon, 24 Jun 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -185,7 +185,7 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
 
         //  This allows passing arguments eithers as a GET or a POST
 
-        $scriptargs = array_merge($_GET, $_POST) ;
+        $scriptargs = array_merge($_POST, $_GET) ;
         $actions_allowed_without_eventid = array(
             WPST_ACTION_EVENTS_ADD
            ,WPST_ACTION_EVENTS_IMPORT
@@ -251,13 +251,14 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
 
         if ($action == WPST_ACTION_SELECT_ACTION)
         {
-            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-            if (array_key_exists('_recorded_action', $scriptargs))
+            if (array_key_exists('_recorded_action', $scriptargs) &&
+                ($scriptargs['_recorded_action'] == WPST_ACTION_SELECT_ACTION))
+                $action = WPST_ACTION_EVENTS_MANAGE ;
+            elseif (array_key_exists('_recorded_action', $scriptargs))
                 $action = $scriptargs['_recorded_action'] ;
             else
                 $action = null ;
         }
-
         //  Did action originate from the Event Groups Tab?  If so
         //  null it out so the event action is handled properly.
 

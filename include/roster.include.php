@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: roster.include.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: roster.include.php 996 2013-06-25 16:13:28Z mpwalsh8 $
  *
  * Roster includes.  These includes define information used in 
  * the Roster classes and child classes in the Wp-SwimTeam plugin.
@@ -12,8 +12,8 @@
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 996 $
+ * @lastmodified $Date: 2013-06-25 12:13:28 -0400 (Tue, 25 Jun 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -64,13 +64,15 @@ define('WPST_ROSTER_TABLES', WPST_ROSTER_TABLE . ", " .
 define("WPST_ROSTER_WHERE_CLAUSE", WPST_SWIMMERS_TABLE . ".id = " .
     WPST_ROSTER_TABLE . ".swimmerid AND " . WPST_ROSTER_TABLE .
     ".status = '" .  WPST_ACTIVE . "' AND " . WPST_ROSTER_TABLE .
-    ".seasonid='%s' AND " . WPST_AGE_GROUP_TABLE . ".gender = ".
-    WPST_SWIMMERS_TABLE . ".gender AND (YEAR(CURRENT_DATE()) - YEAR(birthdate) -
+    ".seasonid='%s' AND (" . WPST_AGE_GROUP_TABLE . ".gender = ".
+    WPST_SWIMMERS_TABLE . ".gender OR " . WPST_AGE_GROUP_TABLE . ".gender='" .
+    WPST_MIXED . "') AND (YEAR(CURRENT_DATE()) - YEAR(birthdate) -
     (MONTH('%s') < MONTH(birthdate)) - ((MONTH('%s') = MONTH(birthdate)) &
     (DAY('%s') <= DAY(birthdate))) >= " . WPST_AGE_GROUP_TABLE .
     ".minage && YEAR(CURRENT_DATE()) - YEAR(birthdate) -
     (MONTH('%s') < MONTH(birthdate)) - ((MONTH('%s') = MONTH(birthdate)) &
-    (DAY('%s') <= DAY(birthdate))) <= " . WPST_AGE_GROUP_TABLE . ".maxage)") ;
+    (DAY('%s') <= DAY(birthdate))) <= " . WPST_AGE_GROUP_TABLE . ".maxage)
+    AND " . WPST_AGE_GROUP_TABLE . ".type LIKE '%s'") ;
 
 define('WPST_ROSTER_COUNT_COLUMNS', " COUNT(YEAR(CURRENT_DATE()) - YEAR(birthdate) -
     (MONTH('%s') < MONTH(birthdate)) - ((MONTH('%s') = MONTH(birthdate)) &
@@ -89,6 +91,6 @@ define('WPST_ROSTER_COUNT_WHERE_CLAUSE', WPST_SWIMMERS_TABLE . ".id = " .
     WPST_AGE_GROUP_TABLE .  ".minage && YEAR(CURRENT_DATE()) -
     YEAR(birthdate) - (MONTH('%s') < MONTH(birthdate)) - ((MONTH('%s') =
     MONTH(birthdate)) & (DAY('%s') <= DAY(birthdate))) <= " .
-    WPST_AGE_GROUP_TABLE . ".maxage) GROUP BY agegroup
-    ORDER BY " . WPST_AGE_GROUP_TABLE . ".minage") ;
+    WPST_AGE_GROUP_TABLE . ".maxage) AND " . WPST_AGE_GROUP_TABLE . ".type = '%s'
+    GROUP BY agegroup ORDER BY " . WPST_AGE_GROUP_TABLE . ".minage") ;
 ?>

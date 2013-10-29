@@ -3,15 +3,15 @@
 /**
  * Roster page content.
  *
- * $Id: roster.php 920 2012-06-28 22:19:07Z mpwalsh8 $
+ * $Id: roster.php 1006 2013-09-28 17:54:31Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 920 $
- * @lastmodified $Date: 2012-06-28 18:19:07 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 1006 $
+ * @lastmodified $Date: 2013-09-28 13:54:31 -0400 (Sat, 28 Sep 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -102,7 +102,7 @@ class RosterTabContainer extends SwimTeamTabContainer
 
         $where_clause = sprintf(WPST_ROSTER_WHERE_CLAUSE, $seasonId,
             $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate,
-            $cutoffdate) ;
+            $cutoffdate, WPST_STANDARD) ;
 
         return $where_clause ;
     }
@@ -239,6 +239,7 @@ class RosterTabContainer extends SwimTeamTabContainer
            ,WPST_ACTION_EXPORT_CSV
            ,WPST_ACTION_EXPORT_MMRE
            ,WPST_ACTION_ASSIGN_LABELS
+           ,WPST_ACTION_EXPORT_ROSTER
         ) ;
 
         //  The swimmerid is the argument which must be
@@ -246,7 +247,7 @@ class RosterTabContainer extends SwimTeamTabContainer
 
         if (array_key_exists(WPST_DB_PREFIX . 'radio', $scriptargs))
             $swimmerid = $scriptargs[WPST_DB_PREFIX . 'radio'][0] ;
-        else if (array_key_exists('swimmerid', $scriptargs))
+        else if (array_key_exists('swimmerid', $scriptargs) && !empty($scriptargs['swimmerid']))
             $swimmerid = $scriptargs['swimmerid'] ;
         else
             $swimmerid = null ;
@@ -354,6 +355,14 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $form->setSwimmerId($swimmerid) ;
                     $this->setShowFormInstructions() ;
                     $this->setFormInstructionsHeader($optout . ' Swimmer') ;
+                    break ;
+
+                case WPST_ACTION_EXPORT_ROSTER:
+                    $form = new WpSwimTeamExportRosterForm('Export Roster',
+                        SwimTeamUtils::GetPageURI(), 400) ;
+                    $form->setSwimmerId($swimmerid) ;
+                    $this->setShowFormInstructions() ;
+                    $this->setFormInstructionsHeader('Export Roster') ;
                     break ;
 
 
@@ -497,6 +506,63 @@ class RosterTabContainer extends SwimTeamTabContainer
 
                 if ($fp->is_action_successful())
                 {
+                    $c = container() ;
+                    
+                    //  Did we export something?  If so, need to download the file(s)
+
+                    if ($action == WPST_ACTION_EXPORT_ROSTER)
+                    {
+                        $exports = &$fp->_form_content->__exports ;
+
+                        //  CSV
+                        if (in_array(WPST_CSV, $exports))
+                        {
+                            $csv = &$fp->_form_content->__csv ;
+                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($csv->getCSVFile()),
+                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+
+                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                            $c->add($if) ;
+                        }
+
+                        //  RE1
+                        if (in_array(WPST_RE1, $exports))
+                        {
+                            $re1 = &$fp->_form_content->__re1 ;
+                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($re1->getRE1File()),
+                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1')) ;
+
+                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                            $c->add($if) ;
+                        }
+
+                        //  HY3
+                        if (in_array(WPST_HY3, $exports))
+                        {
+                            $hy3 = &$fp->_form_content->__hy3 ;
+                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($hy3->getHY3File()),
+                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3')) ;
+
+                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                            $c->add($if) ;
+                        }
+
+                        //  SDIF
+                        if (in_array(WPST_SDIF, $exports))
+                        {
+                            $sdif = &$fp->_form_content->__sdif ;
+                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($sdif->getSDIFFile()),
+                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3')) ;
+
+                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                            $c->add($if) ;
+                        }
+                    }
+
                     //  Need to show a different GDL based on whether or
                     //  not the end user has a level of Admin ability.
 
@@ -504,7 +570,7 @@ class RosterTabContainer extends SwimTeamTabContainer
 
                     $div->add($gdl) ;
 
-	                $div->add(html_br(2), $form->form_success()) ;
+	                $div->add(html_br(2), $form->form_success(), $c) ;
                     $this->setShowActionSummary() ;
                     $this->setActionSummaryHeader('Roster Action Summary') ;
                 }

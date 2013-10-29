@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.39.985
- * Last Modified:  2013/06/08 15:47:51
+ * Version: 1.40.1034
+ * Last Modified:  2013/10/29 16:26:37
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 922 2012-06-28 22:22:24Z mpwalsh8 $
+ * $Id: swimteam.php 1020 2013-10-07 00:31:34Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,8 +20,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 922 $
- * @lastmodified $Date: 2012-06-28 18:22:24 -0400 (Thu, 28 Jun 2012) $
+ * @version $Rev: 1020 $
+ * @lastmodified $Date: 2013-10-06 20:31:34 -0400 (Sun, 06 Oct 2013) $
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
  */
@@ -281,6 +281,12 @@ function swimteam_install()
     //  Initialize the database
     swimteam_database_init() ;
 
+    //  Setup default roles
+    swimteam_add_default_roles() ;
+
+    //  Setup default capabilities
+    swimteam_add_default_capabilities() ;
+
     //  Load all of the options which will force
     //  them to be written to the WordPress option
     //  database.
@@ -289,6 +295,78 @@ function swimteam_install()
 
     $options = new SwimTeamOptions() ;
     $options->loadOptions() ;
+}
+
+
+/**
+ * swimteam_add_default_roles()
+ *
+ * Add capabilities to roles by default
+ */
+function swimteam_add_default_roles()
+{
+    global $wp_roles;
+
+    if ( ! isset( $wp_roles ) )
+        $wp_roles = new WP_Roles();
+
+    //  Setup the default swim team roles
+
+    //  Swimmer and Parents/Guardians are based on Subscriber role
+    $role = $wp_roles->get_role('subscriber');
+    $wp_roles->add_role(WPST_SWIMMER_ROLE, WPST_SWIMMER_ROLE_LABEL, $role->capabilities);
+    $wp_roles->add_role(WPST_PARENT_OR_GUARDIAN_ROLE, WPST_PARENT_OR_GUARDIAN_ROLE_LABEL, $role->capabilities);
+
+    //  Swim Team Manager is based on Editor role
+    $role = $wp_roles->get_role('editor');
+    $wp_roles->add_role(WPST_MANAGER_ROLE, WPST_MANAGER_ROLE_LABEL, $role->capabilities);
+
+    //  Swim Team Admin is based on Editor role
+    $role = $wp_roles->get_role('admin');
+    $wp_roles->add_role(WPST_ADMIN_ROLE, WPST_ADMIN_ROLE_LABEL, $role->capabilities);
+}
+
+/**
+ * swimteam_add_default_capabilities()
+ *
+ * Add capabilities to roles by default
+ */
+function swimteam_add_default_capabilities()
+{
+    //  Setup Swimmer Capabilities
+	$role = get_role(WPST_SWIMMER_ROLE);
+
+    if ($role !== null) {
+	    $role->add_cap(WPST_SWIMMER_CAP);
+    }
+
+    //  Setup Parent/Guardian Capabilities
+	$role = get_role(WPST_PARENT_OR_GUARDIAN_ROLE);
+
+    if ($role !== null) {
+	    $role->add_cap(WPST_PARENT_OR_GUARDIAN_CAP);
+    }
+
+    //  Setup Swim Team Manager Capabilities
+	$role = get_role(WPST_MANAGER_ROLE);
+
+    if ($role !== null) {
+	    $role->add_cap(WPST_SWIMMER_CAP);
+	    $role->add_cap(WPST_PARENT_OR_GUARDIAN_CAP);
+	    $role->add_cap(WPST_MANAGE_TEAM_CAP);
+	    $role->add_cap(WPST_RUN_REPORTS_CAP);
+    }
+
+    //  Setup Swim Team Admin Capabilities
+	$role = get_role(WPST_ADMIN_ROLE);
+
+    if ($role !== null) {
+	    $role->add_cap(WPST_SWIMMER_CAP);
+	    $role->add_cap(WPST_PARENT_OR_GUARDIAN_CAP);
+	    $role->add_cap(WPST_MANAGE_TEAM_CAP);
+	    $role->add_cap(WPST_RUN_REPORTS_CAP);
+	    $role->add_cap(WPST_ADMIN_OPTIONS_CAP);
+    }
 }
 
 /**
@@ -374,7 +452,8 @@ function swimteam_database_init()
             id INT(11) NOT NULL AUTO_INCREMENT,
             minage SMALLINT(5) NOT NULL,
             maxage SMALLINT(5) NOT NULL,
-            gender ENUM('" . WPST_GENDER_MALE . "', '" . WPST_GENDER_FEMALE . "') NOT NULL,
+            gender ENUM('" . WPST_GENDER_MALE . "', '" . WPST_GENDER_FEMALE . "', '" . WPST_GENDER_MIXED . "') NOT NULL,
+            type ENUM('" . WPST_STANDARD . "', '" . WPST_COMBINED . "') NOT NULL DEFAULT '" . WPST_STANDARD . "',
             swimmerlabelprefix VARCHAR(50) NOT NULL DEFAULT '',
             registrationfee FLOAT NOT NULL DEFAULT 0,
             PRIMARY KEY  (id)

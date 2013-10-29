@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmeets.forms.class.php 980 2013-04-11 21:22:40Z mpwalsh8 $
+ * $Id: swimmeets.forms.class.php 1027 2013-10-25 14:26:52Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
- * @version $Revision: 980 $
+ * @version $Revision: 1027 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2013-04-11 17:22:40 -0400 (Thu, 11 Apr 2013) $
+ * @lastmodifiedby $Date: 2013-10-25 10:26:52 -0400 (Fri, 25 Oct 2013) $
  *
  */
 
@@ -315,7 +315,9 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
             $this->setExportFileExtension('.sd3') ;
             $this->setExportFile(urlencode($sd3->getSDIFFile())) ;
 
-            $this->set_action_message(sprintf('%s meet entries exported in SDIF format.', $sd3->getSDIFCount())) ;
+            //  SDIF entries have D0 and D3 records, divide count by 2 to get number of entries
+            
+            $this->set_action_message(sprintf('%s meet entries exported in SDIF format.', $sd3->getSDIFCount() / 2)) ;
         }
         else if (($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE) ||
                  ($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_MM_HY3_VALUE))

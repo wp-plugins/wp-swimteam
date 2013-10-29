@@ -31,7 +31,8 @@ define('WPST_HY3_UNUSED', '') ;
 define('WPST_HY3_NO_VALUE', '') ;
 define('WPST_HY3_SOFTWARE_NAME', 'Hy-Tek, Ltd') ;
 //define('WPST_HY3_SOFTWARE_VERSION', WPST_VERSION) ;
-define('WPST_HY3_SOFTWARE_VERSION', 'WPST vX.Y.Z') ;
+define('WPST_HY3_SOFTWARE_VERSION',
+    sprintf('WPST v%s.%s', WPST_MAJOR_VERSION, WPST_MINOR_VERSION)) ;
 
 /**
  * Hy-tek Team Manager (TM) and Meet Manager (MM) handle zero

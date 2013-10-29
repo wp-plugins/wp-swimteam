@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 964 2012-08-03 02:44:00Z mpwalsh8 $
+ * $Id: swimteam.include.php 1014 2013-10-06 13:03:08Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -13,8 +13,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 964 $
- * @lastmodified $Date: 2012-08-02 22:44:00 -0400 (Thu, 02 Aug 2012) $
+ * @version $Revision: 1014 $
+ * @lastmodified $Date: 2013-10-06 09:03:08 -0400 (Sun, 06 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -33,9 +33,13 @@ define('WPST_NA', 'n/a') ;
 define('WPST_OPEN', 'open') ;
 define('WPST_CLOSED', 'closed') ;
 define('WPST_BOTH', 'both') ;
+define('WPST_MIXED', 'mixed') ;
 define('WPST_GENDER_MALE', 'male') ;
 define('WPST_GENDER_FEMALE', 'female') ;
 define('WPST_GENDER_BOTH', WPST_BOTH) ;
+define('WPST_GENDER_MIXED', WPST_MIXED) ;
+define('WPST_STANDARD', 'standard') ;
+define('WPST_COMBINED', 'combined') ;
 define('WPST_AGE_MIN', 0) ;
 define('WPST_AGE_MAX', 125) ;
 define('WPST_SDIF_MAX_EVENTS', 7) ;
@@ -92,6 +96,10 @@ define('WPST_INVITATIONAL', 'invitational') ;
 define('WPST_RELAY_CARNIVAL', 'relay carnival') ;
 define('WPST_HTML', 'html') ;
 define('WPST_TEXT', 'plain text') ;
+define('WPST_HY3', 'Hy-tek HY3') ;
+define('WPST_RE1', 'Hy-tek RE1') ;
+define('WPST_CSV', 'CSV') ;
+define('WPST_SDIF', 'SDIF') ;
 define('WPST_OPT_IN', 'opt in') ;
 define('WPST_OPT_OUT', 'opt out') ;
 define('WPST_FULL', 'full') ;
@@ -138,6 +146,7 @@ define('WPST_ACTION_DELETE', 'Delete') ;
 define('WPST_ACTION_OBSOLETE', 'Obsolete') ;
 define('WPST_ACTION_ASSIGN_LABEL', 'Assign Label') ;
 define('WPST_ACTION_ASSIGN_LABELS', 'Assign Labels') ;
+define('WPST_ACTION_EXPORT_ROSTER', 'Export Roster') ;
 define('WPST_ACTION_EXPORT_CSV', 'Export CSV') ;
 define('WPST_ACTION_EXPORT_SDIF', 'Export SDIF') ;
 define('WPST_ACTION_EXPORT_MMRE', 'Export MM Registration') ;
@@ -392,6 +401,23 @@ define('WPST_FILE_FORMAT_HYTEK_MM_HY3_LABEL', 'Hy-tek Meet Manager') ;
 define('WPST_FILE_FORMAT_HYTEK_MM_HY3_VALUE', '.mm.hy3') ;
 define('WPST_FILE_FORMAT_HYTEK_CL2_LABEL', 'Hy-tek CL2') ;
 define('WPST_FILE_FORMAT_HYTEK_CL2_VALUE', 'cl2') ;
+
+// Roles used the plugin
+define('WPST_SWIMMER_ROLE', 'swimteam_swimmer');
+define('WPST_SWIMMER_ROLE_LABEL', 'Swim Team Swimmer');
+define('WPST_PARENT_OR_GUARDIAN_ROLE', 'swimteam_parent_or_guardian');
+define('WPST_PARENT_OR_GUARDIAN_ROLE_LABEL', 'Swim Team Parent or Guardian');
+define('WPST_MANAGER_ROLE', 'swimteam_manager');
+define('WPST_MANAGER_ROLE_LABEL', 'Swim Team Manager');
+define('WPST_ADMIN_ROLE', 'swimteam_admin');
+define('WPST_ADMIN_ROLE_LABEL', 'Swim Team Administrator');
+
+// Capabilities used by the plugin
+define('WPST_SWIMMER_CAP', 'swimteam_swimmer');
+define('WPST_PARENT_OR_GUARDIAN_CAP', 'swimteam_parent_or_guardian');
+define('WPST_MANAGE_TEAM_CAP', 'swimteam_manage_team');
+define('WPST_RUN_REPORTS_CAP', 'swimteam_run_reports');
+define('WPST_ADMIN_OPTIONS_CAP', 'swimteam_admin_options');
 
 
 if (WPST_DEBUG) :

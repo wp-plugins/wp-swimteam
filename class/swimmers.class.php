@@ -3,15 +3,15 @@
 /**
  * Swimmer classes.
  *
- * $Id: swimmers.class.php 980 2013-04-11 21:22:40Z mpwalsh8 $
+ * $Id: swimmers.class.php 1032 2013-10-25 16:09:03Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 980 $
- * @lastmodified $Date: 2013-04-11 17:22:40 -0400 (Thu, 11 Apr 2013) $
+ * @version $Revision: 1032 $
+ * @lastmodified $Date: 2013-10-25 12:09:03 -0400 (Fri, 25 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -683,7 +683,7 @@ class SwimTeamSwimmer extends SwimTeamDBI
         $d = &$this->__dateOfBirth ;
 
         $uss = strtoupper(sprintf('%02s%02s%02s%-3s%1s%-4s',
-            substr($d['year'], 2, 2), $d['month'], $d['day'],
+            $d['month'], $d['day'], substr($d['year'], 2, 2),
             substr($this->getFirstName(), 0, 3),
             substr($this->getMiddleName(), 0, 1),
             substr($this->getLastName(),0, 4))) ;

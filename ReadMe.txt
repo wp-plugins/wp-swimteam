@@ -2,8 +2,8 @@
 Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
-Requires at least: 3.1
-Tested up to: 3.5.1
+Requires at least: 3.5
+Tested up to: 3.6.1
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -65,6 +65,25 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.40 =
+* This update requires phpHtmlLib v2.6.7 or later!
+* Fixed initializion bug when Adding Events to an Event Group.  Events were by default not being assigned to the correct group.
+* Fixed pagination bug when managing large number of events.  When paging through events the GUI would get confused.
+* Fixed Event Group bug which was propagating the wrong event group to subsequent actions.
+* Added support for Mixed Gender and Combined age groups.
+* Added support for Mixed Gender and Combined Events.
+* Added support for exporting mixed gender event entries in SD3 and HY3 formats.
+* Added support for mixed gender events when importing events.
+* Fixed bug resulting in database error when generating RE1 roster.
+* Re-implemented Roster Export functionality - multiple formats can now be exported.  The export can also be limited one gender.
+* Added support for age groups where min age and max age are identical.
+* Added smart processing of 0 as min or max age in HYV event imports, mapping 0 to minimum or maximum age setting as appropriate.
+* Fixed bug in USS Number generation.
+* Fixed bug in HY3 entries generation where E1 record did not contain gender.
+* Fixed reported entry count when exporting SDIF, count was off by 2x.
+* Fixed bug exporting roster by single gender which resulted in no swimmers.
+* Fixed bug which prevented proper HY3 meet entry generation for Opt-In swim meets.
 
 = 1.39 =
 * Added CSS class and element ID to DIV which wraps Google Maps.  This allows sites to add CSS easily to address an unusual situation where the map won't show in FireFox or IE due to a max-width promperty on the IMG element.

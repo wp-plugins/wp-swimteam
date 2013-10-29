@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: roster.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: roster.forms.class.php 1008 2013-09-28 17:55:11Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 849 $
+ * @version $Revision: 1008 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2013-09-28 13:55:11 -0400 (Sat, 28 Sep 2013) $
  *
  */
 
@@ -27,7 +27,7 @@ require_once('roster.class.php') ;
 /**
  * Construct the Register Swimmer form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -378,7 +378,7 @@ class WpSwimTeamSwimmerRegisterForm extends WpSwimTeamForm
 /**
  * Construct the Register Swimmer form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -524,7 +524,7 @@ class WpSwimTeamSwimmerUnregisterForm extends WpSwimTeamSwimmerRegisterForm
 /**
  * Construct the Label Swimmer form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -717,4 +717,452 @@ class WpSwimTeamSwimmerLabelForm extends WpSwimTeamSwimmerUnregisterForm
         return $this->form_content_buttons_Assign_Cancel() ;
     }
 }
+
+/**
+ * Construct the Export Roster form
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see WpSwimTeamForm
+ */
+class WpSwimTeamExportRosterForm extends WpSwimTeamForm
+{
+    /**
+     * exports
+     */
+    var $__exports = array() ;
+
+    /**
+     * action messages
+     */
+    var $__actionmsgs = array() ;
+
+    /**
+     * id property - used to track the swimmer record
+     */
+
+    var $__swimmerId ;
+
+    /**
+     * Set the Swimmer Id property
+     */
+    function setSwimmerId($swimmerId)
+    {
+        $this->__swimmerId = $swimmerId ;
+    }
+
+    /**
+     * Get the Swimmer Id property
+     */
+    function getSwimmerId()
+    {
+        return $this->__swimmerId ;
+    }
+
+    /**
+     * generated CSV
+     */
+    var $__csv ;
+
+    /**
+     * generated RE1
+     */
+    var $__re1 ;
+
+    /**
+     * generated HY3
+     */
+    var $__hy3 ;
+
+    /**
+     * generated SDIF
+     */
+    var $__sdif ;
+
+    /**
+     * Set up CSV generation
+     *
+     * @param mixed $csv - CSV report object
+     */
+    function __initializeReportGeneratorCSV(&$csv)
+    {
+        $csv->setFirstName(true) ;
+        $csv->setMiddleName(true) ;
+        $csv->setNickName(true) ;
+        $csv->setLastName(true) ;
+        $csv->setBirthDate(true) ;
+        $csv->setAge(true) ;
+        $csv->setAgeGroup(true) ;
+        $csv->setGender(true) ;
+        $csv->setStatusFilter(true) ;
+        $csv->setStatusFilterValue(WPST_ACTIVE) ;
+        $csv->setSwimmerLabel(true) ;
+        $csv->setResults(true) ;
+        $csv->setPrimaryContact(true) ;
+        $csv->setSecondaryContact(true) ;
+
+        //  How many user options does this configuration support?
+
+        $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
+
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+            
+        //  Handle the optional fields
+
+        for ($oc = 1 ; $oc <= $options ; $oc++)
+        {
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
+                
+            if (get_option($oconst) != WPST_DISABLED)
+            {
+                $csv->setOptionalField($oconst, true) ;
+            }
+        }
+    }
+
+    /**
+     * Set up RE1 generation
+     *
+     * @param mixed $re1 - RE1 report object
+     */
+    function __initializeReportGeneratorRE1(&$re1)
+    {
+        $re1->setFirstName(true) ;
+        $re1->setMiddleName(false) ;
+        $re1->setNickName(false) ;
+        $re1->setLastName(true) ;
+        $re1->setBirthDate(true) ;
+        $re1->setAge(false) ;
+        $re1->setAgeGroup(false) ;
+        $re1->setGender(true) ;
+        $re1->setStatusFilter(true) ;
+        $re1->setStatusFilterValue(WPST_ACTIVE) ;
+        $re1->setSwimmerLabel(true) ;
+        $re1->setResults(false) ;
+        $re1->setPrimaryContact(false) ;
+        $re1->setSecondaryContact(false) ;
+
+        //  How many user options does this configuration support?
+
+        $options = get_option(WPST_OPTION_SWIMMER_OPTION_COUNT) ;
+
+        if ($options === false) $options = WPST_DEFAULT_SWIMMER_OPTION_COUNT ;
+            
+        //  Handle the optional fields
+
+        for ($oc = 1 ; $oc <= $options ; $oc++)
+        {
+            $oconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc) ;
+            $lconst = constant('WPST_OPTION_SWIMMER_OPTION' . $oc . '_LABEL') ;
+                
+            if (get_option($oconst) != WPST_DISABLED)
+            {
+                $re1->setOptionalField($oconst, false) ;
+            }
+        }
+    }
+
+    /**
+     * This method gets called EVERY time the object is
+     * created.  It is used to build all of the 
+     * FormElement objects used in this Form.
+     *
+     */
+    function form_init_elements()
+    {
+        $this->add_hidden_element('swimmerid') ;
+ 
+        //  This is used to remember the action
+        //  which originated from the GUIDataList.
+ 
+        $this->add_hidden_element('_action') ;
+
+        //  Gender
+        $gender = new FECheckBoxList('Gender', true, '150px');
+        $gender->set_list_data(array(
+             ucfirst(WPST_GENDER_MALE) => WPST_GENDER_MALE
+            ,ucfirst(WPST_GENDER_FEMALE) => WPST_GENDER_FEMALE
+            ,ucfirst(WPST_GENDER_BOTH) => WPST_GENDER_BOTH
+        )) ;
+        $gender = new FERadioGroup('Gender', array(
+             ucfirst(WPST_GENDER_MALE) => WPST_GENDER_MALE
+            ,ucfirst(WPST_GENDER_FEMALE) => WPST_GENDER_FEMALE
+            ,ucfirst(WPST_GENDER_BOTH) => WPST_GENDER_BOTH
+        ), true) ;
+        $gender->set_br_flag(true) ;
+        $this->add_element($gender) ;
+
+        //  Export Format
+        $format = new FECheckBoxList('File Format', true, '150px');
+        $format->set_list_data(array(
+             ucfirst(WPST_CSV) => WPST_CSV
+            ,ucfirst(WPST_SDIF) => WPST_SDIF
+            ,ucfirst(WPST_HY3) => WPST_HY3
+            ,ucfirst(WPST_RE1) => WPST_RE1
+        )) ;
+        $format->set_style_attribute('border', '0px') ;
+        $format->set_style_attribute('background-color', '#eee') ;
+        $this->add_element($format) ;
+    }
+
+    /**
+     * This method is called only the first time the form
+     * page is hit.  This enables u to query a DB and 
+     * pre populate the FormElement objects with data.
+     *
+     */
+    function form_init_data()
+    {
+        $this->set_hidden_element_value('swimmerid', $this->getSwimmerId()) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_EXPORT_ROSTER) ;
+
+        $options = new SwimTeamOptions() ;
+        $options->loadOptions() ;
+
+        //  Initialize the form fields
+        $this->set_element_value('Gender', $options->getGender()) ;
+        //$this->set_element_value('File Format', WPST_CSV) ;
+    }
+
+    /**
+     * This is the method that builds the layout of where the
+     * FormElements will live.  You can lay it out any way
+     * you like.
+     *
+     */
+    function form_content()
+    {
+
+        $table = html_table($this->_width,0,4) ;
+        $table->set_style('border: 1px solid') ;
+
+        $table->add_row($this->element_label('Gender'),
+            $this->element_form('Gender')) ;
+
+        $table->add_row($this->element_label('File Format'),
+            $this->element_form('File Format')) ;
+
+        $this->add_form_block(null, $table) ;
+    }
+
+    /**
+     * This method gets called after the FormElement data has
+     * passed the validation.  This enables you to validate the
+     * data against some backend mechanism, say a DB.
+     *
+     */
+    function form_backend_validation()
+    {
+        return true ;
+    }
+
+    /**
+     * This method is called ONLY after ALL validation has
+     * passed.  This is the method that allows you to 
+     * do something with the data, say insert/update records
+     * in the DB.
+     */
+    function form_action()
+    {
+        $this->__exports = $this->get_element_value('File Format') ;
+
+        $action = $this->get_hidden_element_value('_action') ;
+        $actionmsgs = &$this->__actionmsgs ;
+
+        $formats = $this->get_element_value('File Format') ;
+
+        //  Export each format requested
+
+        foreach ($formats as $format)
+        {
+            switch ($format)
+            {
+                case WPST_CSV:
+                    $this->_form_action_export_csv() ;
+                    break ;
+
+                case WPST_RE1:
+                    $this->_form_action_export_re1() ;
+                    break ;
+
+                case WPST_HY3:
+                    $this->_form_action_export_hy3() ;
+                    break ;
+
+                case WPST_SDIF:
+                    $this->_form_action_export_sdif() ;
+                    break ;
+            }
+        }
+
+        //  Construct action message
+
+        if (!empty($actionmsgs))
+        {
+            $c = container() ;
+
+            foreach($actionmsgs as $actionmsg)
+            {
+                $c->add($actionmsg, html_br()) ;
+            }
+
+            $actionmsg = $c->render() ;
+        }
+        else
+        {
+            $this->setErrorActionMessageDivClass() ;
+            $actionmsg = sprintf("No %s actions exectuted.", $action) ;
+        }
+
+        $this->set_action_message($actionmsg) ;
+
+        return true ;
+    }
+
+    /**
+     * Export the CSV data
+     *
+     */
+    function _form_action_export_csv()
+    {
+        $this->__csv = new SwimTeamSwimmersReportGeneratorCSV() ;
+        $csv = &$this->__csv ;
+        $actionmsgs = &$this->__actionmsgs ;
+        $this->__initializeReportGeneratorCSV($csv) ;
+
+        //  Filter the export based on Gender?
+
+        $gender = $this->get_element_value('Gender') ;
+
+        if ($gender != WPST_GENDER_BOTH)
+        {
+            $csv->setGenderFilter(true) ;
+            $csv->setGenderFilterValue($gender) ;
+        }
+
+        $csv->generateReport($this->getSwimmerid(), false) ;
+        $csv->generateCSVFile() ;
+
+        //  Build the message that goes back to the user
+
+        $actionmsgs[] = sprintf('Swim Team Roster Exported,
+            %s CSV record%s exported.', $csv->getRecordCount(),
+            $csv->getRecordCount() == 1 ? '' : 's') ;
+
+        return true ;
+    }
+
+    /**
+     * Export the RE1 data
+     *
+     */
+    function _form_action_export_re1()
+    {
+        $this->__re1 = new SwimTeamSwimmersReportGeneratorRE1() ;
+        $re1 = &$this->__re1 ;
+        $actionmsgs = &$this->__actionmsgs ;
+        $this->__initializeReportGeneratorRE1($re1) ;
+
+        //  Filter the export based on Gender?
+
+        $gender = $this->get_element_value('Gender') ;
+
+        if ($gender != WPST_GENDER_BOTH)
+        {
+            $re1->setGenderFilter(true) ;
+            $re1->setGenderFilterValue($gender) ;
+        }
+
+        $re1->generateReport($this->getSwimmerid(), false) ;
+        $re1->generateRE1File() ;
+
+        //  Build the message that goes back to the user
+
+        $actionmsgs[] = sprintf('Swim Team Roster Exported,
+            %s RE1 record%s exported.', $re1->getRecordCount(),
+            $re1->getRecordCount() == 1 ? '' : 's') ;
+
+        return true ;
+    }
+
+    function _form_action_export_hy3()
+    {
+        require_once('hy-tek.class.php') ;
+        $this->__hy3 = new HY3Roster() ;
+        $hy3 = &$this->__hy3 ;
+        $actionmsgs = &$this->__actionmsgs ;
+
+        //  Filter the export based on Gender?
+
+        $gender = $this->get_element_value('Gender') ;
+
+        if ($gender != WPST_GENDER_BOTH)
+        {
+            $hy3->setGender($gender) ;
+        }
+
+        $hy3->generateHY3($this->getSwimmerid(), false) ;
+        $hy3->generateHY3File() ;
+
+        //  Build the message that goes back to the user
+
+        $actionmsgs[] = sprintf('Swim Team Roster Exported,
+            %s HY3 record%s exported.', $hy3->getHY3Count(),
+            $hy3->getHY3Count() == 1 ? '' : 's') ;
+
+        return true ;
+    }
+
+    function _form_action_export_sdif()
+    {
+        require_once('sdif.class.php') ;
+        $this->__sdif = new SDIFLSCRegistrationPyramid() ;
+        $sdif = &$this->__sdif ;
+        $actionmsgs = &$this->__actionmsgs ;
+
+        //  Filter the export based on Gender?
+
+        $gender = $this->get_element_value('Gender') ;
+
+        if ($gender != WPST_GENDER_BOTH)
+        {
+            $sdif->setGender($gender) ;
+        }
+
+        $sdif->generateSDIF($this->getSwimmerid()) ;
+        $sdif->generateSDIFFile() ;
+
+        //  Build the message that goes back to the user
+
+        $actionmsgs[] = sprintf('Swim Team Roster Exported,
+            %s SDIF record%s exported.', $sdif->getSDIFCount(),
+            $sdif->getSDIFCount() == 1 ? '' : 's') ;
+
+        return true ;
+    }
+
+    /**
+     * Build the success action messages
+     *
+     */
+    function form_success()
+    {
+        $container = container() ;
+        $container->add($this->_action_message) ;
+
+        return $container ;
+    }
+
+    /**
+     * Overload form_content_buttons() method to have the
+     * button display 'Register' instead of the default 'Save'.
+     *
+     */
+    function form_content_buttons()
+    {
+        return $this->form_content_buttons_Export_Cancel() ;
+    }
+}
+
 ?>

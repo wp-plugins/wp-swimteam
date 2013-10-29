@@ -3,15 +3,15 @@
 /**
  * Management admin page content.
  *
- * $Id: manage_menu.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: manage_menu.php 1017 2013-10-06 13:07:44Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1017 $
+ * @lastmodified $Date: 2013-10-06 09:07:44 -0400 (Sun, 06 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -103,8 +103,9 @@ class ManagementTabContainer extends Container
         //  Clean up the URL or the tab=N argument
         //  may be appended to the URI mutliple times.
 
-        $url = add_query_arg(array('tab' => false),
-            admin_url($pagenow .'?'.$_SERVER['QUERY_STRING'])) ;
+        //$url = add_query_arg(array('tab' => false),
+            //admin_url($pagenow .'?'.$_SERVER['QUERY_STRING'])) ;
+        $url = remove_query_arg(array('tab')) ;
 
         //  Construct the tabs
 

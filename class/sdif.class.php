@@ -3,15 +3,15 @@
 /**
  * TeamProfile classes.
  *
- * $Id: sdif.class.php 957 2012-07-07 04:39:17Z mpwalsh8 $
+ * $Id: sdif.class.php 1028 2013-10-25 14:27:12Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision: 957 $
- * @lastmodified $Date: 2012-07-07 00:39:17 -0400 (Sat, 07 Jul 2012) $
+ * @version $Revision: 1028 $
+ * @lastmodified $Date: 2013-10-25 10:27:12 -0400 (Fri, 25 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -415,6 +415,11 @@ class SDIFBasePyramid extends SDIFProfile
     var $__sdifDebugFlag = false ;
 
     /**
+     * gender
+     */
+    var $__gender = WPST_GENDER_BOTH ;
+
+    /**
      * Get SDIF Debug Flag
      *
      * @return boolean - state of SDIF debug flag
@@ -432,6 +437,26 @@ class SDIFBasePyramid extends SDIFProfile
     function setSDIFDebugFlag($flag = true)
     {
         $this->__sdifDebugFlag = $flag ;
+    }
+
+    /**
+     * Get Gender
+     *
+     * @return string - gender to limit SDIF data
+     */
+    function getGender()
+    {
+        return $this->__gender;
+    }
+
+    /**
+     * Set Gender
+     *
+     * @param string - gender to limit SDIF data
+     */
+    function setGender($gender = WPST_GENDER_BOTH)
+    {
+        $this->__gender = $gender ;
     }
 
     /**
@@ -644,51 +669,58 @@ class SDIFLSCRegistrationPyramid extends SDIFBasePyramid
             $roster->setSwimmerId($swimmerId) ;
             $roster->loadRosterBySeasonIdAndSwimmerId() ;
             $swimmer->loadSwimmerById($swimmerId) ;
-            $contact->loadUserProfileByUserId($swimmer->getContact1Id()) ;
-                    
-            //  Initialize D1 record fields which are swimmer based
-            $d1->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
-            $d1->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
 
-            //  How should the Swimmer Id appear in the SDIF file?
-            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
-                $d1->setUSS($swimmer->getId()) ;
-            if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
-                $d1->setUSS($roster->getSwimmerLabel()) ;
-            else
-                $d1->setUSS($swimmer->getUSSNumber()) ;
+            //  Make sure we only generate records for the requested gender
 
-            $d1->setPhoneNumber($contact->getPrimaryPhone()) ;
-            $d1->setSecondaryPhoneNumber($contact->getSecondaryPhone()) ;
-    
-            if ($this->getUseAgeGroupAge() == WPST_NO)
-                $d1->setAgeOrClass($swimmer->getAge()) ;
-            else
-                $d1->setAgeOrClass($swimmer->getAgeGroupAge()) ;
-            $d1->setGender($swimmer->getGender()) ;
-    
-            if ($this->getSDIFDebugFlag())
+            if (($this->getGender() == WPST_GENDER_BOTH) ||
+                ($this->getGender() == $swimmer->getGender()))
             {
-                $sdif[] = WPST_SDIF_COLUMN_DEBUG1 ;
-                $sdif[] = WPST_SDIF_COLUMN_DEBUG2 ;
-            }
-    
-            $sdif[] = $d1->GenerateRecord() ;
-            $sdif_counters['d']++ ;
+                $contact->loadUserProfileByUserId($swimmer->getContact1Id()) ;
 
-            $d2->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
-            $d2->setSwimmerAddress1($contact->getFullStreetAddress()) ;
-            $d2->setSwimmerCity($contact->getCity()) ;
-            $d2->setSwimmerState($contact->getStateOrProvince()) ;
-            $d2->setSwimmerPostalCode($contact->getPostalCode()) ;
-            $sdif[] = $d2->GenerateRecord() ;
-            $sdif_counters['d']++ ;
+                //  Initialize D1 record fields which are swimmer based
+                $d1->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
+                $d1->setBirthDate($swimmer->getDateOfBirthAsMMDDYYYY(), true) ;
     
-            //  Update the various counters
+                //  How should the Swimmer Id appear in the SDIF file?
+                if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_WPST_ID)
+                    $d1->setUSS($swimmer->getId()) ;
+                if ($this->getSwimmerIdFormat() == WPST_SDIF_SWIMMER_ID_FORMAT_SWIMMER_LABEL)
+                    $d1->setUSS($roster->getSwimmerLabel()) ;
+                else
+                    $d1->setUSS($swimmer->getUSSNumber()) ;
     
-            //  Track uninque swimmers
-            if (!in_array($swimmer->getId(), $unique_swimmers))
-                $unique_swimmers[] = $swimmer->getId() ;
+                $d1->setPhoneNumber($contact->getPrimaryPhone()) ;
+                $d1->setSecondaryPhoneNumber($contact->getSecondaryPhone()) ;
+        
+                if ($this->getUseAgeGroupAge() == WPST_NO)
+                    $d1->setAgeOrClass($swimmer->getAge()) ;
+                else
+                    $d1->setAgeOrClass($swimmer->getAgeGroupAge()) ;
+                $d1->setGender($swimmer->getGender()) ;
+        
+                if ($this->getSDIFDebugFlag())
+                {
+                    $sdif[] = WPST_SDIF_COLUMN_DEBUG1 ;
+                    $sdif[] = WPST_SDIF_COLUMN_DEBUG2 ;
+                }
+        
+                $sdif[] = $d1->GenerateRecord() ;
+                $sdif_counters['d']++ ;
+    
+                $d2->setSwimmerName($swimmer->getLastCommaFirstNames($this->getUseNickName())) ;
+                $d2->setSwimmerAddress1($contact->getFullStreetAddress()) ;
+                $d2->setSwimmerCity($contact->getCity()) ;
+                $d2->setSwimmerState($contact->getStateOrProvince()) ;
+                $d2->setSwimmerPostalCode($contact->getPostalCode()) ;
+                $sdif[] = $d2->GenerateRecord() ;
+                $sdif_counters['d']++ ;
+        
+                //  Update the various counters
+        
+                //  Track uninque swimmers
+                if (!in_array($swimmer->getId(), $unique_swimmers))
+                    $unique_swimmers[] = $swimmer->getId() ;
+            }
         }
 
         //  Construct the Z0 file termination record
@@ -1269,6 +1301,7 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
                         $d0->setAgeOrClass($swimmer->getAge()) ;
                     else
                         $d0->setAgeOrClass($swimmer->getAgeGroupAge()) ;
+
                     $d0->setGender($swimmer->getGender()) ;
     
                     if ($this->getSDIFDebugFlag())
@@ -3463,8 +3496,10 @@ class SDIFDxRecord extends SDIFRecord
  
         if ($txt == WPST_GENDER_MALE)
             $this->_event_gender = WPST_SDIF_SWIMMER_SEX_CODE_MALE_VALUE ;
-        else if ($txt == WPST_GENDER_FEMALE)
+        elseif ($txt == WPST_GENDER_FEMALE)
             $this->_event_gender = WPST_SDIF_SWIMMER_SEX_CODE_FEMALE_VALUE ;
+        elseif ($txt == WPST_GENDER_MIXED)
+            $this->_event_gender = WPST_SDIF_EVENT_SEX_CODE_MIXED_VALUE ;
         else
             $this->_event_gender = $txt ;
     }

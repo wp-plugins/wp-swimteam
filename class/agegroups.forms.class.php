@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: agegroups.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: agegroups.forms.class.php 1011 2013-10-06 12:58:24Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,22 +10,22 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage AgeGroups
- * @version $Revision: 849 $
+ * @version $Revision: 1011 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2013-10-06 08:58:24 -0400 (Sun, 06 Oct 2013) $
  *
  */
 
-require_once("agegroups.class.php") ;
-require_once("forms.class.php") ;
+require_once('agegroups.class.php') ;
+require_once('forms.class.php') ;
 
 /**
  * Construct the Add Age Group form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -36,6 +36,21 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
      */
 
     var $__id ;
+
+    /**
+     * div to hold the standard age group options
+     */
+    var $__standard_div ;
+
+    /**
+     * div to hold the combined age group options
+     */
+    var $__combined_div ;
+
+    /**
+     * div to hold the toggle of group types
+     */
+    var $__type_div ;
 
     /**
      * Set the Id property
@@ -58,7 +73,7 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
      *
      * @return mixed - array of gender key value pairs
      */
-    function _genderSelections()
+    function _genderSelections($mixed = false)
     {
         //  Gender options and labels are set based on
         //  the plugin options
@@ -73,10 +88,8 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
             //  age group prefixes as it would end up with both genders
             //  having the same swimmer id prefix and that would be bad.
 
-            if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-                WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-                (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-                WPST_AGE_GROUP_PREFIX_WPST_ID))
+            if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+                (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
             {
                 $g = array(ucfirst(get_option(WPST_OPTION_GENDER_LABEL_MALE)) => WPST_GENDER_MALE
                     ,ucfirst(get_option(WPST_OPTION_GENDER_LABEL_FEMALE)) => WPST_GENDER_FEMALE
@@ -91,7 +104,10 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
             }
         }
 
-         return $g ;
+        //  Support mixed genders?
+        if ($mixed) $g[ucfirst(WPST_GENDER_MIXED)] = WPST_GENDER_MIXED ;
+
+        return $g ;
     }
 
     /**
@@ -106,14 +122,14 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
         //  the delete operation, the fields are displayed
         //  but are set in the disabled state.
         $disabled_field = (strtoupper(get_class($this))
-            == strtoupper("WpSwimTeamAgeGroupDeleteForm")) ? true : false ;
+            == strtoupper('WpSwimTeamAgeGroupDeleteForm')) ? true : false ;
 
-        $this->add_hidden_element("agegroupid") ;
+        $this->add_hidden_element('agegroupid') ;
 
         //  This is used to remember the action
         //  which originated from the GUIDataList.
  
-        $this->add_hidden_element("_action") ;
+        $this->add_hidden_element('_action') ;
 
         //  Set up an age range
         $agelist = array() ;
@@ -121,49 +137,67 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
             $agelist[$i] = $i ;
 
         //  Minimum Age Field
-        $minage = new FEListBox("Minimum Age", !$disabled_field, "75px");
+        $minage = new FEListBox('Minimum Age', !$disabled_field, '75px');
         $minage->set_list_data($agelist) ;
         $minage->set_disabled($disabled_field) ;
 
         $this->add_element($minage);
 		
         //  Maximum Age Field
-        $maxage = new FEListBox("Maximum Age", !$disabled_field, "75px");
+        $maxage = new FEListBox('Maximum Age', !$disabled_field, '75px');
         $maxage->set_list_data($agelist) ;
         $maxage->set_disabled($disabled_field) ;
         $this->add_element($maxage);
 		
+        //  Set up the ActiveDiv to toggle inputs based on type of age group
+        $this->__type_div = new FEActiveDIVRadioButtonGroup(
+            'Type', array(
+                ucwords(WPST_STANDARD) => WPST_STANDARD
+               ,ucwords(WPST_COMBINED) => WPST_COMBINED
+            ), true) ;
+        $this->__type_div->set_br_flag(false) ;
+        $this->__type_div->set_disabled($disabled_field) ;
+        $this->add_element($this->__type_div) ;
+
         //  Gender options and labels are set based on
         //  the plugin options
 
-        $gender = new FEListBox("Gender", !$disabled_field, "100px");
-        $gender->set_list_data($this->_genderSelections()) ;
-        $gender->set_disabled($disabled_field) ;
+        $gender_s = new FEListBox('Standard Gender', !$disabled_field, '100px');
+        $gender_s->set_list_data($this->_genderSelections(false)) ;
+        $gender_s->set_disabled($disabled_field) ;
 
-        $this->add_element($gender) ;
+        $this->add_element($gender_s) ;
+
+        $gender_c = new FEListBox('Combined Gender', !$disabled_field, '100px');
+        $gender_c->set_list_data($this->_genderSelections(true)) ;
+        $gender_c->set_disabled($disabled_field) ;
+
+        $this->add_element($gender_c) ;
 
         //  Need to handle swimmer id when alpha-numeric
         //  swimmer ids are enabled.
 
-        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID))
+        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
         {
-            $swimmeridprefix = new FEText("Age Group Swimmer Label Prefix",
-                !$disabled_field, "75px") ;
+            $swimmeridprefix = new FEText('Standard Age Group Swimmer Label Prefix', false, '75px') ;
             $swimmeridprefix->set_disabled($disabled_field) ;
 
             $this->add_element($swimmeridprefix) ;
         }
         else
         {
-            $this->add_hidden_element("Age Group Swimmer Label Prefix") ;
+            $this->add_hidden_element('Standard Age Group Swimmer Label Prefix') ;
         }
+
+        $this->add_hidden_element('Combined Age Group Swimmer Label Prefix') ;
  
-        $regfee = new FENumberPrice("Registration Fee", !$disabled_field, "100px");
-        $this->add_element($regfee) ;
+        //  Handle Registration Fees
+        $regfee = new FENumberPrice('Standard Registration Fee', !$disabled_field, '100px');
         $regfee->set_disabled($disabled_field) ;
+        $this->add_element($regfee) ;
+ 
+        $this->add_hidden_element('Combined Registration Fee') ;
     }
 
     /**
@@ -175,19 +209,39 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
     function form_init_data()
     {
         //  Initialize the form fields
-        $this->set_hidden_element_value("_action", WPST_AGT_ADD_AGE_GROUP) ;
-        $this->set_element_value("Minimum Age", WPST_AGT_MIN_AGE) ;
-        $this->set_element_value("Maximum Age", WPST_AGT_MAX_AGE) ;
-        $this->set_element_value("Gender", WPST_AGT_GENDER_BOTH) ;
-        $this->set_element_value("Registration Fee", get_option(WPST_OPTION_REG_FEE_AMOUNT)) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_ADD) ;
+        $this->set_element_value('Minimum Age', get_option(WPST_OPTION_MIN_AGE)) ;
+        $this->set_element_value('Maximum Age', get_option(WPST_OPTION_MAX_AGE)) ;
 
-        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID))
-            $this->set_element_value("Age Group Swimmer Label Prefix", WPST_NULL_STRING) ;
+        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
+        {
+            $this->set_element_value('Standard Gender', WPST_GENDER_MALE) ;
+            $this->set_element_value('Combined Gender', WPST_GENDER_MALE) ;
+        }
         else
-            $this->set_hidden_element_value("Age Group Swimmer Label Prefix", WPST_NULL_STRING) ;
+        {
+            $this->set_element_value('Standard Gender', WPST_GENDER_BOTH) ;
+            $this->set_element_value('Combined Gender', WPST_GENDER_BOTH) ;
+        }
+
+
+        $this->set_element_value('Type', WPST_STANDARD) ;
+        $this->set_element_value('Standard Registration Fee', get_option(WPST_OPTION_REG_FEE_AMOUNT)) ;
+        $this->set_hidden_element_value('Combined Registration Fee', get_option(WPST_OPTION_REG_FEE_AMOUNT)) ;
+
+        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
+        {
+            $this->set_element_value('Standard Age Group Swimmer Label Prefix', WPST_NULL_STRING) ;
+            //$this->set_element_value('Combined Age Group Swimmer Label Prefix', WPST_NULL_STRING) ;
+            $this->set_hidden_element_value('Combined Age Group Swimmer Label Prefix', WPST_NULL_STRING) ;
+        }
+        else
+        {
+            $this->set_hidden_element_value('Standard Age Group Swimmer Label Prefix', WPST_NULL_STRING) ;
+            $this->set_hidden_element_value('Combined Age Group Swimmer Label Prefix', WPST_NULL_STRING) ;
+        }
     }
 
 
@@ -199,29 +253,48 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
      */
     function form_content()
     {
-        $table = html_table($this->_width,0,4) ;
-        $table->set_style("border: 1px solid") ;
+        $table = html_table($this->_width, 0, 4) ;
+        $table->set_style('border: 1px solid') ;
 
-        $table->add_row($this->element_label("Minimum Age"),
-            $this->element_form("Minimum Age")) ;
+        //  Build the Magic Divs
 
-        $table->add_row($this->element_label("Maximum Age"),
-            $this->element_form("Maximum Age")) ;
+        $this->__standard_div = $this->__type_div->build_div(0) ;
+        $stable = html_table($this->_width, 0, 4) ;
+        $stable->add_row($this->element_label('Minimum Age'),
+            $this->element_form('Minimum Age')) ;
+        $stable->add_row($this->element_label('Maximum Age'),
+            $this->element_form('Maximum Age')) ;
+        $stable->add_row(sprintf('%s Gender',
+            $this->get_required_marker()), $this->element_form('Standard Gender')) ;
 
-        $table->add_row($this->element_label("Gender"),
-            $this->element_form("Gender")) ;
-
-        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID))
+        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
         {
-            $table->add_row($this->element_label("Age Group Swimmer Label Prefix"),
-                $this->element_form("Age Group Swimmer Label Prefix")) ;
+            $stable->add_row(sprintf('%s Swimmer Label Prefix',
+                $this->get_required_marker()), $this->element_form('Standard Age Group Swimmer Label Prefix')) ;
         }
 
-        $table->add_row($this->element_label("Registration Fee"),
-            $this->element_form("Registration Fee")) ;
+        $stable->add_row(sprintf('%s Standard Registration Fee',
+            $this->get_required_marker()), $this->element_form('Standard Registration Fee')) ;
+        $this->__standard_div->add($stable) ;
+
+        $this->__combined_div = $this->__type_div->build_div(1) ;
+        $ctable = html_table($this->_width, 0, 4) ;
+        $ctable->add_row($this->element_label('Minimum Age'),
+            $this->element_form('Minimum Age')) ;
+        $ctable->add_row($this->element_label('Maximum Age'),
+            $this->element_form('Maximum Age')) ;
+        $ctable->add_row(sprintf('%s Gender',
+            $this->get_required_marker()), $this->element_form('Combined Gender')) ;
+        $this->__combined_div->add($ctable) ;
+
+        $type = html_div(null, $this->__standard_div, $this->__combined_div) ;
+
+        $table->add_row($this->element_label('Type'), $this->element_form('Type')) ;
+        $td = html_td() ;
+        $td->add($type) ;
+        $td->set_tag_attribute('colspan', '2') ;
+        $table->add_row($td) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -241,22 +314,36 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
         //  Make sure position is unique
 
         $ageGroup = new SwimTeamAgeGroup() ;
-        $ageGroup->setId($this->get_hidden_element_value("agegroupid")) ;
-        $ageGroup->setMinAge($this->get_element_value("Minimum Age")) ;
-        $ageGroup->setMaxAge($this->get_element_value("Maximum Age")) ;
-        $ageGroup->setGender($this->get_element_value("Gender")) ;
-        $ageGroup->setRegistrationFee($this->get_element_value("Registration Fee")) ;
+        $ageGroup->setId($this->get_hidden_element_value('agegroupid')) ;
+        $ageGroup->setMinAge($this->get_element_value('Minimum Age')) ;
+        $ageGroup->setMaxAge($this->get_element_value('Maximum Age')) ;
 
-        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID))
+        $type = $this->get_element_value('Type') ;
+        $ageGroup->setType($type) ;
+
+        if ($type == WPST_STANDARD)
         {
-            $ageGroup->setSwimmerLabelPrefix($this->get_element_value("Age Group Swimmer Label Prefix")) ;
+            $ageGroup->setGender($this->get_element_value('Standard Gender')) ;
+            $ageGroup->setRegistrationFee($this->get_element_value('Standard Registration Fee')) ;
         }
         else
         {
-            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value("Age Group Swimmer Label Prefix")) ;
+            $ageGroup->setGender($this->get_element_value('Combined Gender')) ;
+            $ageGroup->setRegistrationFee($this->get_hidden_element_value('Combined Registration Fee')) ;
+        }
+
+        if ($type == WPST_COMBINED)
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value('Combined Age Group Swimmer Label Prefix')) ;
+        }
+        elseif ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_element_value('Standard Age Group Swimmer Label Prefix')) ;
+        }
+        else
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value('Standard Age Group Swimmer Label Prefix')) ;
         }
 
         //  Make sure the age group isn't in use - need to handle
@@ -265,30 +352,28 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
         if ($ageGroup->ageGroupExist())
         {
             $qr = $ageGroup->getQueryResult() ;
-            if (is_null($ageGroup->getId()) || ($ageGroup->getId() != $qr["id"]))
+            if (is_null($ageGroup->getId()) || ($ageGroup->getId() != $qr['id']))
             {
-                $this->add_error("Minimum Age", "Age Group already exists.");
-                $this->add_error("Maximum Age", "Age Group already exists.");
-                $this->add_error("Gender", "Age Group already exists.");
+                $this->add_error('Minimum Age', 'Age Group already exists.');
+                $this->add_error('Maximum Age', 'Age Group already exists.');
+                $this->add_error(ucwords($type) . ' Gender', 'Age Group already exists.');
                 $valid = false ;
             }
         }
 
-        if (((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID)) && $ageGroup->ageGroupPrefixInUse())
+        if (((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID)) && $ageGroup->ageGroupPrefixInUse())
         {
-            $this->add_error("Age Group Swimmer Label Prefix", "Age Group Swimmer Label Prefix is already in use.");
+            $this->add_error(ucwords($type) . ' Age Group Swimmer Label Prefix', 'Age Group Swimmer Label Prefix is already in use.');
             $valid = false ;
         }
 
         //  Make sure quantity is > 0
 
-        if ($this->get_element_value("Minimum Age") >= $this->get_element_value("Maximum Age"))
+        if ($this->get_element_value('Minimum Age') > $this->get_element_value('Maximum Age'))
         {
-            $this->add_error("Minimum Age", "Minimum age must be less than Maximum age.") ;
-            $this->add_error("Maximum Age", "Maximum age must be greater than Maximum age.") ;
+            $this->add_error('Minimum Age', 'Minimum age must be less than or equal to Maximum age.') ;
+            $this->add_error('Maximum Age', 'Maximum age must be greater than or equal to Maximum age.') ;
             $valid = false ;
         }
         
@@ -304,19 +389,39 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
     function form_action()
     {
         $ageGroup = new SwimTeamAgeGroup() ;
-        $ageGroup->setMinAge($this->get_element_value("Minimum Age")) ;
-        $ageGroup->setMaxAge($this->get_element_value("Maximum Age")) ;
-        $ageGroup->setRegistrationFee($this->get_element_value("Registration Fee")) ;
+        $ageGroup->setId($this->get_hidden_element_value('agegroupid')) ;
+        $ageGroup->setMinAge($this->get_element_value('Minimum Age')) ;
+        $ageGroup->setMaxAge($this->get_element_value('Maximum Age')) ;
 
-        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID))
-            $ageGroup->setSwimmerLabelPrefix($this->get_element_value("Age Group Swimmer Label Prefix")) ;
+        $type = $this->get_element_value('Type') ;
+        $ageGroup->setType($type) ;
+
+        if ($type == WPST_STANDARD)
+        {
+            $gender = $this->get_element_value('Standard Gender') ;
+            $ageGroup->setGender($gender) ;
+            $ageGroup->setRegistrationFee($this->get_element_value('Standard Registration Fee')) ;
+        }
         else
-            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value("Age Group Swimmer Label Prefix")) ;
+        {
+            $gender = $this->get_element_value('Combined Gender') ;
+            $ageGroup->setGender($gender) ;
+            $ageGroup->setRegistrationFee($this->get_hidden_element_value('Combined Registration Fee')) ;
+        }
 
-        $gender = $this->get_element_value("Gender") ;
+        if ($type == WPST_COMBINED)
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value('Combined Age Group Swimmer Label Prefix')) ;
+        }
+        elseif ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_element_value('Standard Age Group Swimmer Label Prefix')) ;
+        }
+        else
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value('Standard Age Group Swimmer Label Prefix')) ;
+        }
 
         if ($gender == WPST_GENDER_BOTH)
         {
@@ -327,7 +432,7 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
         }
         else
         {
-            $ageGroup->setGender($this->get_element_value("Gender")) ;
+            //$ageGroup->setGender($this->get_element_value('Gender')) ;
             $success = $ageGroup->addAgeGroup() ;
         }
 
@@ -336,11 +441,11 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
         if ($success) 
         {
             $ageGroup->setId($success) ;
-            $this->set_action_message("Age Group successfully added.") ;
+            $this->set_action_message('Age Group successfully added.') ;
         }
         else
         {
-            $this->set_action_message("Age Group was not successfully added.") ;
+            $this->set_action_message('Age Group was not successfully added.') ;
         }
 
         return $success ;
@@ -358,7 +463,7 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
 /**
  * Construct the Update AgeGroup form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamAgeGroupAddForm
  */
@@ -381,6 +486,7 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
         else
             $g = array(ucfirst(get_option(WPST_OPTION_GENDER_LABEL_MALE)) => WPST_GENDER_MALE
                 ,ucfirst(get_option(WPST_OPTION_GENDER_LABEL_FEMALE)) => WPST_GENDER_FEMALE
+                ,ucfirst(WPST_GENDER_MIXED) => WPST_GENDER_MIXED
             ) ;
 
          return $g ;
@@ -398,26 +504,29 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
         $ageGroup->loadAgeGroupById($this->getId()) ;
 
         //  Initialize the form fields
-        $this->set_hidden_element_value("agegroupid", $this->getId()) ;
-        $this->set_hidden_element_value("_action", WPST_AGT_UPDATE_AGE_GROUP) ;
-        $this->set_element_value("Minimum Age", $ageGroup->getMinAge()) ;
-        $this->set_element_value("Maximum Age", $ageGroup->getMaxAge()) ;
-        $this->set_element_value("Gender", $ageGroup->getGender()) ;
-        $this->set_element_value("Registration Fee", $ageGroup->getRegistrationFee()) ;
+        $this->set_hidden_element_value('agegroupid', $this->getId()) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_UPDATE) ;
+        $this->set_element_value('Minimum Age', $ageGroup->getMinAge()) ;
+        $this->set_element_value('Maximum Age', $ageGroup->getMaxAge()) ;
+        $this->set_element_value('Type', $ageGroup->getType()) ;
+        $this->set_element_value('Standard Gender', $ageGroup->getGender()) ;
+        $this->set_element_value('Combined Gender', $ageGroup->getGender()) ;
+        $this->set_element_value('Standard Registration Fee', $ageGroup->getRegistrationFee()) ;
+        $this->set_hidden_element_value('Combined Registration Fee', $ageGroup->getRegistrationFee()) ;
 
-        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID))
+        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
         {
-            $this->set_element_value("Age Group Swimmer Label Prefix",
+            $this->set_element_value('Standard Age Group Swimmer Label Prefix',
                 $ageGroup->getSwimmerLabelPrefix()) ;
         }
         else
         {
-            $this->set_hidden_element_value("Age Group Swimmer Label Prefix",
+            $this->set_hidden_element_value('Standard Age Group Swimmer Label Prefix',
                 WPST_NULL_STRING) ;
         }
+
+        $this->set_hidden_element_value('Combined Age Group Swimmer Label Prefix', WPST_NULL_STRING) ;
     }
 
     /**
@@ -429,24 +538,39 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
     function form_action()
     {
         $ageGroup = new SwimTeamAgeGroup() ;
-        $ageGroup->setId($this->get_hidden_element_value("agegroupid")) ;
-        $ageGroup->setMinAge($this->get_element_value("Minimum Age")) ;
-        $ageGroup->setMaxAge($this->get_element_value("Maximum Age")) ;
-        $ageGroup->setGender($this->get_element_value("Gender")) ;
-        $ageGroup->setRegistrationFee($this->get_element_value("Registration Fee")) ;
+        $ageGroup->setId($this->get_hidden_element_value('agegroupid')) ;
+        $ageGroup->setMinAge($this->get_element_value('Minimum Age')) ;
+        $ageGroup->setMaxAge($this->get_element_value('Maximum Age')) ;
 
-        if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_NUMERIC) ||
-            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
-            WPST_AGE_GROUP_PREFIX_WPST_ID))
+        $type = $this->get_element_value('Type') ;
+        $ageGroup->setType($type) ;
+
+        if ($type == WPST_STANDARD)
         {
-            $ageGroup->setSwimmerLabelPrefix($this->get_element_value("Age Group Swimmer Label Prefix")) ;
+            $gender = $this->get_element_value('Standard Gender') ;
+            $ageGroup->setGender($gender) ;
+            $ageGroup->setRegistrationFee($this->get_element_value('Standard Registration Fee')) ;
         }
         else
         {
-            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value("Age Group Swimmer Label Prefix")) ;
+            $gender = $this->get_element_value('Combined Gender') ;
+            $ageGroup->setGender($gender) ;
+            $ageGroup->setRegistrationFee($this->get_hidden_element_value('Combined Registration Fee')) ;
         }
 
+        if ($type == WPST_COMBINED)
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value('Combined Age Group Swimmer Label Prefix')) ;
+        }
+        elseif ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
+            (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_element_value('Standard Age Group Swimmer Label Prefix')) ;
+        }
+        else
+        {
+            $ageGroup->setSwimmerLabelPrefix($this->get_hidden_element_value('Standard Age Group Swimmer Label Prefix')) ;
+        }
         $success = $ageGroup->updateAgeGroup() ;
 
         //  If successful, store the added age group id in so it can be used later.
@@ -454,11 +578,11 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
         if ($success) 
         {
             $ageGroup->setId($success) ;
-            $this->set_action_message("Age Group successfully updated.") ;
+            $this->set_action_message('Age Group successfully updated.') ;
         }
         else
         {
-            $this->set_action_message("Age Group was not updated.") ;
+            $this->set_action_message('Age Group was not updated.') ;
         }
 
         return true ;
@@ -483,7 +607,7 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
 /**
  * Construct the Update AgeGroup form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamAgeGroupUpdateForm
  */
@@ -501,12 +625,15 @@ class WpSwimTeamAgeGroupDeleteForm extends WpSwimTeamAgeGroupUpdateForm
         $ageGroup->loadAgeGroupById($this->getId()) ;
 
         //  Initialize the form fields
-        $this->set_hidden_element_value("agegroupid", $this->getId()) ;
-        $this->set_hidden_element_value("_action", WPST_AGT_DELETE_AGE_GROUP) ;
-        $this->set_element_value("Minimum Age", $ageGroup->getMinAge()) ;
-        $this->set_element_value("Maximum Age", $ageGroup->getMaxAge()) ;
-        $this->set_element_value("Gender", $ageGroup->getGender()) ;
-        $this->set_element_value("Registration Fee", $ageGroup->getRegistrationFee()) ;
+        $this->set_hidden_element_value('agegroupid', $this->getId()) ;
+        $this->set_hidden_element_value('_action', WPST_ACTION_DELETE) ;
+        $this->set_element_value('Minimum Age', $ageGroup->getMinAge()) ;
+        $this->set_element_value('Maximum Age', $ageGroup->getMaxAge()) ;
+        $this->set_element_value('Standard Gender', $ageGroup->getGender()) ;
+        $this->set_element_value('Combined Gender', $ageGroup->getGender()) ;
+        $this->set_element_value('Type', $ageGroup->getType()) ;
+        $this->set_element_value('Standard Registration Fee', $ageGroup->getRegistrationFee()) ;
+        $this->set_hidden_element_value('Combined Registration Fee', $ageGroup->getRegistrationFee()) ;
     }
 
     /**
@@ -531,13 +658,13 @@ class WpSwimTeamAgeGroupDeleteForm extends WpSwimTeamAgeGroupUpdateForm
     function form_action()
     {
         $ageGroup = new SwimTeamAgeGroup() ;
-        $ageGroup->setId($this->get_hidden_element_value("agegroupid")) ;
+        $ageGroup->setId($this->get_hidden_element_value('agegroupid')) ;
         $success = $ageGroup->deleteAgeGroup() ;
 
         if ($success) 
-            $this->set_action_message("Age Group successfully deleted.") ;
+            $this->set_action_message('Age Group successfully deleted.') ;
         else
-            $this->set_action_message("Age Group was not successfully deleted.") ;
+            $this->set_action_message('Age Group was not successfully deleted.') ;
 
         return $success ;
     }

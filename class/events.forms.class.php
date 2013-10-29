@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: events.forms.class.php 921 2012-06-28 22:21:32Z mpwalsh8 $
+ * $Id: events.forms.class.php 1012 2013-10-06 12:59:12Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage Events
- * @version $Revision: 921 $
+ * @version $Revision: 1012 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-06-28 18:21:32 -0400 (Thu, 28 Jun 2012) $
+ * @lastmodifiedby $Date: 2013-10-06 08:59:12 -0400 (Sun, 06 Oct 2013) $
  *
  */
 
@@ -250,6 +250,7 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
         $this->set_hidden_element_value('_swimmeetid', $this->getMeetId()) ;
         $this->set_hidden_element_value('_eventgroupid', $this->getEventGroupId()) ;
         $this->set_hidden_element_value('_action', WPST_ACTION_EVENTS_ADD) ;
+        $this->set_element_value('Event Group', $this->getEventGroupId()) ;
     }
 
 
@@ -1373,6 +1374,16 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
     var $__eventgroupid ;
 
     /**
+     * map min 0 property - used to map 0 in HYV record to min swim team age
+     */
+    var $__map0tomin = false ;
+
+    /**
+     * map max 0 property - used to map 0 in HYV record to max swim team age
+     */
+    var $__map0tomax = false ;
+
+    /**
      * Set the Event Group Id property
      */
     function setEventGroupId($id)
@@ -1407,6 +1418,16 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
         $dupes->set_br_flag(true) ;
         $this->add_element($dupes) ;
 
+        //  Map minimum 0 to min age setting?
+        $min = new FEYesNoRadioGroup(sprintf('Map 0 to minimum Swim Team age (%s)',
+            get_option(WPST_OPTION_MIN_AGE), true)) ;
+        $this->add_element($min) ;
+
+        //  Map maximum 0 to min age setting?
+        $max = new FEYesNoRadioGroup(sprintf('Map 0 to maximum Swim Team age (%s)',
+            get_option(WPST_OPTION_MAX_AGE), true)) ;
+        $this->add_element($max) ;
+
         //  Hidden field to hold the event group id
         $this->add_hidden_element('_eventgroupid') ;
     }
@@ -1420,6 +1441,10 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
     function form_init_data()
     {
         $this->set_element_value('Duplicate Event Numbers', WPST_ACTION_IGNORE) ;
+        $this->set_element_value(sprintf('Map 0 to minimum Swim Team age (%s)',
+            get_option(WPST_OPTION_MIN_AGE)), WPST_YES) ;
+        $this->set_element_value(sprintf('Map 0 to maximum Swim Team age (%s)',
+            get_option(WPST_OPTION_MAX_AGE)), WPST_YES) ;
         $this->set_hidden_element_value('_eventgroupid', $this->getEventGroupId()) ;
     }
 
@@ -1440,6 +1465,27 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
 
         $table->add_row($this->element_label('Duplicate Event Numbers'),
             $this->element_form('Duplicate Event Numbers')) ;
+
+        $td = html_td(null, null, html_h4('Zero (0) handling for Min and Max age in an Event')) ;
+        $td->set_tag_attribute('colspan', 2) ;
+        $table->add_row($td) ;
+
+        $table->add_row($this->element_label(sprintf('Map 0 to minimum Swim Team age (%s)',
+            get_option(WPST_OPTION_MIN_AGE))),
+            $this->element_form(sprintf('Map 0 to minimum Swim Team age (%s)',
+            get_option(WPST_OPTION_MIN_AGE)))) ;
+
+        $table->add_row($this->element_label(sprintf('Map 0 to maximum Swim Team age (%s)',
+            get_option(WPST_OPTION_MAX_AGE))),
+            $this->element_form(sprintf('Map 0 to maximum Swim Team age (%s)',
+            get_option(WPST_OPTION_MAX_AGE)))) ;
+
+        $td = html_td(null, null, html_p(html_small('Hy-tek event files may represent an open
+            or undefinded minimum or maximum age using a "0" as the min or max value in the age
+            group range.  This may result in age group mismatches with wp-SwimTeam.  Indicate
+            how zero should be handled in age group ranges.'))) ;
+        $td->set_tag_attribute('colspan', 2) ;
+        $table->add_row($td) ;
 
         $this->add_form_block(null, $table) ;
     }
@@ -1589,14 +1635,19 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
         }
 
         //  Validate Gender - Field 3
-        if (array_search($fields[2], array('M', 'F'), true) === false)
+        if (array_search($fields[2], array('M', 'F', 'X'), true) === false)
         {
             $err = sprintf('Error:  Invalid gender in Event Record, found \'%s\', should be \'M\', or \'F\'', $fields[2]) ;
             return false ;
         }
         else
         {
-            $gender = ($fields[2] == 'M') ? WPST_GENDER_MALE : WPST_GENDER_FEMALE ;
+            if ($fields[2] == 'M')
+                $gender = WPST_GENDER_MALE ;
+            elseif ($fields[2] == 'F')
+                $gender = WPST_GENDER_FEMALE ;
+            else
+                $gender = WPST_GENDER_MIXED ;
         }
 
         //  Validate Event Type - Field 4
@@ -1605,7 +1656,7 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
             $err = sprintf('Error:  Invalid event type in Event Record, found \'%s\', should be \'I\', or \'R\'', $fields[3]) ;
             return false ;
         }
-
+ 
         //  Validate minimum age - Field 5
         preg_match("/(?P<minage>\d+$)/", $fields[4], $age);
         if (!array_key_exists('minage', $age))
@@ -1613,7 +1664,11 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
             $err = sprintf('Error:  Invalid minimum age (%s) found in Event Record.', $fields[4]) ;
             return false ;
         }
-        else if ((int)$age['minage'] < get_option(WPST_OPTION_MIN_AGE))
+        elseif (((int)$age['minage'] == 0) && $this->__map0tomin)
+        {
+            $minage = get_option(WPST_OPTION_MIN_AGE) ;
+        }
+        elseif ((int)$age['minage'] < get_option(WPST_OPTION_MIN_AGE))
         {
             $err = sprintf('Error:  Minimum age (%s) found in Event Record is less than Swim Team minimum age (%s).',
                 $fields[4], get_option(WPST_OPTION_MIN_AGE)) ;
@@ -1631,7 +1686,11 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
             $err = sprintf('Error:  Invalid maximum age (%s) found in Event Record.', $fields[5]) ;
             return false ;
         }
-        else if ((int)$age['maxage'] > get_option(WPST_OPTION_MAX_AGE))
+        elseif (((int)$age['maxage'] == 0) && $this->__map0tomax)
+        {
+            $maxage = get_option(WPST_OPTION_MAX_AGE) ;
+        }
+        elseif ((int)$age['maxage'] > get_option(WPST_OPTION_MAX_AGE))
         {
             $err = sprintf('Error:  Maximum age (%s) found in Event Record is greater than Swim Team maximum age (%s).',
                 $fields[5], get_option(WPST_OPTION_MAX_AGE)) ;
@@ -1643,9 +1702,9 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
         }
 
         //  Validate minimum and maximum ages make sense
-        if ($minage >= $maxage)
+        if ($minage > $maxage)
         {
-            $err = sprintf('Error:  Invalid Event Record, minimum age (%s) must be less than maximum age (%s).', $fields[4], $fields[5]) ;
+            $err = sprintf('Error:  Invalid Event Record, minimum age (%s) must be less than or equal to maximum age (%s).', $fields[4], $fields[5]) ;
             return false ;
         }
 
@@ -1658,7 +1717,7 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
         if (!$ag->ageGroupExistsByMinAgeMaxAgeAndGender())
         {
             $err = sprintf('Error:  Age range (%s-%s) in Event Record does not match any \'%s\' age groups.',
-                $fields[4], $fields[5], ucwords($gender)) ;
+                $minage, $maxage, ucwords($gender)) ;
             return false ;
         }
 
@@ -1673,6 +1732,12 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
      */
     function form_backend_validation()
     {
+        //  Set up 0 mapping
+        $this->__map0tomin = $this->get_element_value(sprintf('Map 0 to minimum Swim Team age (%s)',
+            get_option(WPST_OPTION_MIN_AGE))) == WPST_YES ;
+        $this->__map0tomax = $this->get_element_value(sprintf('Map 0 to maximum Swim Team age (%s)',
+            get_option(WPST_OPTION_MAX_AGE))) == WPST_YES ;
+
         //  A Hy-tek Events file contains one header record and N event records
 
         $file = $this->get_element('Filename') ; 
@@ -1804,8 +1869,35 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
             }
             else
             {
-                $gender = ($fields[2] == 'M') ? WPST_GENDER_MALE : WPST_GENDER_FEMALE ;
-                $agegroupid = $ag->getAgeGroupIdByMinAgeMaxAgeAndGender($fields[4], $fields[5], $gender) ;
+                if ($fields[2] == 'M')
+                    $gender = WPST_GENDER_MALE ;
+                elseif ($fields[2] == 'F')
+                    $gender = WPST_GENDER_FEMALE ;
+                else
+                    $gender = WPST_GENDER_MIXED ;
+
+                //  Set up min and max ages based on 0 mapping
+                $min = (($fields[4] == 0) && ($this->__map0tomin)) ? get_option(WPST_OPTION_MIN_AGE) : $fields[4] ;
+                $max = (($fields[5] == 0) && ($this->__map0tomax)) ? get_option(WPST_OPTION_MAX_AGE) : $fields[5] ;
+
+                //  If Gender is mixed, always look for a combined age group.  If a standard age
+                //  group isn't found, look for a combined single gender age group.  If a match
+                //  still isn't found, skip the event as it doesn't have a match.
+
+                //  First look for a standard Age Group
+                $agegroupid = $ag->getAgeGroupIdByMinAgeMaxAgeAndGender($min, $max, $gender) ;
+
+                //  Second look for a combined Age Group
+                if (is_null($agegroupid))
+                    $agegroupid = $ag->getAgeGroupIdByMinAgeMaxAgeAndGender($min, $max, $gender, false, WPST_COMBINED) ;
+
+                //  Nothing found?  Skip it and let the user know.
+                if (is_null($agegroupid))
+                {
+                    $actionmsgs[] = sprintf('Event Number %s on line %d will be ignored, no matching age group found.',
+                        $fields[0], $line_number) ;
+                    continue ;
+                }
 
                 //  Hy-tek "sort of" uses the SDIF stroke codes correctly.  The codes are
                 //  correct for individual events but not for relays so you need to look at

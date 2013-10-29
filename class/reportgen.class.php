@@ -3,15 +3,15 @@
 /**
  * Reports classes.
  *
- * $Id: reportgen.class.php 942 2012-07-02 21:08:28Z mpwalsh8 $
+ * $Id: reportgen.class.php 1032 2013-10-25 16:09:03Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Reports
- * @version $Revision: 942 $
- * @lastmodified $Date: 2012-07-02 17:08:28 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 1032 $
+ * @lastmodified $Date: 2013-10-25 12:09:03 -0400 (Fri, 25 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -869,7 +869,7 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
             //  PHP trick to pass an undetermined number of arguments
             //  to a method.
 
-            call_user_method_array('add_row', $table, $tr) ;
+            call_user_func_array(array($table, 'add_row'), $tr);
         }
     }
 
@@ -1631,7 +1631,7 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
                     //  PHP trick to pass an undetermined number of arguments
                     //  to a method.
         
-                    call_user_method_array('add_row', $table, $tr) ;
+                    call_user_func_array(array($table, 'add_row'), $tr);
                 }
             }
         }
@@ -2957,7 +2957,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
             //  PHP trick to pass an undetermined number of arguments
             //  to a method.
 
-            call_user_method_array('add_row', $table, $tr) ;
+            call_user_func_array(array($table, 'add_row'), $tr);
         }
     }
 
@@ -3592,8 +3592,13 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
 
         //  Get all the swimmer ids using the appropriate filter
 
+        $joins = sprintf('LEFT JOIN %s r ON (r.swimmerid=s.id)
+            LEFT JOIN %s s2 ON (s2.id=r.seasonid)', WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
+
+        //  Get all the swimmer ids using the appropriate filter
+
         if (is_null($swimmerid))
-            $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
+            $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter(), 'lastname', $joins) ;
         else
             $swimmerIds = array(array('swimmerid' => $swimmerid)) ;
 

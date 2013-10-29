@@ -3,15 +3,15 @@
 /**
  * Event Groups admin pevent content.
  *
- * $Id: eventgroups.php 974 2012-11-27 12:39:26Z mpwalsh8 $
+ * $Id: eventgroups.php 988 2013-06-24 15:32:58Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @packevent swimteam
  * @subpackevent admin
- * @version $Revision: 974 $
- * @lastmodified $Date: 2012-11-27 07:39:26 -0500 (Tue, 27 Nov 2012) $
+ * @version $Revision: 988 $
+ * @lastmodified $Date: 2013-06-24 11:32:58 -0400 (Mon, 24 Jun 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -126,8 +126,11 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
 
         if ($action == WPST_ACTION_SELECT_ACTION)
         {
-            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
-            if (array_key_exists('_recorded_action', $scriptargs))
+            printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+            if (array_key_exists('_recorded_action', $scriptargs) &&
+                ($scriptargs['_recorded_action'] == WPST_ACTION_SELECT_ACTION))
+                $action = WPST_ACTION_EVENTS_MANAGE ;
+            elseif (array_key_exists('_recorded_action', $scriptargs))
                 $action = $scriptargs['_recorded_action'] ;
             else
                 $action = null ;
@@ -242,7 +245,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
                      */
 
                 default:
-                    //printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
+                    printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
                     $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
 
                     break ;
@@ -285,7 +288,8 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
             else if (isset($c))
             {
                 $div->add(html_br(), $c) ;
-                $div->add(SwimTeamGUIButtons::getButton('Return to Event Groups')) ;
+                $url = remove_query_arg(array('eventgroupid')) ;
+                $div->add(SwimTeamGUIButtons::getButton('Return to Event Groups', $url)) ;
             }
             else
             {

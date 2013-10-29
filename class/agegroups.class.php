@@ -3,15 +3,15 @@
 /**
  * AgeGroup classes.
  *
- * $Id: agegroups.class.php 970 2012-08-28 18:39:22Z mpwalsh8 $
+ * $Id: agegroups.class.php 1032 2013-10-25 16:09:03Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package SwimTeam
  * @subpackage AgeGroups
- * @version $Revision: 970 $
- * @lastmodified $Date: 2012-08-28 14:39:22 -0400 (Tue, 28 Aug 2012) $
+ * @version $Revision: 1032 $
+ * @lastmodified $Date: 2013-10-25 12:09:03 -0400 (Fri, 25 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -53,6 +53,11 @@ class SwimTeamAgeGroup extends SwimTeamDBI
      * swimmer id prefix property - swimmer id prefix for the age group
      */
     var $__swimmerlabelprefix ;
+
+    /**
+     * type - standard or combined age group
+     */
+    var $__type ;
 
     /**
      * registration fee property - registration fee for the age group
@@ -148,10 +153,32 @@ class SwimTeamAgeGroup extends SwimTeamDBI
     {
         if ($this->__gender == WPST_GENDER_MALE)
             return get_option(WPST_OPTION_GENDER_LABEL_MALE) ;
-        else if ($this->__gender == WPST_GENDER_FEMALE)
+        elseif ($this->__gender == WPST_GENDER_FEMALE)
             return get_option(WPST_OPTION_GENDER_LABEL_FEMALE) ;
+        elseif ($this->__gender == WPST_GENDER_MIXED)
+            return WPST_GENDER_MIXED ;
         else
             return null ;
+    }
+
+    /**
+     * Set the type of the age group
+     *
+     * @param - string - type of the age group
+     */
+    function setType($type)
+    {
+        $this->__type = $type ;
+    }
+
+    /**
+     * Get the type of the age group
+     *
+     * @return - string - type of the age group
+     */
+    function getType()
+    {
+        return ($this->__type) ;
     }
 
     /**
@@ -205,10 +232,10 @@ class SwimTeamAgeGroup extends SwimTeamDBI
     {
 	    //  Is age group already in the database?
 
-        $query = sprintf('SELECT id FROM %s WHERE 
+        $query = sprintf('SELECT id FROM %s WHERE type="%s" AND
             minage = "%s" AND maxage="%s" AND gender="%s"',
-            WPST_AGE_GROUP_TABLE, $this->getMinAge(), $this->getMaxAge(),
-            $this->getGender()) ;
+            WPST_AGE_GROUP_TABLE, $this->getType(), $this->getMinAge(),
+            $this->getMaxAge(), $this->getGender()) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -331,12 +358,14 @@ class SwimTeamAgeGroup extends SwimTeamDBI
                 maxage="%s",
                 gender="%s",
                 swimmerlabelprefix="%s",
+                type="%s",
                 registrationfee="%s"',
                 WPST_AGE_GROUP_TABLE,
                 $this->getMinAge(),
                 $this->getMaxAge(),
                 $this->getGender(),
                 $this->getSwimmerLabelPrefix(),
+                $this->getType(),
                 $this->getRegistrationFee()) ;
 
             $this->setQuery($query) ;
@@ -365,6 +394,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
                 maxage="%s",
                 gender="%s",
                 swimmerlabelprefix="%s",
+                type="%s",
                 registrationfee="%s"
                 WHERE id="%s"',
                 WPST_AGE_GROUP_TABLE,
@@ -372,6 +402,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
                 $this->getMaxAge(),
                 $this->getGender(),
                 $this->getSwimmerLabelPrefix(),
+                $this->getType(),
                 $this->getRegistrationFee(),
                 $this->getId()
             ) ;
@@ -447,6 +478,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
             $this->setMaxAge($result['maxage']) ;
             $this->setGender($result['gender']) ;
             $this->setSwimmerLabelPrefix($result['swimmerlabelprefix']) ;
+            $this->setType($result['type']) ;
             $this->setRegistrationFee($result['registrationfee']) ;
         }
 
@@ -487,8 +519,8 @@ class SwimTeamAgeGroup extends SwimTeamDBI
     function getAgeGroupIdByAgeAndGender($age, $gender, $setid = false)
     {
         $query = sprintf('SELECT id FROM %s WHERE "%s" >= minage
-            AND "%s" <= maxage AND gender="%s"', WPST_AGE_GROUP_TABLE,
-            $age, $age, $gender) ;
+            AND "%s" <= maxage AND gender="%s" AND type="%s"', WPST_AGE_GROUP_TABLE,
+            $age, $age, $gender, WPST_STANDARD) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -513,23 +545,29 @@ class SwimTeamAgeGroup extends SwimTeamDBI
      * @param - string - gender
      * @return - int - age group id
      */
-    function getAgeGroupIdByMinAgeMaxAgeAndGender($minage, $maxage, $gender, $setid = false)
+    function getAgeGroupIdByMinAgeMaxAgeAndGender($minage, $maxage, $gender, $setid = false, $type = WPST_STANDARD)
     {
         $query = sprintf('SELECT id FROM %s WHERE minage="%s"
-            AND maxage="%s" AND gender = "%s"', WPST_AGE_GROUP_TABLE,
-            $minage, $maxage, $gender) ;
+            AND maxage="%s" AND gender = "%s" AND type="%s"', WPST_AGE_GROUP_TABLE,
+            $minage, $maxage, $gender, $type) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
 
-        $result = $this->getQueryResult() ;
-
         //  Only return a unique result
 
-        $id = ($this->getQueryCount() == 1) ? $result['id'] : null ;
+        if ($this->getQueryCount() == 1)
+        {
+            $result = $this->getQueryResult() ;
+            $id = $result['id'] ;
+        }
+        else
+            $id = null ;
 
         if ($setid)
             $this->setId($id) ;
+
+        if (!is_null($id))
 
         return $id ;
     }
@@ -566,7 +604,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
             get_option(WPST_OPTION_AGE_CUTOFF_DAY)) ;
 
         $select_clause = sprintf(WPST_ROSTER_COUNT_COLUMNS, 
-            $cutoffdate, $cutoffdate, $cutoffdate) ;
+            $cutoffdate, $cutoffdate, $cutoffdate, WPST_STANDARD) ;
 
         return $select_clause ;
     }
@@ -576,7 +614,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
      *
      * @return string - where clause for GUIDataList query
      */
-    function __buildWhereClause($seasonId = null)
+    function __buildWhereClause($seasonId = null, $type = WPST_STANDARD)
     {
         $cutoffdate = sprintf('%s-%02s-%02s', date('Y'), 
             get_option(WPST_OPTION_AGE_CUTOFF_MONTH),
@@ -595,7 +633,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
 
         $where_clause = sprintf(WPST_ROSTER_COUNT_WHERE_CLAUSE, $seasonId,
             $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate, $cutoffdate,
-            $cutoffdate) ;
+            $cutoffdate, $type) ;
 
         return $where_clause ;
     }
@@ -641,11 +679,13 @@ class SwimTeamAgeGroup extends SwimTeamDBI
                 $this->setId($agegroup['id']) ;
                 $this->loadAgeGroupById() ;
 
+                //  Only count standard age groups!
+                if ($this->getType() == WPST_COMBINED) continue ;
+
                 $agegroupcount = 0 ;
 
                 for ($i = 0 ; $i < count($agc) ; $i++)
                 {
-
                     if ($agc[$i]['agegroup'] == $this->getGender() . ' ' . $this->getMinAge() . ' - ' . $this->getMaxAge())
                     {
                         $agegroupcount = $agc[$i]['agegroupcount'] ;
@@ -726,10 +766,10 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
 	         	    '300', 'gender', SORTABLE, SEARCHABLE, 'left') ;
 
 		$this->add_header_item('Minimum Age',
-	       	    '200', 'minage', SORTABLE, SEARCHABLE, 'left') ;
+	       	    '150', 'minage', SORTABLE, SEARCHABLE, 'left') ;
 
 	  	$this->add_header_item('Maximum Age',
-	         	    '200', 'maxage', SORTABLE, SEARCHABLE, 'left') ;
+	         	    '150', 'maxage', SORTABLE, SEARCHABLE, 'left') ;
 
         if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) ==
             WPST_AGE_GROUP_PREFIX_NUMERIC) ||
@@ -740,8 +780,11 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
 	         	    '200', 'swimmerlabelprefix', SORTABLE, SEARCHABLE, 'left') ;
         }
 
+	  	$this->add_header_item('Type',
+	         	    '150', 'type', SORTABLE, SEARCHABLE, 'left') ;
+
 	  	$this->add_header_item('Registration Fee',
-	         	    '200', 'registrationfee', SORTABLE, SEARCHABLE, 'left') ;
+	         	    '150', 'registrationfee', SORTABLE, SEARCHABLE, 'left') ;
 
         //  Construct the DB query
         $this->_datasource->setup_db_options($this->getColumns(),
@@ -769,6 +812,8 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
      */
 	function build_column_item($row_data, $col_name)
     {
+        $na = array('Registration Fee', 'Swimmer Label Prefix') ;
+
 		switch ($col_name)
         {
                 /*
@@ -788,6 +833,10 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
                         $obj = ucfirst(get_option(WPST_OPTION_GENDER_LABEL_FEMALE)) ;
                         break ;
 
+                    case WPST_GENDER_MIXED:
+                        $obj = ucfirst(WPST_GENDER_MIXED) ;
+                        break ;
+
                     default:
                         $obj = 'Error - no gender' ;
                         break ;
@@ -795,12 +844,21 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
                 break ;
 
             case 'Registration Fee' :
-                $obj = get_option(WPST_OPTION_REG_FEE_CURRENCY_LABEL) .
-                    $row_data['registrationfee'] ;
+                if (($row_data['type'] == WPST_COMBINED) && in_array($col_name, $na))
+			        $obj = strtoupper(WPST_NA) ;
+                else
+                    $obj = get_option(WPST_OPTION_REG_FEE_CURRENCY_LABEL) .  $row_data['registrationfee'] ;
                 break ;
 
-		    default:
-			    $obj = DefaultGUIDataList::build_column_item($row_data, $col_name);
+            case 'Type' :
+                $obj = ucfirst($row_data['type']) ;
+                break ;
+
+ 		    default:
+                if (($row_data['type'] == WPST_COMBINED) && in_array($col_name, $na))
+			        $obj = strtoupper(WPST_NA) ;
+                else
+			        $obj = DefaultGUIDataList::build_column_item($row_data, $col_name);
 			    break;
 		}
 		return $obj;

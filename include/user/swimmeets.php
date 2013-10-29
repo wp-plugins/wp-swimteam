@@ -3,15 +3,15 @@
 /**
  * Swim Meets admin page content.
  *
- * $Id: swimmeets.php 977 2013-04-11 21:20:41Z mpwalsh8 $
+ * $Id: swimmeets.php 1029 2013-10-25 14:27:46Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mike_walsh@mindspring.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 977 $
- * @lastmodified $Date: 2013-04-11 17:20:41 -0400 (Thu, 11 Apr 2013) $
+ * @version $Revision: 1029 $
+ * @lastmodified $Date: 2013-10-25 10:27:46 -0400 (Fri, 25 Oct 2013) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -388,8 +388,9 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                         $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
                         $c->add($if) ;
 
+                        //  SDIF entries have D0 and D3 records, divide count by 2 to get number of entries
                         $msg = html_div('updated fade',
-                            html_h4(sprintf('%s meet entries exported in SDIF format.', $sdif->getSDIFCount()))) ;
+                            html_h4(sprintf('%s meet entries exported in SDIF format.', $sdif->getSDIFCount() / 2))) ;
                         $c->add($msg) ;
                     }
                     else
