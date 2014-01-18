@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: agegroups.forms.class.php 1011 2013-10-06 12:58:24Z mpwalsh8 $
+ * $Id: agegroups.forms.class.php 1036 2014-01-18 12:29:04Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage AgeGroups
- * @version $Revision: 1011 $
+ * @version $Revision: 1036 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2013-10-06 08:58:24 -0400 (Sun, 06 Oct 2013) $
+ * @lastmodifiedby $Date: 2014-01-18 07:29:04 -0500 (Sat, 18 Jan 2014) $
  *
  */
 
@@ -137,17 +137,28 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
             $agelist[$i] = $i ;
 
         //  Minimum Age Field
-        $minage = new FEListBox('Minimum Age', !$disabled_field, '75px');
-        $minage->set_list_data($agelist) ;
-        $minage->set_disabled($disabled_field) ;
-
-        $this->add_element($minage);
+        $minage_s = new FEListBox('Standard Minimum Age', !$disabled_field, '75px');
+        $minage_s->set_list_data($agelist) ;
+        $minage_s->set_disabled($disabled_field) ;
+        $this->add_element($minage_s);
 		
         //  Maximum Age Field
-        $maxage = new FEListBox('Maximum Age', !$disabled_field, '75px');
-        $maxage->set_list_data($agelist) ;
-        $maxage->set_disabled($disabled_field) ;
-        $this->add_element($maxage);
+        $maxage_s = new FEListBox('Standard Maximum Age', !$disabled_field, '75px');
+        $maxage_s->set_list_data($agelist) ;
+        $maxage_s->set_disabled($disabled_field) ;
+        $this->add_element($maxage_s);
+		
+        //  Minimum Age Field
+        $minage_c = new FEListBox('Combined Minimum Age', !$disabled_field, '75px');
+        $minage_c->set_list_data($agelist) ;
+        $minage_c->set_disabled($disabled_field) ;
+        $this->add_element($minage_c);
+		
+        //  Maximum Age Field
+        $maxage_c = new FEListBox('Combined Maximum Age', !$disabled_field, '75px');
+        $maxage_c->set_list_data($agelist) ;
+        $maxage_c->set_disabled($disabled_field) ;
+        $this->add_element($maxage_c);
 		
         //  Set up the ActiveDiv to toggle inputs based on type of age group
         $this->__type_div = new FEActiveDIVRadioButtonGroup(
@@ -210,8 +221,10 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
     {
         //  Initialize the form fields
         $this->set_hidden_element_value('_action', WPST_ACTION_ADD) ;
-        $this->set_element_value('Minimum Age', get_option(WPST_OPTION_MIN_AGE)) ;
-        $this->set_element_value('Maximum Age', get_option(WPST_OPTION_MAX_AGE)) ;
+        $this->set_element_value('Standard Minimum Age', get_option(WPST_OPTION_MIN_AGE)) ;
+        $this->set_element_value('Standard Maximum Age', get_option(WPST_OPTION_MAX_AGE)) ;
+        $this->set_element_value('Combined Minimum Age', get_option(WPST_OPTION_MIN_AGE)) ;
+        $this->set_element_value('Combined Maximum Age', get_option(WPST_OPTION_MAX_AGE)) ;
 
         if ((get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_NUMERIC) ||
             (get_option(WPST_OPTION_SWIMMER_LABEL_FORMAT) == WPST_AGE_GROUP_PREFIX_WPST_ID))
@@ -260,10 +273,10 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
 
         $this->__standard_div = $this->__type_div->build_div(0) ;
         $stable = html_table($this->_width, 0, 4) ;
-        $stable->add_row($this->element_label('Minimum Age'),
-            $this->element_form('Minimum Age')) ;
-        $stable->add_row($this->element_label('Maximum Age'),
-            $this->element_form('Maximum Age')) ;
+        $stable->add_row(sprintf('%s Minimum Age',
+            $this->get_required_marker()), $this->element_form('Standard Minimum Age')) ;
+        $stable->add_row(sprintf('%s Maximum Age',
+            $this->get_required_marker()), $this->element_form('Standard Maximum Age')) ;
         $stable->add_row(sprintf('%s Gender',
             $this->get_required_marker()), $this->element_form('Standard Gender')) ;
 
@@ -280,10 +293,10 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
 
         $this->__combined_div = $this->__type_div->build_div(1) ;
         $ctable = html_table($this->_width, 0, 4) ;
-        $ctable->add_row($this->element_label('Minimum Age'),
-            $this->element_form('Minimum Age')) ;
-        $ctable->add_row($this->element_label('Maximum Age'),
-            $this->element_form('Maximum Age')) ;
+        $ctable->add_row(sprintf('%s Minimum Age',
+            $this->get_required_marker()), $this->element_form('Combined Minimum Age')) ;
+        $ctable->add_row(sprintf('%s Maximum Age',
+            $this->get_required_marker()), $this->element_form('Combined Maximum Age')) ;
         $ctable->add_row(sprintf('%s Gender',
             $this->get_required_marker()), $this->element_form('Combined Gender')) ;
         $this->__combined_div->add($ctable) ;
@@ -315,19 +328,21 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
 
         $ageGroup = new SwimTeamAgeGroup() ;
         $ageGroup->setId($this->get_hidden_element_value('agegroupid')) ;
-        $ageGroup->setMinAge($this->get_element_value('Minimum Age')) ;
-        $ageGroup->setMaxAge($this->get_element_value('Maximum Age')) ;
 
         $type = $this->get_element_value('Type') ;
         $ageGroup->setType($type) ;
 
         if ($type == WPST_STANDARD)
         {
+            $ageGroup->setMinAge($this->get_element_value('Standard Minimum Age')) ;
+            $ageGroup->setMaxAge($this->get_element_value('Standard Maximum Age')) ;
             $ageGroup->setGender($this->get_element_value('Standard Gender')) ;
             $ageGroup->setRegistrationFee($this->get_element_value('Standard Registration Fee')) ;
         }
         else
         {
+            $ageGroup->setMinAge($this->get_element_value('Combined Minimum Age')) ;
+            $ageGroup->setMaxAge($this->get_element_value('Combined Maximum Age')) ;
             $ageGroup->setGender($this->get_element_value('Combined Gender')) ;
             $ageGroup->setRegistrationFee($this->get_hidden_element_value('Combined Registration Fee')) ;
         }
@@ -354,8 +369,8 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
             $qr = $ageGroup->getQueryResult() ;
             if (is_null($ageGroup->getId()) || ($ageGroup->getId() != $qr['id']))
             {
-                $this->add_error('Minimum Age', 'Age Group already exists.');
-                $this->add_error('Maximum Age', 'Age Group already exists.');
+                $this->add_error(ucwords($type) . ' Minimum Age', 'Age Group already exists.');
+                $this->add_error(ucwords($type) . ' Maximum Age', 'Age Group already exists.');
                 $this->add_error(ucwords($type) . ' Gender', 'Age Group already exists.');
                 $valid = false ;
             }
@@ -370,10 +385,10 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
 
         //  Make sure quantity is > 0
 
-        if ($this->get_element_value('Minimum Age') > $this->get_element_value('Maximum Age'))
+        if ($this->get_element_value(ucwords($type) . ' Minimum Age') > $this->get_element_value(ucwords($type) . ' Maximum Age'))
         {
-            $this->add_error('Minimum Age', 'Minimum age must be less than or equal to Maximum age.') ;
-            $this->add_error('Maximum Age', 'Maximum age must be greater than or equal to Maximum age.') ;
+            $this->add_error(ucwords($type) . ' Minimum Age', 'Minimum age must be less than or equal to Maximum age.') ;
+            $this->add_error(ucwords($type) . ' Maximum Age', 'Maximum age must be greater than or equal to Maximum age.') ;
             $valid = false ;
         }
         
@@ -384,14 +399,12 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
      * This method is called ONLY after ALL validation has
      * passed.  This is the method that allows you to 
      * do something with the data, say insert/update records
-     * in the DB.
+     * in the DB.administrator
      */
     function form_action()
     {
         $ageGroup = new SwimTeamAgeGroup() ;
         $ageGroup->setId($this->get_hidden_element_value('agegroupid')) ;
-        $ageGroup->setMinAge($this->get_element_value('Minimum Age')) ;
-        $ageGroup->setMaxAge($this->get_element_value('Maximum Age')) ;
 
         $type = $this->get_element_value('Type') ;
         $ageGroup->setType($type) ;
@@ -399,12 +412,16 @@ class WpSwimTeamAgeGroupAddForm extends WpSwimTeamForm
         if ($type == WPST_STANDARD)
         {
             $gender = $this->get_element_value('Standard Gender') ;
+            $ageGroup->setMinAge($this->get_element_value('Standard Minimum Age')) ;
+            $ageGroup->setMaxAge($this->get_element_value('Standard Maximum Age')) ;
             $ageGroup->setGender($gender) ;
             $ageGroup->setRegistrationFee($this->get_element_value('Standard Registration Fee')) ;
         }
         else
         {
             $gender = $this->get_element_value('Combined Gender') ;
+            $ageGroup->setMinAge($this->get_element_value('Combined Minimum Age')) ;
+            $ageGroup->setMaxAge($this->get_element_value('Combined Maximum Age')) ;
             $ageGroup->setGender($gender) ;
             $ageGroup->setRegistrationFee($this->get_hidden_element_value('Combined Registration Fee')) ;
         }
@@ -506,8 +523,10 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
         //  Initialize the form fields
         $this->set_hidden_element_value('agegroupid', $this->getId()) ;
         $this->set_hidden_element_value('_action', WPST_ACTION_UPDATE) ;
-        $this->set_element_value('Minimum Age', $ageGroup->getMinAge()) ;
-        $this->set_element_value('Maximum Age', $ageGroup->getMaxAge()) ;
+        $this->set_element_value('Standard Minimum Age', $ageGroup->getMinAge()) ;
+        $this->set_element_value('Standard Maximum Age', $ageGroup->getMaxAge()) ;
+        $this->set_element_value('Combined Minimum Age', $ageGroup->getMinAge()) ;
+        $this->set_element_value('Combined Maximum Age', $ageGroup->getMaxAge()) ;
         $this->set_element_value('Type', $ageGroup->getType()) ;
         $this->set_element_value('Standard Gender', $ageGroup->getGender()) ;
         $this->set_element_value('Combined Gender', $ageGroup->getGender()) ;
@@ -539,8 +558,6 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
     {
         $ageGroup = new SwimTeamAgeGroup() ;
         $ageGroup->setId($this->get_hidden_element_value('agegroupid')) ;
-        $ageGroup->setMinAge($this->get_element_value('Minimum Age')) ;
-        $ageGroup->setMaxAge($this->get_element_value('Maximum Age')) ;
 
         $type = $this->get_element_value('Type') ;
         $ageGroup->setType($type) ;
@@ -548,12 +565,16 @@ class WpSwimTeamAgeGroupUpdateForm extends WpSwimTeamAgeGroupAddForm
         if ($type == WPST_STANDARD)
         {
             $gender = $this->get_element_value('Standard Gender') ;
+            $ageGroup->setMinAge($this->get_element_value('Standard Minimum Age')) ;
+            $ageGroup->setMaxAge($this->get_element_value('Standard Maximum Age')) ;
             $ageGroup->setGender($gender) ;
             $ageGroup->setRegistrationFee($this->get_element_value('Standard Registration Fee')) ;
         }
         else
         {
             $gender = $this->get_element_value('Combined Gender') ;
+            $ageGroup->setMinAge($this->get_element_value('Combined Minimum Age')) ;
+            $ageGroup->setMaxAge($this->get_element_value('Combined Maximum Age')) ;
             $ageGroup->setGender($gender) ;
             $ageGroup->setRegistrationFee($this->get_hidden_element_value('Combined Registration Fee')) ;
         }
@@ -627,8 +648,10 @@ class WpSwimTeamAgeGroupDeleteForm extends WpSwimTeamAgeGroupUpdateForm
         //  Initialize the form fields
         $this->set_hidden_element_value('agegroupid', $this->getId()) ;
         $this->set_hidden_element_value('_action', WPST_ACTION_DELETE) ;
-        $this->set_element_value('Minimum Age', $ageGroup->getMinAge()) ;
-        $this->set_element_value('Maximum Age', $ageGroup->getMaxAge()) ;
+        $this->set_element_value('Standard Minimum Age', $ageGroup->getMinAge()) ;
+        $this->set_element_value('Standard Maximum Age', $ageGroup->getMaxAge()) ;
+        $this->set_element_value('Combined Minimum Age', $ageGroup->getMinAge()) ;
+        $this->set_element_value('Combined Maximum Age', $ageGroup->getMaxAge()) ;
         $this->set_element_value('Standard Gender', $ageGroup->getGender()) ;
         $this->set_element_value('Combined Gender', $ageGroup->getGender()) ;
         $this->set_element_value('Type', $ageGroup->getType()) ;

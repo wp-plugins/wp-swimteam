@@ -3,7 +3,7 @@ Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
 Requires at least: 3.5
-Tested up to: 3.6.1
+Tested up to: 3.8
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -65,6 +65,10 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.41 =
+* Fixed bug which prevented adding standard age groups.
+* Fixed bug which caused extraneous output upon plugin activation.
 
 = 1.40 =
 * This update requires phpHtmlLib v2.6.7 or later!

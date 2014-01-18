@@ -4,14 +4,14 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.40.1034
- * Last Modified:  2013/10/29 16:26:37
+ * Version: 1.41.1037
+ * Last Modified:  2014/01/18 12:30:16
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 1020 2013-10-07 00:31:34Z mpwalsh8 $
+ * $Id: swimteam.php 1035 2014-01-18 11:57:54Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
@@ -20,8 +20,8 @@
  * @author Mike Walsh <mike@walshcrew.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 1020 $
- * @lastmodified $Date: 2013-10-06 20:31:34 -0400 (Sun, 06 Oct 2013) $
+ * @version $Rev: 1035 $
+ * @lastmodified $Date: 2014-01-18 06:57:54 -0500 (Sat, 18 Jan 2014) $
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
  */
@@ -322,7 +322,7 @@ function swimteam_add_default_roles()
     $wp_roles->add_role(WPST_MANAGER_ROLE, WPST_MANAGER_ROLE_LABEL, $role->capabilities);
 
     //  Swim Team Admin is based on Editor role
-    $role = $wp_roles->get_role('admin');
+    $role = $wp_roles->get_role('administrator');
     $wp_roles->add_role(WPST_ADMIN_ROLE, WPST_ADMIN_ROLE_LABEL, $role->capabilities);
 }
 
