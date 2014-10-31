@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: seasons.forms.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: seasons.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,14 +13,14 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Seasons
- * @version $Revision: 849 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once('seasons.class.php') ;
-require_once('forms.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
 
 /**
  * Construct the Add Season form

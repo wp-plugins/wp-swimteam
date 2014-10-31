@@ -3,29 +3,29 @@
 /**
  * MyJobs admin page content.
  *
- * $Id: myjobs.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: myjobs.php 1069 2014-09-22 23:20:14Z mpwalsh8 $
  *
  * (c) 2011 by Mike Walsh
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1069 $
+ * @lastmodified $Date: 2014-09-22 19:20:14 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('jobs.class.php') ;
-require_once('seasons.class.php') ;
-require_once('textmap.class.php') ;
-require_once('container.class.php') ;
-require_once('container.class.php') ;
+require_once(WPST_PATH . 'class/jobs.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
 
 /**
  * Class definition of the overview tab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -66,33 +66,43 @@ class MyJobsTabContainer extends SwimTeamTabContainer
 
         $season = new SwimTeamSeason() ;
         $active = $season->getActiveSeasonId() ;
-        $seasonlabel = SwimTeamTextMap::__MapSeasonIdToText($active) ;
 
-        $jobs = array() ;
-        $jobs[$active] = new SwimTeamUserJobsInfoTable('My Jobs - ' . $seasonlabel['label'], '100%') ;
-
-        $myjobs = &$jobs[$active] ;
-
-        $myjobs->setSeasonId($active) ;
-        $myjobs->setUserId($current_user->ID) ;
-        $myjobs->constructSwimTeamUserJobsInfoTable() ;
-
-        //  Report credits versus team requirements
-        $required = get_option(WPST_OPTION_JOB_CREDITS_REQUIRED) ;
-        if ($required === false) $required = 0 ;
-
-        $div->add($myjobs) ;
-
-        //  Summarize credits versus requirements
- 
-        $div->add(html_h5(sprintf('%s credits assigned / %s credits required.',
-            $myjobs->getCredits(), $required))) ;
-
-        if ($myjobs->getCredits() < $required)
+        if ($active == WPST_NULL_ID)
         {
-            $notice = html_div('error fade',
-               html_h4(sprintf('Notice:  You have not met your team Jobs requirement of %s credits.', $required))) ;
-            $div->add($notice) ;
+            $div->add(html_h4('No active season found, no jobs to report.'));
+
+        }
+        else 
+        {
+            $seasonlabel = SwimTeamTextMap::__mapSeasonIdToText($active) ;
+
+
+            $jobs = array() ;
+            $jobs[$active] = new SwimTeamUserJobsInfoTable('My Jobs - ' . is_array($seasonlabel) ? $seasonlabel['label'] : $seasonlabel, '100%') ;
+
+            $myjobs = &$jobs[$active] ;
+
+            $myjobs->setSeasonId($active) ;
+            $myjobs->setUserId($current_user->ID) ;
+            $myjobs->constructSwimTeamUserJobsInfoTable() ;
+
+            //  Report credits versus team requirements
+            $required = get_option(WPST_OPTION_JOB_CREDITS_REQUIRED) ;
+            if ($required === false) $required = 0 ;
+
+            $div->add($myjobs) ;
+
+            //  Summarize credits versus requirements
+ 
+            $div->add(html_h5(sprintf('%s credits assigned / %s credits required.',
+                $myjobs->getCredits(), $required))) ;
+
+            if ($myjobs->getCredits() < $required)
+            {
+                $notice = html_div('error fade',
+                   html_h4(sprintf('Notice:  You have not met your team Jobs requirement of %s credits.', $required))) ;
+                $div->add($notice) ;
+            }
         }
 
         //  Summarize prior seasons if they exist

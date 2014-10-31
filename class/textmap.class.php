@@ -3,26 +3,26 @@
 /**
  * Text mapping classes.
  *
- * $Id: textmap.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: textmap.class.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
  *
  * (c) 2010 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TextMap
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1071 $
+ * @lastmodified $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('seasons.class.php') ;
-require_once('swimmeets.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/swimmeets.class.php') ;
 
 /**
  * Class definition of the swim team text map
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  */
 class SwimTeamTextMap
@@ -123,8 +123,8 @@ class SwimTeamTextMap
      */
     function __mapEventIdToText($eventid)
     {
-        require_once('events.class.php') ;
-        require_once('agegroups.class.php') ;
+        require_once(WPST_PATH . 'class/events.class.php') ;
+        require_once(WPST_PATH . 'class/agegroups.class.php') ;
 
         //  Handle null id gracefully for null events
 
@@ -133,8 +133,9 @@ class SwimTeamTextMap
         $event = new SwimTeamEvent() ;
         $event->loadSwimTeamEventByEventId($eventid) ;
 
-        $text = sprintf('%04s  %s  %s  %s  %s',
+        $text = sprintf('%04s%s  %s  %s  %s  %s',
             $event->getEventNumber(),
+            $event->getEventSuffix(),
             SwimTeamTextMap::__mapAgeGroupIdToText($event->getAgeGroupId()),
             SwimTeamTextMap::__mapStrokeCodeToText($event->getStroke()),
             $event->getDistance(),
@@ -150,7 +151,7 @@ class SwimTeamTextMap
      */
     function __mapAgeGroupIdToText($agegroupid)
     {
-        require_once('agegroups.class.php') ;
+        require_once(WPST_PATH . 'class/agegroups.class.php') ;
 
         $agegroup = new SwimTeamAgeGroup() ;
         $agegroup->loadAgeGroupById($agegroupid) ;
@@ -245,7 +246,7 @@ class SwimTeamTextMap
     {
         if ($eventgroupid !== WPST_NULL_ID)
         {
-            require_once('events.class.php') ;
+            require_once(WPST_PATH . 'class/events.class.php') ;
 
             $eventgroup = new SwimTeamEventGroup() ;
             

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: forms.class.php 874 2012-05-13 01:48:42Z mpwalsh8 $
+ * $Id: forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Form classes.  These classes manage the
  * entry and display of the various forms used
@@ -10,11 +10,11 @@
  *
  * (c) 2007 by Mike Walsh for WpSwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage forms
- * @version $Revision: 874 $
- * @lastmodified $Date: 2012-05-12 21:48:42 -0400 (Sat, 12 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -23,12 +23,12 @@
  * Include the Form Processing objects
  *
  */
-include_once(PHPHTMLLIB_ABSPATH . '/form/includes.inc') ;
+require_once(PHPHTMLLIB_ABSPATH . '/form/includes.inc') ;
 
 /**
  * Build a Clothing Size Select box
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package wp-SwimTeam
  * @subpackage FormProcessing
  * @see FEListBox
@@ -69,7 +69,7 @@ class FEClothingSizeListBox extends FEListBox
 /**
  * Build a WP User Select list box
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package wp-SwimTeam
  * @subpackage FormProcessing
  * @see FEListBox
@@ -588,7 +588,7 @@ class WpSwimTeamForm extends StandardFormContent
 /**
  * Construct the Swim Meet Import Results form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimMeetForm
  */

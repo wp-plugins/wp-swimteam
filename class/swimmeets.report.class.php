@@ -3,34 +3,34 @@
 /**
  * Meets classes.
  *
- * $Id: swimmeets.report.class.php 945 2012-07-02 21:14:40Z mpwalsh8 $
+ * $Id: swimmeets.report.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Meets
- * @version $Revision: 945 $
- * @lastmodified $Date: 2012-07-02 17:14:40 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
 
-require_once('forms.class.php') ;
-require_once('events.class.php') ;
-require_once('seasons.class.php') ;
-require_once('swimmeets.class.php') ;
-require_once('swimclubs.class.php') ;
-require_once('roster.class.php') ;
-require_once('jobs.class.php') ;
-require_once('textmap.class.php') ;
-require_once('print.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/events.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/swimmeets.class.php') ;
+require_once(WPST_PATH . 'class/swimclubs.class.php') ;
+require_once(WPST_PATH . 'class/roster.class.php') ;
+require_once(WPST_PATH . 'class/jobs.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
+require_once(WPST_PATH . 'class/print.class.php') ;
 
 /**
  * Class definition of the meets
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimMeet
  */
@@ -1037,7 +1037,7 @@ class SwimMeetReport extends SwimMeet
 /**
  * Class definition of the printable swim meet report
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimMeetReport
  */
@@ -1072,7 +1072,7 @@ class PrintableSwimMeetReport extends SwimMeetReport
 /**
  * Construct the Add SwimMeet form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */

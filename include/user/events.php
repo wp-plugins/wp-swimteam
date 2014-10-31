@@ -3,28 +3,28 @@
 /**
  * Events admin page content.
  *
- * $Id: events.php 988 2013-06-24 15:32:58Z mpwalsh8 $
+ * $Id: events.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 988 $
- * @lastmodified $Date: 2013-06-24 11:32:58 -0400 (Mon, 24 Jun 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('events.class.php') ;
-require_once('events.forms.class.php') ;
-require_once('container.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/events.class.php') ;
+require_once(WPST_PATH . 'class/events.forms.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -151,7 +151,7 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
     {
 
         $gdl = new SwimTeamEventsGUIDataList($this->getEventDescription(),
-            '100%', 'eventgroup, eventnumber', false) ;
+            '100%', 'eventgroup,eventnumber,eventsuffix', false) ;
 
         $gdl->set_alternating_row_colors(true) ;
         $gdl->set_show_empty_datalist_actionbar(true) ;
@@ -438,7 +438,7 @@ class SwimTeamEventsTabContainer extends SwimTeamTabContainer
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */
@@ -483,7 +483,7 @@ class AdminSwimTeamEventsTabContainer extends SwimTeamEventsTabContainer
     function __buildGDL()
     {
         $gdl = new SwimTeamEventsAdminGUIDataList('Swim Team Events',
-            '100%', 'eventgroupid,eventnumber', false, WPST_EVENTS_DEFAULT_COLUMNS,
+            '100%', 'eventgroupid,eventnumber,eventsuffix', false, WPST_EVENTS_DEFAULT_COLUMNS,
             WPST_EVENTS_DEFAULT_TABLES, sprintf('eventgroupid="%s" AND meetid="%s"',
             $this->getEventGroupId(), WPST_NULL_ID)) ;
 
@@ -498,7 +498,7 @@ class AdminSwimTeamEventsTabContainer extends SwimTeamEventsTabContainer
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimMeetTabContainer
  */
@@ -509,7 +509,7 @@ class SwimMeetEventsTabContainer extends SwimTeamEventsTabContainer
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see AdminSwimTeamEventsTabContainer
  */
@@ -554,7 +554,7 @@ class AdminSwimMeetEventsTabContainer extends AdminSwimTeamEventsTabContainer
     function __buildGDL()
     {
         $gdl = new SwimMeetEventsAdminGUIDataList('Swim Meet Events',
-            '100%', 'eventnumber', false, WPST_EVENTS_DEFAULT_COLUMNS,
+            '100%', 'eventnumber,eventsuffix', false, WPST_EVENTS_DEFAULT_COLUMNS,
             WPST_EVENTS_DEFAULT_TABLES, sprintf('meetid="%s"',
             $this->getSwimMeetId())) ;
 

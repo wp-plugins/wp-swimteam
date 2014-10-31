@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: table.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: table.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Table classes.  These classes manage the
  * entry and display of the various tables used
@@ -10,11 +10,11 @@
  *
  * (c) 2005 by Mike Walsh for SwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Tables
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodified $Author: mpwalsh8 $
  *
  */
@@ -25,7 +25,7 @@
  * handles empty strings in tables such that tables are not
  * rendered missing cell borders.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see InfoTable
  */
@@ -76,7 +76,7 @@ class SwimTeamInfoTable extends InfoTable
  * This class extends the NavTable class and allows control
  * over the character used as a bullet when rendering the NavTable.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see NavTable
  */

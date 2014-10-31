@@ -3,20 +3,20 @@
 /**
  * Management admin page content.
  *
- * $Id: manage_menu.php 1017 2013-10-06 13:07:44Z mpwalsh8 $
+ * $Id: manage_menu.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 1017 $
- * @lastmodified $Date: 2013-10-06 09:07:44 -0400 (Sun, 06 Oct 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the Management Page

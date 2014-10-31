@@ -24,7 +24,7 @@
  *
  */
 
-include_once('swimteam.include.php') ;
+require_once(WPST_PATH . '/include/swimteam.include.php') ;
 
 define('WPST_HY3_VERSION', '3.0') ;
 define('WPST_HY3_UNUSED', '') ;

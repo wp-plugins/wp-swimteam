@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: db.class.php 1023 2013-10-23 13:56:11Z mpwalsh8 $
+ * $Id: db.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Form classes.  These classes manage the
  * entry and display of the various forms used
@@ -10,28 +10,28 @@
  *
  * (c) 2007 by Mike Walsh for WpSwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage db
- * @version $Revision: 1023 $
- * @lastmodified $Date: 2013-10-23 09:56:11 -0400 (Wed, 23 Oct 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
 //  Need the DB defintions so everything will work
 
-require_once('db.include.php') ;
+require_once(WPST_PATH . 'include/db.include.php') ;
 
 //  Build upon the WordPress database class
 
-//include_once(ABSPATH . '/wp-config.php') ;
-//include_once(ABSPATH . '/wp-includes/wp-db.php') ;
+//require_once(ABSPATH . '/wp-config.php') ;
+//require_once(ABSPATH . '/wp-includes/wp-db.php') ;
 
 /**
  * Class for managing the SwimTeam the database interface.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  *
  */

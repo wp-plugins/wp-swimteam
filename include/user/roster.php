@@ -3,33 +3,33 @@
 /**
  * Roster page content.
  *
- * $Id: roster.php 1006 2013-09-28 17:54:31Z mpwalsh8 $
+ * $Id: roster.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 1006 $
- * @lastmodified $Date: 2013-09-28 13:54:31 -0400 (Sat, 28 Sep 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('sdif.class.php') ;
-require_once('roster.class.php') ;
-require_once('roster.forms.class.php') ;
-require_once('seasons.class.php') ;
-require_once('swimmers.class.php') ;
-require_once('swimmers.forms.class.php') ;
-require_once('reportgen.class.php') ;
-require_once('container.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/sdif.class.php') ;
+require_once(WPST_PATH . 'class/roster.class.php') ;
+require_once(WPST_PATH . 'class/roster.forms.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/swimmers.class.php') ;
+require_once(WPST_PATH . 'class/swimmers.forms.class.php') ;
+require_once(WPST_PATH . 'class/reportgen.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the roster
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -388,7 +388,7 @@ class RosterTabContainer extends SwimTeamTabContainer
 
                 case WPST_ACTION_EXPORT_HY3:
                     $c = container() ;
-                    require_once('hy-tek.class.php') ;
+                    require_once(WPST_PATH . 'class/hy-tek.class.php') ;
 
                     $hy3 = new HY3Roster() ;
                     //$hy3->setHy3DebugFlag(true) ;
@@ -518,48 +518,132 @@ class RosterTabContainer extends SwimTeamTabContainer
                         if (in_array(WPST_CSV, $exports))
                         {
                             $csv = &$fp->_form_content->__csv ;
-                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($csv->getCSVFile()),
-                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+                            $t = $csv->getExportTransient() ;
+                            $v = empty($t) ? null : get_transient($t) ;
 
-                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
-                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
-                            $c->add($if) ;
+                            //  Use transients instead of temporary files for storage?
+ 
+                            if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                            {
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH)) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            elseif (file_exists($csv->getCSVFile()) && filesize($csv->getCSVFile()) > 0)
+                            {
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($csv->getCSVFile()),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            else
+                            {
+                                $c->add(html_div("updated error", html_h4('CSV Export file does not exist, nothing to download.'))) ;
+                            }
                         }
 
                         //  RE1
                         if (in_array(WPST_RE1, $exports))
                         {
                             $re1 = &$fp->_form_content->__re1 ;
-                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($re1->getRE1File()),
-                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1')) ;
+                            $t = $re1->getExportTransient() ;
+                            $v = empty($t) ? null : get_transient($t) ;
 
-                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
-                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
-                            $c->add($if) ;
+                            //  Use transients instead of temporary files for storage?
+ 
+                            if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                            {
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1'), urlencode(ABSPATH)) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            elseif (file_exists($re1->getRE1File()) && filesize($re1->getRE1File()) > 0)
+                            {
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($re1->getRE1File()),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1')) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            else
+                            {
+                                $c->add(html_div("updated error", html_h4('RE1 export file does not exist, nothing to download.'))) ;
+                            }
                         }
 
                         //  HY3
                         if (in_array(WPST_HY3, $exports))
                         {
                             $hy3 = &$fp->_form_content->__hy3 ;
-                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($hy3->getHY3File()),
-                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3')) ;
+                            $t = $hy3->getExportTransient() ;
+                            $v = empty($t) ? null : get_transient($t) ;
 
-                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
-                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
-                            $c->add($if) ;
+                            //  Use transients instead of temporary files for storage?
+ 
+                            if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                            {
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3'), urlencode(ABSPATH)) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            elseif (file_exists($hy3->getHY3File()) && filesize($hy3->getHY3File()) > 0)
+                            {
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($hy3->getHY3File()),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3')) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            else
+                            {
+                                $c->add(html_div("updated error", html_h4('HY3 export file does not exist, nothing to download.'))) ;
+                            }
                         }
 
                         //  SDIF
                         if (in_array(WPST_SDIF, $exports))
                         {
                             $sdif = &$fp->_form_content->__sdif ;
-                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($sdif->getSDIFFile()),
-                                urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3')) ;
+                            $t = $sdif->getExportTransient() ;
+                            $v = empty($t) ? null : get_transient($t) ;
 
-                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
-                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
-                            $c->add($if) ;
+                            //  Use transients instead of temporary files for storage?
+ 
+                            if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                            {
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3'), urlencode(ABSPATH)) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            elseif (file_exists($sdif->getSDIFFile()) && filesize($sdif->getSDIFFile()) > 0)
+                            {
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($sdif->getSDIFFile()),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3')) ;
+
+                                $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                                $c->add($if) ;
+                            }
+                            else
+                            {
+                                $c->add(html_div("updated error", html_h4('SDIF export file does not exist, nothing to download.'))) ;
+                            }
                         }
                     }
 
@@ -599,7 +683,7 @@ class RosterTabContainer extends SwimTeamTabContainer
 /**
  * Class definition of the roster
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */

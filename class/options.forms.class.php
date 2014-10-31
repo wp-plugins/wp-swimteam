@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: options.forms.class.php 967 2012-08-03 03:31:54Z mpwalsh8 $
+ * $Id: options.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,22 +10,22 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Options
- * @version $Revision: 967 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-08-02 23:31:54 -0400 (Thu, 02 Aug 2012) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once('forms.class.php') ;
-require_once('options.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/options.class.php') ;
 
 /**
  * Construct the Options Settings form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -375,7 +375,7 @@ class WpSwimTeamOptionsForm extends WpSwimTeamForm
 /**
  * Construct the Registration Options Settings form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -574,7 +574,7 @@ class WpSwimTeamRegistrationOptionsForm extends WpSwimTeamForm
 /**
  * Construct the User Profile Options form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -789,7 +789,7 @@ class WpSwimTeamUserProfileOptionsForm extends WpSwimTeamForm
 /**
  * Construct the Swimmer Profile Options form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1034,7 +1034,7 @@ class WpSwimTeamSwimmerProfileOptionsForm extends WpSwimTeamForm
 /**
  * Construct the Googple Maps Options Settings form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1130,7 +1130,7 @@ class WpSwimTeamGoogleMapsOptionsForm extends WpSwimTeamForm
 /**
  * Construct the Job Options Settings form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1271,7 +1271,7 @@ class WpSwimTeamJobOptionsForm extends WpSwimTeamForm
 /**
  * Construct the Googple Maps Options Settings form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1285,6 +1285,9 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
      */
     function form_init_elements()
     {
+        $usetransients = new FEYesNoListBox('Use Transients for Temporary Storage', true, '75px') ;
+        $this->add_element($usetransients) ;
+
         $enableverbosemessges = new FEYesNoListBox('Enable Verbose Messages', true, '75px') ;
         $this->add_element($enableverbosemessges) ;
 
@@ -1324,6 +1327,7 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
         $options->loadOptions() ;
 
         //  Initialize the form fields
+        $this->set_element_value('Use Transients for Temporary Storage', $options->getUseTransients()) ;
         $this->set_element_value('Enable Verbose Messages', $options->getEnableVerboseMessages()) ;
         $this->set_element_value('Rows to Display', $options->getGDLRowsToDisplay()) ;
         $this->set_element_value('Time Format', $options->getTimeFormat()) ;
@@ -1342,6 +1346,9 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
     function form_content()
     {
         $table = html_table($this->_width, 0, 4) ;
+
+        $table->add_row($this->element_label('Use Transients for Temporary Storage'),
+            $this->element_form('Use Transients for Temporary Storage')) ;
 
         $table->add_row($this->element_label('Enable Verbose Messages'),
             $this->element_form('Enable Verbose Messages')) ;
@@ -1402,6 +1409,7 @@ class WpSwimTeamMiscellaneousOptionsForm extends WpSwimTeamForm
     {
         $options = new SwimTeamOptions() ;
         $options->loadOptions() ;
+        $options->setUseTransients($this->get_element_value('Use Transients for Temporary Storage')) ;
         $options->setEnableVerboseMessages($this->get_element_value('Enable Verbose Messages')) ;
         $options->setGDLRowsToDisplay($this->get_element_value('Rows to Display')) ;
         $options->setTimeFormat($this->get_element_value('Time Format')) ;

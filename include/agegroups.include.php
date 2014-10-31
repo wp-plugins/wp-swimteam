@@ -2,23 +2,23 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: agegroups.include.php 992 2013-06-25 14:10:09Z mpwalsh8 $
+ * $Id: agegroups.include.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Job includes.  These includes define information used in 
  * the Job classes and child classes in the Wp-SwimTeam plugin.
  *
  * (c) 2007 by Mike Walsh for Wp-SwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 992 $
- * @lastmodified $Date: 2013-06-25 10:10:09 -0400 (Tue, 25 Jun 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-include_once("swimteam.include.php") ;
+require_once(WPST_PATH . '/include/swimteam.include.php') ;
 
 /**
  * Define age group table name

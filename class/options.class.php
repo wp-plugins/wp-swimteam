@@ -3,29 +3,29 @@
 /**
  * Options classes.
  *
- * $Id: options.class.php 982 2013-04-11 21:23:38Z mpwalsh8 $
+ * $Id: options.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Options
- * @version $Revision: 982 $
- * @lastmodified $Date: 2013-04-11 17:23:38 -0400 (Thu, 11 Apr 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
 //error_reporting(E_ALL) ;
 
-require_once("db.class.php") ;
-require_once("swimteam.include.php") ;
-require_once("options.include.php") ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
+require_once(WPST_PATH . 'include/options.include.php') ;
 
 /**
  * Class definition of the agegroups
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -280,6 +280,31 @@ class SwimTeamOptions extends SwimTeamDBI
      * email swimmer optional fields
      */
     var $__email_swimmer_optional_fields ;
+
+    /**
+     * email swimmer optional fields
+     */
+    var $__use_transients ;
+
+    /**
+     * Set the use_transients property - true or false
+     *
+     * @param - boolean - true to use transients instead of temp files
+     */
+    function setUseTransients($use_transients = true)
+    {
+        $this->__use_transients = $use_transients ;
+    }
+
+    /**
+     * Get the use_transients property - true or false
+     *
+     * @return - string - true to use transients instead of temp files
+     */
+    function getUseTransients()
+    {
+        return ($this->__use_transients) ;
+    }
 
     /**
      * Set the usonly property - true or false
@@ -1590,6 +1615,20 @@ class SwimTeamOptions extends SwimTeamDBI
             update_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES, WPST_DEFAULT_ENABLE_VERBOSE_MESSAGES) ;
         }
 
+        //  Enable Transients
+        $option = get_option(WPST_OPTION_USE_TRANSIENTS) ;
+
+        //  If option isn't stored in the database, use the default
+        if ($option !== false)
+        {
+            $this->setUseTransients($option) ;
+        }
+        else
+        {
+            $this->setUseTransients(WPST_DEFAULT_USE_TRANSIENTS) ;
+            update_option(WPST_OPTION_USE_TRANSIENTS, WPST_DEFAULT_USE_TRANSIENTS) ;
+        }
+
         //  Enable Google Maps
         $option = get_option(WPST_OPTION_ENABLE_GOOGLE_MAPS) ;
 
@@ -2123,6 +2162,7 @@ class SwimTeamOptions extends SwimTeamDBI
         update_option(WPST_OPTION_AUTO_REGISTER, $this->getAutoRegister()) ;
         update_option(WPST_OPTION_REGISTRATION_SYSTEM, $this->getRegistrationSystem()) ;
         update_option(WPST_OPTION_ENABLE_VERBOSE_MESSAGES, $this->getEnableVerboseMessages()) ;
+        update_option(WPST_OPTION_USE_TRANSIENTS, $this->getUseTransients()) ;
         update_option(WPST_OPTION_ENABLE_GOOGLE_MAPS, $this->getEnableGoogleMaps()) ;
         update_option(WPST_OPTION_GOOGLE_API_KEY, $this->getGoogleAPIKey()) ;
         update_option(WPST_OPTION_GDL_ROWS_TO_DISPLAY, $this->getGDLRowsToDisplay()) ;
@@ -2225,7 +2265,7 @@ class SwimTeamOptions extends SwimTeamDBI
 /**
  * Class definition of the Swim Team Option Meta
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */

@@ -3,25 +3,25 @@
 /**
  * UserProfile classes.
  *
- * $Id: users.class.php 961 2012-07-09 21:00:26Z mpwalsh8 $
+ * $Id: users.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage UserProfile
- * @version $Revision: 961 $
- * @lastmodified $Date: 2012-07-09 17:00:26 -0400 (Mon, 09 Jul 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('users.include.php') ;
-require_once('db.class.php') ;
-require_once('swimteam.include.php') ;
-require_once('table.class.php') ;
-require_once('widgets.class.php') ;
-require_once('options.class.php') ;
+require_once(WPST_PATH . 'include/users.include.php') ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
+require_once(WPST_PATH . 'class/table.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
+require_once(WPST_PATH . 'class/options.class.php') ;
 
 /**
  * Class definition of the agegroups

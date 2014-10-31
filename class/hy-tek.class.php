@@ -16,14 +16,14 @@
  *
  */
 
-require_once('db.include.php') ;
-require_once('swimteam.include.php') ;
-require_once('hy-tek.include.php') ;
-require_once('users.class.php') ;
-require_once('team.class.php') ;
-require_once('seasons.class.php') ;
-require_once('roster.class.php') ;
-require_once('swimclubs.class.php') ;
+require_once(WPST_PATH . 'include/db.include.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
+require_once(WPST_PATH . 'include/hy-tek.include.php') ;
+require_once(WPST_PATH . 'class/users.class.php') ;
+require_once(WPST_PATH . 'class/team.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/roster.class.php') ;
+require_once(WPST_PATH . 'class/swimclubs.class.php') ;
 
 /**
  * Class definition of the HY3 team profile
@@ -77,6 +77,36 @@ class HY3BaseRecord extends HY3Profile
      * gender
      */
     var $__gender = WPST_GENDER_BOTH ;
+
+    /**
+     * temp file error flag
+     */
+    var $__tempFileError = false ;
+
+    /**
+     * export Transient
+     */
+    var $__exportTransient ;
+
+    /**
+     * Get Temp File Error
+     *
+     * @return boolean - status of temp file creation
+     */
+    function getTempFileError()
+    {
+        return $this->__tempFileError ;
+    }
+
+    /**
+     * Set Temp File Error
+     *
+     * @param boolean - status of temp file creation
+     */
+    function setTempFileError($e)
+    {
+        $this->__tempFileError = $e ;
+    }
 
     /**
      * Get HY3 Debug Flag
@@ -159,23 +189,84 @@ class HY3BaseRecord extends HY3Profile
     }
 
     /**
+     * Get Export file name
+     *
+     * @return string - SDIF file name
+     */
+    function getExportFile()
+    {
+        return $this->__hy3File ;
+    }
+
+    /**
+     * Get Export Transient
+     *
+     * @return string - Export Transient
+     */
+    function getExportTransient()
+    {
+        return $this->__exportTransient ;
+    }
+
+    /**
+     * Set Export Transient
+     *
+     * @param string - Export Transient
+     */
+    function setExportTransient($t)
+    {
+        $this->__exportTransient = $t ;
+    }
+
+    /**
      * Write the HY3 data to a file which can be sent to the browser
      *
      */
     function generateHY3File()
     {
-        //  Generate a temporary file to hold the data
+        //  Generate a temporary file to hold the data?
  
-        $this->setHY3File(tempnam('', 'SD3')) ;
+        //  Use transients instead of temporary files for storage?
 
-        //  Write the HY3 data to the file
+        if (get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES)
+        {
+            //  Create a random string of characters for the transient
+            $transient = 'wpst_' . substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 20) ;
+            
+            //  Save the transient name so it can be referenced at time of download
+            //  and store the export data in the transient and expire it after one hour.
 
-        $f = fopen($this->getHY3File(), 'w') ;
+            $this->setExportTransient($transient) ;
 
-        foreach ($this->__hy3Data as $hy3)
-            fwrite($f, $hy3 . WPST_HY3_RECORD_TERMINATOR) ;
+            $hy3 = '' ;
 
-        fclose($f) ;
+            foreach ($this->__hy3Data as $h)
+                $hy3 .= sprintf('%s%s', $h, WPST_HY3_RECORD_TERMINATOR) ;
+
+            $f = set_transient($transient, $hy3, 3600) ;
+        }
+        else
+        {
+            $this->setHY3File(tempnam('', 'HY3')) ;
+
+            //  Write the HY3 data to the file
+
+            $f = fopen($this->getHY3File(), 'w') ;
+
+            if ($f !== false)
+            {
+                foreach ($this->__hy3Data as $hy3)
+                    fwrite($f, $hy3 . WPST_HY3_RECORD_TERMINATOR) ;
+
+                fclose($f) ;
+            }
+            else
+            {
+                $this->setTempFileError(true) ;
+            }
+
+        }
+        return ($f !== false) ;
     }
 }
 
@@ -1149,7 +1240,7 @@ class HY3MeetEntries extends HY3BaseRecord
                         $e1->setStroke($event->getStroke()) ;
                         $e1->setAgeLower($event->getMinAge()) ;
                         $e1->setAgeUpper($event->getMaxAge()) ;
-                        $e1->setEventNumber($event->getEventNumber()) ;
+                        $e1->setEventNumber($event->getEventNumber() . $event->getEventSuffix()) ;
 
                         //  Initialize E1 record fields which are swimmer based
 
@@ -1225,7 +1316,7 @@ class HY3MeetEntries extends HY3BaseRecord
                 $f1->setRelayStroke($event->getStroke()) ;
                 $f1->setRelayAgeLower($event->getMinAge()) ;
                 $f1->setRelayAgeUpper($event->getMaxAge()) ;
-                $f1->setEventNumber($event->getEventNumber()) ;
+                $f1->setEventNumber($event->getEventNumber() . $event->getEventSuffix()) ;
 
                 if ($this->getHY3DebugFlag())
                 {

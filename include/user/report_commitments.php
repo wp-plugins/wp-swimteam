@@ -7,7 +7,7 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage reports
  * @version $Revision$
@@ -16,14 +16,14 @@
  *
  */
 
-require_once("reportgen.class.php") ;
-require_once("reportgen.forms.class.php") ;
-require_once("container.class.php") ;
+require_once(WPST_PATH . 'class/reportgen.class.php') ;
+require_once(WPST_PATH . 'class/reportgen.forms.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
 
 /**
  * Class definition of the ReportGeneratorTab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -79,6 +79,7 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
 
         //  If the Form Processor was succesful, let the user know
 
+        error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
         if ($fp->is_action_successful())
         {
             $mode = $fp->_form_content->get_element_value("Report") ;
@@ -90,15 +91,37 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
             if ($mode == WPST_GENERATE_CSV)
             {
                 $rpt->generateCSVFile() ;
+                $t = $rpt->getExportTransient() ;
+                $v = empty($t) ? null : get_transient($t) ;
 
-                $arg = urlencode($rpt->getCSVFile()) ;
+                //  Use transients instead of temporary files for storage?
+ 
+                if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                {
+                    $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH)) ;
 
-                $if = html_iframe(sprintf("%s/include/user/reportgenCSV.php?file=%s", WPST_PLUGIN_URL, $arg)) ;
-                $if->set_tag_attributes(array("width" => 0, "height" => 0)) ;
-                $c->add($if) ;
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                    $c->add($if) ;
+                }
+                elseif (file_exists($rpt->getCSVFile()) && filesize($rpt->getCSVFile()) > 0)
+                {
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($rpt->getCSVFile()),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
 
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                    $c->add($if) ;
+                }
+                else
+                {
+                    $c->add(html_div("updated error", html_h4('CSV Export file does not exist, nothing to download.'))) ;
+                }
 
-                $fp->set_render_form_after_success(true) ;
+                $c->add($rpt->getReport(true)) ;
+
+                $fp->set_render_form_after_success(false) ;
 
 	            $div->add($fp, html_br(), $c) ;
             }

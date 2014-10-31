@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: plugininit.include.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: plugininit.include.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,16 +10,16 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Revision: 849 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-define('WPST_PATH', dirname(__FILE__)) ;
+define('WPST_PATH', plugin_dir_path(__FILE__)) ;
 
 //  Initialize the phpHtmlLib library.
 //  To Do:  Need to check to make sure the plugin is installed.
@@ -41,7 +41,7 @@ $includePath = WPST_PATH . "/include" ;
 
 //  Make sure it works under Windows and Unix.
 
-ini_set('include_path', $classPath . PATH_SEPARATOR . $includePath . PATH_SEPARATOR . ini_get('include_path')) ;
+//ini_set('include_path', $classPath . PATH_SEPARATOR . $includePath . PATH_SEPARATOR . ini_get('include_path')) ;
 
 //  PHP4 introduced some new warning when assigning with references.
 //  phpHtmlLib uses this construct so a fair number of warnings are

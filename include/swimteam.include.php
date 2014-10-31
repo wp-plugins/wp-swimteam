@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimteam.include.php 1014 2013-10-06 13:03:08Z mpwalsh8 $
+ * $Id: swimteam.include.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Swim Team includes.  These includes define constants
  * used the throughout the Wp-SwimTeam plugin.  All constants
@@ -10,16 +10,16 @@
  *
  * (c) 2007 by Mike Walsh for Wp-SwimTeam.
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Admin
- * @version $Revision: 1014 $
- * @lastmodified $Date: 2013-10-06 09:03:08 -0400 (Sun, 06 Oct 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('version.include.php') ;
+require_once(WPST_PATH . '/include/version.include.php') ;
 
 define('WPST_DEBUG', true) ;
 
@@ -218,6 +218,7 @@ define('WPST_DEFAULT_OPT_IN_OPT_OUT_EMAIL_FORMAT', WPST_HTML) ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_MODE', WPST_BOTH) ;
 define('WPST_DEFAULT_OPT_IN_OPT_OUT_USAGE_MODEL', WPST_STROKE) ;
 define('WPST_DEFAULT_ENABLE_VERBOSE_MESSAGES', WPST_NO) ;
+define('WPST_DEFAULT_USE_TRANSIENTS', WPST_NO) ;
 define('WPST_DEFAULT_ENABLE_GOOGLE_MAPS', WPST_NO) ;
 define('WPST_DEFAULT_GOOGLE_API_KEY', 'Google API Key') ;
 define('WPST_DEFAULT_GDL_ROWS_TO_DISPLAY', 20) ;
@@ -260,6 +261,7 @@ define('WPST_OPTION_SWIMMER_LABEL_FORMAT', WPST_OPTION_PREFIX . 'swimmer_label_f
 define('WPST_OPTION_SWIMMER_LABEL_FORMAT_CODE', WPST_OPTION_PREFIX . 'swimmer_label_format_code') ;
 define('WPST_OPTION_SWIMMER_LABEL_INITIAL_VALUE', WPST_OPTION_PREFIX . 'swimmer_label_initial_value') ;
 define('WPST_OPTION_ENABLE_VERBOSE_MESSAGES', WPST_OPTION_PREFIX . 'enable_verbose_messages') ;
+define('WPST_OPTION_USE_TRANSIENTS', WPST_OPTION_PREFIX . 'use_transients') ;
 define('WPST_OPTION_ENABLE_GOOGLE_MAPS', WPST_OPTION_PREFIX . 'enable_google_maps') ;
 define('WPST_OPTION_GOOGLE_API_KEY', WPST_OPTION_PREFIX . 'google_api_key') ;
 define('WPST_OPTION_GDL_ROWS_TO_DISPLAY', WPST_OPTION_PREFIX . 'gdl_rows_to_display') ;

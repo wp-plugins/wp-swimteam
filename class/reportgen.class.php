@@ -3,27 +3,27 @@
 /**
  * Reports classes.
  *
- * $Id: reportgen.class.php 1032 2013-10-25 16:09:03Z mpwalsh8 $
+ * $Id: reportgen.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Reports
- * @version $Revision: 1032 $
- * @lastmodified $Date: 2013-10-25 12:09:03 -0400 (Fri, 25 Oct 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('db.class.php') ;
-require_once('jobs.class.php') ;
-require_once('table.class.php') ;
-require_once('seasons.class.php') ;
-require_once('swimmers.class.php') ;
-require_once('roster.class.php') ;
-require_once('users.csv.class.php') ;
-require_once('swimteam.include.php') ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'class/jobs.class.php') ;
+require_once(WPST_PATH . 'class/table.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/swimmers.class.php') ;
+require_once(WPST_PATH . 'class/roster.class.php') ;
+require_once(WPST_PATH . 'class/users.csv.class.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
 
 /**
  * Class definition of the base report generator
@@ -250,13 +250,203 @@ class SwimTeamReportGenerator extends SwimTeamDBI
 }
 
 /**
+ * Class definition of the base report generator
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see SwimTeamReportGenerator
+ */
+class SwimTeamReportGeneratorExport extends SwimTeamReportGenerator
+{
+    /**
+     * export data
+     */
+    var $__exportData ;
+
+    /**
+     * export File
+     */
+    var $__exportFile ;
+
+    /**
+     * export Transient
+     */
+    var $__exportTransient ;
+
+    /**
+     * export record count
+     */
+    var $__exportCount ;
+
+    /**
+     * temp file error flag
+     */
+    var $__tempFileError = false ;
+
+    /**
+     * Get Export record count
+     *
+     * @return int - count of Export records
+     */
+    function getExportCount()
+    {
+        return $this->__exportCount ;
+    }
+
+    /**
+     * Get Temp File Error
+     *
+     * @return boolean - status of temp file creation
+     */
+    function getTempFileError()
+    {
+        return $this->__tempFileError ;
+    }
+
+    /**
+     * Set Temp File Error
+     *
+     * @param boolean - status of temp file creation
+     */
+    function setTempFileError($e)
+    {
+        $this->__tempFileError = $e ;
+    }
+
+    /**
+     * Get Export file name
+     *
+     * @return string - Export file name
+     */
+    function getExportFile()
+    {
+        return $this->__exportFile ;
+    }
+
+    /**
+     * Set Export file name
+     *
+     * @param string - Export file name
+     */
+    function setExportFile($f)
+    {
+        $this->__exportFile = $f ;
+    }
+
+    /**
+     * Get Export Transient
+     *
+     * @return string - Export Transient
+     */
+    function getExportTransient()
+    {
+        return $this->__exportTransient ;
+    }
+
+    /**
+     * Set Export Transient
+     *
+     * @param string - Export Transient
+     */
+    function setExportTransient($t)
+    {
+        $this->__exportTransient = $t ;
+    }
+
+    /**
+     * Get report
+     *
+     * @return html_table - report table
+     */
+    //function getReport()
+    //{
+    //    return parent::getHTMLReport() ;
+    //}
+
+    /**
+     * Write the Export data to a file which can be sent to the browser
+     *
+     */
+    function generateExportFile()
+    {
+        //  Use transients instead of temporary files for storage?
+
+        if (get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES)
+        {
+            //  Create a random string of characters for the transient
+            $transient = 'wpst_' . substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 20) ;
+            
+            //  Save the transient name so it can be referenced at time of download
+            //  and store the export data in the transient and expire it after one hour.
+
+            $this->setExportTransient($transient) ;
+            $f = set_transient($transient, $this->__exportData, 3600) ;
+        }
+        else
+        {
+            //  Generate a temporary file to hold the data
+ 
+            //$this->setExportFile(tempnam(ABSPATH .
+            //    '/' . get_option('upload_path'), 'Export')) ;
+
+            $this->setExportFile(tempnam('', 'Export')) ;
+
+            //  Write the Export data to the file
+
+            $f = fopen($this->getExportFile(), 'w') ;
+
+            if ($f !== false)
+            {
+                fwrite($f, $this->__exportData) ;
+                fclose($f) ;
+            }
+            else
+            {
+                $this->setTempFileError(true) ;
+            }
+        }
+
+        return ($f !== false) ;
+    }
+}
+
+/**
+ * Class definition of the base report generator
+ *
+ * @author Mike Walsh <mpwalsh8@gmail.com>
+ * @access public
+ * @see SwimTeamReportGeneratorExport
+ */
+class SwimTeamReportGeneratorExportCSV extends SwimTeamReportGeneratorExport
+{
+    /**
+     * Get Export file name
+     *
+     * @return string - Export file name
+     */
+    function getCSVFile()
+    {
+        return $this->getExportFile() ;
+    }
+
+    /**
+     * Write the CSV data to a file which can be sent to the browser
+     *
+     */
+    function generateCSVFile()
+    {
+        return $this->generateExportFile() ;
+    }
+}
+
+/**
  * Class definition of the report generator
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamReportGenerator
  */
-class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
+class SwimTeamUsersReportGenerator extends SwimTeamReportGeneratorExportCSV
 {
     /**
      * username field
@@ -609,6 +799,9 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
         foreach ($userIds as $userId)
             $u[] = $userId['userid'] ;
 
+
+        //error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
+        //$u = array_slice($u, 0, 10) ;
         return $u ;
     }
 
@@ -695,7 +888,6 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
         if ($this->getSecondaryPhone())
             $tr[] = get_option(WPST_OPTION_USER_SECONDARY_PHONE_LABEL) ;
         if ($this->getContactInformation()) $tr[] = 'Contact Information' ;
-        //if ($this->getTShirtSize()) $tr[] = 'T-Shirt Size' ;
 
         //  How many user options does this configuration support?
 
@@ -808,10 +1000,10 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
      * Generate the Report
      *
      */
-    function generateReport()
-    {
-        $this->generateHTMLReport() ;
-    }
+    //function generateReport()
+    //{
+    //    $this->generateHTMLReport() ;
+    //}
 
     /**
      * Generate the HTML Report
@@ -840,7 +1032,6 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
 
         $user = new SwimTeamUserProfile() ;
         $ometa = new SwimTeamOptionMeta() ;
-        //$userIds = $user->getUserIds(false, true, $this->getFilter()) ;
         $userIds = $this->getUserIds() ;
 
         //  Loop through the users
@@ -858,7 +1049,6 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
             //  WordPress user table but doesn't exist in the wp-SwimTeam user
             //  table.  Force the user id so the report will emit something useful.
 
-            //if (!$valid) $user->setId($userId['userid']) ;
             if (!$valid) $user->setId($userId) ;
 
             $tr = array() ;
@@ -901,73 +1091,8 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGenerator
  * @access public
  * @see SwimTeamUsersReportGenerator
  */
-class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
+class SwimTeamUsersReportGeneratorExportCSV extends SwimTeamUsersReportGenerator
 {
-    /**
-     * csv data
-     */
-    var $__csvData ;
-
-    /**
-     * csv File
-     */
-    var $__csvFile ;
-
-    /**
-     * csv record count
-     */
-    var $__csvCount ;
-
-    /**
-     * Get CSV record count
-     *
-     * @return int - count of CSV records
-     */
-    function getCSVCount()
-    {
-        return $this->__csvCount ;
-    }
-
-    /**
-     * Get CSV file name
-     *
-     * @return string - CSV file name
-     */
-    function getCSVFile()
-    {
-        return $this->__csvFile ;
-    }
-
-    /**
-     * Set CSV file name
-     *
-     * @param string - CSV file name
-     */
-    function setCSVFile($f)
-    {
-        $this->__csvFile = $f ;
-    }
-
-   /**
-     * Get CSV report
-     *
-     * @return mixed - report CSV
-     */
-    function getCSVReport()
-    {
-        return new Container(html_pre($this->__csvData)) ;
-    }
-
-    /**
-     * Get report
-     *
-     * @return html_table - report table
-     */
-    function getReport()
-    {
-        return parent::getHTMLReport() ;
-    }
-
     /**
      * Get the CSV Header
      *
@@ -1181,9 +1306,9 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
      */
     function generateCSVReport()
     {
-        $this->__csvData = '' ;
+        $this->__exportData = '' ;
 
-        $csv = &$this->__csvData ;
+        $csv = &$this->__exportData ;
 
         $season = new SwimTeamSeason() ;
         $swimmer = new SwimTeamSwimmer() ;
@@ -1221,26 +1346,6 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
             $csv .= "\r\n" ;
         }
     }
-
-    /**
-     * Write the CSV data to a file which can be sent to the browser
-     *
-     */
-    function generateCSVFile()
-    {
-        //  Generate a temporary file to hold the data
- 
-        $this->setCSVFile(tempnam(ABSPATH .
-            '/' . get_option('upload_path'), 'CSV')) ;
-
-        $this->setCSVFile(tempnam('', 'CSV')) ;
-
-        //  Write the CSV data to the file
-
-        $f = fopen($this->getCSVFile(), 'w') ;
-        fwrite($f, $this->__csvData) ;
-        fclose($f) ;
-    }
 }
 
 /**
@@ -1250,7 +1355,7 @@ class SwimTeamUsersReportGeneratorCSV extends SwimTeamUsersReportGenerator
  * @access public
  * @see SwimTeamUsersReportGeneratorCSV
  */
-class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGeneratorCSV
+class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGeneratorExportCSV
 {
     /**
      * job position field
@@ -1655,7 +1760,7 @@ class SwimTeamJobAssignmentsReportGenerator extends SwimTeamUsersReportGenerator
  * @access public
  * @see SwimTeamJobAssignmentsReportGenerator
  */
-class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsReportGenerator
+class SwimTeamJobAssignmentsReportGeneratorExportCSV extends SwimTeamJobAssignmentsReportGenerator
 {
     /**
      * Get the CSV Header
@@ -1761,10 +1866,10 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
      */
     function generateCSVReport()
     {
-        $this->__csvData = '' ;
+        $this->__exportData = '' ;
         $this->__recordcount = 0 ;
 
-        $csv = &$this->__csvData ;
+        $csv = &$this->__exportData ;
 
         $swimmeet = new SwimMeet() ;
         $season = new SwimTeamSeason() ;
@@ -1864,7 +1969,7 @@ class SwimTeamJobAssignmentsReportGeneratorCSV extends SwimTeamJobAssignmentsRep
  * @access public
  * @see SwimTeamUsersReportGeneratorCSV
  */
-class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGeneratorCSV
+class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGeneratorExportCSV
 {
     /**
      * Credits property
@@ -2058,7 +2163,7 @@ class SwimTeamJobCommitmentsReportGenerator extends SwimTeamUsersReportGenerator
  * @access public
  * @see SwimTeamJobCommitmentsReportGenerator
  */
-class SwimTeamJobCommitmentsReportGeneratorCSV extends SwimTeamJobCommitmentsReportGenerator
+class SwimTeamJobCommitmentsReportGeneratorExportCSV extends SwimTeamJobCommitmentsReportGenerator
 {
     /**
      * Get the CSV Header
@@ -2132,7 +2237,7 @@ class SwimTeamJobCommitmentsReportGeneratorCSV extends SwimTeamJobCommitmentsRep
  * @access public
  * @see SwimTeamReportGenerator
  */
-class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
+class SwimTeamSwimmersReportGenerator extends SwimTeamReportGeneratorExportCSV
 {
     /**
      * middle name field
@@ -2991,80 +3096,6 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGenerator
  */
 class SwimTeamSwimmersReportGeneratorExport extends SwimTeamSwimmersReportGenerator
 {
-    /**
-     * export data
-     */
-    var $__exportData ;
-
-    /**
-     * export File
-     */
-    var $__exportFile ;
-
-    /**
-     * export record count
-     */
-    var $__exportCount ;
-
-    /**
-     * Get Export record count
-     *
-     * @return int - count of Export records
-     */
-    function getExportCount()
-    {
-        return $this->__exportCount ;
-    }
-
-    /**
-     * Get Export file name
-     *
-     * @return string - Export file name
-     */
-    function getExportFile()
-    {
-        return $this->__exportFile ;
-    }
-
-    /**
-     * Set Export file name
-     *
-     * @param string - Export file name
-     */
-    function setExportFile($f)
-    {
-        $this->__exportFile = $f ;
-    }
-
-    /**
-     * Get report
-     *
-     * @return html_table - report table
-     */
-    function getReport()
-    {
-        return parent::getHTMLReport() ;
-    }
-
-    /**
-     * Write the Export data to a file which can be sent to the browser
-     *
-     */
-    function generateExportFile()
-    {
-        //  Generate a temporary file to hold the data
- 
-        $this->setExportFile(tempnam(ABSPATH .
-            '/' . get_option('upload_path'), 'Export')) ;
-
-        $this->setExportFile(tempnam('', 'Export')) ;
-
-        //  Write the Export data to the file
-
-        $f = fopen($this->getExportFile(), 'w') ;
-        fwrite($f, $this->__exportData) ;
-        fclose($f) ;
-    }
 }
 
 /**
@@ -3074,18 +3105,8 @@ class SwimTeamSwimmersReportGeneratorExport extends SwimTeamSwimmersReportGenera
  * @access public
  * @see SwimTeamSwimmersReportGenerator
  */
-class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGeneratorExport
+class SwimTeamSwimmersReportGeneratorExportCSV extends SwimTeamSwimmersReportGeneratorExport
 {
-    /**
-     * Get Export file name
-     *
-     * @return string - Export file name
-     */
-    function getCSVFile()
-    {
-        return $this->getExportFile() ;
-    }
-
     /**
      * Get the CSV Header
      *
@@ -3398,15 +3419,6 @@ class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
             $csv .= "\r\n" ;
         }
     }
-
-    /**
-     * Write the CSV data to a file which can be sent to the browser
-     *
-     */
-    function generateCSVFile()
-    {
-        $this->generateExportFile() ;
-    }
 }
 
 /**
@@ -3623,7 +3635,7 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
      */
     function generateRE1File()
     {
-        $this->generateExportFile() ;
+        return $this->generateExportFile() ;
     }
 }
 

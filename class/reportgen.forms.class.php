@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: reportgen.forms.class.php 888 2012-05-18 04:57:05Z mpwalsh8 $
+ * $Id: reportgen.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,14 +13,14 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Reports
- * @version $Revision: 888 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-18 00:57:05 -0400 (Fri, 18 May 2012) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once('forms.class.php') ;
-require_once('reportgen.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/reportgen.class.php') ;
 
 define('FEFILTER', ' Filter') ;
 define('FEFILTERLB', FEFILTER . ' Listbox') ;
@@ -495,7 +495,7 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
-            $this->__report = new SwimTeamUsersReportGeneratorCSV() ;
+            $this->__report = new SwimTeamUsersReportGeneratorExportCSV() ;
         }
         else
         {
@@ -851,10 +851,10 @@ class WpSwimTeamJobAssignmentsReportGeneratorForm extends WpSwimTeamUsersReportG
             $this->__report = new SwimTeamJobAssignmentsReportGenerator() ;
             
         }
-        else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
+        elseif ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
-            $this->__report = new SwimTeamJobAssignmentsReportGeneratorCSV() ;
+            $this->__report = new SwimTeamJobAssignmentsReportGeneratorExportCSV() ;
         }
         else
         {
@@ -1183,7 +1183,7 @@ class WpSwimTeamJobCommitmentsReportGeneratorForm extends WpSwimTeamUsersReportG
         else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
-            $this->__report = new SwimTeamJobCommitmentsReportGeneratorCSV() ;
+            $this->__report = new SwimTeamJobCommitmentsReportGeneratorExportCSV() ;
         }
         else
         {
@@ -1559,9 +1559,7 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
         else if ($this->get_element_value('Report') == WPST_GENERATE_CSV)
         {
             $csv = true ;
-            $this->__report = new SwimTeamSwimmersReportGeneratorCSV() ;
-            //$this->__report = new SwimTeamInfoTable('Swim Team Report', '800px') ;
-            //$this->__report = new Container() ;
+            $this->__report = new SwimTeamSwimmersReportGeneratorExportCSV() ;
         }
         else
         {
@@ -1678,10 +1676,6 @@ class WpSwimTeamSwimmersReportGeneratorForm extends WpSwimTeamForm
         }
 
         $rpt->generateReport() ;
-        
-        //  In CSV mode, also force the HTML report to be generated
-
-        //if ($csv) $rpt->generateReport(null, true) ;
         
         $this->set_action_message(sprintf('Swim Team Report Generated,
             %s record%s returned.', $rpt->getRecordCount(),

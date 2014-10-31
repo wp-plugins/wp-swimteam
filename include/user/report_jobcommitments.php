@@ -3,28 +3,28 @@
 /**
  * Age Groups admin page content.
  *
- * $Id: report_jobcommitments.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: report_jobcommitments.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('reportgen.class.php') ;
-require_once('reportgen.forms.class.php') ;
-require_once('container.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/reportgen.class.php') ;
+require_once(WPST_PATH . 'class/reportgen.forms.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the ReportGeneratorTab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -89,13 +89,33 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
             if ($mode == WPST_GENERATE_CSV)
             {
                 $rpt->generateCSVFile() ;
+                $t = $rpt->getExportTransient() ;
+                $v = empty($t) ? null : get_transient($t) ;
 
-                $arg = urlencode($rpt->getCSVFile()) ;
+                //  Use transients instead of temporary files for storage?
+ 
+                if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                {
+                    $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH)) ;
 
-                $if = html_iframe(sprintf('%s/include/user/reportgenCSV.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
-                $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
-                $c->add($if) ;
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                    $c->add($if) ;
+                }
+                elseif (file_exists($rpt->getCSVFile()) && filesize($rpt->getCSVFile()) > 0)
+                {
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($rpt->getCSVFile()),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
 
+                    $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                    $c->add($if) ;
+                }
+                else
+                {
+                    $c->add(html_div("updated error", html_h4('CSV Export file does not exist, nothing to download.'))) ;
+                }
 
                 $c->add($rpt->getReport()) ;
 

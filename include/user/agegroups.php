@@ -3,28 +3,28 @@
 /**
  * Age Groups admin page content.
  *
- * $Id: agegroups.php 862 2012-05-11 18:45:34Z mpwalsh8 $
+ * $Id: agegroups.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 862 $
- * @lastmodified $Date: 2012-05-11 14:45:34 -0400 (Fri, 11 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('agegroups.class.php') ;
-require_once('agegroups.forms.class.php') ;
-require_once('container.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/agegroups.class.php') ;
+require_once(WPST_PATH . 'class/agegroups.forms.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the jobs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */

@@ -3,32 +3,32 @@
 /**
  * Swim Meets admin page content.
  *
- * $Id: swimmeets.php 1029 2013-10-25 14:27:46Z mpwalsh8 $
+ * $Id: swimmeets.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 1029 $
- * @lastmodified $Date: 2013-10-25 10:27:46 -0400 (Fri, 25 Oct 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('swimteam.include.php') ;
-require_once('swimmeets.class.php') ;
-require_once('swimmeets.forms.class.php') ;
-require_once('events.class.php') ;
-require_once('jobs.forms.class.php') ;
-require_once('container.class.php') ;
-require_once('textmap.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
+require_once(WPST_PATH . 'class/swimmeets.class.php') ;
+require_once(WPST_PATH . 'class/swimmeets.forms.class.php') ;
+require_once(WPST_PATH . 'class/events.class.php') ;
+require_once(WPST_PATH . 'class/jobs.forms.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the swim meets
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -239,7 +239,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                 case WPST_ACTION_EXPORT_ENTRIES:
                     $swimmeet = SwimTeamTextMap::__mapMeetIdToText($swimmeetid) ;
-                    //  Does the meet have events to load results against?
+                    //  Does the meet have events to export entries for?
                    
                     $event = new SwimMeetEvent() ;
                     $event->setMeetId($swimmeetid) ;
@@ -354,13 +354,14 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                     //  Leverage the Events tab management code
 
-                    require_once('events.php') ;
+                    require_once(WPST_PATH . 'class/events.php') ;
                     $c = new AdminSwimMeetEventsTabContainer($swimmeetid, $desc) ;
 
                     break ;
 
+/*
                 case WPST_ACTION_EXPORT_ENTRIES:
-                    //  Does the meet have events to load results against?
+                    //  Does the meet have events to export entries for?
                    
                     $c = container() ;
 
@@ -370,7 +371,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                     if (!empty($eventIds))
                     {
-                        require_once('sdif.class.php') ;
+                        require_once(WPST_PATH . 'class/sdif.class.php') ;
                         //$form = new WpSwimTeamSwimMeetExportEntriesForm('Export Entries Swim Meet',
                         //    SwimTeamUtils::GetPageURI(), 600) ;
                         //$form->setMeetId($swimmeetid) ;
@@ -410,6 +411,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                     $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
 
                     break ;
+*/
 
                 case WPST_ACTION_RESULTS:
                 case WPST_ACTION_EXPORT_RESULTS:
@@ -451,20 +453,43 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
                         //$div->add($c, html_br(),
                         //    SwimTeamGUIButtons::getBackHomeButtons()) ;
                     }
-                    else if ($action == WPST_ACTION_EXPORT_ENTRIES)
+                    elseif ($action == WPST_ACTION_EXPORT_ENTRIES)
                     {
                         $div->add($this->__buildGDL($swimmeetid)) ;
                         $this->setShowActionSummary() ;
                         $this->setActionSummaryHeader('Swim Meeets Action Summary') ;
 
                         $c = container() ;
-                        $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($form->getExportFile()),
-                            urlencode('SwimMeetEntries-' . date('Y-m-d') . $form->getExportFileExtension()), urlencode('txt')) ;
 
-                        $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
-                        $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                        $t = $form->getExportTransient() ;
+                        $v = empty($t) ? null : get_transient($t) ;
 
-                        $c->add($if) ;
+                        if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                        {
+                            $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                                urlencode('SwimMeetEntries-' . date('Y-m-d') . $form->getExportFileExtension()),
+                                urlencode('txt'), urlencode(ABSPATH)) ;
+
+                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                            $c->add($if) ;
+                        }
+                        elseif (file_exists($hy3->getHY3File()) && filesize($hy3->getHY3File()) > 0)
+                        {
+                            $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($form->getExportFile()),
+                                urlencode('SwimMeetEntries-' . date('Y-m-d') . $form->getExportFileExtension()), urlencode('txt')) ;
+
+                            $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                            $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                            $c->add($if) ;
+                        }
+                        else
+                        {
+                            $c->add(html_div("updated error",
+                                html_h4(sprintf('Entries %s export file does not exist, nothing to download.',
+                                strtoupper($form-getExportFileExtension()))))) ;
+                        }
+
                         $div->add($c) ;
                     }
                     else
@@ -484,7 +509,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 	                $div->add($fp, html_br()) ;
                 }
             }
-            else if (isset($c))
+            elseif (isset($c))
             {
                 $div->add($c) ;
                 //$div->add($c, html_br(), SwimTeamGUIButtons::getButton('Return to Swim Meets')) ;
@@ -502,7 +527,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 /**
  * Class definition of the jobs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */

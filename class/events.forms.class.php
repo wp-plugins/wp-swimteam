@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: events.forms.class.php 1012 2013-10-06 12:59:12Z mpwalsh8 $
+ * $Id: events.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,25 +10,25 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Events
- * @version $Revision: 1012 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2013-10-06 08:59:12 -0400 (Sun, 06 Oct 2013) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once('forms.class.php') ;
-require_once('seasons.class.php') ;
-require_once('events.class.php') ;
-require_once('agegroups.class.php') ;
-require_once('portlets.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/events.class.php') ;
+require_once(WPST_PATH . 'class/agegroups.class.php') ;
+require_once(WPST_PATH . 'class/portlets.class.php') ;
 
 /**
  * Construct the Add Event form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -186,6 +186,24 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
     }
 
     /**
+     * Get the array of event suffix key and value pairs
+     *
+     * @return mixed - array of event suffix key value pairs
+     */
+    function _eventsuffixSelections()
+    {
+        //  Event Suffix options and labels - can be a single character from A to Z or null
+
+        $s = array('--' => '') ;
+
+        for ($i = ord('A') ; $i <= ord('Z') ; $i++)
+            $s[chr($i)] = chr($i) ;
+
+        return $s ;
+    }
+
+
+    /**
      * This method gets called EVERY time the object is
      * created.  It is used to build all of the 
      * FormElement objects used in this Form.
@@ -235,6 +253,12 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
 
         $eventnumber = new FENumber('Event Number', false, '50px');
         $this->add_element($eventnumber) ;
+
+		//  Event Suffix field
+
+        $eventsuffix = new FEListBox('Event Suffix', false, '50px');
+        $eventsuffix->set_list_data($this->_eventsuffixSelections()) ;
+        $this->add_element($eventsuffix) ;
     }
 
     /**
@@ -294,13 +318,20 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
             $table->add_row(html_td(null, null,
                 $this->element_label('Event Number')), html_td(null, null,
                 $this->element_form('Event Number'),
-                div_font8bold('Leave blank when creating multiple events.'))) ;
+                div_font8bold('Ignored when creating multiple events.'))) ;
+            $table->add_row(html_td(null, null,
+                $this->element_label('Event Suffix')), html_td(null, null,
+                $this->element_form('Event Suffix'),
+                div_font8bold('Ignored when creating multiple events.'))) ;
         }
         else
         {
             $table->add_row(html_td(null, null,
                 $this->element_label('Event Number')), html_td(null, null,
                 $this->element_form('Event Number'))) ;
+            $table->add_row(html_td(null, null,
+                $this->element_label('Event Suffix')), html_td(null, null,
+                $this->element_form('Event Suffix'))) ;
         }
 
         $this->add_form_block(null, $table) ;
@@ -339,6 +370,26 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
         $event->setEventGroupId($this->get_element_value('Event Group')) ;
         $event->setMeetId($this->get_hidden_element_value('_swimmeetid')) ;
         $event->setEventGroupId($this->get_hidden_element_value('_eventgroupid')) ;
+        $event->setEventNumber(WPST_NULL_STRING) ;
+        $event->setEventSuffix(WPST_NULL_STRING) ;
+
+        //  Single event?  If so, then can specify the Event Number and Suffix
+
+        if (count($strokes) == 1 && count($agegroups) == 1)
+        {
+            $event->setEventNumber($this->get_element_value('Event Number')) ;
+            $event->setEventSuffix($this->get_element_value('Event Suffix')) ;
+
+            //  Check the event number to make sure it is unused.
+
+            if ($event->getSwimTeamEventExistsByEventNumberAndGroupId())
+            {
+                $this->add_error('Event Number',
+                    sprintf('Event Number "%s%s" already exists.',
+                    $event->getEventNumber(), $event->getEventSuffix()));
+                $valid = false ;
+            }
+        }
 
         //  Loop through age groups
 
@@ -356,7 +407,7 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
  
                 if ($checkexists)
                 {
-                    if ($event->getSwimTeamEventExists())
+                    if ($event->getSwimTeamEventExists(null, null, true))
                     {
                         $this->add_error('Event Group', 'One or more similar events already exists.');
                         $this->add_error('Age Group', 'One or more similar events already exists.');
@@ -396,11 +447,12 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
         $event->setCourse($this->get_element_value('Course')) ;
         $event->setDistance($this->get_element_value('Distance')) ;
         $event->setEventGroupId($this->get_element_value('Event Group')) ;
+        $event->setEventSuffix($this->get_element_value('Event Suffix')) ;
 
         //  How to handle event number?  It is (a) optional
         //  and (b) ignored when defining multiple events.
 
-        $en = $event->getMaxEventNumber() ;
+        $en = $event->getMaxEventNumber() + 1 ;
 
         if ((count($strokes) == 1) && (count($agegroups) == 1))
         {
@@ -418,12 +470,12 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
             {
                 $event->setStroke($stroke) ;
                 $event->setAgeGroupId($agegroup) ;
-                $event->setEventNumber(++$en) ;
+                $event->setEventNumber($en++) ;
 
                 //  By 'anding' the successes together,
                 //  we can determine if any of them failed.
 
-                $success &= ($event->addSwimTeamEvent() != null) ;
+                $success &= ($event->addSwimTeamEvent(null, null, true) != null) ;
             }
         }
 
@@ -460,7 +512,7 @@ class WpSwimTeamEventAddForm extends WpSwimTeamForm
 /**
  * Construct the Update Event form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamEventAddForm
  */
@@ -531,6 +583,16 @@ class WpSwimTeamEventUpdateForm extends WpSwimTeamEventAddForm
 
         $this->add_element($eventnumber) ;
 
+		//  Event Suffix field
+
+        $eventsuffix = new FEListBox('Event Suffix', true, '50px');
+        $eventsuffix->set_list_data($this->_eventsuffixSelections()) ;
+
+        if ($action == WPST_ACTION_EVENTS_DELETE)
+            $eventsuffix->set_readonly(true) ;
+
+        $this->add_element($eventsuffix) ;
+
 		//  Event Group field
 
         $eventgroup = new FEListBox('Event Group', true, '175px');
@@ -561,6 +623,7 @@ class WpSwimTeamEventUpdateForm extends WpSwimTeamEventAddForm
         $this->set_element_value('Age Group', $event->getAgeGroupId()) ;
         $this->set_element_value('Event Group', $event->getEventGroupId()) ;
         $this->set_element_value('Event Number', $event->getEventNumber()) ;
+        $this->set_element_value('Event Suffix', $event->getEventSuffix()) ;
         $this->set_element_value('Stroke', $event->getStroke()) ;
         $this->set_element_value('Distance', $event->getDistance()) ;
         $this->set_element_value('Course', $event->getCourse()) ;
@@ -593,6 +656,7 @@ class WpSwimTeamEventUpdateForm extends WpSwimTeamEventAddForm
         $event->setAgeGroupId($this->get_element_value('Age Group')) ;
         $event->setEventGroupId($this->get_element_value('Event Group')) ;
         $event->setEventNumber($this->get_element_value('Event Number')) ;
+        $event->setEventSuffix($this->get_element_value('Event Suffix')) ;
         $event->setStroke($this->get_element_value('Stroke')) ;
         $event->setDistance($this->get_element_value('Distance')) ;
         $event->setCourse($this->get_element_value('Course')) ;
@@ -618,7 +682,7 @@ class WpSwimTeamEventUpdateForm extends WpSwimTeamEventAddForm
 /**
  * Construct the Delete Event form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamEventUpdateForm
  */
@@ -694,7 +758,7 @@ class WpSwimTeamEventDeleteForm extends WpSwimTeamEventUpdateForm
 /**
  * Construct the Delete Event form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamEventUpdateForm
  */
@@ -825,11 +889,11 @@ class WpSwimTeamEventDeleteAllForm extends WpSwimTeamEventDeleteForm
             $event->loadSwimTeamEventByEventId() ;
 
             if ($event->deleteSwimTeamEvent())
-                $actionmsgs[] = sprintf('Event Number %s was deleted from %s.',
-                    $event->getEventNumber(), $desc) ;
+                $actionmsgs[] = sprintf('Event Number %s%s was deleted from %s.',
+                    $event->getEventNumber(), $event->getEventSuffix(), $desc) ;
             else
-                $actionmsgs[] = sprintf('Event Number %s was not deleted from %s.',
-                    $event->getEventNumber(), $desc) ;
+                $actionmsgs[] = sprintf('Event Number %s%s was not deleted from %s.',
+                    $event->getEventNumber(), $event->getEventSuffix(), $desc) ;
         }
 
         //  Construct action message
@@ -878,7 +942,7 @@ class WpSwimTeamEventDeleteAllForm extends WpSwimTeamEventDeleteForm
 /**
  * Construct the Event Load form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -970,7 +1034,7 @@ class WpSwimTeamEventLoadForm extends WpSwimTeamForm
         {
             $event->loadSwimTeamEventByEventId($eventId['eventid']) ;
             $desc = sprintf('%04s:  %s %s %s %s', 
-                $event->getEventNumber(),
+                $event->getEventNumber() . $event->getEventSuffix(),
                 SwimTeamTextMap::__mapAgeGroupIdToText($event->getAgeGroupId()),
                 $event->getDistance(),
                 SwimTeamTextMap::__mapCourseCodeToText($event->getCourse()),
@@ -1121,12 +1185,12 @@ class WpSwimTeamEventLoadForm extends WpSwimTeamForm
             if ($success)
             {
                 $actionmsgcount['good']++ ;
-                $actionmsgs[] = sprintf('Event %d added to %s.', $event->getEventNumber(), $desc) ;
+                $actionmsgs[] = sprintf('Event %s%s added to %s.', $event->getEventNumber(), $event->getEventSuffix(), $desc) ;
             }
             else
             {
                 $actionmsgcount['bad']++ ;
-                $actionmsgs[] = sprintf('Event %d was not added to %s.', $event->getEventNumber(), $desc) ;
+                $actionmsgs[] = sprintf('Event %s%s was not added to %s.', $event->getEventNumber(), $event->getEventSuffix(), $desc) ;
             }
         }
 
@@ -1352,7 +1416,7 @@ class WpSwimTeamEventLoadForm extends WpSwimTeamForm
 /**
  * Construct the Event Load form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1620,8 +1684,8 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
             return false ;
         }
 
-        //  Validate event number - Field 1
-        if (!preg_match('/^\d+$/', $fields[0]))
+        //  Validate event number - Field 1 (handle optional suffix)
+        if (!preg_match('/^\d+[A-Z]*$/', $fields[0]))
         {
             $err = sprintf('Error:  Invalid event number (%s) found in Event Record.', $fields[0]) ;
             return false ;
@@ -1918,7 +1982,18 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
 
                 $event->setStroke($stroke) ;
                 $event->setAgeGroupId($agegroupid) ;
-                $event->setEventNumber($fields[0]) ;
+
+                //  Does event number have a suffix?
+                if (is_numeric($fields[0]))
+                {
+                    $event->setEventNumber($fields[0]) ;
+                    $event->setEventSuffix(WPST_NULL_STRING) ;
+                }
+                else
+                {
+                    $event->setEventNumber(substr($fields[0], 0, strlen($fields[0] - 1))) ;
+                    $event->setEventSuffix(substr(strrev(trim($fields[0])), 0, 1)) ;
+                }
                 $event->setDistance($fields[6]) ;
            
                 //  Check to see if the event already exists
@@ -1995,7 +2070,7 @@ class WpSwimTeamEventsImportForm extends WpSwimTeamFileUploadForm
 /**
  * Construct the Add Event Group Form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -2186,7 +2261,7 @@ class WpSwimTeamEventGroupAddForm extends WpSwimTeamForm
 /**
  * Construct the Update Event Group form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamEventGroupAddForm
  */
@@ -2274,7 +2349,7 @@ class WpSwimTeamEventGroupUpdateForm extends WpSwimTeamEventGroupAddForm
 /**
  * Construct the Delete Event Group form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -2381,7 +2456,7 @@ class WpSwimTeamEventGroupDeleteForm extends WpSwimTeamEventGroupUpdateForm
 /**
  * Construct the Reorder Event form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see DIVtag
  */
@@ -2512,7 +2587,7 @@ class WpSwimTeamEventReorderAjaxForm extends TABLEtag
 /**
  * Construct the Reorder Event by Swim Meet form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamEventReorderAjaxForm
  */
@@ -2536,7 +2611,7 @@ class WpSwimTeamEventReorderBySwimMeetAjaxForm extends WpSwimTeamEventReorderAja
 /**
  * Construct the Reorder Event by Event Group form
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamEventReorderAjaxForm
  */

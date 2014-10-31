@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmeets.forms.class.php 1027 2013-10-25 14:26:52Z mpwalsh8 $
+ * $Id: swimmeets.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,20 +13,20 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
- * @version $Revision: 1027 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2013-10-25 10:26:52 -0400 (Fri, 25 Oct 2013) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once('forms.class.php') ;
-require_once('seasons.class.php') ;
-require_once('swimmeets.class.php') ;
-require_once('swimclubs.class.php') ;
-require_once('swimmers.class.php') ;
-require_once('events.class.php') ;
-require_once('sdif.class.php') ;
-require_once('hy-tek.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/swimmeets.class.php') ;
+require_once(WPST_PATH . 'class/swimclubs.class.php') ;
+require_once(WPST_PATH . 'class/swimmers.class.php') ;
+require_once(WPST_PATH . 'class/events.class.php') ;
+require_once(WPST_PATH . 'class/sdif.class.php') ;
+require_once(WPST_PATH . 'class/hy-tek.class.php') ;
 
 /**
  * Construct the base SwimMeet form
@@ -161,6 +161,11 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
     var $__export_file_extension ;
 
     /**
+     * export Transient
+     */
+    var $__exportTransient ;
+
+    /**
      * Set the Export file property
      */
     function setExportFile($txt)
@@ -193,6 +198,26 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
     }
 
     /**
+     * Get Export Transient
+     *
+     * @return string - Export Transient
+     */
+    function getExportTransient()
+    {
+        return $this->__exportTransient ;
+    }
+
+    /**
+     * Set Export Transient
+     *
+     * @param string - Export Transient
+     */
+    function setExportTransient($t)
+    {
+        $this->__exportTransient = $t ;
+    }
+
+    /**
      * This method gets called EVERY time the object is
      * created.  It is used to build all of the 
      * FormElement objects used in this Form.
@@ -208,14 +233,9 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
  
         $this->add_hidden_element('_action') ;
 
-        //$zerotimemode = new FEListBox('Zero Time Format', true, '200px');
-        //$zerotimemode->set_list_data(SDIFCodeTableMappings::GetZeroTimeMode()) ;
-        //$this->add_element($zerotimemode) ;
-
         $fileformat = new FERadioGroup('File Format',
             SDIFCodeTableMappings::GetFileFormat(), true, '200px');
         $fileformat->set_br_flag(true) ;
-        //$fileformat->set_readonly(true) ;
         $this->add_element($fileformat) ;
 
         $zerotimemode = new FERadioGroup('Zero Time Format',
@@ -314,12 +334,13 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
 
             $this->setExportFileExtension('.sd3') ;
             $this->setExportFile(urlencode($sd3->getSDIFFile())) ;
+            $this->setExportTransient($sd3->getExportTransient()) ;
 
             //  SDIF entries have D0 and D3 records, divide count by 2 to get number of entries
             
             $this->set_action_message(sprintf('%s meet entries exported in SDIF format.', $sd3->getSDIFCount() / 2)) ;
         }
-        else if (($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE) ||
+        elseif (($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_TM_HY3_VALUE) ||
                  ($this->get_element_value('File Format') == WPST_FILE_FORMAT_HYTEK_MM_HY3_VALUE))
         {
             $hy3 = new HY3MeetEntries() ;
@@ -331,6 +352,7 @@ class WpSwimTeamSwimMeetExportEntriesForm extends WpSwimTeamSwimMeetForm
 
             $this->setExportFileExtension('.hy3') ;
             $this->setExportFile(urlencode($hy3->getHY3File())) ;
+            $this->setExportTransient($hy3->getExportTransient()) ;
 
             $this->set_action_message(sprintf('%s meet entries exported in Hy-tek HY3 format.', $hy3->getHY3Count())) ;
         }

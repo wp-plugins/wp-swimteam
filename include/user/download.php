@@ -26,26 +26,42 @@ if (!empty($args))
 {
     //  Make sure we have the right argument
 
-    if ((array_key_exists('file', $args)) &&
-        (array_key_exists('filename', $args)) &&
-        (array_key_exists('contenttype', $args)))
+    if ((array_key_exists('filename', $args)) &&
+        (array_key_exists('contenttype', $args)) &&
+        ((array_key_exists('file', $args)) ||
+        ((array_key_exists('transient', $args) && array_key_exists('abspath', $args)))))
     {
         $txt = '' ;
+        $abspath = urldecode($args['abspath']) ;
 
-        $file = urldecode($args['file']) ;
+        require($abspath . DIRECTORY_SEPARATOR . 'wp-load.php') ;
+
+        //  Use transients instead of temporary files for storage?
+
+        if (get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES)
+        {
+            
+            $transient = urldecode($args['transient']) ;
+            $txt = get_transient($transient) ;
+            delete_transient($transient) ;
+        }
+        else
+        {
+            $file = urldecode($args['file']) ;
+            $fh = fopen($file, 'r') or die('Unable to load file, something bad has happened.') ;
+
+            while (!feof($fh))
+                $txt .= fread($fh, 1024) ;
+
+            //  Clean up the temporary file - permissions
+            //  may prevent this from succeedeing so use the '@'
+            //  to suppress any messages from PHP.
+
+            @unlink($file) ;
+        }
+
         $filename = urldecode($args['filename']) ;
         $contenttype = urldecode($args['contenttype']) ;
-
-        $fh = fopen($file, 'r') or die('Unable to load file, something bad has happened.') ;
-
-        while (!feof($fh))
-            $txt .= fread($fh, 1024) ;
-
-        //  Clean up the temporary file - permissions
-        //  may prevent this from succeedeing so use the '@'
-        //  to suppress any messages from PHP.
-
-        @unlink($file) ;
 
         // Tell browser to expect a text file of some sort (usually txt or csv)
  

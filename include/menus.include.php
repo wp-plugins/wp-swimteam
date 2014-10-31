@@ -3,15 +3,15 @@
 /**
  * Plugin menus.
  *
- * $Id: menus.include.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: menus.include.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage menus
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1071 $
+ * @lastmodified $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -44,7 +44,7 @@ function swimteam_add_menu_pages()
     global $swimteamPluginHooks ;
 
     //$swimteamFileName = plugin_basename(__FILE__);
-    $swimteamFileName = "swimteam.php" ;
+    $swimteamFileName = 'swimteam.php' ;
 
     // Add a top-level menu - the Wordpress Codex notes this is ill-advised
     $swimteamPluginHooks['Swim Team'] = add_menu_page('Swim Team',
@@ -72,8 +72,8 @@ function swimteam_add_menu_pages()
  */
 function swimteam_sublevel_tab_test()
 {
-    swimteam_menu_page_content("<h2>Swim Team Test</h2>") ;
-    //require_once("admin/overview.php") ;
+    swimteam_menu_page_content('<h2>Swim Team Test</h2>') ;
+    //require_once('admin/overview.php') ;
 }
 
 /**
@@ -82,8 +82,8 @@ function swimteam_sublevel_tab_test()
  */
 function swimteam_sublevel_tab_overview()
 {
-    //swimteam_menu_page_content("<h2>Swim Team Overview</h2>") ;
-    require_once("user/overview.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Overview</h2>') ;
+    require_once('user/overview.php') ;
 }
 
 /**
@@ -92,8 +92,8 @@ function swimteam_sublevel_tab_overview()
  */
 function swimteam_manage_jobs()
 {
-    //swimteam_menu_page_content("<h2>Swim Team Volunteer Roles</h2>") ;
-    require_once("admin/jobs.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Volunteer Roles</h2>') ;
+    require_once('admin/jobs.php') ;
 }
 
 /**
@@ -102,8 +102,8 @@ function swimteam_manage_jobs()
  */
 function swimteam_manage_age_groups()
 {
-    //swimteam_menu_page_content("<h2>Swim Team Age Groups</h2>") ;
-    require_once("admin/agegroups.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Age Groups</h2>') ;
+    require_once('admin/agegroups.php') ;
 }
 
 /**
@@ -112,8 +112,8 @@ function swimteam_manage_age_groups()
  */
 function swimteam_manage_events()
 {
-    //swimteam_menu_page_content("<h2>Swim Team Events</h2>") ;
-    require_once("admin/events.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Events</h2>') ;
+    require_once('admin/events.php') ;
 }
 
 /**
@@ -122,7 +122,7 @@ function swimteam_manage_events()
  */
 function swimteam_sublevel_tab_2()
 {
-    swimteam_menu_page_content("<h2>Swim Team Tab 2</h2>") ;
+    swimteam_menu_page_content('<h2>Swim Team Tab 2</h2>') ;
 }
 
 /**
@@ -131,7 +131,7 @@ function swimteam_sublevel_tab_2()
  */
 function swimteam_sublevel_tab_3()
 {
-    swimteam_menu_page_content("<h2>Swim Team Tab 3</h2>") ;
+    swimteam_menu_page_content('<h2>Swim Team Tab 3</h2>') ;
 }
 
 /**
@@ -140,8 +140,8 @@ function swimteam_sublevel_tab_3()
  */
 function swimteam_swimmers()
 {
-    //swimteam_menu_page_content("<h2>Swim Team Swimmers Page</h2>") ;
-    require_once("user/swimmers.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Swimmers Page</h2>') ;
+    require_once('user/swimmers.php') ;
 }
 
 /**
@@ -150,8 +150,8 @@ function swimteam_swimmers()
  */
 function swimteam_profile()
 {
-    //swimteam_menu_page_content("<h2>Swim Team Profile Page</h2>") ;
-    require_once("user/profile.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Profile Page</h2>') ;
+    require_once('user/profile.php') ;
 }
 
 /**
@@ -160,8 +160,8 @@ function swimteam_profile()
  */
 function swimteam_roster()
 {
-    //swimteam_menu_page_content("<h2>Swim Team Roster</h2>") ;
-    require_once("user/roster.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Roster</h2>') ;
+    require_once('user/roster.php') ;
 }
 
 /**
@@ -170,8 +170,8 @@ function swimteam_roster()
  */
 function swimteam_seasons()
 {
-    swimteam_menu_page_content("<h2>Swim Team Seasons Page</h2>") ;
-    //require_once("admin/seasons.php") ;
+    swimteam_menu_page_content('<h2>Swim Team Seasons Page</h2>') ;
+    //require_once('admin/seasons.php') ;
 }
 
 /**
@@ -180,8 +180,8 @@ function swimteam_seasons()
  */
 function swimteam_users_page()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Users Page</h2>") ;
-    require_once("user/users_menu.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Users Page</h2>') ;
+    require_once('user/users_menu.php') ;
 }
 
 /**
@@ -190,8 +190,8 @@ function swimteam_users_page()
  */
 function swimteam_manage_page()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Manage Page</h2>") ;
-    require_once("user/manage_menu.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Manage Page</h2>') ;
+    require_once('user/manage_menu.php') ;
 }
 
 /**
@@ -200,8 +200,8 @@ function swimteam_manage_page()
  */
 function swimteam_reports_page()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Reports Page</h2>") ;
-    require_once("user/reports_menu.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Reports Page</h2>') ;
+    require_once('user/reports_menu.php') ;
 }
 
 /**
@@ -210,8 +210,8 @@ function swimteam_reports_page()
  */
 function swimteam_options_page()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Options Page</h2>") ;
-    require_once("user/options_menu.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Options Page</h2>') ;
+    require_once('user/options_menu.php') ;
 }
 
 /**
@@ -220,8 +220,8 @@ function swimteam_options_page()
  */
 function swimteam_team_profile()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Manage Seasons</h2>") ;
-    require_once("admin/teamprofile.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Manage Seasons</h2>') ;
+    require_once('admin/teamprofile.php') ;
 }
 
 /**
@@ -230,8 +230,8 @@ function swimteam_team_profile()
  */
 function swimteam_sdif_profile()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team SDIF Profile</h2>") ;
-    require_once("admin/sdifprofile.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team SDIF Profile</h2>') ;
+    require_once('admin/sdifprofile.php') ;
 }
 
 /**
@@ -240,8 +240,8 @@ function swimteam_sdif_profile()
  */
 function swimteam_all_swimmers()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team All Swimmers</h2>") ;
-    require_once("admin/swimmers.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team All Swimmers</h2>') ;
+    require_once('admin/swimmers.php') ;
 }
 
 /**
@@ -250,8 +250,8 @@ function swimteam_all_swimmers()
  */
 function swimteam_report_generator()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team All Swimmers</h2>") ;
-    require_once("admin/reportgen.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team All Swimmers</h2>') ;
+    require_once('admin/reportgen.php') ;
 }
 
 /**
@@ -260,8 +260,8 @@ function swimteam_report_generator()
  */
 function swimteam_manage_swimclubs()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Manage Swim Clubs</h2>") ;
-    require_once("admin/swimclubs.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Manage Swim Clubs</h2>') ;
+    require_once('admin/swimclubs.php') ;
 }
 
 /**
@@ -270,8 +270,8 @@ function swimteam_manage_swimclubs()
  */
 function swimteam_manage_seasons()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Manage Seasons</h2>") ;
-    require_once("admin/seasons.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Manage Seasons</h2>') ;
+    require_once('admin/seasons.php') ;
 }
 
 /**
@@ -280,8 +280,8 @@ function swimteam_manage_seasons()
  */
 function swimteam_parents_and_guardians()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Parents & Guardians</h2>") ;
-    require_once("admin/users.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Parents & Guardians</h2>') ;
+    require_once('admin/users.php') ;
 }
 
 /**
@@ -290,8 +290,8 @@ function swimteam_parents_and_guardians()
  */
 function swimteam_manage_swimmeets()
 {
-    //swimteam_menu_page_content( "<h2>Swim Team Manage Meets</h2>") ;
-    require_once("user/swimmeets.php") ;
+    //swimteam_menu_page_content('<h2>Swim Team Manage Meets</h2>') ;
+    require_once('user/swimmeets.php') ;
 }
 
 /**
@@ -300,7 +300,7 @@ function swimteam_manage_swimmeets()
  */
 function swimteam_theme_page()
 {
-    swimteam_menu_page_content( "<h2>Swim Team Theme Page</h2>") ;
+    swimteam_menu_page_content('<h2>Swim Team Theme Page</h2>') ;
 }
 
 /**
@@ -309,7 +309,7 @@ function swimteam_theme_page()
  */
 function swimteam_toplevel_page()
 {
-    swimteam_menu_page_content( "<h2>Swim Team Top Level Page</h2>") ;
+    swimteam_menu_page_content('<h2>Swim Team Top Level Page</h2>') ;
 }
 
 /**

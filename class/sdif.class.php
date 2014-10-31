@@ -3,27 +3,27 @@
 /**
  * TeamProfile classes.
  *
- * $Id: sdif.class.php 1028 2013-10-25 14:27:12Z mpwalsh8 $
+ * $Id: sdif.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TeamProfile
- * @version $Revision: 1028 $
- * @lastmodified $Date: 2013-10-25 10:27:12 -0400 (Fri, 25 Oct 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('db.class.php') ;
-require_once('swimteam.include.php') ;
-require_once('sdif.include.php') ;
-require_once('users.class.php') ;
-require_once('team.class.php') ;
-require_once('seasons.class.php') ;
-require_once('roster.class.php') ;
-require_once('swimclubs.class.php') ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
+require_once(WPST_PATH . 'include/sdif.include.php') ;
+require_once(WPST_PATH . 'class/users.class.php') ;
+require_once(WPST_PATH . 'class/team.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/roster.class.php') ;
+require_once(WPST_PATH . 'class/swimclubs.class.php') ;
 
 /**
  * Class definition of the SDIF team profile
@@ -420,6 +420,36 @@ class SDIFBasePyramid extends SDIFProfile
     var $__gender = WPST_GENDER_BOTH ;
 
     /**
+     * temp file error flag
+     */
+    var $__tempFileError = false ;
+
+    /**
+     * export Transient
+     */
+    var $__exportTransient ;
+
+    /**
+     * Get Temp File Error
+     *
+     * @return boolean - status of temp file creation
+     */
+    function getTempFileError()
+    {
+        return $this->__tempFileError ;
+    }
+
+    /**
+     * Set Temp File Error
+     *
+     * @param boolean - status of temp file creation
+     */
+    function setTempFileError($e)
+    {
+        $this->__tempFileError = $e ;
+    }
+
+    /**
      * Get SDIF Debug Flag
      *
      * @return boolean - state of SDIF debug flag
@@ -500,23 +530,84 @@ class SDIFBasePyramid extends SDIFProfile
     }
 
     /**
+     * Get Export file name
+     *
+     * @return string - SDIF file name
+     */
+    function getExportFile()
+    {
+        return $this->__sdifFile ;
+    }
+
+    /**
+     * Get Export Transient
+     *
+     * @return string - Export Transient
+     */
+    function getExportTransient()
+    {
+        return $this->__exportTransient ;
+    }
+
+    /**
+     * Set Export Transient
+     *
+     * @param string - Export Transient
+     */
+    function setExportTransient($t)
+    {
+        $this->__exportTransient = $t ;
+    }
+
+    /**
      * Write the SDIF data to a file which can be sent to the browser
      *
      */
     function generateSDIFFile()
     {
-        //  Generate a temporary file to hold the data
+        //  Generate a temporary file to hold the data?
  
-        $this->setSDIFFile(tempnam('', 'SD3')) ;
+        //  Use transients instead of temporary files for storage?
 
-        //  Write the SDIF data to the file
+        if (get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES)
+        {
+            //  Create a random string of characters for the transient
+            $transient = 'wpst_' . substr(str_shuffle("0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"), 0, 20) ;
+            
+            //  Save the transient name so it can be referenced at time of download
+            //  and store the export data in the transient and expire it after one hour.
 
-        $f = fopen($this->getSDIFFile(), 'w') ;
+            $this->setExportTransient($transient) ;
 
-        foreach ($this->__sdifData as $sdif)
-            fwrite($f, $sdif . WPST_SDIF_RECORD_TERMINATOR) ;
+            $sd3 = '' ;
 
-        fclose($f) ;
+            foreach ($this->__sdifData as $s)
+                $sd3 .= sprintf('%s%s', $s, WPST_SDIF_RECORD_TERMINATOR) ;
+
+            $f = set_transient($transient, $sd3, 3600) ;
+        }
+        else
+        {
+            $this->setSDIFFile(tempnam('', 'SD3')) ;
+
+            //  Write the SDIF data to the file
+
+            $f = fopen($this->getSDIFFile(), 'w') ;
+
+            if ($f !== false)
+            {
+                foreach ($this->__sdifData as $sdif)
+                    fwrite($f, $sdif . WPST_SDIF_RECORD_TERMINATOR) ;
+
+                fclose($f) ;
+            }
+            else
+            {
+                $this->setTempFileError(true) ;
+            }
+        }
+
+        return ($f !== false) ;
     }
 }
 
@@ -1184,7 +1275,7 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
                 $e0->setEventDistance($event->getDistance()) ;
                 $e0->setCourseCode($event->getCourse()) ;
                 $e0->setStrokeCode($event->getStroke()) ;
-                $e0->setEventNumber($event->getEventNumber()) ;
+                $e0->setEventNumber($event->getEventNumber() . $event->getEventSuffix()) ;
                 $e0->setEventAgeCode($event->getMinAge(), $event->getMaxAge()) ;
 
                 $f0count = 0 ;
@@ -1266,7 +1357,7 @@ class SDIFMeetEntriesPyramid extends SDIFBasePyramid
                 $d0->setEventDistance($event->getDistance()) ;
                 $d0->setCourseCode($event->getCourse()) ;
                 $d0->setStrokeCode($event->getStroke()) ;
-                $d0->setEventNumber($event->getEventNumber()) ;
+                $d0->setEventNumber($event->getEventNumber() . $event->getEventSuffix()) ;
                 $d0->setEventAgeCode($event->getMinAge(), $event->getMaxAge()) ;
 
                 foreach ($swimmerIds as $key => &$swimmerId)
@@ -1782,8 +1873,10 @@ class SDIFRecord extends SwimTeamDBI
     {
         if (is_null($uss))
         {
-            $dob = split('-', $this->getBirthDate()) ;
-            $name = split(',', $this->getSwimmerName()) ;
+            //$dob = split('-', $this->getBirthDate()) ;
+            //$name = split(',', $this->getSwimmerName()) ;
+            $dob = explode('-', $this->getBirthDate()) ;
+            $name = explode(',', $this->getSwimmerName()) ;
 
             //  Make sure there are 3 elements in the $name array
             for ($i = 0 ; $i <= 2 ; $i++)

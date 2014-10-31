@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: agegroups.forms.class.php 1036 2014-01-18 12:29:04Z mpwalsh8 $
+ * $Id: agegroups.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,14 +13,14 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage AgeGroups
- * @version $Revision: 1036 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2014-01-18 07:29:04 -0500 (Sat, 18 Jan 2014) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once('agegroups.class.php') ;
-require_once('forms.class.php') ;
+require_once(WPST_PATH . 'class/agegroups.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
 
 /**
  * Construct the Add Age Group form

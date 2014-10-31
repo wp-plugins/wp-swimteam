@@ -3,27 +3,27 @@
 /**
  * Age Groups admin page content.
  *
- * $Id: googlemapsoptions.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: googlemapsoptions.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('options.class.php') ;
-require_once('options.forms.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/options.class.php') ;
+require_once(WPST_PATH . 'class/options.forms.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the OptionsTab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */

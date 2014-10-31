@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: portlets.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: portlets.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * jQuery Portet widget - used to reorder events
  * and heats.  This code was adapted from the jQuery
@@ -17,12 +17,12 @@
  *
  * (c) 2008 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Events
- * @version $Revision: 849 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @see http://sonspring.com/journal/jquery-portlets
  *
  */
@@ -33,7 +33,7 @@ define('ORDER_PORTLET_BY_COLUMN', 'column') ;
 /**
  * Class definition of a Portet
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see DIVtag
  */
@@ -267,7 +267,7 @@ class Portlet extends DIVtag
 /**
  * Class definition of Portet CSS
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see CSSBuilder
  */
@@ -453,7 +453,7 @@ class PortletCSS extends CSSBuilder
 /**
  * Class definition of One Column Portet CSS
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see PortletCSS
  */
@@ -497,7 +497,7 @@ class OneColumnPortletCSS extends PortletCSS
 /**
  * Class definition of Two Column Portet CSS
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see PortletCSS
  */
@@ -541,7 +541,7 @@ class TwoColumnPortletCSS extends PortletCSS
 /**
  * Class definition of Three Column Portet CSS
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see PortletCSS
  */
@@ -565,7 +565,7 @@ class ThreeColumnPortletCSS extends PortletCSS
 /**
  * Class definition of One Column Portet CSS
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see PortletCSS
  */

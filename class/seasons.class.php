@@ -3,15 +3,15 @@
 /**
  * Season classes.
  *
- * $Id: seasons.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: seasons.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Season
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -27,11 +27,11 @@
  *
  */
 
-require_once('db.class.php') ;
-require_once('swimteam.include.php') ;
-require_once('seasons.include.php') ;
-require_once('widgets.class.php') ;
-require_once('table.class.php') ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
+require_once(WPST_PATH . 'include/seasons.include.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
+require_once(WPST_PATH . 'class/table.class.php') ;
 
 /**
  * Class definition of the seasons

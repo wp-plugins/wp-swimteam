@@ -3,28 +3,28 @@
 /**
  * Overview admin page content.
  *
- * $Id: overview.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: overview.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once("seasons.class.php") ;
-require_once("agegroups.class.php") ;
-require_once("swimmeets.class.php") ;
-require_once("container.class.php") ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/agegroups.class.php') ;
+require_once(WPST_PATH . 'class/swimmeets.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
 
 /**
  * Class definition of the overview tab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -103,7 +103,7 @@ class OverviewTabContainer extends SwimTeamTabContainer
 /**
  * Class definition of the Management overview tab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see OverviewTabContainer
  */
@@ -132,7 +132,7 @@ class ManagementOverviewTabContainer extends OverviewTabContainer
 /**
  * Class definition of the overview tab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see OverviewTabContainer
  */
@@ -164,7 +164,7 @@ class ReportsOverviewTabContainer extends OverviewTabContainer
 /**
  * Class definition of the Management overview tab
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see OverviewTabContainer
  */

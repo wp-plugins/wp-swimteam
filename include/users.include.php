@@ -2,18 +2,18 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: users.include.php 924 2012-06-28 22:23:28Z mpwalsh8 $
+ * $Id: users.include.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Users includes.  These includes define information used in 
  * the Users classes and child classes in the Wp-SwimTeam plugin.
  *
  * (c) 2007 by Mike Walsh for Wp-SwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Users
- * @version $Revision: 924 $
- * @lastmodified $Date: 2012-06-28 18:23:28 -0400 (Thu, 28 Jun 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */

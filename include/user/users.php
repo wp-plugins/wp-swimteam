@@ -3,25 +3,25 @@
 /**
  * User page content.
  *
- * $Id: users.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: users.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('users.class.php') ;
-require_once('users.forms.class.php') ;
-//require_once('users.csv.class.php') ;
-require_once('reportgen.class.php') ;
-require_once('container.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/users.class.php') ;
+require_once(WPST_PATH . 'class/users.forms.class.php') ;
+//require_once(WPST_PATH . 'class/users.csv.class.php') ;
+require_once(WPST_PATH . 'class/reportgen.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the user
@@ -294,15 +294,39 @@ class UsersTabContainer extends SwimTeamTabContainer
                 case WPST_ACTION_EXPORT_CSV:
                     $c = container() ;
 
-                    $csv = new SwimTeamUsersReportGeneratorCSV() ;
+                    $csv = new SwimTeamUsersReportGeneratorExportCSV() ;
                     $this->__initializeReportGenerator($csv) ;
                     $csv->generateReport(true) ;
-                    $csv->generateCSVFile() ;
-                    $arg = urlencode($csv->getCSVFile()) ;
+                    $csv->generateCSVFile(true) ;
 
-                    $if = html_iframe(sprintf('%s/include/user/reportgenCSV.php?file=%s', WPST_PLUGIN_URL, $arg)) ;
-                    $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
-                    $c->add($if) ;
+                    $t = $csv->getExportTransient() ;
+                    $v = empty($t) ? null : get_transient($t) ;
+
+                    //  Use transients instead of temporary files for storage?
+ 
+                    if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
+                    {
+                        $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
+                            urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH)) ;
+
+                        $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                        $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                        $c->add($if) ;
+                    }
+                    elseif (file_exists($csv->getCSVFile()) && filesize($csv->getCSVFile()) > 0)
+                    {
+                        $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($csv->getCSVFile()),
+                            urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+
+                        $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
+                        $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
+                        $c->add($if) ;
+                    }
+                    else
+                    {
+                        $c->add(html_div("updated error", html_h4('CSV Export file does not exist, nothing to download.'))) ;
+                    }
+
                     $c->add($csv->getReport(true)) ;
                     
                     $div->add(html_div('updated fade',

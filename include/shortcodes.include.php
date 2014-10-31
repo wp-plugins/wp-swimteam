@@ -3,21 +3,24 @@
 /**
  * Plugin shortcodes.
  *
- * $Id: shortcodes.include.php 984 2013-06-08 14:45:39Z mpwalsh8 $
+ * $Id: shortcodes.include.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage shortcodes
- * @version $Revision: 984 $
- * @lastmodified $Date: 2013-06-08 10:45:39 -0400 (Sat, 08 Jun 2013) $
+ * @version $Revision: 1071 $
+ * @lastmodified $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
+error_log(plugin_basename(__FILE__)) ;
+error_log(plugin_dir_path(__FILE__)) ;
+error_log(WPST_PATH) ;
 require_once(PHPHTMLLIB_ABSPATH . '/widgets/GoogleMap.inc') ;
-require_once('textmap.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
 
 /**
  * wpst_flickr_slideshow shortcode handler
@@ -114,8 +117,8 @@ add_shortcode('wpst_flickr_slideshow', 'wpst_flickr_slideshow_sc_handler');
  */
 function wpst_meet_schedule_sc_handler($atts)
 {
-    require_once('seasons.class.php') ;
-    require_once('swimmeets.class.php') ;
+    require_once(WPST_PATH . 'class/seasons.class.php') ;
+    require_once(WPST_PATH . 'class/swimmeets.class.php') ;
 
     $c = container() ;
 
@@ -160,7 +163,7 @@ add_shortcode('wpst_meet_schedule', 'wpst_meet_schedule_sc_handler');
  */
 function wpst_club_profile_sc_handler($atts)
 {
-    require_once('swimclubs.class.php') ;
+    require_once(WPST_PATH . 'class/swimclubs.class.php') ;
 
     $c = container() ;
 
@@ -395,7 +398,7 @@ add_shortcode('wpst_google_map', 'wpst_google_map_sc_handler');
  */
 function wpst_meet_report_sc_handler($atts)
 {
-    require_once('swimmeets.report.class.php') ;
+    require_once(WPST_PATH . 'class/swimmeets.report.class.php') ;
 
     $c = container() ;
 
@@ -521,7 +524,7 @@ add_shortcode('wpst_meet_report', 'wpst_meet_report_sc_handler');
  */
 function wpst_meet_job_assignments_sc_handler($atts)
 {
-    require_once('jobs.class.php') ;
+    require_once(WPST_PATH . 'class/jobs.class.php') ;
 
     $c = container() ;
 
@@ -598,7 +601,7 @@ add_shortcode('wpst_meet_job_assignments', 'wpst_meet_job_assignments_sc_handler
  */
 function wpst_job_descriptions_sc_handler($atts)
 {
-    require_once('jobs.class.php') ;
+    require_once(WPST_PATH . 'class/jobs.class.php') ;
 
     $c = container() ;
 

@@ -2,8 +2,8 @@
 Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
-Requires at least: 3.5
-Tested up to: 3.8
+Requires at least: 3.8
+Tested up to: 4.0
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -61,10 +61,17 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 4. Job Assignment Report Generator
 5. Swimmer Profile Options
 
-== Changelog ==
+== Change log ==
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.42 =
+* Added checking and error messages for creation of temporary files used during export (CSV, HY3, SD3, RE1).
+* Added support for Event Number suffixes.
+* Added support for Transients as temporary storage when exporting data or generating reports.
+* Major change to how files are included to better support newer versions of PHP.  The PHP include_path is no longer modified nor assumed.
+* Fixed bug in MyJobs which appears when no active season is designated.
 
 = 1.41 =
 * Fixed bug which prevented adding standard age groups.

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmers.forms.class.php 921 2012-06-28 22:21:32Z mpwalsh8 $
+ * $Id: swimmers.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,27 +10,27 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 921 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-06-28 18:21:32 -0400 (Thu, 28 Jun 2012) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once('forms.class.php') ;
-require_once('swimmers.class.php') ;
-require_once('seasons.class.php') ;
-require_once('swimmeets.class.php') ;
-require_once('textmap.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/swimmers.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/swimmeets.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
 
 define('CHECKBOX_SUFFIX', ' CheckBox') ;
 
 /**
  * Construct the Add Swimmer form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -690,7 +690,7 @@ class WpSwimTeamSwimmerAddForm extends WpSwimTeamForm
 /**
  * Construct the Update Swimmer form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimmerAddForm
  */
@@ -971,7 +971,7 @@ class WpSwimTeamSwimmerUpdateForm extends WpSwimTeamSwimmerAddForm
 /**
  * Construct the Update Swimmer form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamSwimmerUpdateForm
  */
@@ -1050,7 +1050,7 @@ class WpSwimTeamSwimmerDeleteForm extends WpSwimTeamSwimmerUpdateForm
 /**
  * Construct the Swimmer OptInOut form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1558,7 +1558,7 @@ class WpSwimTeamSwimmerOptInOutForm extends WpSwimTeamForm
 /**
  * Construct the Swimmer OptInOut form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1578,7 +1578,7 @@ class WpSwimTeamSwimmerOptInOutAdminForm extends WpSwimTeamSwimmerOptInOutForm
 /**
  * Construct the Global Swimmer Update form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */

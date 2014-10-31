@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: sdif.forms.class.php 900 2012-06-04 01:42:50Z mpwalsh8 $
+ * $Id: sdif.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,23 +10,23 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SDIFProfile
- * @version $Revision: 900 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2012-06-03 21:42:50 -0400 (Sun, 03 Jun 2012) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once("sdif.include.php") ;
-require_once("sdif.class.php") ;
-require_once("forms.class.php") ;
+require_once(WPST_PATH . 'include/sdif.include.php') ;
+require_once(WPST_PATH . 'class/sdif.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
 
 /**
  * Construct the Add Age Group form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */

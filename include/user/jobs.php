@@ -3,29 +3,29 @@
 /**
  * Swim Team Jobs admin page content.
  *
- * $Id: jobs.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: jobs.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
 
-require_once('jobs.class.php') ;
-require_once('jobs.forms.class.php') ;
-require_once('container.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/jobs.class.php') ;
+require_once(WPST_PATH . 'class/jobs.forms.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the swim clubs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */
@@ -279,7 +279,7 @@ class SwimTeamJobsTabContainer extends SwimTeamTabContainer
 /**
  * Class definition of the swim clubs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see Container
  */

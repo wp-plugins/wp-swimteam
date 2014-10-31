@@ -3,30 +3,30 @@
 /**
  * Events classes.
  *
- * $Id: events.class.php 975 2012-11-27 12:40:52Z mpwalsh8 $
+ * $Id: events.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Events
- * @version $Revision: 975 $
- * @lastmodified $Date: 2012-11-27 07:40:52 -0500 (Tue, 27 Nov 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('db.class.php') ;
-require_once('swimteam.include.php') ;
-require_once('events.include.php') ;
-require_once('swimclubs.class.php') ;
-require_once('widgets.class.php') ;
-require_once('textmap.class.php') ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'include/swimteam.include.php') ;
+require_once(WPST_PATH . 'include/events.include.php') ;
+require_once(WPST_PATH . 'class/swimclubs.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
 
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -56,6 +56,11 @@ class SwimTeamEvent extends SwimTeamDBI
      * event number property - used for event sequencing
      */
     var $__eventnumber ;
+
+    /**
+     * event suffix property - used for sequencing within an event
+     */
+    var $__eventsuffix ;
 
     /**
      * stroke property - the stroke for the event.
@@ -190,9 +195,9 @@ class SwimTeamEvent extends SwimTeamDBI
      *
      * @param - int - event number
      */
-    function setEventNumber($type)
+    function setEventNumber($number)
     {
-        $this->__eventnumber = $type ;
+        $this->__eventnumber = $number ;
     }
 
     /**
@@ -203,6 +208,26 @@ class SwimTeamEvent extends SwimTeamDBI
     function getEventNumber()
     {
         return ($this->__eventnumber) ;
+    }
+
+    /**
+     * Set the event suffix
+     *
+     * @param - int - event suffix
+     */
+    function setEventSuffix($suffix)
+    {
+        $this->__eventsuffix = $suffix ;
+    }
+
+    /**
+     * Get the event suffix
+     *
+     * @return - int - event suffix
+     */
+    function getEventSuffix()
+    {
+        return ($this->__eventsuffix) ;
     }
 
     /**
@@ -340,7 +365,7 @@ class SwimTeamEvent extends SwimTeamDBI
      *
      * @return - boolean - existance of event
      */
-    function getSwimTeamEventExists($eventnumber = false, $seteventid = false)
+    function getSwimTeamEventExists($eventnumber = false, $seteventid = false, $eventsuffix = false)
     {
 	    //  Is a similar event already in the database?
 
@@ -351,6 +376,7 @@ class SwimTeamEvent extends SwimTeamDBI
                 agegroupid = "%s" AND
                 eventgroupid = "%s" AND
                 eventnumber = "%s" AND
+                eventsuffix = "%s" AND
                 stroke = "%s" AND
                 distance = "%s" AND
                 course="%s"',
@@ -359,6 +385,26 @@ class SwimTeamEvent extends SwimTeamDBI
                 $this->getAgeGroupId(),
                 $this->getEventGroupId(),
                 $this->getEventNumber(),
+                $this->getEventSuffix(),
+                $this->getStroke(),
+                $this->getDistance(),
+                $this->getCourse()) ;
+        }
+        elseif ($eventsuffix)
+        {
+            $query = sprintf('SELECT eventid FROM %s WHERE
+                meetid = "%s" AND
+                agegroupid = "%s" AND
+                eventgroupid = "%s" AND
+                eventsuffix = "%s" AND
+                stroke = "%s" AND
+                distance = "%s" AND
+                course="%s"',
+                WPST_EVENTS_TABLE,
+                $this->getMeetId(),
+                $this->getAgeGroupId(),
+                $this->getEventGroupId(),
+                $this->getEventSuffix(),
                 $this->getStroke(),
                 $this->getDistance(),
                 $this->getCourse()) ;
@@ -444,15 +490,16 @@ class SwimTeamEvent extends SwimTeamDBI
      * @return - boolean - existance of event
      */
     function getSwimTeamEventExistsByEventNumberAndGroupId($eventnumber = null,
-        $eventgroupid = null, $seteventid = false)
+        $eventgroupid = null, $seteventid = false, $eventsuffix = null)
     {
         if (is_null($eventnumber)) $eventnumber = $this->getEventNumber() ;
+        if (is_null($eventsuffix)) $eventsuffix = $this->getEventSuffix() ;
         if (is_null($eventgroupid)) $eventgroupid = $this->getEventGroupId() ;
 
-	    //  Is Event Number already in the database?
+	    //  Is Event Number and optional suffix already in the database?
 
-        $query = sprintf('SELECT eventid FROM %s WHERE eventnumber="%s"
-            AND eventgroupid="%s"', WPST_EVENTS_TABLE, $eventnumber, $eventgroupid) ;
+        $query = sprintf('SELECT eventid FROM %s WHERE eventnumber="%s" AND eventsuffix="%s"
+            AND eventgroupid="%s"', WPST_EVENTS_TABLE, $eventnumber, $eventsuffix, $eventgroupid) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;
@@ -489,6 +536,7 @@ class SwimTeamEvent extends SwimTeamDBI
                 agegroupid="%s",
                 eventgroupid="%s",
                 eventnumber="%s",
+                eventsuffix="%s",
                 stroke="%s",
                 distance="%s",
                 course="%s"',
@@ -497,6 +545,7 @@ class SwimTeamEvent extends SwimTeamDBI
                 $this->getAgeGroupId(),
                 $this->getEventGroupId(),
                 $this->getEventNumber(),
+                $this->getEventSuffix(),
                 $this->getStroke(),
                 $this->getDistance(),
                 $this->getCourse()) ;
@@ -529,6 +578,7 @@ class SwimTeamEvent extends SwimTeamDBI
                 agegroupid="%s",
                 eventgroupid="%s",
                 eventnumber="%s",
+                eventsuffix="%s",
                 stroke="%s",
                 distance="%s",
                 course="%s"
@@ -538,6 +588,7 @@ class SwimTeamEvent extends SwimTeamDBI
                 $this->getAgeGroupId(),
                 $this->getEventGroupId(),
                 $this->getEventNumber(),
+                $this->getEventSuffix(),
                 $this->getStroke(),
                 $this->getDistance(),
                 $this->getCourse(),
@@ -624,6 +675,7 @@ class SwimTeamEvent extends SwimTeamDBI
             $this->setAgeGroupId($result['agegroupid']) ;
             $this->setEventGroupId($result['eventgroupid']) ;
             $this->setEventNumber($result['eventnumber']) ;
+            $this->setEventSuffix($result['eventsuffix']) ;
             $this->setStroke($result['stroke']) ;
             $this->setDistance($result['distance']) ;
             $this->setCourse($result['course']) ;
@@ -734,7 +786,7 @@ class SwimTeamEvent extends SwimTeamDBI
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -756,7 +808,7 @@ class SwimMeetEvent extends SwimTeamEvent
 /**
  * Class definition of the event groups
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -1118,7 +1170,7 @@ class SwimTeamEventGroup extends SwimTeamDBI
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -1217,9 +1269,9 @@ class SwimTeamEventsGUIDataList extends SwimTeamGUIDataList
     {
 		switch ($col_name)
         {
-            //case 'Event' :
-            //    $obj = $row_data['eventgroupid'] . '-' . $row_data['eventnumber'] ;
-            //    break ;
+            case 'Event' :
+                $obj = $row_data['eventnumber'] . $row_data['eventsuffix'] ;
+                break ;
 
             case 'Course' :
                 $obj = SwimTeamTextMap::__mapCourseCodeToText($row_data['course']) ;
@@ -1249,7 +1301,7 @@ class SwimTeamEventsGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various events.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamEventsGUIDataList
  */
@@ -1354,7 +1406,7 @@ class SwimTeamEventsAdminGUIDataList extends SwimTeamEventsGUIDataList
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -1466,7 +1518,7 @@ class SwimTeamEventGroupsGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various events.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamEventGroupsGUIDataList
  */
@@ -1616,7 +1668,7 @@ class SwimMeetEventsAdminGUIDataList extends SwimTeamEventsAdminGUIDataList
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -1664,7 +1716,7 @@ class SwimTeamEventGroupInfoTable extends SwimTeamInfoTable
 /**
  * Class definition of the events
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */

@@ -3,29 +3,29 @@
 /**
  * Event Groups admin pevent content.
  *
- * $Id: eventgroups.php 988 2013-06-24 15:32:58Z mpwalsh8 $
+ * $Id: eventgroups.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @packevent swimteam
  * @subpackevent admin
- * @version $Revision: 988 $
- * @lastmodified $Date: 2013-06-24 11:32:58 -0400 (Mon, 24 Jun 2013) $
+ * @version $Revision: 1071 $
+ * @lastmodified $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('events.class.php') ;
-require_once('events.forms.class.php') ;
-require_once('container.class.php') ;
-require_once('textmap.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/events.class.php') ;
+require_once(WPST_PATH . 'class/events.forms.class.php') ;
+require_once(WPST_PATH . 'class/container.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the jobs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamTabContainer
  */
@@ -126,7 +126,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
 
         if ($action == WPST_ACTION_SELECT_ACTION)
         {
-            printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
+            //printf('<h3>%s::%s<h3>', basename(__FILE__), __LINE__) ;
             if (array_key_exists('_recorded_action', $scriptargs) &&
                 ($scriptargs['_recorded_action'] == WPST_ACTION_SELECT_ACTION))
                 $action = WPST_ACTION_EVENTS_MANAGE ;
@@ -230,7 +230,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
 
                     //  Leverage the Events tab management code
 
-                    require_once('events.php') ;
+                    require_once(WPST_PATH . 'include/user/events.php') ;
                     $c = new AdminSwimTeamEventsTabContainer($eventgroupid,
                        SwimTeamTextMap::__mapEventGroupIdToText($eventgroupid)) ;
 
@@ -245,7 +245,7 @@ class EventGroupsTabContainer extends SwimTeamTabContainer
                      */
 
                 default:
-                    printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
+                    //printf('<h2>%s::%s</h2>', basename(__FILE__), __LINE__) ;
                     $div->add(html_h4(sprintf('Unsupported action "%s" requested.', $action))) ;
 
                     break ;

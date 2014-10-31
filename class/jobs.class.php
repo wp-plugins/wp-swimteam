@@ -3,29 +3,29 @@
 /**
  * Job classes.
  *
- * $Id: jobs.class.php 973 2012-08-29 13:37:57Z mpwalsh8 $
+ * $Id: jobs.class.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Jobs
- * @version $Revision: 973 $
- * @lastmodified $Date: 2012-08-29 09:37:57 -0400 (Wed, 29 Aug 2012) $
+ * @version $Revision: 1071 $
+ * @lastmodified $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('db.class.php') ;
-require_once('jobs.include.php') ;
-require_once('users.class.php') ;
-require_once('table.class.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'include/jobs.include.php') ;
+require_once(WPST_PATH . 'class/users.class.php') ;
+require_once(WPST_PATH . 'class/table.class.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the jobs
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -548,7 +548,7 @@ class SwimTeamJob extends SwimTeamDBI
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -720,7 +720,7 @@ class SwimTeamJobsGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various jobs.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamJobsGUIDataList
  */
@@ -803,7 +803,7 @@ class SwimTeamJobsAdminGUIDataList extends SwimTeamJobsGUIDataList
  * Extended InfoTable Class for presenting SwimTeam
  * information as a table extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -868,7 +868,7 @@ class SwimTeamJobProfileInfoTable extends SwimTeamInfoTable
 /**
  * Class definition of the jobs allocation
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -1463,7 +1463,7 @@ class SwimTeamJobAllocation extends SwimTeamJob
 /**
  * Class definition of the jobs allocation
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -2499,7 +2499,7 @@ class SwimTeamJobAssignment extends SwimTeamJobAllocation
  * Extended InfoTable Class for presenting SwimTeam
  * information as a table extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -2688,7 +2688,7 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
     {
         //  Need swim meet classes to build the table
 
-        require_once('swimmeets.class.php') ;
+        require_once(WPST_PATH . 'class/swimmeets.class.php') ;
 
         if (is_null($meetid)) $meetid = $this->getMeetId() ;
 
@@ -2819,7 +2819,7 @@ class SwimMeetJobAssignmentInfoTable extends SwimTeamInfoTable
  * Extended InfoTable Class for presenting SwimTeam
  * information as a table extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -2930,7 +2930,7 @@ class SwimTeamJobDescriptionsInfoTable extends SwimTeamInfoTable
  * Extended InfoTable Class for presenting SwimTeam
  * information as a table extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */
@@ -3019,7 +3019,7 @@ class SwimTeamUserJobsInfoTable extends SwimTeamInfoTable
     {
         $this->setCredits(0) ;
 
-        require_once('textmap.class.php') ;
+        require_once(WPST_PATH . 'class/textmap.class.php') ;
 
         $this->set_alt_color_flag(true) ;
         $this->set_show_cellborders(true) ;

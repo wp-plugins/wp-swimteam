@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: jobs.forms.class.php 979 2013-04-11 21:22:18Z mpwalsh8 $
+ * $Id: jobs.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -10,25 +10,25 @@
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Jobs
- * @version $Revision: 979 $
+ * @version $Revision: 1065 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2013-04-11 17:22:18 -0400 (Thu, 11 Apr 2013) $
+ * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  *
  */
 
-require_once("jobs.class.php") ;
-require_once("seasons.class.php") ;
-require_once("swimmeets.class.php") ;
-require_once("forms.class.php") ;
-require_once("textmap.class.php") ;
+require_once(WPST_PATH . 'class/jobs.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/swimmeets.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/textmap.class.php') ;
 
 /**
  * Construct the Add Job form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -316,7 +316,7 @@ class WpSwimTeamJobAddForm extends WpSwimTeamForm
 /**
  * Construct the Update Job form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -426,7 +426,7 @@ class WpSwimTeamJobUpdateForm extends WpSwimTeamJobAddForm
 /**
  * Construct the Add Job form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -532,7 +532,7 @@ class WpSwimTeamJobDeleteForm extends WpSwimTeamJobUpdateForm
 /**
  * Construct the Jobs Allocation form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1109,7 +1109,7 @@ class WpSwimTeamJobsAllocateForm extends WpSwimTeamForm
 /**
  * Construct the Jobs Allocation form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamJobsAllocateForm
  */
@@ -1142,7 +1142,7 @@ class WpSwimTeamJobsReallocateForm extends WpSwimTeamJobsAllocateForm
 /**
  * Construct the Jobs Deallocation form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamJobsReallocateForm
  */
@@ -1283,7 +1283,7 @@ class WpSwimTeamJobsDeallocateForm extends WpSwimTeamJobsReallocateForm
 /**
  * Construct the Assign Job form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1544,7 +1544,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
     function form_content()
     {
         //  Bring in the text mapping
-        require_once('textmap.class.php') ;
+        require_once(WPST_PATH . 'classtextmap.class.php') ;
 
         $season = new SwimTeamSeason() ;
         //$seasonid = $season->getActiveSeasonId() ;
@@ -1633,7 +1633,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
     {
         $actionmsgs = array() ;
         //  Bring in the text mapping
-        require_once('textmap.class.php') ;
+        require_once(WPST_PATH . 'classtextmap.class.php') ;
 
         //  Need to assign each job for the swim meet
 
@@ -1753,7 +1753,7 @@ class WpSwimTeamJobAssignForm extends WpSwimTeamForm
 /**
  * Construct the Assign Job form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -1868,7 +1868,7 @@ class WpSwimTeamSwimMeetJobAssignForm extends WpSwimTeamJobAssignForm
     function form_content()
     {
         //  Bring in the text mapping
-        require_once('textmap.class.php') ;
+        require_once(WPST_PATH . 'classtextmap.class.php') ;
 
         $job = new SwimTeamJob() ;
         $ja = new SwimTeamJobAssignment() ;
@@ -1927,7 +1927,7 @@ class WpSwimTeamSwimMeetJobAssignForm extends WpSwimTeamJobAssignForm
     {
         $actionmsgs = array() ;
         //  Bring in the text mapping
-        require_once('textmap.class.php') ;
+        require_once(WPST_PATH . 'classtextmap.class.php') ;
 
         //  Need to assign each job for the swim meet
 
@@ -2014,7 +2014,7 @@ class WpSwimTeamSwimMeetJobAssignForm extends WpSwimTeamJobAssignForm
 /**
  * Construct the Assign Job form
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see WpSwimTeamForm
  */
@@ -2126,7 +2126,7 @@ class WpSwimTeamSeasonJobAssignForm extends WpSwimTeamJobAssignForm
     function form_content()
     {
         //  Bring in the text mapping
-        require_once('textmap.class.php') ;
+        require_once(WPST_PATH . 'classtextmap.class.php') ;
 
         $job = new SwimTeamJob() ;
         $ja = new SwimTeamJobAssignment() ;
@@ -2196,7 +2196,7 @@ class WpSwimTeamSeasonJobAssignForm extends WpSwimTeamJobAssignForm
     {
         $actionmsgs = array() ;
         //  Bring in the text mapping
-        require_once('textmap.class.php') ;
+        require_once(WPST_PATH . 'classtextmap.class.php') ;
 
         //  Need to assign each job for the swim meet
 

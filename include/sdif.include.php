@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: sdif.include.php 938 2012-07-02 18:18:25Z mpwalsh8 $
+ * $Id: sdif.include.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * SDIF includes.  These includes define information used in 
  * the SDIF classes and child classes in the Wp-SwimTeam plugin.
@@ -16,13 +16,13 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage SDIF
- * @version $Revision: 938 $
- * @lastmodified $Date: 2012-07-02 14:18:25 -0400 (Mon, 02 Jul 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-include_once('swimteam.include.php') ;
+require_once(WPST_PATH . '/include/swimteam.include.php') ;
 
 define('WPST_SDIF_VERSION', '3.0') ;
 define('WPST_SDIF_FUTURE_USE', '') ;

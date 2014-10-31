@@ -3,28 +3,28 @@
 /**
  * AgeGroup classes.
  *
- * $Id: agegroups.class.php 1032 2013-10-25 16:09:03Z mpwalsh8 $
+ * $Id: agegroups.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage AgeGroups
- * @version $Revision: 1032 $
- * @lastmodified $Date: 2013-10-25 12:09:03 -0400 (Fri, 25 Oct 2013) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-require_once('db.class.php') ;
-require_once('table.class.php') ;
-require_once('agegroups.include.php') ;
-require_once('widgets.class.php') ;
+require_once(WPST_PATH . 'class/db.class.php') ;
+require_once(WPST_PATH . 'class/table.class.php') ;
+require_once(WPST_PATH . 'include/agegroups.include.php') ;
+require_once(WPST_PATH . 'class/widgets.class.php') ;
 
 /**
  * Class definition of the agegroups
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamDBI
  */
@@ -713,7 +713,7 @@ class SwimTeamAgeGroup extends SwimTeamDBI
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamGUIDataList
  */
@@ -869,7 +869,7 @@ class SwimTeamAgeGroupsGUIDataList extends SwimTeamGUIDataList
  * GUIDataList class for performaing administration tasks
  * on the various age groups.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamAgeGroupsGUIDataList
  */
@@ -964,7 +964,7 @@ class SwimTeamAgeGroupsAdminGUIDataList extends SwimTeamAgeGroupsGUIDataList
  * Extended InfoTable Class for presenting SwimTeam
  * age group information as a table extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SwimTeamInfoTable
  */

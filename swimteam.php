@@ -4,24 +4,24 @@
  * Plugin Name: SwimTeam
  * Plugin URI: http://www.wp-swimteam.org
  * Description: WordPress plugin to extend Wordpress into a swim team web site.  The wp-SwimTeam plug extends the WP user registration database to include registration of swim team parents, swimmers, and coaches.  Wp-SwimTeam also manages the volunteer jobs to run a swim meet and provides SDIF import/export in order to interface with meet and team management software from Hy-Tek, WinSwim, and Easy Ware.  The jobs and meet events are based on those used by TSA (<a href="http://www.tsanc.org">Tarheel Swimming Association</a>).
- * Version: 1.41.1037
- * Last Modified:  2014/01/18 12:30:16
+ * Version: 1.42.1073
+ * Last Modified:  2014/10/31 13:16:25
  * Author: Mike Walsh
  * Author URI: http://www.michaelwalsh.org
  * License: GPL
  * 
  *
- * $Id: swimteam.php 1035 2014-01-18 11:57:54Z mpwalsh8 $
+ * $Id: swimteam.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
  *
  * Wp-SwimTeam plugin constants.
  *
  * (c) 2007 by Mike Walsh
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage admin
- * @version $Rev: 1035 $
- * @lastmodified $Date: 2014-01-18 06:57:54 -0500 (Sat, 18 Jan 2014) $
+ * @version $Rev: 1071 $
+ * @lastmodified $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
  * @lastmodifiedby $LastChangedBy: mpwalsh8 $
  *
  */
@@ -84,23 +84,23 @@ if (phphtmllib_plugin_installed_check() === false)
     return ;
 }
 
-
-require_once('plugininit.include.php') ;
-require_once('menus.include.php') ;
-require_once('shortcodes.include.php') ;
-require_once('db.include.php') ;
-require_once('jobs.include.php') ;
-require_once('users.include.php') ;
-require_once('agegroups.include.php') ;
-require_once('seasons.include.php') ;
-require_once('swimmers.include.php') ;
-require_once('roster.include.php') ;
-require_once('swimclubs.include.php') ;
-require_once('swimmeets.include.php') ;
-require_once('events.include.php') ;
-require_once('sdif.include.php') ;
-require_once('options.include.php') ;
-require_once('results.include.php') ;
+//  Load all of the pieces Swim Team uses
+require_once(plugin_dir_path(__FILE__) . '/plugininit.include.php') ;
+require_once(WPST_PATH . '/include/menus.include.php') ;
+require_once(WPST_PATH . '/include/shortcodes.include.php') ;
+require_once(WPST_PATH . '/include/db.include.php') ;
+require_once(WPST_PATH . '/include/jobs.include.php') ;
+require_once(WPST_PATH . '/include/users.include.php') ;
+require_once(WPST_PATH . '/include/agegroups.include.php') ;
+require_once(WPST_PATH . '/include/seasons.include.php') ;
+require_once(WPST_PATH . '/include/swimmers.include.php') ;
+require_once(WPST_PATH . '/include/roster.include.php') ;
+require_once(WPST_PATH . '/include/swimclubs.include.php') ;
+require_once(WPST_PATH . '/include/swimmeets.include.php') ;
+require_once(WPST_PATH . '/include/events.include.php') ;
+require_once(WPST_PATH . '/include/sdif.include.php') ;
+require_once(WPST_PATH . '/include/options.include.php') ;
+require_once(WPST_PATH . '/include/results.include.php') ;
 
 /**
  * Add wp_head action
@@ -291,7 +291,7 @@ function swimteam_install()
     //  them to be written to the WordPress option
     //  database.
 
-    require_once('options.class.php') ;
+    require_once(WPST_PATH . '/class/options.class.php') ;
 
     $options = new SwimTeamOptions() ;
     $options->loadOptions() ;
@@ -608,6 +608,7 @@ function swimteam_database_init()
             stroke INT(11),
             distance INT(11),
             course ENUM('" . WPST_SDIF_COURSE_STATUS_CODE_SCM_VALUE . "', '" . WPST_SDIF_COURSE_STATUS_CODE_SCY_VALUE . "', '" . WPST_SDIF_COURSE_STATUS_CODE_LCM_VALUE. "', '" . WPST_SDIF_COURSE_STATUS_CODE_DQ_VALUE . "') NOT NULL,
+            eventsuffix VARCHAR(10) NOT NULL default '',
             KEY agegroupid (agegroupid),
             PRIMARY KEY  (eventid)
 	    );" ;
@@ -826,7 +827,7 @@ function swimteam_reorder_events()
 
     //  Load the Events class so the database can be updated
 
-    require_once("events.class.php") ;
+    require_once(WPST_PATH . '/class/events.class.php') ;
 
     //  Start event numbering at 1
 
@@ -1025,7 +1026,7 @@ add_filter('pre_user_display_name','wpst_default_display_name') ;
  */
 function wpst_dashboard_widget()
 {
-    require_once('agegroups.class.php') ;
+    require_once(WPST_PATH . 'class/agegroups.class.php') ;
 
     $br = html_br() ;
     $div = html_div() ;

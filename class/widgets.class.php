@@ -2,31 +2,31 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: widgets.class.php 849 2012-05-09 16:03:20Z mpwalsh8 $
+ * $Id: widgets.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
  *
  * Widget classes.  These classes create and/or extend
  * phpHtmlLib based widgets used by the Wp-SwimTeam plugin.
  *
  * (c) 2007 by Mike Walsh for WpSwimTeam.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage widget
- * @version $Revision: 849 $
- * @lastmodified $Date: 2012-05-09 12:03:20 -0400 (Wed, 09 May 2012) $
+ * @version $Revision: 1065 $
+ * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
 
-include_once(PHPHTMLLIB_ABSPATH . '/widgets/data_list/includes.inc') ;
-include_once(PHPHTMLLIB_ABSPATH . '/widgets/data_list/WordPressSQLDataListSource.inc') ;
+require_once(PHPHTMLLIB_ABSPATH . '/widgets/data_list/includes.inc') ;
+require_once(PHPHTMLLIB_ABSPATH . '/widgets/data_list/WordPressSQLDataListSource.inc') ;
 
-include_once('db.include.php') ;
+require_once(WPST_PATH . 'include/db.include.php') ;
 
 /**
  * Class definition for the tab content
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access private
  */
 class TabWidgetContent
@@ -149,7 +149,7 @@ class TabWidgetContent
  * Class to construct Javscript Back and Home buttons
  *
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see SPANtag
  */
@@ -223,7 +223,7 @@ class SwimTeamGUIButtons extends SPANtag
  * Extended GUIDataList Class for presenting SwimTeam
  * information extracted from the database.
  *
- * @author Mike Walsh <mike_walsh@mindspring.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access public
  * @see DefaultGUIDataList
  */
@@ -558,7 +558,7 @@ class SwimTeamGUIDataList extends DefaultGUIDataList
 /**
  * Class definition for useful static methods
  *
- * @author Mike Walsh <mike@walshcrew.com>
+ * @author Mike Walsh <mpwalsh8@gmail.com>
  * @access private
  */
 class SwimTeamUtils

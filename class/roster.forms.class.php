@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: roster.forms.class.php 1008 2013-09-28 17:55:11Z mpwalsh8 $
+ * $Id: roster.forms.class.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,16 +13,16 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Swimmers
- * @version $Revision: 1008 $
+ * @version $Revision: 1071 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2013-09-28 13:55:11 -0400 (Sat, 28 Sep 2013) $
+ * @lastmodifiedby $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
  *
  */
 
-require_once('forms.class.php') ;
-require_once('swimmers.class.php') ;
-require_once('seasons.class.php') ;
-require_once('roster.class.php') ;
+require_once(WPST_PATH . 'class/forms.class.php') ;
+require_once(WPST_PATH . 'class/swimmers.class.php') ;
+require_once(WPST_PATH . 'class/seasons.class.php') ;
+require_once(WPST_PATH . 'class/roster.class.php') ;
 
 /**
  * Construct the Register Swimmer form
@@ -979,18 +979,22 @@ class WpSwimTeamExportRosterForm extends WpSwimTeamForm
             switch ($format)
             {
                 case WPST_CSV:
+                    $e = &$this->__csv ;
                     $this->_form_action_export_csv() ;
                     break ;
 
                 case WPST_RE1:
+                    $e = &$this->__re1 ;
                     $this->_form_action_export_re1() ;
                     break ;
 
                 case WPST_HY3:
+                    $e = &$this->__hy3 ;
                     $this->_form_action_export_hy3() ;
                     break ;
 
                 case WPST_SDIF:
+                    $e = &$this->__sdif ;
                     $this->_form_action_export_sdif() ;
                     break ;
             }
@@ -1008,6 +1012,11 @@ class WpSwimTeamExportRosterForm extends WpSwimTeamForm
             }
 
             $actionmsg = $c->render() ;
+        }
+        elseif ($e->getTempFileError())
+        {
+            $this->setErrorActionMessageDivClass() ;
+            $actionmsg = sprintf('Error opening temporary file file for writing:  %s', $e->getExportFile()) ;
         }
         else
         {
@@ -1042,13 +1051,17 @@ class WpSwimTeamExportRosterForm extends WpSwimTeamForm
         }
 
         $csv->generateReport($this->getSwimmerid(), false) ;
-        $csv->generateCSVFile() ;
 
-        //  Build the message that goes back to the user
+        //  Make sure file can be generated
+        
+        if ($csv->generateCSVFile())
+        {
+            //  Build the message that goes back to the user
 
-        $actionmsgs[] = sprintf('Swim Team Roster Exported,
-            %s CSV record%s exported.', $csv->getRecordCount(),
-            $csv->getRecordCount() == 1 ? '' : 's') ;
+            $actionmsgs[] = sprintf('Swim Team Roster Exported,
+                %s CSV record%s exported.', $csv->getRecordCount(),
+                $csv->getRecordCount() == 1 ? '' : 's') ;
+        }
 
         return true ;
     }
@@ -1075,20 +1088,24 @@ class WpSwimTeamExportRosterForm extends WpSwimTeamForm
         }
 
         $re1->generateReport($this->getSwimmerid(), false) ;
-        $re1->generateRE1File() ;
 
-        //  Build the message that goes back to the user
+        //  Make sure file can be generated
+        
+        if ($re1->generateRE1File())
+        {
+            //  Build the message that goes back to the user
 
-        $actionmsgs[] = sprintf('Swim Team Roster Exported,
-            %s RE1 record%s exported.', $re1->getRecordCount(),
-            $re1->getRecordCount() == 1 ? '' : 's') ;
+            $actionmsgs[] = sprintf('Swim Team Roster Exported,
+                %s RE1 record%s exported.', $re1->getRecordCount(),
+                $re1->getRecordCount() == 1 ? '' : 's') ;
+        }
 
         return true ;
     }
 
     function _form_action_export_hy3()
     {
-        require_once('hy-tek.class.php') ;
+        require_once(WPST_PATH . 'class/hy-tek.class.php') ;
         $this->__hy3 = new HY3Roster() ;
         $hy3 = &$this->__hy3 ;
         $actionmsgs = &$this->__actionmsgs ;
@@ -1103,20 +1120,24 @@ class WpSwimTeamExportRosterForm extends WpSwimTeamForm
         }
 
         $hy3->generateHY3($this->getSwimmerid(), false) ;
-        $hy3->generateHY3File() ;
 
-        //  Build the message that goes back to the user
+        //  Make sure file can be generated
+        
+        if ($hy3->generateHY3File())
+        {
+            //  Build the message that goes back to the user
 
-        $actionmsgs[] = sprintf('Swim Team Roster Exported,
-            %s HY3 record%s exported.', $hy3->getHY3Count(),
-            $hy3->getHY3Count() == 1 ? '' : 's') ;
+            $actionmsgs[] = sprintf('Swim Team Roster Exported,
+                %s HY3 record%s exported.', $hy3->getHY3Count(),
+                $hy3->getHY3Count() == 1 ? '' : 's') ;
+        }
 
         return true ;
     }
 
     function _form_action_export_sdif()
     {
-        require_once('sdif.class.php') ;
+        require_once(WPST_PATH . 'class/sdif.class.php') ;
         $this->__sdif = new SDIFLSCRegistrationPyramid() ;
         $sdif = &$this->__sdif ;
         $actionmsgs = &$this->__actionmsgs ;
@@ -1131,13 +1152,17 @@ class WpSwimTeamExportRosterForm extends WpSwimTeamForm
         }
 
         $sdif->generateSDIF($this->getSwimmerid()) ;
-        $sdif->generateSDIFFile() ;
 
-        //  Build the message that goes back to the user
+        //  Make sure file can be generated
+        
+        if ($sdif->generateSDIFFile())
+        {
+            //  Build the message that goes back to the user
 
-        $actionmsgs[] = sprintf('Swim Team Roster Exported,
-            %s SDIF record%s exported.', $sdif->getSDIFCount(),
-            $sdif->getSDIFCount() == 1 ? '' : 's') ;
+            $actionmsgs[] = sprintf('Swim Team Roster Exported,
+                %s SDIF record%s exported.', $sdif->getSDIFCount(),
+                $sdif->getSDIFCount() == 1 ? '' : 's') ;
+        }
 
         return true ;
     }
