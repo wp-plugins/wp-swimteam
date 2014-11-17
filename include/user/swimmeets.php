@@ -3,15 +3,15 @@
 /**
  * Swim Meets admin page content.
  *
- * $Id: swimmeets.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: swimmeets.php 1075 2014-11-17 21:27:07Z mpwalsh8 $
  *
  * (c) 2008 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 1065 $
- * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @version $Revision: 1075 $
+ * @lastmodified $Date: 2014-11-17 16:27:07 -0500 (Mon, 17 Nov 2014) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -354,7 +354,7 @@ class SwimMeetsTabContainer extends SwimTeamTabContainer
 
                     //  Leverage the Events tab management code
 
-                    require_once(WPST_PATH . 'class/events.php') ;
+                    require_once('events.php') ;
                     $c = new AdminSwimMeetEventsTabContainer($swimmeetid, $desc) ;
 
                     break ;
