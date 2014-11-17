@@ -66,6 +66,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
 
+= 1.43 =
+* Fixed several bugs in Jobs module where the 1.42 include file change was made incorrectly.
+
 = 1.42 =
 * Added checking and error messages for creation of temporary files used during export (CSV, HY3, SD3, RE1).
 * Added support for Event Number suffixes.
