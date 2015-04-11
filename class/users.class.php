@@ -3,15 +3,15 @@
 /**
  * UserProfile classes.
  *
- * $Id: users.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: users.class.php 1076 2015-04-11 12:28:11Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage UserProfile
- * @version $Revision: 1065 $
- * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @version $Revision: 1076 $
+ * @lastmodified $Date: 2015-04-11 08:28:11 -0400 (Sat, 11 Apr 2015) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -785,16 +785,25 @@ class SwimTeamUsersGUIDataList extends SwimTeamGUIDataList
         if (is_multisite())
         {
             $blog_users = get_users(array('blogid' => get_current_blog_id(), 'fields' => 'ID')) ;
+            //printf("<pre>%s</pre>", print_r($blog_users, true)) ;
 
             foreach ($blog_users as $blog_user)
-                $where_clause .= sprintf('%s%susers.ID="%s"',
-                    empty($where_clause) ? '' : ' OR ', WP_DB_BASE_PREFIX, $blog_user) ;
+                $where_clause .= sprintf('%su.ID="%s"',
+                    empty($where_clause) ? '' : ' OR ', $blog_user) ;
         }
 
         //  Call the constructor of the parent class
         $this->SwimTeamGUIDataList($title, $width,
             $default_orderby, $default_reverseorder,
             $columns, $tables, $where_clause) ;
+
+        //printf("<pre>%s</pre>", print_r($title, true)) ;
+        //printf("<pre>%s</pre>", print_r($width, true)) ;
+        //printf("<pre>%s</pre>", print_r($default_orderby, true)) ;
+        //printf("<pre>%s</pre>", print_r($default_reverseorder, true)) ;
+        //printf("<pre>%s</pre>", print_r($columns, true)) ;
+        //printf("<pre>%s</pre>", print_r($tables, true)) ;
+        //printf("<pre>%s</pre>", print_r($where_clause, true)) ;
     }
 
     /**

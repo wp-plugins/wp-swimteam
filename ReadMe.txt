@@ -3,7 +3,7 @@ Contributors: mpwalsh8
 Donate link: http://www.wp-swimteam.org/
 Tags: swimteam, swim, team
 Requires at least: 3.8
-Tested up to: 4.0
+Tested up to: 4.1.1
 Stable tag: trunk
 
 Swim Team (aka wp-SwimTeam) is a comprehensive WordPress plugin to run a swim
@@ -65,6 +65,9 @@ Refer to the official [wp-SwimTeam](http://www.wp-swimteam.org) web site for que
 
 The [wp-SwimTeam blog](http://www.wp-swimteam.org) provides full details on changes, bugs, enhancesments,
 future developments and much more and is the definitive source for the Change Log.
+
+= 1.44 =
+* Fixed bug displaying Users on the Swim Team -> Users tab and Manage -> Users tab when running under WordPress Multi-Site.
 
 = 1.43 =
 * Fixed several bugs in Jobs module where the 1.42 include file change was made incorrectly.
