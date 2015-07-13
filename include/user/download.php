@@ -28,13 +28,27 @@ if (!empty($args))
 
     if ((array_key_exists('filename', $args)) &&
         (array_key_exists('contenttype', $args)) &&
+        (array_key_exists('wpstnonce', $args)) &&
         ((array_key_exists('file', $args)) ||
         ((array_key_exists('transient', $args) && array_key_exists('abspath', $args)))))
     {
         $txt = '' ;
         $abspath = urldecode($args['abspath']) ;
 
+        $wpl = $abspath . DIRECTORY_SEPARATOR . 'wp-load.php' ;
+
+        //  Make sure wp-load.php exists and is readable!
+        if (!is_readable($wpl)) {
+            die('Invalid argument(s), unable to load WordPress.') ;
+        }
+
+        //  Load WordPress
         require($abspath . DIRECTORY_SEPARATOR . 'wp-load.php') ;
+
+        //  Verify WordPress nonce
+        $wpstnonce = urldecode($args['wpstnonce']) ;
+        if (!wp_verify_nonce($wpstnonce, 'wpst-nonce') )
+            die("Security check failed, permission denied.");
 
         //  Use transients instead of temporary files for storage?
 

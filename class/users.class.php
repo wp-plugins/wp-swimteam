@@ -3,15 +3,15 @@
 /**
  * UserProfile classes.
  *
- * $Id: users.class.php 1076 2015-04-11 12:28:11Z mpwalsh8 $
+ * $Id: users.class.php 1078 2015-05-15 18:18:25Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage UserProfile
- * @version $Revision: 1076 $
- * @lastmodified $Date: 2015-04-11 08:28:11 -0400 (Sat, 11 Apr 2015) $
+ * @version $Revision: 1078 $
+ * @lastmodified $Date: 2015-05-15 14:18:25 -0400 (Fri, 15 May 2015) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -699,6 +699,11 @@ class SwimTeamUserProfile extends SwimTeamDBI
         //        WPST_OPTIONS_META_TABLE, WPST_USERS_TABLES) ;
         //}
 
+        //  Need to handle WordPress Multi-site
+        //  Get information about this blog's users into an array.
+        $bloguserids = get_users(array('blog_id' => get_current_blog_id(), 'fields' => 'ID') );
+        //error_log(print_r($bloguserids, true)) ;
+
         $query = sprintf('SELECT DISTINCT u.id AS userid FROM %susers u
             LEFT JOIN %susermeta m1 ON (m1.user_id = u.ID AND m1.meta_key = \'first_name\')
             LEFT JOIN %susermeta m2 ON (m2.user_id = u.ID AND m2.meta_key = \'last_name\')
@@ -708,7 +713,10 @@ class SwimTeamUserProfile extends SwimTeamDBI
         //  Filter?
 
         if (!empty($filter))
-            $query .= sprintf(' WHERE %s', $filter) ;
+            $query .= sprintf(' WHERE u.id IN (%s) AND %s', join(',', $bloguserids), $filter) ;
+            //$query .= sprintf(' WHERE %s', $filter) ;
+        else
+            $query .= sprintf(' WHERE u.id IN (%s)', join(',', $bloguserids)) ;
 
         //  Custom ordering?
       
@@ -721,6 +729,8 @@ class SwimTeamUserProfile extends SwimTeamDBI
             $orderby = ' ORDER BY userid' ;
 
         $query .= $orderby ;
+
+        error_log(print_r($query, true)) ;
 
         $this->setQuery($query) ;
         $this->runSelectQuery() ;

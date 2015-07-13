@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: jobs.forms.class.php 1074 2014-11-17 21:18:42Z mpwalsh8 $
+ * $Id: jobs.forms.class.php 1080 2015-05-19 01:07:59Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Jobs
- * @version $Revision: 1074 $
+ * @version $Revision: 1080 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2014-11-17 16:18:42 -0500 (Mon, 17 Nov 2014) $
+ * @lastmodifiedby $Date: 2015-05-18 21:07:59 -0400 (Mon, 18 May 2015) $
  *
  */
 
@@ -1133,7 +1133,7 @@ class WpSwimTeamJobsReallocateForm extends WpSwimTeamJobsAllocateForm
      * do something with the data, say insert/update records
      * in the DB.
      */
-    function form_action()
+    function form_action($action = WPST_ACTION_ALLOCATE)
     {
         return parent::form_action(WPST_ACTION_REALLOCATE) ;
     }
@@ -1183,7 +1183,7 @@ class WpSwimTeamJobsDeallocateForm extends WpSwimTeamJobsReallocateForm
      * do something with the data, say insert/update records
      * in the DB.
      */
-    function form_action()
+    function form_action($action = WPST_ACTION_ALLOCATE)
     {
         return parent::form_action(WPST_ACTION_DEALLOCATE) ;
     }

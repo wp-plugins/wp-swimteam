@@ -3,15 +3,15 @@
 /**
  * Roster page content.
  *
- * $Id: roster.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: roster.php 1084 2015-07-13 14:44:16Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 1065 $
- * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @version $Revision: 1084 $
+ * @lastmodified $Date: 2015-07-13 10:44:16 -0400 (Mon, 13 Jul 2015) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -373,8 +373,8 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $sdif->generateSDIF($swimmerid) ;
                     $sdif->generateSDIFFile() ;
 
-                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($sdif->getSDIFFile()),
-                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('txt')) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($sdif->getSDIFFile()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('txt'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -395,8 +395,8 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $hy3->generateHY3($swimmerid) ;
                     $hy3->generateHY3File() ;
 
-                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($hy3->getHY3File()),
-                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('txt')) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($hy3->getHY3File()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('txt'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -416,8 +416,8 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $csv->generateReport($swimmerid) ;
                     $csv->generateCSVFile() ;
 
-                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($csv->getCSVFile()),
-                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($csv->getCSVFile()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -438,8 +438,8 @@ class RosterTabContainer extends SwimTeamTabContainer
                     $re1->generateReport($swimmerid) ;
                     $re1->generateRE1File() ;
 
-                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($re1->getRE1File()),
-                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('txt')) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($re1->getRE1File()),
+                        urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('txt'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -517,7 +517,10 @@ class RosterTabContainer extends SwimTeamTabContainer
                         //  CSV
                         if (in_array(WPST_CSV, $exports))
                         {
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
                             $csv = &$fp->_form_content->__csv ;
+error_log(print_r($csv->__csvData, true)) ;
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
                             $t = $csv->getExportTransient() ;
                             $v = empty($t) ? null : get_transient($t) ;
 
@@ -525,8 +528,8 @@ class RosterTabContainer extends SwimTeamTabContainer
  
                             if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
                             {
-                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH)) ;
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s&wpstnonce=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -534,8 +537,10 @@ class RosterTabContainer extends SwimTeamTabContainer
                             }
                             elseif (file_exists($csv->getCSVFile()) && filesize($csv->getCSVFile()) > 0)
                             {
-                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($csv->getCSVFile()),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s&abspath=%s&wpstnonce=%s',
+                                    urlencode($csv->getCSVFile()), urlencode('SwimTeamRoster-' . date('Y-m-d').'.csv'),
+                                    urlencode('csv'), urlencode(ABSPATH), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -558,8 +563,8 @@ class RosterTabContainer extends SwimTeamTabContainer
  
                             if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
                             {
-                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1'), urlencode(ABSPATH)) ;
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s&wpstnonce=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1'), urlencode(ABSPATH), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -567,8 +572,8 @@ class RosterTabContainer extends SwimTeamTabContainer
                             }
                             elseif (file_exists($re1->getRE1File()) && filesize($re1->getRE1File()) > 0)
                             {
-                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($re1->getRE1File()),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1')) ;
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($re1->getRE1File()),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.re1'), urlencode('re1'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -591,8 +596,8 @@ class RosterTabContainer extends SwimTeamTabContainer
  
                             if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
                             {
-                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3'), urlencode(ABSPATH)) ;
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s&wpstnonce=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3'), urlencode(ABSPATH), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -600,8 +605,8 @@ class RosterTabContainer extends SwimTeamTabContainer
                             }
                             elseif (file_exists($hy3->getHY3File()) && filesize($hy3->getHY3File()) > 0)
                             {
-                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($hy3->getHY3File()),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3')) ;
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($hy3->getHY3File()),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.hy3'), urlencode('hy3'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -624,8 +629,8 @@ class RosterTabContainer extends SwimTeamTabContainer
  
                             if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
                             {
-                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3'), urlencode(ABSPATH)) ;
+                                $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s&wpstnonce=%s', urlencode($t),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3'), urlencode(ABSPATH), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -633,8 +638,8 @@ class RosterTabContainer extends SwimTeamTabContainer
                             }
                             elseif (file_exists($sdif->getSDIFFile()) && filesize($sdif->getSDIFFile()) > 0)
                             {
-                                $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($sdif->getSDIFFile()),
-                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3')) ;
+                                $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($sdif->getSDIFFile()),
+                                    urlencode('SwimTeamRoster-' . date('Y-m-d').'.sd3'), urlencode('sd3'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                                 $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                                 $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -654,6 +659,8 @@ class RosterTabContainer extends SwimTeamTabContainer
 
                     $div->add($gdl) ;
 
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
+error_log(print_r($c, true)) ;
 	                $div->add(html_br(2), $form->form_success(), $c) ;
                     $this->setShowActionSummary() ;
                     $this->setActionSummaryHeader('Roster Action Summary') ;
@@ -665,10 +672,12 @@ class RosterTabContainer extends SwimTeamTabContainer
             }
             else if (isset($c))
             {
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
                 $div->add($c) ;
             }
             else
             {
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
                 $div->add(html_div('error fade', html_h4('No content to display.'))) ;
             }
         }

@@ -3,15 +3,15 @@
 /**
  * Text mapping classes.
  *
- * $Id: textmap.class.php 1071 2014-10-15 13:39:52Z mpwalsh8 $
+ * $Id: textmap.class.php 1080 2015-05-19 01:07:59Z mpwalsh8 $
  *
  * (c) 2010 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage TextMap
- * @version $Revision: 1071 $
- * @lastmodified $Date: 2014-10-15 09:39:52 -0400 (Wed, 15 Oct 2014) $
+ * @version $Revision: 1080 $
+ * @lastmodified $Date: 2015-05-18 21:07:59 -0400 (Mon, 18 May 2015) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -32,7 +32,7 @@ class SwimTeamTextMap
      *
      * @return string - opponent text description
      */
-    function __mapOpponentSwimClubIdToText($swimclubid)
+    static function __mapOpponentSwimClubIdToText($swimclubid)
     {
         //  Handle null id gracefully for non-dual meets
     
@@ -49,7 +49,7 @@ class SwimTeamTextMap
      *
      * @return string - meet text description
      */
-    function __mapMeetIdToText($meetid)
+    static function __mapMeetIdToText($meetid)
     {
         //  Handle null id gracefully for non-dual meets
     
@@ -76,7 +76,7 @@ class SwimTeamTextMap
      *
      * @return string - season text description
      */
-    function __mapSeasonIdToText($seasonid)
+    static function __mapSeasonIdToText($seasonid)
     {
         //  Handle null id gracefully for non-dual seasons
     
@@ -98,7 +98,7 @@ class SwimTeamTextMap
      *
      * @return string - opponent text description
      */
-    function __mapJobIdToText($jobid, $description = false)
+    static function __mapJobIdToText($jobid, $description = false)
     {
         //  Handle null id gracefully for non-dual meets
 
@@ -121,7 +121,7 @@ class SwimTeamTextMap
      * @param int - event id
      * @return string - opponent text description
      */
-    function __mapEventIdToText($eventid)
+    static function __mapEventIdToText($eventid)
     {
         require_once(WPST_PATH . 'class/events.class.php') ;
         require_once(WPST_PATH . 'class/agegroups.class.php') ;
@@ -149,7 +149,7 @@ class SwimTeamTextMap
      *
      * @return string - season text description
      */
-    function __mapAgeGroupIdToText($agegroupid)
+    static function __mapAgeGroupIdToText($agegroupid)
     {
         require_once(WPST_PATH . 'class/agegroups.class.php') ;
 
@@ -164,7 +164,7 @@ class SwimTeamTextMap
      *
      * @return string - season text description
      */
-    function __mapCourseCodeToText($course)
+    static function __mapCourseCodeToText($course)
     {
         switch($course)
         {
@@ -197,7 +197,7 @@ class SwimTeamTextMap
      *
      * @return string - opponent text description
      */
-    function __mapStrokeCodeToText($stroke)
+    static function __mapStrokeCodeToText($stroke)
     {
         switch($stroke)
         {
@@ -242,7 +242,7 @@ class SwimTeamTextMap
      *
      * @return string - season text description
      */
-    function __mapEventGroupIdToText($eventgroupid)
+    static function __mapEventGroupIdToText($eventgroupid)
     {
         if ($eventgroupid !== WPST_NULL_ID)
         {

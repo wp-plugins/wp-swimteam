@@ -3,15 +3,15 @@
 /**
  * Age Groups admin page content.
  *
- * $Id: report_jobcommitments.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: report_jobcommitments.php 1082 2015-07-03 18:59:41Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package swimteam
  * @subpackage admin
- * @version $Revision: 1065 $
- * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @version $Revision: 1082 $
+ * @lastmodified $Date: 2015-07-03 14:59:41 -0400 (Fri, 03 Jul 2015) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -96,8 +96,9 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
  
                 if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
                 {
-                    $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
-                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH)) ;
+                    $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s&wpstnonce=%s', urlencode($t),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH),
+                        urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -105,8 +106,8 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
                 }
                 elseif (file_exists($rpt->getCSVFile()) && filesize($rpt->getCSVFile()) > 0)
                 {
-                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($rpt->getCSVFile()),
-                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($rpt->getCSVFile()),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;

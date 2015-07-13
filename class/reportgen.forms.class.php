@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: reportgen.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: reportgen.forms.class.php 1078 2015-05-15 18:18:25Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage Reports
- * @version $Revision: 1065 $
+ * @version $Revision: 1078 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @lastmodifiedby $Date: 2015-05-15 14:18:25 -0400 (Fri, 15 May 2015) $
  *
  */
 
@@ -472,8 +472,8 @@ class WpSwimTeamUsersReportGeneratorForm extends WpSwimTeamForm
         {
             if (!is_null($this->get_element_value('Contact Information' . FEFILTER)))
             {
-                $rpt->setGenderFilter(true) ;
-                $rpt->setGenderFilterValue($this->get_element_value('Contact Information' . FEFILTERLB)) ;
+                $rpt->setContactInformationFilter(true) ;
+                $rpt->setContactInformationFilterValue($this->get_element_value('Contact Information' . FEFILTERLB)) ;
             }
         }
     }

@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: swimmeets.forms.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: swimmeets.forms.class.php 1080 2015-05-19 01:07:59Z mpwalsh8 $
  *
  * Plugin initialization.  This code will ensure that the
  * include_path is correct for phpHtmlLib, PEAR, and the local
@@ -13,9 +13,9 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage SwimMeets
- * @version $Revision: 1065 $
+ * @version $Revision: 1080 $
  * @lastmodified $Author: mpwalsh8 $
- * @lastmodifiedby $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @lastmodifiedby $Date: 2015-05-18 21:07:59 -0400 (Mon, 18 May 2015) $
  *
  */
 
@@ -390,7 +390,7 @@ class WpSwimTeamSwimMeetExportEntriesAdminForm extends WpSwimTeamSwimMeetExportE
      *
      * @return mixed - array of swimmer key value pairs
      */
-    function _swimmerSelections()
+    function _swimmerSelections($admin = false)
     {
         return parent::_swimmerSelections(true) ;
     }
@@ -1023,7 +1023,7 @@ class WpSwimTeamSwimMeetUpdateForm extends WpSwimTeamSwimMeetAddForm
      * data against some backend mechanism, say a DB.
      *
      */
-    function form_backend_validation()
+    function form_backend_validation($checkexists = true)
     {
         $valid = parent::form_backend_validation(false) ;
 
@@ -1103,7 +1103,7 @@ class WpSwimTeamSwimMeetDeleteForm extends WpSwimTeamSwimMeetUpdateForm
      *
      * @return boolean
      */
-    function form_backend_validation()
+    function form_backend_validation($checkexists = true)
     {
         return true ;
     }
@@ -1616,7 +1616,7 @@ class WpSwimTeamSwimMeetOptInOutAdminForm extends WpSwimTeamSwimMeetOptInOutForm
      *
      * @return mixed - array of swimmer key value pairs
      */
-    function _swimmerSelections()
+    function _swimmerSelections($admin = false)
     {
         return parent::_swimmerSelections(true) ;
     }
@@ -1951,7 +1951,7 @@ class WpSwimTeamSwimMeetEventOptInOutAdminForm extends WpSwimTeamSwimMeetEventOp
      *
      * @return mixed - array of swimmer key value pairs
      */
-    function _swimmerSelections()
+    function _swimmerSelections($admin = false)
     {
         return parent::_swimmerSelections(true) ;
     }

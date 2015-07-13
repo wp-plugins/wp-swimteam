@@ -79,7 +79,6 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
 
         //  If the Form Processor was succesful, let the user know
 
-        error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
         if ($fp->is_action_successful())
         {
             $mode = $fp->_form_content->get_element_value("Report") ;
@@ -98,8 +97,9 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
  
                 if ((get_option(WPST_OPTION_USE_TRANSIENTS) === WPST_YES) && !empty($t) && !empty($v))
                 {
-                    $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s', urlencode($t),
-                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH)) ;
+                    $args = sprintf('transient=%s&filename=%s&contenttype=%s&abspath=%s&wpstnonce=%s', urlencode($t),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(ABSPATH),
+                        urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;
@@ -107,8 +107,8 @@ class ReportJobCommitmentsTabContainer extends SwimTeamTabContainer
                 }
                 elseif (file_exists($rpt->getCSVFile()) && filesize($rpt->getCSVFile()) > 0)
                 {
-                    $args = sprintf('file=%s&filename=%s&contenttype=%s', urlencode($rpt->getCSVFile()),
-                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv')) ;
+                    $args = sprintf('file=%s&filename=%s&contenttype=%s&wpstnonce=%s', urlencode($rpt->getCSVFile()),
+                        urlencode('SwimTeamReport-' . date('Y-m-d').'.csv'), urlencode('csv'), urlencode(wp_create_nonce('wpst-nonce'))) ;
 
                     $if = html_iframe(sprintf('%s?%s', plugins_url('download.php', __FILE__), $args)) ;
                     $if->set_tag_attributes(array('width' => 0, 'height' => 0)) ;

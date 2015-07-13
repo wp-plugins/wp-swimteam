@@ -3,15 +3,15 @@
 /**
  * Reports classes.
  *
- * $Id: reportgen.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: reportgen.class.php 1084 2015-07-13 14:44:16Z mpwalsh8 $
  *
  * (c) 2007 by Mike Walsh
  *
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package SwimTeam
  * @subpackage Reports
- * @version $Revision: 1065 $
- * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @version $Revision: 1084 $
+ * @lastmodified $Date: 2015-07-13 10:44:16 -0400 (Mon, 13 Jul 2015) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -524,6 +524,11 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGeneratorExportCSV
     var $__contactinfofilter = false ;
 
     /**
+     * contact information filter
+     */
+    var $__contactinfofiltervalue = WPST_NULL_STRING ;
+
+    /**
      * set username field inclusion
      *
      * @param boolean - flag to turn field inclusion on or off
@@ -784,6 +789,26 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGeneratorExportCSV
     }
 
     /**
+     * set contactinfo filter field value
+     *
+     * @param string - value to use to filter report
+     */
+    function setContactInformationFilterValue($filter = '')
+    {
+        $this->__contactinfofiltervalue = $filter ;
+    }
+
+    /**
+     * get contactinfo filter field value
+     *
+     * @return string - value to use to filter report
+     */
+    function getContactInformationFilterValue()
+    {
+        return $this->__contactinfofiltervalue ;
+    }
+
+    /**
      * get userids
      *
      * @return mixed - array of user ids
@@ -812,6 +837,7 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGeneratorExportCSV
      */
     function getFilter()
     {
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
         //  Construct filters
 
         $filter = '' ;
@@ -1000,10 +1026,10 @@ class SwimTeamUsersReportGenerator extends SwimTeamReportGeneratorExportCSV
      * Generate the Report
      *
      */
-    //function generateReport()
-    //{
-    //    $this->generateHTMLReport() ;
-    //}
+    function generateReport()
+    {
+        $this->generateHTMLReport() ;
+    }
 
     /**
      * Generate the HTML Report
@@ -2806,6 +2832,7 @@ class SwimTeamSwimmersReportGenerator extends SwimTeamReportGeneratorExportCSV
      */
     function getFilter()
     {
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
         //  Construct filters
 
         $filter = '' ;
@@ -3646,7 +3673,7 @@ class SwimTeamSwimmersReportGeneratorRE1 extends SwimTeamSwimmersReportGenerator
  * @access public
  * @see SwimTeamSwimmersReportGenerator
  */
-class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerator
+class SwimTeamSwimmersReportGeneratorCSV extends SwimTeamSwimmersReportGenerator
 {
     /**
      * csv data
@@ -3926,9 +3953,12 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
      */
     function generateReport($html = false)
     {
-        $this->__csvData = '' ;
+error_log(sprintf('%s::%s', basename(__FILE__), __LINE__)) ;
+        //$this->__csvData = '' ;
+        $this->__exportData = '' ;
 
-        $csv = &$this->__csvData ;
+        //$csv = &$this->__csvData ;
+        $csv = &$this->__exportData ;
 
         $season = new SwimTeamSeason() ;
         $ometa = new SwimTeamOptionMeta() ;
@@ -3956,7 +3986,10 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
 
         //  Get all the swimmer ids using the appropriate filter
 
-        $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter()) ;
+        $joins = sprintf('LEFT JOIN %s r ON (r.swimmerid=s.id)
+            LEFT JOIN %s s2 ON (s2.id=r.seasonid)', WPST_ROSTER_TABLE, WPST_SEASONS_TABLE) ;
+
+        $swimmerIds = $swimmer->getAllSwimmerIds($this->getFilter(), 'lastname', $joins) ;
 
         //  Loop through the swimmers
 
@@ -3993,26 +4026,6 @@ class SwimTeamSwimmersReportGeneratorCSV2 extends SwimTeamSwimmersReportGenerato
         //  Generate the HTML representation too?
 
         if ($html) parent::generateReport($html) ;
-    }
-
-    /**
-     * Write the CSV data to a file which can be sent to the browser
-     *
-     */
-    function generateCSVFile()
-    {
-        //  Generate a temporary file to hold the data
- 
-        $this->setCSVFile(tempnam(ABSPATH .
-            '/' . get_option('upload_path'), 'CSV')) ;
-
-        $this->setCSVFile(tempnam('', 'CSV')) ;
-
-        //  Write the CSV data to the file
-
-        $f = fopen($this->getCSVFile(), 'w') ;
-        fwrite($f, $this->__csvData) ;
-        fclose($f) ;
     }
 }
 ?>

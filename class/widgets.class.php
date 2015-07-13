@@ -2,7 +2,7 @@
 /* vim: set expandtab tabstop=4 shiftwidth=4: */
 /**
  *
- * $Id: widgets.class.php 1065 2014-09-22 13:04:25Z mpwalsh8 $
+ * $Id: widgets.class.php 1080 2015-05-19 01:07:59Z mpwalsh8 $
  *
  * Widget classes.  These classes create and/or extend
  * phpHtmlLib based widgets used by the Wp-SwimTeam plugin.
@@ -12,8 +12,8 @@
  * @author Mike Walsh <mpwalsh8@gmail.com>
  * @package Wp-SwimTeam
  * @subpackage widget
- * @version $Revision: 1065 $
- * @lastmodified $Date: 2014-09-22 09:04:25 -0400 (Mon, 22 Sep 2014) $
+ * @version $Revision: 1080 $
+ * @lastmodified $Date: 2015-05-18 21:07:59 -0400 (Mon, 18 May 2015) $
  * @lastmodifiedby $Author: mpwalsh8 $
  *
  */
@@ -568,7 +568,7 @@ class SwimTeamUtils
      *
      * @return string
      */
-    function GetPageURL()
+    static function GetPageURL()
     {
         global $pagenow ;
 
@@ -580,7 +580,7 @@ class SwimTeamUtils
      *
      * @return string
      */
-    function GetPageURI()
+    static function GetPageURI()
     {
         global $pagenow ;
 
